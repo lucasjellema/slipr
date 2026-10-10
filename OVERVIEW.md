@@ -15,6 +15,8 @@ Slipr is documented in a fixed set of files. Each file has one job and one main 
 | `docs/decisions.md` | *Why is it built this way?* | Developers, human or AI | A significant technical choice is made or revised |
 | `docs/show-format.md` | *What exactly is in a `show.json`?* | All components, plus anyone writing shows by hand | The show format changes (with a version bump) |
 | `docs/template-format.md` | *What exactly is in a template?* | Template authors, all components | The template format changes (with a version bump) |
+| `docs/specs/<ID>.md` | *What exactly are we building for this larger item, and what did Lucas decide?* | Lucas and Claude | Before a larger backlog item starts, and when its decisions or status change |
+| `templates/<id>/README.md` | *Which layouts does this template have, and where do its assets come from?* | Template users and authors | A layout or asset is added or changed |
 
 ## Two levels: project and component
 

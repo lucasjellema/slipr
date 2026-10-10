@@ -83,11 +83,15 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Done when**: A real deck converts, validates, and presents with text, images, notes and chapters intact.
 
-## Phase 5: Editor MVP (≈ 3–4 sessions)
+## Side track: company template (I-043), alongside Phases 4–5
+
+Derive a Slipr template from the Conclusion PowerPoint template. ✅ First version (12 layouts) and the card layouts with the new `cards` slot type (I-043b), 17 layouts in total. Left: a generator for business-unit variants (I-043c), review by Lucas and the brand team (I-043d), and the Facts icons (I-058). Spec: [docs/specs/I-043-conclusion-template.md](docs/specs/I-043-conclusion-template.md).
+
+## Phase 5: Editor MVP (≈ 3–4 sessions) · in progress
 
 **Goal**: Make and change shows, both layers, without touching JSON.
 
-1. Shell, store, actions, undo/redo. [E-001]
+1. ✅ Shell, store, actions, undo/redo (done 2026-10-10). This also gives first versions of steps 3 and 5–7. [E-001]
 2. Open, save and new-from-template via the File System Access API. [E-002]
 3. Slide list: add, duplicate, delete, reorder, hide. [E-003]
 4. Slide tab: generated slot form + layout picker. [E-004]

@@ -11,9 +11,12 @@
 
 Each slide carries both layers: the concise **audience layer** (the slide itself) and the detailed **reader layer** (blocks of interactive content). See [docs/show-format.md](docs/show-format.md).
 
-> Status: **Phase 3 done**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes. The **PPTX converter** turns PowerPoint decks into Slipr shows. The editor is next. See [ROADMAP.md](ROADMAP.md).
+> Status: **Phases 0–4 done, Phase 5 (editor) in progress**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes, on whole slides and on objects within them. The **PPTX converter** turns PowerPoint decks into Slipr shows. Two templates ship: a neutral `default` and **Conclusion** (the company house style, 17 layouts, for internal use until the brand team has reviewed it). The **editor** has its first version: you can edit a show in the browser, but it cannot save to disk yet. See [ROADMAP.md](ROADMAP.md).
 >
-> Try it: run `npm run serve` in this folder and open <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience) or <http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader> (reader).
+> Try it: run `npm run serve` in this folder and open
+> - <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience; add `&mode=reader` for reader mode)
+> - <http://localhost:8080/viewer/?show=../shows/conclusion-demo/show.json> (every layout of the Conclusion template)
+> - <http://localhost:8080/editor/?show=../shows/demo/show.json> (editor, first version)
 
 ## Components
 
@@ -33,6 +36,7 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 | **Template** | A reusable look and feel: a style guide (colors, fonts, illustrations) plus a set of base slide *layouts*. Each show links to one template. |
 | **Layout** | A base slide format in a template, such as *title*, *section*, *bullets*, *image-full* or *two-column*. |
 | **Slot** | A named place in a layout that a slide fills with content, such as `title`, `body` or `image`. |
+| **Cards** | A slot that holds a small set of repeated items with the same fields, such as four columns with a heading and text, or key figures with an icon. |
 | **Reader block** | A piece of reader-layer content attached to a slide: text, collapsible panel, callout, tabs, image with hotspots, embed. |
 | **Chapter** | A group of slides. Chapters drive the agenda in audience mode and the table of contents in reader mode. |
 | **Glossary** | Terms with definitions. In reader mode they appear as popups wherever the term is referenced. |
@@ -53,8 +57,8 @@ slipr/
 ├── viewer/          viewer web app
 ├── editor/          editor web app
 ├── converter/       PPTX → Slipr converter
-├── templates/       Slipr templates (style guide + layouts)
-├── shows/           shows (sample shows live here)
+├── templates/       Slipr templates: default, conclusion (house style)
+├── shows/           shows: demo (every format feature), conclusion-demo, fixtures
 └── vendor/          third-party libraries, checked in (Reveal.js)
 ```
 

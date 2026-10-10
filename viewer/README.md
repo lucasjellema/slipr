@@ -114,7 +114,7 @@ Full-text search across slides, reader blocks, glossary and presenter notes (whe
 ### Annotations
 - Select text in the article, or in the text on a slide (titles, bullets), to **highlight** it or **add a note**.
 - **✎ Note** next to a slide adds a note about the slide as a whole. A "✎ n notes" chip on the slide opens them.
-- **📍 Pin** turns the slide into a pin board: click any spot, and a numbered pin is attached to the object under it (a specific bullet, the image, the title…). Or pick an object from the list under the slide, which also works with the keyboard. Pins stay on their object when the slide reflows, for example on a phone. Hovering a pin shows its note, and clicking it opens the note.
+- **📍 Pin** turns the slide into a pin board: click any spot, and a numbered pin is attached to the object under it (a specific bullet or card, the image, the title…). Or pick an object from the list under the slide, which also works with the keyboard. Pins stay on their object when the slide reflows, for example on a phone. Hovering a pin shows its note, and clicking it opens the note.
 - All notes appear in the "My notes" panel (`N`), grouped by slide. Clicking highlighted text or a pin opens its note.
 - Highlights stay attached to their text when the show is edited a little. If a pinned object disappears, the pin falls back to its spot on the slide (shown grey). Notes on content that's hidden by your tailoring, or that no longer exists, are listed separately and never silently lost.
 - **Bookmark** any slide.

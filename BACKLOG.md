@@ -15,18 +15,26 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: finishing Phase 4, then the company template
+## Now: Phase 5 (Editor MVP)
+
+- [ ] **E-002** [editor] Open, save and new-from-template via File System Access API · todo · —
+- [ ] **E-003** [editor] Slide list: add, duplicate, delete, reorder, hide · in progress (basic version in E-001) · —
+- [ ] **E-004** [editor] Slide tab: generated slot form + layout picker. Needs a field editor per slot type, including cards (I-035) · in progress (text/richtext/list inputs in E-001) · —
+- [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
+- [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
+- [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
+- [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · todo · —
+- [ ] **E-007** [editor] Present / Read buttons · todo · —
+- [ ] **E-010** [editor] Bug: the slide form corrupts non-text slots. An `image` slot is saved as a bare path string (the format needs `{ src, alt }`, so the show fails validation), and `quote`, `code` and `cards` slots get a one-line text input that shows `[object Object]` and overwrites the value with a string. Until E-004 adds real field editors, show these slots read-only · todo · —
+
+## Pending verification & chores from earlier phases
 
 - [ ] **P-006** [converter] Convert one of Lucas's real decks end-to-end (Lucas supplies a deck without confidential content) · todo · lucas
-- [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Spec: `docs/specs/I-043-conclusion-template.md`. **First version done** (12 layouts, conversion of all 20 PowerPoint layouts); left: see I-043b/c/d · in progress · claude
+- [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Spec: `docs/specs/I-043-conclusion-template.md`. **Done so far**: first version (12 layouts) and the card layouts (I-043b): 17 layouts, and all 20 PowerPoint layouts convert. Left: I-043c, I-043d, I-058 · in progress · claude
 - [ ] **I-043c** [converter] `slipr-template-from-pptx`: generate a draft template from a PowerPoint template (for business-unit variants) · todo · —
 - [ ] **I-043d** [templates] Review of the Conclusion template by Lucas, and later by the brand team, before external use · todo · lucas
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 - [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
-
-## Next: Phase 5 (see ROADMAP.md)
-
-**Phase 5: Editor MVP**: E-001 … E-009 (see ROADMAP) · todo · —
 
 ## Later
 
@@ -161,6 +169,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 ## Done
 
 - [x] **I-043b** [format/templates] `cards` slot type (template format 0.2) + the five card layouts of the Conclusion template (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction): schemas, specs, validator, renderer, viewer (fragments, search, pins), converter card roles, demo slides, tests · done 2026-10-10 · claude
+- [x] **E-001** [editor] Shell, store, actions, undo/redo: 3-column app, pure actions with reference cleanup, store with coalescing, live preview, shortcuts, 24 tests · done 2026-10-10 · claude
 - [x] **P-001** [converter] Package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text, builds, inherited bullets) · done 2026-10-10 · claude
 - [x] **P-002** [converter] `extract.py` + `text.py`: intermediate model, Markdown with bullet levels, formatting and escaping · done 2026-10-10 · claude
 - [x] **P-003** [converter] `mapping.py`: name mapping, title/section hints, best-fit scoring, reader-layer leftovers · done 2026-10-10 · claude

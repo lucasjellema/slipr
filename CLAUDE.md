@@ -14,8 +14,8 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 2. [ARCHITECTURE.md](ARCHITECTURE.md): how the components and the shared core fit together
 3. [docs/show-format.md](docs/show-format.md) and [docs/template-format.md](docs/template-format.md): the data contracts
 4. [docs/decisions.md](docs/decisions.md): why things are the way they are. Do not silently undo a decision.
-5. The `CLAUDE.md` of the component you are touching (`viewer/`, `editor/`, `converter/`)
-6. [BACKLOG.md](BACKLOG.md): what is being worked on now
+5. The `CLAUDE.md` of the component you are touching (`viewer/`, `editor/`, `converter/`), and for template work the template's `README.md`
+6. [BACKLOG.md](BACKLOG.md): what is being worked on now. Larger items have a spec in `docs/specs/<ID>.md` with Lucas's decisions (e.g. `I-043-conclusion-template.md` for the Conclusion template)
 
 ## Hard rules
 
@@ -53,7 +53,7 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 
 Requires Node ≥ 22 (JSON module imports) and Python ≥ 3.11 (converter).
 
-The demo show `shows/demo/` exercises every format feature. Use it as the reference when building or testing anything. Keep it valid **without warnings**, because a test enforces that.
+The demo show `shows/demo/` exercises every format feature. Use it as the reference when building or testing anything. `shows/conclusion-demo/` has one slide per layout of the Conclusion template. Keep both valid **without warnings**, because tests enforce that.
 
 | Task | Command |
 |---|---|
@@ -67,3 +67,8 @@ Two toolchains: the web side uses npm and Node (dev tooling only), and the conve
 ## When in doubt
 
 Ask Lucas rather than guessing on: format changes, new dependencies, anything that changes how a show looks with an existing template, and deleting files.
+
+## Company material and parallel work
+
+- **Never commit** the company PowerPoint (`ConclusionTemplatePresentation.pptx` in the repo root, git-ignored), brand photos, or converted output (`converter/out/`, git-ignored). Use only the original logo and wave assets in `templates/conclusion/assets/`, never regenerated ones.
+- Lucas sometimes runs **more than one session** on this repo at once. Before committing, run `git status` and stage only your own files by path. Don't commit another session's half-finished work, and don't revert it.

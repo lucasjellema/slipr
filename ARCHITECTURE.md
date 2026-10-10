@@ -52,16 +52,27 @@ This document describes how the Slipr components relate to each other and to the
 | `validate.js` ✅ | Validate a show: structure via the schema, then semantics (unique ids, references between slides/glossary/profiles/chapters, slot types and limits from the template, alt text, template version range). Returns `{ ok, errors, warnings }`, never throws |
 | `render.js` ✅ | `renderSlide(slide, ctx, { mode })` returns `.slipr-slide > .slipr-canvas > layout`: clones the layout fragment, rewrites its relative URLs against the layout file, fills `[data-slot]` elements by slot type (a `cards` slot clones its `<template>` blueprint once per card and fills its `[data-field]` elements), and marks empty optional slots `data-empty`. Also `slideTitle()`. Needs a DOM (browser), so it has no Node tests yet |
 | `blocks.js` ✅ | `renderBlocks()` / `renderBlock()` return **HTML strings** (from `escape()` + `markdown()` only, so they are safe for `innerHTML` and testable in Node). Renders reader blocks (`text`, `details`, `callout`, `tabs`, `image` + hotspots, `embed`, `slide-ref`) to HTML. Used by reader mode and the editor preview |
-| `markdown.js` ✅ | `markdown()`, `markdownListItems()`, `markdownInline()`, `markdownToText()`, `escape()`. Markdown subset with Slipr extensions: `[[glossary]]` references, `^[inline popups]`, `#slide` links. Takes a `mode` option: audience mode renders the extensions as plain text. Escapes all source text and allows only safe link schemes. It is the only sanctioned producer of HTML from show content |
+| `markdown.js` ✅ | `markdown()`, `markdownListItems()`, `markdownInline()`, `markdownToText()`, `escape()`. Markdown subset with Slipr extensions: `[[glossary]]` references, `^[inline popups]`, `#slide` links, letter lists (`A.`) and subheadings (an entirely bold paragraph). Takes a `mode` option: audience mode renders the extensions as plain text. Escapes all source text and allows only safe link schemes. It is the only sanctioned producer of HTML from show content |
 | `migrate.js` | Upgrade older show-format versions to the current one *(once a version 2 exists)* |
 
 The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so they can be unit-tested in Node. `validate.js` imports the schemas as JSON modules (`import … with { type: 'json' }`), which works in Node ≥ 22 and all current browsers. Tests live in `shared/test/*.test.js`.
 
 The converter is written in **Python** (D-006) and does not import the JS core. Its contract with the rest of Slipr is the **JSON Schema** in `shared/schema/`, which it loads directly from the repository to validate its output.
 
+## Templates
+
+A template is a folder (`template.json`, `theme.css`, optional `reader.css`, `layouts/*.html`, `assets/`). Two ship with Slipr:
+
+| Template | Format | Layouts | Notes |
+|---|---|---|---|
+| `templates/default/` | 0.1 | 5 | Neutral; the reference for the demo show and the tests |
+| `templates/conclusion/` | 0.2 | 17 | Company house style (magenta), derived from the PowerPoint template; placeholder roles in `pptxMapping`; five card layouts. See its [README](templates/conclusion/README.md) |
+
+The viewer and the editor never know which template is in use: everything goes through the layout fragments and `render.js`. The converter uses a template's `pptxMapping` and slot types.
+
 ## Formats and versioning
 
-- `show.json` carries `"slipr": "<format version>"`. `template.json` carries its own `"version"` and a `"slipr"` format version.
+- `show.json` carries `"slipr": "<format version>"` (currently 0.1). `template.json` carries its own `"version"` and a `"slipr"` format version (0.1 or 0.2).
 - A format change bumps the version in the spec document, the JSON Schema, and the root [CHANGELOG.md](CHANGELOG.md). Where needed it adds a migration step in `migrate.js`.
 
 ## Runtime and hosting

@@ -29,7 +29,7 @@ index.html
 
 ## File structure
 
-Built so far (Phases 1–3) is marked ✅. Everything else is planned.
+Built so far (Phases 1–3, plus slide and object annotations and cards support) is marked ✅. Everything else is planned.
 
 ```
 viewer/
@@ -78,7 +78,7 @@ viewer/test/
 - `audience.js` loads Reveal's `reset.css` + `reveal.css` and `audience.css`, waits for `document.fonts.ready`, then builds `.reveal > .slides > section` per slide, filled by `renderSlide(slide, ctx, { mode: 'audience' })`.
 - Each `<section>` gets `id = slide.id`, so Reveal's own `#/slide-id` deep links work. In-show Markdown links `[x](#s-id)` are rendered with `href="#/s-id"`, so no click handling is needed.
 - Every `[data-slot]` element gets `data-id="slot-<name>"`, so **auto-animate** morphs the same slot between consecutive `audience.autoAnimate` slides. Reveal matches list items and images by content automatically, and unmatched items fade in.
-- `audience.fragments` adds `class="fragment [style]"` to every `<li>`, nested ones included.
+- `audience.fragments` adds `class="fragment [style]"` to every `<li>`, nested ones included, and to every card of a `cards` slot (`.slipr-card`). List items inside a card are not split further.
 - Notes go in `<aside class="notes">` (Reveal Notes plugin). Glossary references and `^[popups]` render as plain text or are omitted (`markdown.js`, `mode: 'audience'`).
 - Backup slides (`audience.hidden`) are moved to the end with `data-visibility="uncounted"` and class `slipr-backup`.
 - `audience.background` becomes `data-background-color` (when it looks like a CSS colour) or `data-background-image` (resolved against `show.json`).
@@ -118,7 +118,7 @@ show + URL params ──► personalize(show, prefs) ──► visible model ─
 - **Embeds** are `<iframe sandbox="allow-scripts allow-forms allow-popups" loading="lazy">`. Without `allow-same-origin`, an embedded page cannot touch the reader page.
 
 ### Search
-- `search-index.js` (pure) builds one document per slide (title, summary, slot text), per reader block (titles, captions, tab and hotspot labels, Markdown bodies), per presenter-notes text and per glossary entry. Text is folded (lower case, accents stripped) with an index map back to the original, so snippets and highlights point at the right characters.
+- `search-index.js` (pure) builds one document per slide (title, summary, slot text, including card fields and card image alt text), per reader block (titles, captions, tab and hotspot labels, Markdown bodies), per presenter-notes text and per glossary entry. Text is folded (lower case, accents stripped) with an index map back to the original, so snippets and highlights point at the right characters.
 - Matching: every query word must match the start of a word in the document (AND). Score = the best field weight per word (title 5 > summary / label 3 > content 2 > body 1), plus 2 for the full phrase. Shows are small, so a linear scan is fast enough and no inverted index is needed.
 - Results respect the tailoring: matches in hidden content are only counted, with a "show everything" action. Presenter notes are searched only while they are shown.
 - `search.js`: a modal `<dialog>` that searches as you type (↑/↓/Enter). The chosen result is reached through the normal routing, and the query words inside the target are marked with the CSS Custom Highlight API (`slipr-search`) for 5 s.
@@ -129,7 +129,7 @@ show + URL params ──► personalize(show, prefs) ──► visible model ─
   - **slide**: a note on the slide as a whole, shown as a "✎ n notes" chip in the slide's header row
   - **pin**: a note attached to an object on the slide visual
 - Creating: the selection must start and end in one scope. Its offsets in `scope.textContent` are computed with a `Range` (so hidden footnote text counts consistently), trimmed, and stored as a **text-quote selector** (`exact`, plus 32 characters of `prefix` / `suffix`, in `quote.js`) together with `slideId` and `blockId`.
-- **Pins** (`pin.js` + `annotations.js`): "📍 Pin" puts a transparent capture layer over the slide frame plus a bar listing the slide's objects (filled slots, with list slots split into items), which is the keyboard-accessible way to pin. A click finds the object under the point (`elementsFromPoint` → innermost `li`, else `[data-slot]`, else the canvas) and stores `{ slot, item, x, y, cx, cy, label }`: the position within the object, and within the canvas as a fallback. Pins are drawn as numbered buttons inside the frame, positioned in % of the frame. A `ResizeObserver` recomputes them when the layout changes, so they follow their object through reflow. A pin whose object can't be found falls back to the canvas position and is drawn grey (`is-approximate`).
+- **Pins** (`pin.js` + `annotations.js`): "📍 Pin" puts a transparent capture layer over the slide frame plus a bar listing the slide's objects (filled slots, with list slots split into bullets and cards slots into cards, via `itemsOf()`), which is the keyboard-accessible way to pin. A click finds the object under the point (`elementsFromPoint` → innermost `li` or `.slipr-card`, else the slot element `[data-slot]:not([data-field])`, else the canvas) and stores `{ slot, item, x, y, cx, cy, label }`: the position within the object, and within the canvas as a fallback. Pins are drawn as numbered buttons inside the frame, positioned in % of the frame. A `ResizeObserver` recomputes them when the layout changes, so they follow their object through reflow. A pin whose object can't be found falls back to the canvas position and is drawn grey (`is-approximate`).
 - Drawing text: after every render, each annotation is re-anchored with `locateQuote()` (the best-matching occurrence wins) and mapped back to a DOM `Range`. All ranges go into one `Highlight` (`slipr-annotation`), so the content DOM is never modified. A click on highlighted text (`caretPositionFromPoint` → `Range.isPointInRange`) opens its note.
 - The "My notes" panel lists notes in show order, plus two separate groups: *hidden by your tailoring* (the slide, block or slide visual exists but isn't shown) and *no longer found* (the slide or block is gone, or the quote can't be located). Notes are never deleted automatically.
 - Export: Markdown (with bookmarks) and JSON `{ slipr: "notes", version, show, annotations }`. Import merges by id, and the most recently `updated` version wins. Files for another show are refused.

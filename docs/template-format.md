@@ -103,7 +103,7 @@ Templates size everything inside the slide in **container query units** (`cqw` =
 
 Slot definitions in `template.json` can also carry `label` and `help` (shown by the editor), `required`, `maxLength` and `maxItems` (validation warnings).
 
-**Restore text semantics.** Host pages may reset typography. Reveal.js's `reset.css` sets `font: inherit` on every element, which removes bold from `<strong>` and headings. A template's `theme.css` should restore `font-weight`/`font-style` inside `.slipr-slide`.
+**Restore text semantics.** Host pages may reset typography. Reveal.js's `reset.css` sets `font: inherit` on every element, which removes bold from `<strong>` and headings. A template's `theme.css` should restore `font-weight`/`font-style` inside `.slipr-slide`. The viewer also resets `margin` on images inside slides, so spacing around an image belongs on the neighbouring element (or in padding).
 
 **Do not use `<section>` elements in layout fragments.** Reveal.js treats every nested `<section>` as a vertical slide. Use `<div>` (or `<article>`, `<aside>`) instead. `validateTemplate` cannot see fragment HTML, so this is enforced by a test on the shipped templates.
 

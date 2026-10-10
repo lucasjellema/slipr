@@ -6,6 +6,10 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Documentation pass (handover)
+- **Changed** README, ROADMAP, ARCHITECTURE (new *Templates* section), OVERVIEW (specs and template READMEs), CLAUDE.md (company material, parallel sessions), and the component docs, to match the current state: Phases 0–4 done, the Conclusion template with 17 layouts, and the editor's first version (E-001) with its known limits.
+- **Added** backlog items E-010 (the editor's slide form overwrites image/quote/code/cards values with text), I-035 (cards editor) and I-058 (Facts icons).
+
 ### 2026-10-10: Cards slots and the card layouts (I-043b)
 - **Added** slot type **`cards`** (template format 0.2, additive; show format stays 0.1): a slot definition lists the `fields` of one card (`text`, `richtext`, `list`, `image`), and the show value is an array of objects. Layouts describe one card in a `<template>` blueprint with `data-field` elements (`data-field="#"` gets the card number). Updated both schemas, both specs, `validate.js` (field types, unknown and empty required fields, `maxLength`, `maxItems`, card images) and `render.js` (`fillCards`; clones get `slipr-card` and `data-card-index`).
 - **Added** card roles in `pptxMapping`: `"cards[i]"` (whole card) and `"cards[i].field"`. `validateTemplate` checks the slot, the field and the index.

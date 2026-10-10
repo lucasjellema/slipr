@@ -53,6 +53,8 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Title / subtitle placeholders | `title` / `subtitle` slots | ✅ |
 | Body text with bullet levels | Markdown list (nested). Bullet settings inherited from the layout/master are respected | ✅ |
 | Paragraphs without bullets, text boxes | Markdown paragraphs | ✅ |
+| Template text styles (numbered and `A.` lists, bold subheadings, serif lines) | `1.` / `A.` lists, `**subheading**`, `*serif line*`, resolved from the paragraph, layout and master styles | ✅ |
+| Repeated placeholders (columns, boxes, key figures, photo cards, people) | a `cards` slot, when the template maps them with card roles | ✅ |
 | Bold / italic / hyperlinks | `**…**` / `*…*` / `[…](url)`. Characters like `*` or `[` in your text are escaped | ✅ |
 | Pictures (placeholders and free pictures) | copied to `images/` (identical pictures only once), `image` slot. Alt text comes from the picture's description; an automatic file-name description counts as missing | ✅ |
 | Speaker notes | `notes` (and optionally a reader block) | ✅ |
@@ -68,6 +70,7 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 ## How layouts are chosen
 
 1. **By name:** if the PowerPoint layout name is in `--mapping` or in the template's `pptxMapping` (e.g. "Title and Content" → `bullets`), that layout is used. The exception: if the slide has pictures and the mapped layout can't hold any, the best fit is used instead.
+   - A template can also give **placeholder roles** (template format 0.2): which PowerPoint placeholder fills which slot, card or card field, and which placeholders are decoration to ignore (footer, logo, overlays). With roles the mapping always wins, and the content lands exactly where the template expects it. The Conclusion template maps all 20 of its PowerPoint layouts this way. See `docs/template-format.md`.
 2. **Title-only slides:** the first one becomes `title`, later ones `section`.
 3. **Best fit:** otherwise, the layout whose slots match the slide's text blocks and pictures with the least left over.
 
