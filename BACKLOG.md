@@ -42,7 +42,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-003** [viewer] Laser pointer, spotlight, on-slide drawing (Reveal plugins)
 - [ ] **I-004** [viewer] QR code slot/overlay that links the audience to the reader version of the show, optionally at the current slide
 - [ ] **I-006** [viewer] Kiosk mode: auto-advance and loop, for screens at events
-- [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), `diagram` (Mermaid), code with line-by-line highlighting, KaTeX
+- [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), code with line-by-line highlighting, KaTeX. Mermaid diagrams moved to I-073
 - [ ] **I-008** [viewer] Jump to slide by number or title search (`G`)
 - [ ] **I-009** [viewer] Zoomable "map" overview: chapters as clusters, zoom into a chapter (Prezi-like)
 
@@ -91,6 +91,67 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-054** [format] Single-file HTML export: show + template + viewer inlined
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
+
+### Rich embeds & visualizations
+- [ ] **I-070** [format] **Shared foundation for rich embeds** (do this first; I-071…I-075 build on it):
+  - Every embed kind is available both as an audience **slot type** and a reader **block type**, with one renderer per kind in `shared/embeds/<kind>.js`, called by `render.js` and `blocks.js`.
+  - Libraries are vendored (D-002) and **lazy-loaded** only on slides that use them, so the core stays light.
+  - Styling comes from the template's `--slipr-*` tokens.
+  - Every kind has a static fallback (image or link card) for print/PDF, editor thumbnails and failures.
+  - **Click-to-load** for anything that contacts an external server (websites, map tiles), so no reader data leaves the browser without consent (D-010).
+  - Needs a new decision entry (D-011: embed architecture and the list of approved libraries) · todo · —
+- [ ] **I-071** [format/viewer] **Website embed**:
+  - Upgrade the reader `embed` block, and add a `web` slot for audience mode.
+  - Per-embed sandbox options (`allow-same-origin` only on explicit opt-in), an "Open in new tab" link, and an aspect ratio or height.
+  - Many sites refuse framing (`X-Frame-Options` / CSP `frame-ancestors`), and that can't be detected reliably, so always offer a link card as fallback.
+  - Optional screenshot image for offline presenting.
+  - Audience mode: live and clickable during the talk, or a static screenshot (author's choice) · todo · —
+- [ ] **I-072** [format/viewer] **PDF document**: a `pdf` slot and block with `src` (relative to show.json), `page` or page range, and optional `title`.
+  - Reader mode: page navigation, zoom, and the PDF's text included in Slipr search (`search-index.js`, V-015). Either the browser's built-in viewer in an iframe (`#page=n`), or vendored **PDF.js** for consistent rendering. Decide in a spike.
+  - Audience mode: show a chosen page as a slide, with fragments stepping through pages.
+  - Local files work offline · todo · —
+- [ ] **I-073** [format/viewer] **Mermaid diagram**: implements the planned `diagram` slot (already in the schema) plus a `diagram` block. Supersedes the Mermaid part of I-007.
+  - Vendored **Mermaid**, about 3 MB, so lazy-loading is essential. `securityLevel: 'strict'`, and theme variables taken from the template tokens.
+  - Reader mode: pan and zoom for large diagrams, and clickable nodes that open a Slipr popover or jump to a slide (`#slide-id`).
+  - Audience mode: build the diagram up step by step with fragments (stretch goal).
+  - Rendered SVG is cached per diagram source.
+  - Editor: a live preview while typing the Mermaid source · todo · —
+- [ ] **I-074** [format/viewer] **Cytoscape graph visualization**: a `graph` slot and block, with nodes and edges inline in show.json or in a `data/*.json` file. Each node has an `id`, `label` and optional `md` / `slide` / `tags`. Also a layout (`cose`, `breadthfirst`, `concentric`, …) and styles mapped from template tokens.
+  - Vendored **Cytoscape.js**.
+  - Reader mode: pan and zoom, click a node → popover with its Markdown or a jump to its slide, highlight neighbours, filter by tag.
+  - Audience mode: a fixed viewport, with fragments that reveal nodes or focus on them in turn.
+  - The same component can power I-017 (concept map of the show's own slides) · todo · —
+- [ ] **I-075** [format/viewer] **Interactive map (Leaflet)**: a `map` slot and block with `center`, `zoom`, `markers` (`lat`, `lng`, `title`, `md`, optional `slide`), optional GeoJSON layers (relative file) and a tile source.
+  - Vendored **Leaflet**.
+  - Reader mode: pan and zoom, with marker popups as Slipr popovers.
+  - Audience mode: fragments as a `flyTo` tour from marker to marker.
+  - **Offline and privacy:** map tiles come from a server, which conflicts with D-002 (offline) and D-010 (privacy). Solutions:
+    - click-to-load (I-070)
+    - a static image fallback rendered at authoring time
+    - optional local tiles for offline presenting
+  - Respect the tile provider's usage policy and show the required attribution (e.g. OpenStreetMap) · todo · —
+
+### AI authoring
+- [ ] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
+  - **Contents of the instruction:**
+    - what Slipr is and the two-layer idea: a concise audience layer, with depth in the reader layer
+    - a condensed show-format spec
+    - the **chosen template's layouts and slots**, with their limits
+    - the reader block types, profiles, depth, paths, glossary, and the `[[term]]` / `^[popup]` syntax
+    - writing guidelines: few words per slide, every image with alt text, stable kebab-case ids
+    - strict output rules: one JSON code block only, `slipr: "0.1"`, the correct `template.ref`
+    - a small worked example
+    - a self-check list for the chatbot
+    - a clearly marked **"## Your content"** section where the user describes topic, audience, length, profiles and source material
+  - **Always in sync:** generated from `shared/schema/show.schema.json` + `template.json` by a script (`npm run prompt -- --template templates/default`), never hand-maintained. A test checks that every layout appears and that the embedded example validates.
+  - **Variants:** *full*, and *compact* (for tools with small prompt limits, such as some Copilot surfaces). Also a hint to attach the file instead of pasting when it's long.
+  - **Images:** chatbots can't supply image files, so the instruction asks for placeholder paths (`images/<descriptive-name>.png`) with a detailed alt text describing the wanted image. The validator's "missing file" warnings then double as a to-do list.
+  - **Where users get it:**
+    - a "Create with AI" page linked from the viewer's help page, with template choice, options (reader layer yes/no, number of slides, profiles) and **Copy** / **Download .md** buttons
+    - later, the same button in the editor
+  - **Round trip:** the user saves the answer as `show.json` and opens it in the viewer. On the validation-error page, a **"Copy fix-up prompt"** button bundles the errors into a follow-up message for the same chatbot.
+  - **Acceptance:** tried with Claude, ChatGPT and Copilot on three different content briefs. Results (valid on first try? which errors?) recorded in `docs/ai/prompt-kit-results.md`, and the instruction tuned until the first answer is usually valid.
+  - **Related:** I-027 (AI assist inside the editor), I-018 ("Ask this show"), I-022 (Markdown outline view) · todo · —
 
 ### Tooling
 - [ ] **I-060** [tooling] Playwright smoke tests for viewer and editor (would also give `render.js` automated tests, which need a DOM)
