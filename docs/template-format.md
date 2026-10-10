@@ -143,7 +143,9 @@ The `styleguide` block in `template.json` and the variables in `theme.css` descr
 
 The template also owns the look of reader mode. A template may ship a `reader.css` (referenced as `"reader": "reader.css"` in `template.json`) that styles:
 - the reader blocks: `.slipr-block--text`, `--details`, `--callout` (with `[data-variant]`), `--tabs`, `--image`, `--embed`, `--slide-ref`
-- popovers: `.slipr-popover` (glossary, footnotes, hotspots), and glossary term markers `.slipr-term`
+- popovers: `.slipr-popover` with `.slipr-popover-title` (glossary, footnotes, hotspots), glossary term markers `.slipr-term`, footnote markers `.slipr-footnote-ref`
+- hotspots: `.slipr-hotspot` buttons, positioned in percentages inside `.slipr-hotspot-frame` (which must be `position: relative`)
+- badges: `.slipr-block-badges` > `.slipr-badge[data-kind="profile"|"depth"]` ("For Developer", "Deep dive")
 - reader typography: article width, headings, chapter headers
 
 The reader app's own `reader.css` handles only the structure (columns, TOC, margin, toolbar) and uses the template's `--slipr-*` variables, so a template restyles both modes consistently.

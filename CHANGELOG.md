@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Phase 2, reader core
+- **Added** `shared/blocks.js`: renders every reader block type (text, details, callout, tabs, image with hotspots, embed, slide-ref) to safe HTML strings, with "For …" / "Deep dive" badges. 14 tests.
+- **Added** reader mode in the viewer (see `viewer/CHANGELOG.md`), including `viewer/reader/personalize.js` with 16 tests in `viewer/test/`. The total is now 109 tests.
+- **Changed** `shared/render.js`: images load lazily in reader mode.
+- **Changed** the default template's `reader.css`: styles for badges, the hotspot frame and popover content.
+- **Changed** the demo show: a new slide "AI help, kept in its cage" (`images/caged-agent.jpg`), hotspot markers moved to the box corners so they don't cover labels, and a rephrased footnote that no longer cites unverified "studies".
+
 ### 2026-10-10: Phase 1, shared core and audience mode
 - **Added** `shared/markdown.js`: a safe Markdown subset (paragraphs, nested lists, code fences, inline formatting, links) with Slipr extensions (`[[glossary]]`, `^[popup]`, `#slide` links) and an audience/reader mode.
 - **Added** `shared/load.js`: loads a show with its template and layouts, HEAD-checks images, validates, and gives readable `LoadError`s.

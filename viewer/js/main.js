@@ -5,7 +5,7 @@
  *   &mode=audience|reader      (default audience)
  */
 import { loadShow, LoadError } from '../../shared/load.js';
-import { addStylesheet, h } from './dom.js';
+import { addStylesheet } from './dom.js';
 import { showHelp, showLoadError, showValidationErrors } from './error-view.js';
 
 const app = /** @type {HTMLElement} */ (document.getElementById('app'));
@@ -55,17 +55,7 @@ async function main() {
     const { startAudience } = await import('../audience/audience.js');
     await startAudience(app, ctx);
   } else {
-    showReaderPlaceholder();
+    const { startReader } = await import('../reader/reader.js');
+    await startReader(app, ctx);
   }
-}
-
-/** Reader mode arrives in roadmap Phase 2. */
-function showReaderPlaceholder() {
-  const audienceUrl = new URL(location.href);
-  audienceUrl.searchParams.delete('mode');
-  app.replaceChildren(h('article', { class: 'slipr-page' }, [
-    h('h1', {}, ['Reader mode is on its way']),
-    h('p', {}, ['The interactive reader mode is built in the next phase of the Slipr roadmap.']),
-    h('p', {}, [h('a', { href: audienceUrl.href }, ['Open this show in audience mode'])]),
-  ]));
 }

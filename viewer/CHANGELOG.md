@@ -4,6 +4,15 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Reader core (Phase 2)
+- **Added** reader mode (`reader/reader.js`, `reader/reader.css`): a top bar with "Present ▶", a chapter contents list (a drawer below 900 px), and the article (hero, chapter sections, slide visuals that reflow on narrow screens, summaries, reader blocks, a collapsed "What the presenter said" panel, "See also" links). No third-party code.
+- **Added** `reader/personalize.js`: profile, depth and path filtering, chapter grouping and nearest-visible-slide fallback. URL parameters `profile`, `depth` and `path` work now. 16 tests in `viewer/test/`.
+- **Added** `reader/nav.js`: contents list and scroll-spy (current entry highlighted, hash kept in sync with `replaceState`).
+- **Added** `reader/interactions.js`: one shared popover for glossary terms, footnotes and image hotspots (hover with a delay, tap/Enter toggles, Esc closes, positioned by JS), and ARIA tabs with arrow keys.
+- **Added** deep links `#slide` and `#slide/block`, with fallback (and hash correction) for slides that are not visible.
+- **Added** mode switching that keeps the position: `R` in audience mode, and `A` / "Present ▶" in reader mode (`js/mode-switch.js`).
+- **Changed** `main.js`: reader mode replaces the placeholder and loads the template's `reader.css`.
+
 ### 2026-10-10: Audience mode (Phase 1)
 - **Added** `index.html`, `js/main.js` (URL parameters, load, validate, dynamic mode import) and `js/dom.js` (`h()` element builder, `addStylesheet()`).
 - **Added** `js/error-view.js`: a help page (no `show` parameter), a load-error page (not found, invalid JSON, server unreachable), and a validation-error page listing every issue with its path.

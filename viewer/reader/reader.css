@@ -1,0 +1,262 @@
+/*
+ * Reader mode: page structure only (top bar, contents, article).
+ * Colours and fonts come from the template's --slipr-* tokens; the look of
+ * reader blocks and popovers comes from the template's reader.css.
+ */
+
+body.slipr-reader {
+  background: var(--slipr-color-surface);
+  color: var(--slipr-color-text);
+  font-family: var(--slipr-font-body);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.reader {
+  --reader-topbar: 3.25rem;
+  --reader-contents: 17rem;
+  display: grid;
+  grid-template-columns: var(--reader-contents) minmax(0, 1fr);
+  grid-template-rows: var(--reader-topbar) 1fr;
+  min-height: 100vh;
+}
+
+/* ---------- top bar ---------- */
+.reader-topbar {
+  grid-column: 1 / -1;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+  background: var(--slipr-color-primary);
+  color: var(--slipr-color-on-primary);
+}
+.reader-topbar-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+  font-family: var(--slipr-font-heading);
+  font-weight: 700;
+  text-decoration: none;
+}
+.reader-present {
+  flex: none;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--slipr-color-accent);
+  color: var(--slipr-color-primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.reader-menu {
+  display: none;
+  font: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0.35rem 0.5rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.reader-topbar a:focus-visible,
+.reader-menu:focus-visible { outline: 3px solid var(--slipr-color-accent); outline-offset: 2px; }
+
+/* ---------- contents ---------- */
+.reader-contents {
+  position: sticky;
+  top: var(--reader-topbar);
+  height: calc(100vh - var(--reader-topbar));
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 1.5rem 1rem 3rem 1.25rem;
+  border-right: 1px solid color-mix(in srgb, var(--slipr-color-primary) 12%, transparent);
+  background: var(--slipr-color-bg);
+  font-size: 0.9rem;
+}
+.reader-contents-heading {
+  margin: 0 0 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slipr-color-muted);
+}
+.reader-toc, .reader-toc ol { list-style: none; margin: 0; padding: 0; }
+.reader-toc-chapter { margin: 0 0 1rem; }
+.reader-toc-chapter-title {
+  display: block;
+  margin: 0 0 0.35rem;
+  font-family: var(--slipr-font-heading);
+  font-weight: 700;
+  color: var(--slipr-color-primary);
+}
+.reader-toc a {
+  display: block;
+  padding: 0.3rem 0.6rem;
+  margin-left: -0.6rem;
+  border-left: 3px solid transparent;
+  border-radius: 0 0.3rem 0.3rem 0;
+  color: var(--slipr-color-text);
+  text-decoration: none;
+  line-height: 1.35;
+}
+.reader-toc a:hover { background: var(--slipr-color-surface); }
+.reader-toc a[aria-current] {
+  border-left-color: var(--slipr-color-accent);
+  background: color-mix(in srgb, var(--slipr-color-accent) 12%, transparent);
+  font-weight: 600;
+}
+
+/* ---------- article ---------- */
+.reader-main {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 54rem;
+  padding: 2.5rem clamp(1rem, 4vw, 3rem) 6rem;
+}
+.reader-hero { margin: 0 0 3rem; }
+.reader-hero h1 {
+  margin: 0 0 0.5rem;
+  font-family: var(--slipr-font-heading);
+  font-size: clamp(1.9rem, 4vw, 2.75rem);
+  line-height: 1.1;
+  color: var(--slipr-color-primary);
+}
+.reader-hero-subtitle { margin: 0 0 0.75rem; font-size: 1.25rem; color: var(--slipr-color-muted); }
+.reader-hero-byline {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--slipr-color-accent);
+}
+.reader-hero-description { max-width: var(--slipr-reader-measure, 42rem); font-size: 1.1rem; line-height: 1.6; }
+.reader-hero-tailored {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.4rem;
+  background: color-mix(in srgb, var(--slipr-color-accent) 15%, var(--slipr-color-bg));
+  font-size: 0.9rem;
+}
+.reader-hero-tailored a { color: var(--slipr-color-primary); }
+
+.reader-chapter { margin: 0 0 2rem; }
+.reader-chapter-header {
+  margin: 0 0 2rem;
+  padding: 1.5rem 0 0;
+  border-top: 3px solid var(--slipr-color-accent);
+}
+.reader-chapter-header h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--slipr-font-heading);
+  font-size: 1.6rem;
+  color: var(--slipr-color-primary);
+}
+.reader-chapter-header p { margin: 0; color: var(--slipr-color-muted); }
+
+.reader-slide {
+  margin: 0 0 3.5rem;
+  scroll-margin-top: calc(var(--reader-topbar) + 1rem);
+}
+.reader-slide .slipr-block { scroll-margin-top: calc(var(--reader-topbar) + 1rem); }
+.reader-slide-title {
+  margin: 0 0 1rem;
+  font-family: var(--slipr-font-heading);
+  font-size: 1.35rem;
+  color: var(--slipr-color-primary);
+}
+.reader-slide-frame {
+  margin: 0 0 1.25rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: var(--slipr-color-bg);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06), 0 0.5rem 1.5rem rgb(0 0 0 / 0.08);
+}
+.reader-summary {
+  max-width: var(--slipr-reader-measure, 42rem);
+  margin: 0 0 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: var(--slipr-color-primary);
+}
+.reader-notes > summary { color: var(--slipr-color-muted); font-weight: 500; }
+.reader-related {
+  max-width: var(--slipr-reader-measure, 42rem);
+  font-size: 0.95rem;
+}
+.reader-related-heading {
+  margin: 0 0 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slipr-color-muted);
+}
+.reader-related ul { margin: 0; padding-left: 1.1rem; }
+.reader-related a { color: var(--slipr-color-primary); }
+
+.reader-footer {
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid color-mix(in srgb, var(--slipr-color-primary) 15%, transparent);
+  color: var(--slipr-color-muted);
+}
+.reader-footer a { color: var(--slipr-color-primary); font-weight: 600; }
+.reader-made-with { font-size: 0.8rem; }
+
+/* Navigation target highlight */
+.is-target { animation: reader-flash 1.6s ease-out; }
+@keyframes reader-flash {
+  0%, 30% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--slipr-color-accent) 70%, transparent); border-radius: 0.5rem; }
+  100% { box-shadow: 0 0 0 4px transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .is-target { animation: none; outline: 3px solid var(--slipr-color-accent); }
+  html { scroll-behavior: auto; }
+}
+
+/* Popover placement is done in JS; neutralise the UA's centring. */
+.slipr-popover:popover-open { position: fixed; inset: auto; }
+
+/* ---------- small screens: contents become a drawer ---------- */
+@media (max-width: 900px) {
+  .reader { grid-template-columns: minmax(0, 1fr); }
+  .reader-menu { display: inline-flex; }
+  .reader-contents {
+    position: fixed;
+    top: var(--reader-topbar);
+    left: 0;
+    bottom: 0;
+    z-index: 25;
+    width: min(20rem, 85vw);
+    height: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+    box-shadow: 0 0 2rem rgb(0 0 0 / 0.2);
+    visibility: hidden;
+  }
+  .reader-contents.is-open { transform: none; visibility: visible; }
+  .reader-main { margin: 0 auto; padding-top: 1.5rem; }
+}
+@media (max-width: 900px) and (prefers-reduced-motion: reduce) {
+  .reader-contents { transition: none; }
+}

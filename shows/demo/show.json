@@ -111,7 +111,7 @@
             "id": "story",
             "type": "text",
             "depth": 1,
-            "md": "A good talk keeps its slides sparse: the speaker carries the story. But the deck is what people keep, share and read later^[Studies of conference decks consistently find that most views happen after the event, not during it.], and on its own it rarely makes sense."
+            "md": "A good talk keeps its slides sparse: the speaker carries the story. But the deck is what people keep, share and read later^[Think of how often you open a deck after a talk, compared to how long you watched it during the talk.], and on its own it rarely makes sense."
           },
           {
             "id": "layers",
@@ -252,12 +252,12 @@
             "image": { "src": "images/architecture.svg", "alt": "Slipr architecture diagram with clickable components" },
             "caption": "Click the markers to learn about each part.",
             "hotspots": [
-              { "x": 0.175, "y": 0.444, "title": "Converter", "md": "Turns a `.pptx` into a show folder. Written in Python with `python-pptx`." },
-              { "x": 0.5, "y": 0.444, "title": "Show folder", "md": "`show.json` plus `images/`. Plain files: easy to inspect, diff and back up." },
-              { "x": 0.5, "y": 0.167, "title": "Editor", "md": "Browser app that edits both layers of a show, with a live preview." },
-              { "x": 0.825, "y": 0.444, "title": "Viewer", "md": "Two apps behind one URL: audience mode (Reveal.js) and reader mode." },
-              { "x": 0.825, "y": 0.8, "title": "Template", "md": "Style guide plus [[layout]]s. Owns every visual decision." },
-              { "x": 0.5, "y": 0.8, "title": "Shared core", "md": "Loading, validation and rendering, used by editor and viewer, so what you edit is what you present." }
+              { "x": 0.2875, "y": 0.367, "title": "Converter", "md": "Turns a `.pptx` into a show folder. Written in Python with `python-pptx`." },
+              { "x": 0.6125, "y": 0.367, "title": "Show folder", "md": "`show.json` plus `images/`. Plain files: easy to inspect, diff and back up." },
+              { "x": 0.6125, "y": 0.1, "title": "Editor", "md": "Browser app that edits both layers of a show, with a live preview." },
+              { "x": 0.9375, "y": 0.367, "title": "Viewer", "md": "Two apps behind one URL: audience mode (Reveal.js) and reader mode." },
+              { "x": 0.9375, "y": 0.733, "title": "Template", "md": "Style guide plus [[layout]]s. Owns every visual decision." },
+              { "x": 0.65, "y": 0.733, "title": "Shared core", "md": "Loading, validation and rendering, used by editor and viewer, so what you edit is what you present." }
             ]
           },
           {

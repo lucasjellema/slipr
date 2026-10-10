@@ -29,7 +29,7 @@ index.html
 
 ## File structure
 
-Built so far (Phase 1) is marked ✅. Everything else is planned.
+Built so far (Phases 1–2) is marked ✅. Everything else is planned.
 
 ```
 viewer/
@@ -40,22 +40,25 @@ viewer/
 │   ├── main.js             ✅ entry: read URL params, load + validate, start mode app
 │   ├── dom.js              ✅ h() element builder (never parses HTML), addStylesheet()
 │   ├── error-view.js       ✅ help page, load-error page, validation-error page
-│   └── mode-switch.js      map position between modes (index ↔ slide id), swap modes
+│   └── mode-switch.js      ✅ audienceUrl() / readerUrl() by slide id, parseReaderHash()
 ├── audience/
 │   ├── audience.js         ✅ build <section>s, configure and start Reveal
 │   ├── agenda.js           ✅ generated agenda slides + chapter progress bar
 │   ├── audience.css        ✅ Reveal integration, agenda and progress-bar styles
 │   └── visuals.js          build-up of charts/diagrams on fragment events (with the chart slot type)
 └── reader/
-    ├── reader.js           app shell: layout, routing (#s-05/b3), keyboard map
+    ├── reader.js           ✅ app shell: top bar, contents, article; routing (#s-05/b3); keys
     ├── state.js            reader state + persistence
-    ├── personalize.js      pure: (show, prefs) → visible model
-    ├── nav.js              TOC, progress marks, path navigation, related links, tag filter
-    ├── interactions.js     popover wiring (glossary, footnotes, hotspots), tabs
+    ├── personalize.js      ✅ pure: (show, prefs) → visible model; prefs from URL; nearest visible slide
+    ├── nav.js              ✅ chapter contents + scroll-spy (progress marks, tag filter: Phase 3)
+    ├── interactions.js     ✅ popover wiring (glossary, footnotes, hotspots), ARIA tabs
     ├── search.js           index build + search UI
     ├── annotations.js      selection → highlight/note, margin rendering, export/import
     ├── welcome.js          first-visit profile / depth / path chooser
-    └── reader.css          app layout; block styling comes from the template
+    └── reader.css          ✅ page structure; block and popover styling comes from the template
+
+viewer/test/
+    └── personalize.test.js ✅ node --test
 ```
 
 ## Start-up (`main.js`)
@@ -83,33 +86,42 @@ viewer/
 ### Data flow
 
 ```
-show + template ──► personalize(show, prefs) ──► visible model ──► render ──► DOM
-                         ▲                                                    │
-                    state.prefs  ◄──── user changes profile/depth/path ───────┘
+show + URL params ──► personalize(show, prefs) ──► visible model ──► render ──► DOM
+                              ▲                                                │
+                         (Phase 3) stored prefs + toolbar controls ◄───────────┘
 ```
 
-- **`state.js`** holds `{ prefs: {profile, depth, path, showNotes}, position: {slideId, blockId}, visited: Set, bookmarks: Set, annotations: [] }`. It is persisted per `show.id` in IndexedDB, with `localStorage` as fallback. URL parameters override the stored prefs for the current visit. A small subscribe/notify, the same pattern as the editor store.
-- **`personalize.js`** is pure and DOM-free (unit-testable in Node). It applies `reader.hidden`, the path (order and selection), the profile filter (`for`) and the depth filter (`depth ≤ level`), and returns the ordered list of visible slides and blocks.
-- **Rendering**: each visible slide becomes `<section id="s-05">` containing an optional slide visual (`shared/render.js`, `mode: 'reader'`, in an aspect-ratio frame), then the blocks (`shared/blocks.js`), then related links. Changing prefs re-renders the article and restores the scroll position by slide and block id.
+- **`personalize.js`** is pure and DOM-free (tests in `viewer/test/`). It applies the path (selection and order; `"*"` = all), drops `reader.hidden` slides, filters blocks by `for` (no profile chosen = show all) and `depth ≤ level` (default 2), and groups consecutive slides by chapter. `nearestVisibleSlide()` maps a requested id onto what is visible: the nearest earlier visible slide in show order, then the nearest later one.
+- **Rendering** (`reader.js`): a hero header from `meta` (plus a "Tailored: …" note with a link back to the standard version when prefs differ from the default), one `<section>` per chapter run, and per slide an `<article id="{slide.id}">`. Each article holds a heading (visually hidden when the slide visual is shown), the slide visual (`shared/render.js`, `mode: 'reader'`, lazy images), the summary, blocks (`shared/blocks.js`, HTML strings), a collapsed "What the presenter said" panel, and "See also" links.
+- **Phase 3:** `state.js` will hold prefs, position, visited slides, bookmarks and annotations, persisted per `show.id` in IndexedDB, with URL parameters overriding them for the current visit.
+
+### Routing
+
+- The hash is `#slide-id` or `#slide-id/block-id`. Blocks have DOM id `slide-id--block-id` (`blockDomId()`).
+- On load and on `hashchange`, `go()` resolves the target through `nearestVisibleSlide()` (and updates the hash when it falls back), scrolls to it, and flashes it. After the window `load` event it settles once more, because late images can shift the layout.
+- The scroll-spy (`IntersectionObserver` with a band 30–35 % down the viewport) highlights the contents entry, points "Present ▶" at the current slide, and keeps the hash in sync via `history.replaceState`, so no history entries pile up.
+- `A` / "Present ▶" → `audienceUrl(currentSlideId)`. In audience mode `R` → `readerUrl(id)`, where an agenda slide maps to the next real slide.
 
 ### Interactions
-- **Popovers** use the native **Popover API** (`popover` attribute) with **CSS anchor positioning**, both supported in current Chromium. On pointer devices they open on hover (with a delay), on touch devices on tap. Each popover has an `id`, and its trigger is a `<button>` for keyboard access.
-- **Details** use native `<details>/<summary>`. **Tabs** are a small ARIA tablist component.
-- **Hotspots** are absolutely positioned buttons over the image (percent coordinates), each with a popover.
-- **Embeds**: `<iframe sandbox loading="lazy">`.
+- **Popovers**: one shared element in the top layer (`popover="auto"`, so Esc and light dismiss work), filled per trigger and **positioned by JS** below the trigger (above when there is no room), kept inside the viewport and repositioned on scroll and resize. JS positioning was chosen over CSS anchor positioning because it works in every current browser. Mouse: hover opens after 250 ms, and the popover stays open while the pointer is over trigger or popover. Touch and keyboard: click/Enter toggles. Triggers get `aria-expanded` / `aria-controls`.
+  - Glossary terms: content from `show.glossary` (the definition is rendered in audience mode, so there are no nested popups) plus a "Learn more" link.
+  - Footnotes: the hidden `.slipr-footnote` sibling generated by `markdown.js`.
+  - Hotspots: the hidden `.slipr-hotspot-content` inside the same image frame.
+- **Details** are native `<details>/<summary>`. **Tabs** use the ARIA tablist pattern with roving `tabindex` and ←/→/Home/End.
+- **Embeds** are `<iframe sandbox="allow-scripts allow-forms allow-popups" loading="lazy">`. Without `allow-same-origin`, an embedded page cannot touch the reader page.
 
-### Search
+### Search *(Phase 3)*
 - `search.js` builds an in-memory inverted index at load (lower-cased, accent-folded tokens) over slide titles, slot text, block text, summaries and glossary. Notes are only included when enabled. Shows are small (hundreds of slides at most), so no library is needed.
 - Results are ranked by field weight (title > summary > body) and term proximity. Clicking a result navigates to `#slide/block` and highlights the match with the CSS Custom Highlight API.
 
-### Annotations
+### Annotations *(Phase 3)*
 - Anchoring follows the W3C Web Annotation idea: **block id + text-quote selector** (`prefix`, `exact`, `suffix`). This lets highlights survive small edits to the show. Orphaned annotations (text no longer found) are kept and listed separately.
 - Highlights are drawn with the CSS Custom Highlight API, so the content DOM is not modified.
 - Export/import: Markdown (readable) and JSON (lossless).
 
-### Navigation & progress
+### Progress *(Phase 3)*
 - A slide counts as *visited* once ≥ 50 % of it has been in view for 3 s (IntersectionObserver).
-- `nav.js` renders the TOC by chapter, filtered by the active path, with progress marks. Scroll-spy updates the current item and the URL hash with `history.replaceState`.
+- `nav.js` will add progress marks to the contents entries it already renders (filtered by the active path).
 
 ## Dependencies
 
@@ -120,5 +132,6 @@ show + template ──► personalize(show, prefs) ──► visible model ─�
 
 - D-008 → reader mode is its own app, not Reveal's scroll view (see `docs/decisions.md`).
 - D-010 → reader data stays in the browser.
-- Phones: below about 700 px the slide visual reflows using the layout's reader CSS (`.slipr-mode-reader`) instead of being scaled. Needs a design pass per layout.
+- Phones: when the slide frame is narrower than 640 px, the default template reflows the slide visual (container query on `.slipr-slide`) instead of scaling it. This is verified at 375 px, with no horizontal scrolling. Other templates must provide their own reflow rules.
+- Below 900 px the contents list becomes a drawer behind the ☰ button.
 - Profiles might eventually also change the *audience* layer (e.g. a different deck variant per audience). This is out of scope for now and listed in the backlog.

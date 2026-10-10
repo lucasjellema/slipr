@@ -65,7 +65,7 @@ export function renderSlide(slide, ctx, options = {}) {
       el.setAttribute('data-empty', '');
       continue;
     }
-    fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc);
+    fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode });
   }
   return root;
 }
@@ -91,8 +91,9 @@ export function slideTitle(slide) {
  * @param {import('./load.js').ShowContext} ctx
  * @param {import('./markdown.js').MarkdownOptions} md
  * @param {Document} doc
+ * @param {{ mode: string }} options
  */
-function fillSlot(el, type, value, ctx, md, doc) {
+function fillSlot(el, type, value, ctx, md, doc, options) {
   switch (type) {
     case 'text':
       el.textContent = String(value);
@@ -112,6 +113,7 @@ function fillSlot(el, type, value, ctx, md, doc) {
       img.src = ctx.resolveAsset(value.src);
       img.alt = value.alt ?? '';
       img.decoding = 'async';
+      if (options.mode === 'reader') img.loading = 'lazy';
       if (value.fit) {
         img.dataset.fit = value.fit;
         img.style.objectFit = value.fit;

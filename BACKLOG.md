@@ -15,27 +15,17 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 2 (Reader core)
+## Now: Phase 3 (Reader personalisation)
 
-- [ ] **S-006** [shared] `blocks.js`: render all reader block types · todo · claude
-- [ ] **V-004** [viewer] Reader app shell: contents / article / margin, routing, keys · todo · claude
-- [ ] **V-008** [viewer] Popovers (glossary, footnotes, hotspots), tabs, details, embeds · todo · claude
-- [ ] **V-009** [viewer] Chapter TOC, scroll-spy, related, next/previous · todo · claude
-- [ ] **V-005** [viewer] Mode switch (`R` / `A`) that keeps position · todo · claude
-- [ ] **V-006** [viewer] Deep links in reader mode (`#s-05/b3`); audience mode already has `#/slide-id` · todo · claude
-- [ ] **V-010** [viewer] Responsive pass + layout reflow in reader mode · todo · claude
+- [ ] **V-011** [viewer] Reader state + IndexedDB persistence · todo · claude
+- [ ] **V-013** [viewer] Welcome chooser and toolbar controls for profile / depth / path (URL parameters already work) · todo · claude
+- [ ] **V-014** [viewer] Progress marks, resume, bookmarks · todo · claude
+- [ ] **V-015** [viewer] Full-text search with jump + highlight · todo · claude
+- [ ] **V-016** [viewer] Annotations: highlights, margin notes, export/import · todo · claude
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 - [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
 
-## Next: Phases 3–5 (see ROADMAP.md)
-
-**Phase 3: Reader personalisation**
-- [ ] **V-011** [viewer] Reader state + IndexedDB persistence · todo · —
-- [ ] **V-012** [viewer] `personalize.js`: profile / depth / path filtering + tests · todo · —
-- [ ] **V-013** [viewer] Welcome chooser, toolbar controls, URL parameters · todo · —
-- [ ] **V-014** [viewer] Progress marks, resume, bookmarks · todo · —
-- [ ] **V-015** [viewer] Full-text search with jump + highlight · todo · —
-- [ ] **V-016** [viewer] Annotations: highlights, margin notes, export/import · todo · —
+## Next: Phases 4–5 (see ROADMAP.md)
 
 **Phase 4: Converter MVP**: P-001 … P-005 (see ROADMAP) · todo · —
 
@@ -110,6 +100,15 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **S-006** [shared] `blocks.js`: all reader block types as safe HTML strings, 14 tests · done 2026-10-10 · claude
+- [x] **V-004** [viewer] Reader app shell: top bar, contents (drawer on phones), article, routing, keys · done 2026-10-10 · claude
+- [x] **V-008** [viewer] Popovers (glossary, footnotes, hotspots), tabs, details, embeds · done 2026-10-10 · claude
+- [x] **V-009** [viewer] Chapter contents, scroll-spy, related links, J/K next/previous · done 2026-10-10 · claude
+- [x] **V-005** [viewer] Mode switch (`R` / `A` / "Present ▶") that keeps the position · done 2026-10-10 · claude
+- [x] **V-006** [viewer] Deep links in reader mode (`#s-05/b3`) with fallback for invisible slides · done 2026-10-10 · claude
+- [x] **V-010** [viewer] Responsive pass: verified at 375 px (reflow, no horizontal scroll, drawer) · done 2026-10-10 · claude
+- [x] **V-012** [viewer] `personalize.js`: profile / depth / path filtering + URL parameters, 16 tests · done 2026-10-10 · claude
+- [x] **T-004** [shows] Demo: "AI help, kept in its cage" slide with `caged-agent.jpg`; hotspots moved to box corners · done 2026-10-10 · claude
 - [x] **S-003** [shared] `load.js`: show + template + layouts, image checks, `LoadError`, 7 tests · done 2026-10-10 · claude
 - [x] **S-004** [shared] `markdown.js`: safe subset + glossary, popups, slide links, mode option, 29 tests · done 2026-10-10 · claude
 - [x] **S-005** [shared] `render.js`: slide + layout → element, all slot types · done 2026-10-10 · claude

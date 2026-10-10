@@ -12,6 +12,7 @@ import { renderSlide } from '../../shared/render.js';
 import { markdown } from '../../shared/markdown.js';
 import { addStylesheet, h } from '../js/dom.js';
 import { buildAgendaSlide, createChapterBar } from './agenda.js';
+import { readerUrl } from '../js/mode-switch.js';
 
 const VENDOR = new URL('../../vendor/reveal.js-6.0.2/dist/', import.meta.url);
 const COLOR = /^(#[0-9a-f]{3,8}|(rgb|hsl|oklch|color)\(.*\)|[a-z]+)$/i;
@@ -76,6 +77,15 @@ export async function startAudience(app, ctx) {
     plugins: [RevealNotes, RevealZoom, RevealSearch],
   });
   await deck.initialize();
+
+  // R: continue reading this slide in reader mode. Agenda slides map to the
+  // first slide of the chapter they introduce.
+  deck.addKeyBinding({ keyCode: 82, key: 'R', description: 'Reader mode' }, () => {
+    /** @type {HTMLElement | null} */
+    let section = deck.getCurrentSlide();
+    while (section && !section.dataset.slideId) section = /** @type {HTMLElement | null} */ (section.nextElementSibling);
+    location.href = readerUrl(section?.dataset.slideId);
+  });
 
   if (show.chapters?.length) createChapterBar(deck, ctx, revealEl);
   return deck;

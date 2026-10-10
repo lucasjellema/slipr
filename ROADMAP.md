@@ -45,7 +45,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Done when**: The demo presents at 1920×1080 and 1280×720, the presenter view shows notes, and the builds and morphs look smooth.
 
-## Phase 2: Reader core (≈ 2 sessions)
+## Phase 2: Reader core (≈ 2 sessions) ✅ done 2026-10-10
 
 **Goal**: A reader can read and explore the full depth of the demo, without personalisation yet.
 
@@ -63,8 +63,8 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 **Goal**: The reader experience adapts to the person and remembers them.
 
 1. `reader/state.js`: prefs, position, visited, bookmarks, persisted in IndexedDB. [V-011]
-2. `reader/personalize.js` + unit tests: profile, depth and path filtering. [V-012]
-3. Welcome chooser + toolbar controls, plus URL parameters `profile`, `depth`, `path`. [V-013]
+2. ~~`reader/personalize.js` + unit tests: profile, depth and path filtering.~~ Done early in Phase 2, so only the UI wiring is left. [V-012]
+3. Welcome chooser + toolbar controls (URL parameters `profile`, `depth`, `path` already work). [V-013]
 4. Progress marks, resume where you left off, bookmarks. [V-014]
 5. `reader/search.js`: index, `/` search UI, jump + highlight. [V-015]
 6. `reader/annotations.js`: highlights + notes in the margin, Markdown/JSON export & import. [V-016]

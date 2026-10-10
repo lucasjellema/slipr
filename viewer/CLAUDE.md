@@ -4,6 +4,8 @@ Read the root `CLAUDE.md` first. This file adds viewer-specific guidance.
 
 ## Orientation in 60 seconds
 
+- Tests for pure viewer modules live in `viewer/test/` (run by `npm test`).
+
 - Two **separate** mode apps behind one entry (`js/main.js`):
   - `audience/`: a thin layer over Reveal.js. Linear and stateless. Keep it thin.
   - `reader/`: an interactive app with state, personalisation, search, popovers and annotations. Most viewer code lives here.
@@ -33,18 +35,18 @@ With `shows/demo`:
 
 **Reader**
 
-5. The welcome chooser appears on first visit and is skipped on the next visit.
-6. Switching profile/depth/path changes the visible blocks and keeps the scroll position.
+5. *(Phase 3)* The welcome chooser appears on first visit and is skipped on the next visit.
+6. `?profile=dev&depth=3` shows the developer deep-dive blocks (tabs on "A show is just data"), `?profile=mgr` hides them, and `?path=quick` shows 5 slides. *(Phase 3)* Toolbar controls change this without losing the scroll position.
 7. Glossary terms, footnotes and hotspots open popovers on hover (mouse), on tap (touch emulation) and with Enter (keyboard).
 8. Details panels and tabs work. Embeds load lazily.
-9. `/` search finds text in a reader block and jumps to it with a highlight.
-10. Highlight some text and add a note. After a reload it is still there. Export produces Markdown.
-11. Progress marks update in the TOC. A reload resumes at the last position.
-12. At 375 px width there is no horizontal scrolling and the slide visual reflows.
+9. *(Phase 3)* `/` search finds text in a reader block and jumps to it with a highlight.
+10. *(Phase 3)* Highlight some text and add a note. After a reload it is still there. Export produces Markdown.
+11. The contents entry of the slide being read is highlighted and the hash follows it. `#s-thanks` (reader-hidden) falls back to the nearest earlier slide. *(Phase 3)* Progress marks; a reload resumes at the last position.
+12. At 375 px width there is no horizontal scrolling, the slide visual reflows, and ☰ opens the contents drawer.
 
 **Both**
 
-13. *(from Phase 2)* `R` / `A` switch modes and keep the position.
+13. `R` / `A` switch modes and keep the position.
 14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.
 
@@ -59,3 +61,5 @@ With `shows/demo`:
 - Screenshots of a hidden browser pane freeze CSS transitions mid-way. Check the DOM (`data-auto-animate-target`, opacity) rather than trusting a screenshot of an animation.
 - Re-rendering the reader article after a pref change destroys DOM nodes. Re-apply annotation highlights and restore focus afterwards.
 - Hover-only interactions are invisible on touch devices. Always provide the tap/click path too.
+- `shared/blocks.js` returns HTML **strings** (so it is testable in Node), and `shared/render.js` returns **elements** (it clones template fragments). Insert block HTML with `innerHTML`. That is safe only because everything in it went through `escape()` or `markdown()`, so keep it that way.
+- The browser pane sometimes captures stale or garbled screenshots. If a screenshot contradicts the DOM, re-take it after `resize_window`, or trust the DOM state.
