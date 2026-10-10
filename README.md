@@ -27,6 +27,16 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 | **Converter** | [converter/](converter/README.md) | Turns a PowerPoint file (`.pptx`) into a Slipr show | Python (CLI), `python-pptx` |
 | *Shared core* | `shared/` | Loads, validates and renders shows. All components use it | Vanilla JS (ES modules) |
 
+## Quick start: editing and presenting
+
+1. Start the local server:
+   ```bash
+   npm run serve
+   ```
+2. **Edit a show:** Open <http://localhost:8080/editor/> and choose **Open show folder…** (a show anywhere on your disk) or **New show…** (from a template), or open the demo at <http://localhost:8080/editor/?show=../shows/demo/show.json>. Select slides in the left pane, edit layout slots and reader blocks in the center inspector, and inspect live updates in the right preview pane. See [editor/README.md](editor/README.md) for the full user guide and keyboard shortcuts.
+3. **Present to an audience:** Click **Present ▶** in the editor toolbar, press `F5`, or open <http://localhost:8080/viewer/?show=../shows/demo/show.json>.
+4. **Explore in reader mode:** Click **Read 📖** in the editor or add `&mode=reader` to the viewer URL.
+
 ## Key concepts
 
 | Concept | Meaning |
