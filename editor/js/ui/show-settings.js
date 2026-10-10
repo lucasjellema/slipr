@@ -4,7 +4,10 @@
  * chapters, glossary, profiles, and curated paths.
  */
 
-import { h } from '../dom.js';
+import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+
+/** Actions the settings form dispatches while the user types. */
+const TYPING_ACTIONS = new Set(['setMeta', 'setSettings', 'upsertChapter']);
 
 /**
  * Mount the show settings panel into container.
@@ -164,12 +167,11 @@ export function mountShowSettings(container, store) {
     root.append(heading, metaSection, settingsSection, chaptersSection);
   }
 
-  store.subscribe(({ changedKeys }) => {
-    if (changedKeys.includes('show')) {
-      if (document.activeElement && root.contains(document.activeElement)) {
-        return;
-      }
-      render();
+  store.subscribe((event) => {
+    if (event.changedKeys.includes('show')) {
+      // Leave the form alone while it echoes the user's own typing; re-render for anything else.
+      if (isTypingEcho(root, event, TYPING_ACTIONS)) return;
+      rerenderKeepingFocus(root, render);
     }
   });
 

@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Inspector forms update after every change (E-013)
+- **Fixed** the Slide, Reader and Show Settings tabs not re-rendering while focus was inside them. Changing the layout left the old layout's fields on screen (no image field after switching to `text-image`), and "+ Add Block", "+ Add Chapter" and undo/redo with a field focused showed stale content. A form now skips a re-render only for the echo of the user's own typing (`isTypingEcho()`: a text field in that form has focus and the action is one of its typing actions), and otherwise re-renders keeping focus, text selection and scroll position (`rerenderKeepingFocus()` in `dom.js`).
+
 ### 2026-10-10: Slide list scrolls, slide navigator (E-012)
 - **Fixed** the slide list not scrolling: with more slides than fit, the rest could not be reached. Its panel was not a bounded flex column. The list also keeps its scroll position when it re-renders after an edit, and scrolls the selected slide into view.
 - **Fixed** the toolbar hiding Open, New, Save, Present and Read in narrower windows: it now wraps.

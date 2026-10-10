@@ -4,7 +4,10 @@
  * profile/depth controls, related slides, and reader visibility.
  */
 
-import { h } from '../dom.js';
+import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+
+/** Actions the reader form dispatches while the user types. */
+const TYPING_ACTIONS = new Set(['setSummary', 'updateBlock']);
 
 const BLOCK_TYPES = [
   { type: 'text', label: 'Text (Markdown)' },
@@ -253,12 +256,11 @@ export function mountReaderForm(container, store) {
     root.append(summaryRow, blocksHeader, blocksList, visibilityRow);
   }
 
-  store.subscribe(({ changedKeys }) => {
-    if (changedKeys.includes('show') || changedKeys.includes('selectedSlideId')) {
-      if (document.activeElement && root.contains(document.activeElement)) {
-        return;
-      }
-      render();
+  store.subscribe((event) => {
+    if (event.changedKeys.includes('show') || event.changedKeys.includes('selectedSlideId')) {
+      // Leave the form alone while it echoes the user's own typing; re-render for anything else.
+      if (isTypingEcho(root, event, TYPING_ACTIONS)) return;
+      rerenderKeepingFocus(root, render);
     }
   });
 

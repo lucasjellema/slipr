@@ -23,7 +23,7 @@ Steps 4 (E-006) and 7 (I-020) can't be run yet. For step 8, Claude's browser pan
 
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one. With a long show (20+ slides), the list scrolls to the last slide, "Go to slide" finds a slide by number and by title, and the list keeps its scroll position after an edit.
-3. Switch a slide from `bullets` to `two-column` and back. The content survives.
+3. Switch a slide from `bullets` to `two-column` and back. The content survives, and the form shows the new layout's fields at once (with focus still on the layout select).
 4. Drop an image. The file is copied into `images/` and the alt-text dialog appears.
 5. Undo/redo through all of the above.
 6. `Ctrl+S`, reload the page, reopen the folder. Everything is intact.
@@ -36,4 +36,5 @@ Steps 4 (E-006) and 7 (I-020) can't be run yet. For step 8, Claude's browser pan
 - File System Access permissions are per session. After a reload, call `handle.requestPermission({ mode: 'readwrite' })` from a user gesture (click), never on page load.
 - `actions.js` must stay DOM-free so it can be tested with `node --test`.
 - A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input. The rules live in `js/slot-values.js`; extend them (with a test) when you add a field editor.
+- A form must not skip re-rendering just because it has focus: that leaves stale fields after a layout change, a button press or undo (bug E-013). Skip only the echo of the user's own typing (`isTypingEcho()`), and re-render with `rerenderKeepingFocus()` from `dom.js`. Add new typing actions to the form's `TYPING_ACTIONS`.
 - Large images make the whole store slow if inlined. Keep only paths in the show, never data URLs.

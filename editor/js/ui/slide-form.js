@@ -4,8 +4,11 @@
  * layout picker, speaker notes, chapter assignment and audience visibility.
  */
 
-import { h } from '../dom.js';
+import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
+
+/** Actions the slide form dispatches while the user types. */
+const TYPING_ACTIONS = new Set(['setSlot', 'setNotes']);
 
 /**
  * Mount the slide form into a container.
@@ -130,17 +133,16 @@ export function mountSlideForm(container, store) {
     root.append(layoutRow, slotsContainer, notesRow, chapterRow, visibilityRow);
   }
 
-  store.subscribe(({ changedKeys }) => {
+  store.subscribe((event) => {
+    const { changedKeys } = event;
     if (
       changedKeys.includes('show') ||
       changedKeys.includes('selectedSlideId') ||
       changedKeys.includes('template')
     ) {
-      // Don't reconstruct form if user is currently typing in an input inside this form
-      if (document.activeElement && root.contains(document.activeElement)) {
-        return;
-      }
-      render();
+      // Leave the form alone while it echoes the user's own typing; re-render for anything else.
+      if (isTypingEcho(root, event, TYPING_ACTIONS)) return;
+      rerenderKeepingFocus(root, render);
     }
   });
 
