@@ -6,6 +6,8 @@
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
+import { addImageToSlot, imageFileFrom, readClipboardImage } from '../image-input.js';
+import { showBanner } from './dialogs.js';
 
 /** Actions the slide form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSlot', 'setNotes']);
@@ -197,13 +199,21 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
   } else if (kind === 'image') {
     const image = imageValue(value, {});
     inputs = [
+      imageDropZone(labelText, image, slideId, slotName, store),
       h('input', {
         type: 'text',
-        class: 'slipr-input',
+        class: 'slipr-input slipr-input-alt',
         placeholder: 'images/example.png',
         'aria-label': `${labelText}: image path`,
         value: image?.src ?? '',
         oninput: (e) => write(imageValue(current, { src: /** @type {HTMLInputElement} */ (e.target).value })),
+        onpaste: (/** @type {ClipboardEvent} */ e) => {
+          // An image on the clipboard goes into the slot; pasted text stays a path.
+          const file = imageFileFrom(e.clipboardData);
+          if (!file) return;
+          e.preventDefault();
+          runImage(store, () => addImageToSlot(store, { slideId, slot: slotName, file }));
+        },
       }),
       h('input', {
         type: 'text',
@@ -238,4 +248,85 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     ...inputs,
     help ? h('span', { class: 'slipr-help' }, [help]) : null,
   ]);
+}
+
+/**
+ * Run an image action and report failures as a banner.
+ * @param {import('../store.js').EditorStore} store
+ * @param {() => Promise<void>} action
+ */
+function runImage(store, action) {
+  action().catch((err) => showBanner(err instanceof Error ? err.message : String(err), 'error'));
+}
+
+/**
+ * The image area of an image slot (E-006): a preview, and three ways to add an
+ * image: drop a file on it, paste (Ctrl+V while it has focus, or the Paste
+ * button), or choose a file.
+ * @param {string} labelText
+ * @param {{ src?: string, alt?: string } | undefined} image
+ * @param {string} slideId
+ * @param {string} slotName
+ * @param {import('../store.js').EditorStore} store
+ */
+function imageDropZone(labelText, image, slideId, slotName, store) {
+  const add = (/** @type {File | null} */ file) => {
+    if (!file) {
+      showBanner('There is no image to add. Copy an image, or drop an image file.', 'info', { timeout: 4000 });
+      return;
+    }
+    runImage(store, () => addImageToSlot(store, { slideId, slot: slotName, file }));
+  };
+
+  const fileInput = /** @type {HTMLInputElement} */ (h('input', {
+    type: 'file',
+    accept: 'image/png,image/jpeg,image/gif,image/webp,image/avif,image/svg+xml',
+    hidden: true,
+    onchange: () => {
+      add(fileInput.files?.[0] ?? null);
+      fileInput.value = '';
+    },
+  }));
+
+  const preview = image?.src
+    ? h('img', { class: 'slipr-image-thumb', src: store.state.resolveAsset?.(image.src) ?? image.src, alt: image.alt ?? '' })
+    : h('span', { class: 'slipr-image-empty' }, ['No image yet']);
+
+  const zone = h('div', {
+    class: 'slipr-image-zone',
+    tabindex: '0',
+    role: 'group',
+    'aria-label': `${labelText}: drop an image here, or press Ctrl+V to paste one`,
+    ondragover: (/** @type {DragEvent} */ e) => {
+      if (!e.dataTransfer?.types.includes('Files')) return;
+      e.preventDefault();
+      zone.classList.add('is-dragover');
+    },
+    ondragleave: () => zone.classList.remove('is-dragover'),
+    ondrop: (/** @type {DragEvent} */ e) => {
+      e.preventDefault();
+      zone.classList.remove('is-dragover');
+      add(imageFileFrom(e.dataTransfer));
+    },
+    onpaste: (/** @type {ClipboardEvent} */ e) => {
+      e.preventDefault();
+      add(imageFileFrom(e.clipboardData));
+    },
+  }, [
+    preview,
+    h('div', { class: 'slipr-image-actions' }, [
+      h('span', { class: 'slipr-help' }, ['Drop an image here, or paste with Ctrl+V']),
+      h('div', { class: 'slipr-image-buttons' }, [
+        h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', onclick: () => fileInput.click() }, ['Choose…']),
+        h('button', {
+          type: 'button',
+          class: 'slipr-btn slipr-btn-sm',
+          title: 'Paste an image from the clipboard',
+          onclick: () => runImage(store, async () => add(await readClipboardImage())),
+        }, ['Paste']),
+      ]),
+    ]),
+    fileInput,
+  ]);
+  return zone;
 }

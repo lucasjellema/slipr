@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Images: choose, drop and paste (E-006, first part)
+- **Added** to every image field a preview and three ways to add an image: **Choose…**, dropping an image file, and pasting from the clipboard (`Ctrl+V` in the field, the **Paste** button, or `Ctrl+V` anywhere outside a text field, which fills the slide's first empty image slot). The image is copied into `images/<slug>-<hash8>.<ext>`; an image already in the folder (same content hash) is reused. Then the alt-text dialog asks for a description. Large images (over 3 MB) get a notice.
+- **Added** `io/images.js` (names, types; tests), `image-input.js`, `writeImage()` / `findImageBySuffix()` in `io/fs-access.js`, and the alt-text dialog.
+- A show opened by URL first asks for its folder, like Save.
+- Not yet: hotspot placement on reader images, and images inside cards (cards are still read-only).
+
 ### 2026-10-10: Inspector forms update after every change (E-013)
 - **Fixed** the Slide, Reader and Show Settings tabs not re-rendering while focus was inside them. Changing the layout left the old layout's fields on screen (no image field after switching to `text-image`), and "+ Add Block", "+ Add Chapter" and undo/redo with a field focused showed stale content. A form now skips a re-render only for the echo of the user's own typing (`isTypingEcho()`: a text field in that form has focus and the action is one of its typing actions), and otherwise re-renders keeping focus, text selection and scroll position (`rerenderKeepingFocus()` in `dom.js`).
 

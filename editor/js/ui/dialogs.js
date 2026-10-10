@@ -166,6 +166,48 @@ export function openChooseDialog({ title, text, actionLabel, onChoose }) {
 }
 
 /**
+ * Alt text for an image just added (E-006). Saving with an empty field is
+ * allowed (the validator keeps warning), so the user is never stuck.
+ * @param {{ path: string, previewUrl: string, alt: string,
+ *   onSave: (alt: string) => void, onClose?: () => void }} options
+ */
+export function openAltTextDialog({ path, previewUrl, alt, onSave, onClose }) {
+  const dialog = openDialog('Describe the image', (close) => {
+    const input = /** @type {HTMLTextAreaElement} */ (h('textarea', {
+      class: 'slipr-textarea slipr-textarea-sm',
+      id: 'slipr-alt-text',
+      placeholder: 'What the image shows, for people who cannot see it',
+    }, [alt]));
+    const form = h('form', {
+      class: 'slipr-dialog-form',
+      onsubmit: (/** @type {Event} */ e) => {
+        e.preventDefault();
+        onSave(input.value.trim());
+        close();
+      },
+    }, [
+      h('img', { class: 'slipr-alt-preview', src: previewUrl, alt: '' }),
+      h('p', { class: 'slipr-help' }, [`Saved as ${path}`]),
+      h('div', { class: 'slipr-form-group' }, [h('label', { class: 'slipr-label', for: 'slipr-alt-text' }, ['Alt text']), input]),
+      h('p', { class: 'slipr-help' }, ['Screen readers read this aloud, and reader mode shows it when the image cannot load. Leave it empty only for decoration.']),
+      h('div', { class: 'slipr-dialog-actions' }, [
+        h('button', { type: 'button', class: 'slipr-btn', onclick: close }, ['Later']),
+        h('button', { type: 'submit', class: 'slipr-btn slipr-btn-primary' }, ['Save alt text']),
+      ]),
+    ]);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+    queueMicrotask(() => input.focus());
+    return [form];
+  });
+  if (onClose) dialog.addEventListener('close', onClose);
+}
+
+/**
  * A dismissible notice under the toolbar.
  * @param {string} message
  * @param {'info' | 'error' | 'success'} [kind]

@@ -22,7 +22,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
 - [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
-- [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · todo · —
+- [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · in progress (choose / drop / paste into image slots, alt-text dialog, dedup by content: done 2026-10-10; left: hotspot placement on reader image blocks) · claude
 
 ## Pending verification & chores from earlier phases
 

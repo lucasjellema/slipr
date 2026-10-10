@@ -85,6 +85,10 @@ describe('loadShowFromFolder', () => {
     assert.match(ctx.resolveAsset('images/architecture.svg'), /^blob:test\//);
     assert.ok(ctx.resolveTemplateAsset('theme.css').endsWith('/templates/default/theme.css'));
     assert.equal(ctx.notices.length, 1, 'the demo uses a relative ref, so it gets a notice');
+    // A file added later (E-006) becomes resolvable as a blob URL.
+    assert.equal(ctx.resolveAsset('images/new.png'), 'images/new.png');
+    ctx.registerAsset('images/new.png', new Blob(['x']));
+    assert.match(ctx.resolveAsset('images/new.png'), /^blob:test\//);
     assert.equal(ctx.folder, source);
   });
 

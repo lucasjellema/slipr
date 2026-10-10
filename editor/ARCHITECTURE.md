@@ -29,6 +29,7 @@ editor/
 ├── test/                 ✅ actions.test.js, store.test.js (node --test)
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
+    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006)
     ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
@@ -37,7 +38,8 @@ editor/
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+Enter, Ctrl+D, Alt+↑/↓, F5
     ├── io/
-    │   ├── fs-access.js  ✅ File System Access API: pick folder, permission, write show.json, create a new show (copying images: E-006)
+    │   ├── fs-access.js  ✅ File System Access API: pick folder, permission, write show.json, create a new show, copy an image in (`writeImage`, `findImageBySuffix`)
+    │   ├── images.js     ✅ DOM-free: supported image types, `images/<slug>-<hash8>.<ext>` names, content suffix (E-006)
     │   ├── serialize.js  ✅ DOM-free: show.json text with schema key order and 2-space indent
     │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
@@ -52,7 +54,7 @@ editor/
         ├── hotspot-editor.js   (planned, E-006) click on an image to place and edit hotspots
         ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
         ├── field-editors.js    (planned, E-004) one editor per slot type, including a cards editor (I-035)
-        └── dialogs.js       ✅ start screen, access screen, new-show and choose-folder dialogs, banners (alt-text dialog: E-006)
+        └── dialogs.js       ✅ start screen, access screen, new-show, choose-folder and alt-text dialogs, banners
 ```
 
 **Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
@@ -85,7 +87,7 @@ In **audience** mode it renders the selected slide with `shared/render.js` into 
 - **Open**: `showDirectoryPicker()` → check for `show.json` → remember the handle in IndexedDB (`shared/folder-handles.js`) → reload as `?folder=<key>`. On load, `loadShowFromFolder()` reads the show and its images through the handle and resolves the template by name (D-012). Reloading keeps working; if the browser dropped the permission, an access screen asks for it with one click.
 - **New**: title + template (from `templates/index.json`) → pick an empty folder → write `show.json` (template ref `/templates/<id>`) and `images/` → open it like *Open*.
 - **Save**: write `show.json` (`io/serialize.js`: 2-space indent, key order from the JSON Schema, like the converter's output). Saving a hand-formatted file reformats it once. A show opened by URL (`?show=`) first asks for its folder and checks the show id. Edits made while saving stay dirty (`store.markSaved()`).
-- **Images**: written to `images/<slug>-<hash8>.<ext>` to avoid name collisions.
+- **Images** (`image-input.js`): written to `images/<slug>-<hash8>.<ext>`, where the hash is of the content. The slug is the file name, or for pasted images (`image.png`) the slide title and slot. An image whose hash is already in `images/` is reused, whatever its name. The slot gets `{ src, alt }` through `setSlot`, so undo works; the file is never deleted. Folder shows resolve images as `blob:` URLs, so a new image is registered with `ctx.registerAsset()` (`shared/load.js`).
 - **Drafts**: the current show goes to IndexedDB every 5 s while dirty. On open, if a newer draft exists, the editor offers to restore it.
 - Folder handles are remembered in IndexedDB for "recent shows" (start screen). Permission is re-requested on reopen, from a click.
 

@@ -101,3 +101,50 @@ export async function createShowInFolder(handle, show) {
   await handle.getDirectoryHandle('images', { create: true });
   await saveShow(handle, show);
 }
+
+/**
+ * Copy an image into the show folder at `path` (e.g. "images/photo-1a2b3c4d.png").
+ * Names contain a hash of the content, so an existing file is the same image
+ * and is not written again.
+ * @param {FileSystemDirectoryHandle} handle  The show folder.
+ * @param {string} path
+ * @param {Blob} blob
+ * @returns {Promise<boolean>}  true if the file was written, false if it already existed.
+ */
+export async function writeImage(handle, path, blob) {
+  const parts = path.split('/');
+  const name = /** @type {string} */ (parts.pop());
+  let dir = handle;
+  for (const part of parts) dir = await dir.getDirectoryHandle(part, { create: true });
+  try {
+    await dir.getFileHandle(name);
+    return false;
+  } catch (err) {
+    if (/** @type {any} */ (err)?.name !== 'NotFoundError') throw err;
+  }
+  const fileHandle = await dir.getFileHandle(name, { create: true });
+  const writable = await fileHandle.createWritable();
+  await writable.write(blob);
+  await writable.close();
+  return true;
+}
+
+/**
+ * An image already in the show's images/ folder whose name ends with `suffix`
+ * (same content hash), as a path relative to show.json, or null.
+ * @param {FileSystemDirectoryHandle} handle  The show folder.
+ * @param {string} suffix  From contentSuffix().
+ * @returns {Promise<string | null>}
+ */
+export async function findImageBySuffix(handle, suffix) {
+  let dir;
+  try {
+    dir = await handle.getDirectoryHandle('images');
+  } catch {
+    return null;
+  }
+  for await (const name of /** @type {any} */ (dir).keys()) {
+    if (name.endsWith(suffix)) return `images/${name}`;
+  }
+  return null;
+}

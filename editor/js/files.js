@@ -173,7 +173,7 @@ export function viewerUrl({ folderKey, showUrl, mode, slideId }) {
  * that holds this show, check it is the same show, then save there.
  * @param {import('./store.js').EditorStore} store
  */
-function askForShowFolder(store) {
+export function askForShowFolder(store) {
   const id = store.state.show?.id;
   openChooseDialog({
     title: 'Choose the show folder',

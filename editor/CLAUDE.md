@@ -19,12 +19,12 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 
 ## Smoke-test checklist
 
-Steps 4 (E-006) and 7 (I-020) can't be run yet. For step 8, Claude's browser pane blocks popups: stub `window.open` from `javascript_tool` to check the URL, and open that URL in the pane. Shows by URL: `editor/?show=../shows/demo/show.json`. The native folder picker can't be driven from Claude's browser pane; there, test steps 1 and 6 with a folder in the origin-private file system (`navigator.storage.getDirectory()`) remembered via `shared/folder-handles.js` and opened as `editor/?folder=<key>`, and clean it up afterwards.
+Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a `ClipboardEvent('paste')` or `DragEvent('drop')` whose `DataTransfer` holds a canvas-made PNG `File`; the Paste button (`navigator.clipboard.read()`) needs a real user and a permission prompt. For step 8, Claude's browser pane blocks popups: stub `window.open` from `javascript_tool` to check the URL, and open that URL in the pane. Shows by URL: `editor/?show=../shows/demo/show.json`. The native folder picker can't be driven from Claude's browser pane; there, test steps 1 and 6 with a folder in the origin-private file system (`navigator.storage.getDirectory()`) remembered via `shared/folder-handles.js` and opened as `editor/?folder=<key>`, and clean it up afterwards.
 
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one. With a long show (20+ slides), the list scrolls to the last slide, "Go to slide" finds a slide by number and by title, and the list keeps its scroll position after an edit.
 3. Switch a slide from `bullets` to `two-column` and back. The content survives, and the form shows the new layout's fields at once (with focus still on the layout select).
-4. Drop an image. The file is copied into `images/` and the alt-text dialog appears.
+4. Drop an image, paste one (`Ctrl+V` in the image field and on the page), and choose one. The file is copied into `images/` and the alt-text dialog appears. The same image on another slide reuses the file. Undo restores the previous image.
 5. Undo/redo through all of the above.
 6. `Ctrl+S`, reload the page, reopen the folder. Everything is intact.
 7. Kill the tab while dirty and reopen. The draft restore is offered.

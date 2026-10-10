@@ -39,6 +39,8 @@ import { normalizePath } from './folder-source.js';
  * @property {import('./validate.js').ValidationResult} validation  show + template issues combined
  * @property {(src: string) => string} resolveAsset  Resolve a path relative to show.json.
  * @property {(path: string) => string} resolveTemplateAsset  Resolve a path relative to template.json.
+ * @property {(src: string, blob: Blob) => void} registerAsset  Make a file just added to the show folder
+ *   resolvable (folder shows use blob: URLs; for URL shows the server serves it, so this does nothing).
  * @property {string[]} notices        Things the user should know that are not validation issues.
  * @property {import('./folder-source.js').FolderSource} [folder]  Set when loaded from a folder.
  */
@@ -100,6 +102,7 @@ export async function loadShow(showUrl, options = {}) {
     validation: validateAll(show, template, existing ? (src) => existing.has(src) : undefined),
     resolveAsset: (src) => new URL(src, showHref).href,
     resolveTemplateAsset: (path) => new URL(path, templateHref).href,
+    registerAsset: () => {},
     notices: [],
   };
 }
@@ -143,6 +146,9 @@ export async function loadShowFromFolder(source, options = {}) {
     validation: validateAll(show, template, imageExists),
     resolveAsset: (src) => blobUrls.get(src) ?? src,
     resolveTemplateAsset: (path) => new URL(path, templateHref).href,
+    registerAsset: (src, blob) => {
+      if (!blobUrls.has(src)) blobUrls.set(src, createObjectURL(blob));
+    },
     notices: notice ? [notice] : [],
     folder: source,
   };

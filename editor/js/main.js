@@ -8,7 +8,8 @@ import { loadShow, loadShowFromFolder } from '../../shared/load.js';
 import { createFolderSource } from '../../shared/folder-source.js';
 import { listFolders, recallFolder, rememberFolder } from '../../shared/folder-handles.js';
 import { createStore } from './store.js';
-import { addStylesheet, h } from './dom.js';
+import { addStylesheet, h, isTextEntry } from './dom.js';
+import { addImageToSlot, imageFileFrom, pasteTargetSlot } from './image-input.js';
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
 import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
 import { mountToolbar } from './ui/toolbar.js';
@@ -178,7 +179,25 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
     mountPreview(previewEl, store);
   }
 
-  // 7. Global shortcuts
+  // 7. Paste an image anywhere outside a text field: it goes into the current
+  //    slide's first empty image slot (image fields handle their own paste).
+  window.addEventListener('paste', (e) => {
+    const target = /** @type {Element | null} */ (e.target instanceof Element ? e.target : null);
+    if (e.defaultPrevented || isTextEntry(target) || target?.closest('dialog, [contenteditable]')) return;
+    const file = imageFileFrom(e.clipboardData);
+    if (!file) return;
+    e.preventDefault();
+    const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === store.state.selectedSlideId);
+    const slot = pasteTargetSlot(store.state.template, slide);
+    if (!slide || !slot) {
+      showBanner(`The layout of this slide ("${slide?.layout ?? '–'}") has no image field. Choose a layout with an image first.`, 'info', { timeout: 5000 });
+      return;
+    }
+    store.setActiveTab('slide');
+    run(() => addImageToSlot(store, { slideId: slide.id, slot, file }));
+  });
+
+  // 8. Global shortcuts
   registerShortcuts(store, {
     onSave: () => run(() => save(store)),
     onPresent: () => present('audience'),

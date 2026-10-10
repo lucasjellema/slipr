@@ -30,7 +30,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 - **Manage slides**: add, duplicate, delete, reorder (drag and drop), hide from audience or reader mode.
 - **Edit a slide**: choose a layout, then fill in the fields that layout offers. Changing the layout keeps the content of fields with matching names.
 - **Rich text and lists** use simple Markdown: `**bold**`, `*italic*`, `- bullet`.
-- **Images**: drop or paste an image onto an image field. It is copied into the show's `images/` folder, and you are asked for alt text.
+- **Images**: drop an image file on an image field, paste one (`Ctrl+V` in the field, the **Paste** button, or `Ctrl+V` anywhere outside a text field: it goes into the slide's first empty image field), or use **Choose…**. The image is copied into the show's `images/` folder (an image that is already there is reused), and you are asked for alt text. PNG, JPEG, GIF, WebP, AVIF and SVG. The show must be opened from its folder; a show opened by URL asks for its folder first. Hotspots on reader images are not there yet.
 - **Speaker notes** per slide.
 - **Reader layer** per slide, in a separate *Reader* tab next to the *Slide* tab:
   - a one-line summary

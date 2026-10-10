@@ -778,3 +778,67 @@ body.is-screen #slipr-editor-banners {
 .slipr-banner--success {
   color: #3FB950;
 }
+
+/* ---------- Image fields (E-006) ---------- */
+
+.slipr-image-zone {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border: 1px dashed var(--slipr-editor-border);
+  border-radius: 6px;
+  background: var(--slipr-editor-bg);
+}
+
+.slipr-image-zone:focus-visible,
+.slipr-image-zone.is-dragover {
+  outline: none;
+  border-color: var(--slipr-editor-accent);
+  background: rgba(47, 129, 247, 0.08);
+}
+
+.slipr-image-thumb,
+.slipr-image-empty {
+  width: 96px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: var(--slipr-editor-surface-raised);
+}
+
+.slipr-image-thumb {
+  object-fit: contain;
+}
+
+.slipr-image-empty {
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-image-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.slipr-image-actions .slipr-help {
+  margin: 0;
+}
+
+.slipr-image-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+.slipr-alt-preview {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  align-self: center;
+  border-radius: 4px;
+  background: var(--slipr-editor-bg);
+}

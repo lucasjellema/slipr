@@ -21,6 +21,7 @@ const DEFAULT_COALESCE_MS = 1000;
  * @property {any} [template]
  * @property {Map<string, any>} [layouts]
  * @property {((src: string) => string)} [resolveAsset]
+ * @property {((src: string, blob: Blob) => void)} [registerAsset]  Make a newly added image resolvable (E-006).
  * @property {((path: string) => string)} [resolveTemplateAsset]
  * @property {any} [folderHandle]
  * @property {string | null} selectedSlideId
@@ -91,6 +92,7 @@ export class EditorStore {
       template,
       layouts: context.layouts ?? new Map(),
       resolveAsset: context.resolveAsset ?? ((src) => src),
+      registerAsset: context.registerAsset ?? (() => {}),
       resolveTemplateAsset: context.resolveTemplateAsset ?? ((path) => path),
       folderHandle: context.folderHandle ?? null,
       selectedSlideId: initialShow?.slides?.[0]?.id ?? null,
@@ -331,6 +333,7 @@ export class EditorStore {
     this.state.template = showContext.template;
     this.state.layouts = showContext.layouts ?? new Map();
     this.state.resolveAsset = showContext.resolveAsset ?? ((src) => src);
+    this.state.registerAsset = showContext.registerAsset ?? (() => {});
     this.state.resolveTemplateAsset = showContext.resolveTemplateAsset ?? ((path) => path);
     this.state.folderHandle = folderHandle;
     this.state.selectedSlideId = showContext.show?.slides?.[0]?.id ?? null;

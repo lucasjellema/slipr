@@ -6,6 +6,9 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: `registerAsset()` in the show context (E-006)
+- **Added** `ctx.registerAsset(src, blob)` to `shared/load.js`: for a show loaded from a folder it makes a newly added file resolvable (a `blob:` URL); for URL shows it does nothing, because the server serves the new file.
+
 ### 2026-10-10: The viewer opens show folders (E-007)
 - **Added** `viewer/?folder=<key>`, using the shared folder loader (D-012), so the editor's Present and Read work for shows anywhere on disk. See the viewer and editor changelogs.
 
