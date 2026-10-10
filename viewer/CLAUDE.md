@@ -15,6 +15,9 @@ Read the root `CLAUDE.md` first. This file adds viewer-specific guidance.
 
 ## Invariants
 
+- All reader state goes through the store in `reader/state.js`. Never write to IndexedDB or localStorage directly, and never store anything outside it.
+- Annotations are never deleted automatically, even when their text disappears.
+
 - The viewer never modifies the show. It is read-only.
 - Identity is `slide.id` and `block.id`, never an index. Use ids for links, mode switching, progress and annotation anchors.
 - Reveal.js is loaded only in audience mode. Reader mode has no third-party dependencies.
@@ -35,13 +38,13 @@ With `shows/demo`:
 
 **Reader**
 
-5. *(Phase 3)* The welcome chooser appears on first visit and is skipped on the next visit.
-6. `?profile=dev&depth=3` shows the developer deep-dive blocks (tabs on "A show is just data"), `?profile=mgr` hides them, and `?path=quick` shows 5 slides. *(Phase 3)* Toolbar controls change this without losing the scroll position.
+5. The welcome chooser appears on first visit (clear the site data, or use a private window, to see it again) and is skipped on the next visit, and also when the link carries `profile`, `depth` or `path`.
+6. `?profile=dev&depth=3` shows the developer deep-dive blocks (tabs on "A show is just data"), `?profile=mgr` hides them, and `?path=quick` shows 5 slides. ⚙ Tailor and `D` change this without losing the scroll position, and the choice survives a reload.
 7. Glossary terms, footnotes and hotspots open popovers on hover (mouse), on tap (touch emulation) and with Enter (keyboard).
 8. Details panels and tabs work. Embeds load lazily.
-9. *(Phase 3)* `/` search finds text in a reader block and jumps to it with a highlight.
-10. *(Phase 3)* Highlight some text and add a note. After a reload it is still there. Export produces Markdown.
-11. The contents entry of the slide being read is highlighted and the hash follows it. `#s-thanks` (reader-hidden) falls back to the nearest earlier slide. *(Phase 3)* Progress marks; a reload resumes at the last position.
+9. `/` search finds text in a reader block and jumps to it with a highlight.
+10. Select text in a block → Highlight / Add note. After a reload it is still highlighted and the note is back. With a profile that hides that block, the note moves to "Hidden by your tailoring". Export Markdown and JSON download files, and importing the JSON again reports "0 new".
+11. The contents entry of the slide being read is highlighted and the hash follows it. `#s-thanks` (reader-hidden) falls back to the nearest earlier slide. After 3 s on a slide its contents mark fills and "n of m read" goes up. `M` / ★ bookmarks a slide (listed at the top of the contents). Reopening without a hash offers "Continue with …".
 12. At 375 px width there is no horizontal scrolling, the slide visual reflows, and ☰ opens the contents drawer.
 
 **Both**
@@ -63,3 +66,5 @@ With `shows/demo`:
 - Hover-only interactions are invisible on touch devices. Always provide the tap/click path too.
 - `shared/blocks.js` returns HTML **strings** (so it is testable in Node), and `shared/render.js` returns **elements** (it clones template fragments). Insert block HTML with `innerHTML`. That is safe only because everything in it went through `escape()` or `markdown()`, so keep it that way.
 - The browser pane sometimes captures stale or garbled screenshots. If a screenshot contradicts the DOM, re-take it after `resize_window`, or trust the DOM state.
+- In Claude's browser pane, synthetic key presses sometimes don't arrive while the pane isn't drawing. Dispatch `KeyboardEvent`s from `javascript_tool` to test shortcuts. `requestAnimationFrame` also doesn't fire then, so don't use it for logic that must run (focus, state). Keep it for visuals only.
+- Reader state persists between test runs. To start fresh, delete the `slipr-reader` IndexedDB database (DevTools → Application) or use a private window.

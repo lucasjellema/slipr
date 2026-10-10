@@ -15,19 +15,18 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 3 (Reader personalisation)
+## Now: Phase 4 (Converter MVP)
 
-- [ ] **V-011** [viewer] Reader state + IndexedDB persistence · todo · claude
-- [ ] **V-013** [viewer] Welcome chooser and toolbar controls for profile / depth / path (URL parameters already work) · todo · claude
-- [ ] **V-014** [viewer] Progress marks, resume, bookmarks · todo · claude
-- [ ] **V-015** [viewer] Full-text search with jump + highlight · todo · claude
-- [ ] **V-016** [viewer] Annotations: highlights, margin notes, export/import · todo · claude
+- [ ] **P-001** [converter] Python package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text) · todo · claude
+- [ ] **P-002** [converter] `extract.py` + `text.py`: intermediate model, Markdown text with bullet levels · todo · claude
+- [ ] **P-003** [converter] `mapping.py`: layout mapping + heuristics · todo · claude
+- [ ] **P-004** [converter] `emit.py`, `validate.py`, CLI `slipr-convert`, `conversion-report.md`, `--notes-to-reader` · todo · claude
+- [ ] **P-005** [converter] Tests with fixture decks generated in code · todo · claude
+- [ ] **P-006** [converter] Convert one of Lucas's real decks end-to-end (Lucas supplies a deck without confidential content) · todo · lucas
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 - [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
 
-## Next: Phases 4–5 (see ROADMAP.md)
-
-**Phase 4: Converter MVP**: P-001 … P-005 (see ROADMAP) · todo · —
+## Next: Phase 5 (see ROADMAP.md)
 
 **Phase 5: Editor MVP**: E-001 … E-009 (see ROADMAP) · todo · —
 
@@ -57,7 +56,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-016** [format] `quiz` block: self-check questions with feedback
 - [ ] **I-017** [viewer] Concept map navigation: a graph of slides linked by `related` and `tags`
 - [ ] **I-018** [viewer] "Ask this show": a question box answered by Claude using only the show's content (needs an API key, so it is opt-in)
-- [ ] **I-019** [viewer] Personal summary: export my highlights + notes + bookmarked slides as a nicely formatted document
+- [ ] **I-019** [viewer] Personal summary: a nicely formatted (printable / PDF) version of my highlights, notes and bookmarks. A Markdown export exists since Phase 3
 - [ ] **I-030** [viewer] Optional sync / shared annotations across devices (needs a backend, revisits D-010)
 - [ ] **I-031** [format] Glossary auto-linking: mark the first occurrence of each term per slide automatically
 - [ ] **I-032** [viewer] Step through a slide's build animations inside reader mode
@@ -100,6 +99,11 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **V-011** [viewer] Reader state: IndexedDB → localStorage → memory, debounced store, `migrate()` · done 2026-10-10 · claude
+- [x] **V-013** [viewer] Welcome chooser and ⚙ Tailor panel (profile / depth / route / presenter notes), `D` key · done 2026-10-10 · claude
+- [x] **V-014** [viewer] Progress marks + "n of m read", resume message, bookmarks (★ / `M`) · done 2026-10-10 · claude
+- [x] **V-015** [viewer] Search (`/`): word-prefix, accent-insensitive, snippets, on-page highlight, hidden-match count · done 2026-10-10 · claude
+- [x] **V-016** [viewer] Annotations: highlights + notes, text-quote anchoring, "My notes" panel, Markdown/JSON export, JSON import · done 2026-10-10 · claude
 - [x] **S-006** [shared] `blocks.js`: all reader block types as safe HTML strings, 14 tests · done 2026-10-10 · claude
 - [x] **V-004** [viewer] Reader app shell: top bar, contents (drawer on phones), article, routing, keys · done 2026-10-10 · claude
 - [x] **V-008** [viewer] Popovers (glossary, footnotes, hotspots), tabs, details, embeds · done 2026-10-10 · claude

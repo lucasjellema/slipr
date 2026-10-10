@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Phase 3, reader personalisation
+- **Added** to reader mode: persistent per-reader state, a welcome chooser and Tailor panel, progress tracking with a resume message, bookmarks, full-text search, and highlights with notes (export/import). See `viewer/CHANGELOG.md`.
+- **Added** 19 tests for the pure Phase 3 modules (state store, text-quote anchoring, search, notes export). The total is now 128.
+- All reader data stays in the reader's browser (D-010): IndexedDB database `slipr-reader`, one record per `show.id`.
+
 ### 2026-10-10: Phase 2, reader core
 - **Added** `shared/blocks.js`: renders every reader block type (text, details, callout, tabs, image with hotspots, embed, slide-ref) to safe HTML strings, with "For …" / "Deep dive" badges. 14 tests.
 - **Added** reader mode in the viewer (see `viewer/CHANGELOG.md`), including `viewer/reader/personalize.js` with 16 tests in `viewer/test/`. The total is now 109 tests.

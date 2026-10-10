@@ -4,6 +4,16 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Reader personalisation (Phase 3)
+- **Added** `reader/state.js`: per-show reader state (prefs, presenter-notes toggle, welcome done, position, visited, bookmarks, annotations) in IndexedDB, falling back to localStorage and then memory. A debounced pure store, `migrate()` for robustness, flush when the page is hidden.
+- **Added** `reader/tailor.js`: the first-visit welcome dialog (profile, depth, route), and a ⚙ Tailor panel in the top bar whose changes apply immediately and keep the position. URL parameters override stored prefs until changed in the UI.
+- **Added** progress: visit tracking (3 s substantially in view), contents marks, "n of m read", and a "Welcome back. Continue with …" message.
+- **Added** bookmarks: ★ per slide and `M`, listed at the top of the contents.
+- **Added** search (`reader/search-index.js` + `reader/search.js`): `/` opens a dialog that searches as you type over slides, blocks, glossary and presenter notes. Accent-insensitive word-prefix matching, marked snippets, keyboard navigation, matches highlighted on the page, and a count of matches hidden by the tailoring.
+- **Added** annotations (`reader/quote.js`, `reader/annotations.js`, `reader/notes-export.js`): highlight or note on selected text, drawn with the CSS Custom Highlight API and re-anchored by text quote. A "My notes" panel (`N`) groups notes, keeps "hidden by tailoring" and "text no longer found" notes separate, and offers Markdown/JSON export and JSON import with merging.
+- **Added** keys `/`, `D`, `M`, `N`.
+- **Fixed** the contents list now reads bookmarks and visits live, instead of from a snapshot taken at build time.
+
 ### 2026-10-10: Reader core (Phase 2)
 - **Added** reader mode (`reader/reader.js`, `reader/reader.css`): a top bar with "Present ▶", a chapter contents list (a drawer below 900 px), and the article (hero, chapter sections, slide visuals that reflow on narrow screens, summaries, reader blocks, a collapsed "What the presenter said" panel, "See also" links). No third-party code.
 - **Added** `reader/personalize.js`: profile, depth and path filtering, chapter grouping and nearest-visible-slide fallback. URL parameters `profile`, `depth` and `path` work now. 16 tests in `viewer/test/`.

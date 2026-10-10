@@ -58,7 +58,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Done when**: Every block type and popup in the demo works with mouse, touch emulation and keyboard, and at 375 px there is no horizontal scrolling.
 
-## Phase 3: Reader personalisation (≈ 2–3 sessions)
+## Phase 3: Reader personalisation (≈ 2–3 sessions) ✅ done 2026-10-10
 
 **Goal**: The reader experience adapts to the person and remembers them.
 

@@ -260,3 +260,297 @@ body.slipr-reader {
 @media (max-width: 900px) and (prefers-reduced-motion: reduce) {
   .reader-contents { transition: none; }
 }
+
+/* ======================================================================
+   Phase 3: tools, panels, dialogs, progress, bookmarks, notes, search
+   ====================================================================== */
+
+/* ---------- top-bar tools ---------- */
+.reader-tools { display: flex; align-items: center; gap: 0.25rem; }
+.reader-tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.6rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+.reader-tool:hover { background: rgb(255 255 255 / 0.12); }
+.reader-tool:focus-visible { outline: 3px solid var(--slipr-color-accent); outline-offset: 1px; }
+.reader-tool[aria-expanded="true"] { background: rgb(255 255 255 / 0.18); }
+.reader-tool-count:not(:empty) {
+  min-width: 1.2rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--slipr-color-accent);
+  color: var(--slipr-color-primary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+@media (max-width: 700px) {
+  .reader-tool-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .reader-tool { font-size: 1.1rem; padding: 0.35rem 0.45rem; }
+}
+
+/* ---------- buttons ---------- */
+.reader-button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--slipr-color-primary) 30%, transparent);
+  border-radius: 0.4rem;
+  background: var(--slipr-color-bg);
+  color: var(--slipr-color-primary);
+  cursor: pointer;
+}
+.reader-button--primary { background: var(--slipr-color-primary); border-color: var(--slipr-color-primary); color: var(--slipr-color-on-primary); font-weight: 700; }
+.reader-button:focus-visible, .reader-link-button:focus-visible { outline: 3px solid var(--slipr-color-accent); outline-offset: 2px; }
+.reader-link-button {
+  font: inherit;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--slipr-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
+}
+.reader-link-button--danger { color: #B3261E; }
+
+/* ---------- dialogs and panels ---------- */
+.reader-dialog {
+  box-sizing: border-box;
+  width: min(36rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 4rem);
+  padding: 1.5rem 1.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--slipr-color-bg);
+  color: var(--slipr-color-text);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / 0.25);
+}
+.reader-dialog::backdrop { background: rgb(14 17 22 / 0.55); }
+.reader-dialog h2, .reader-panel h2 {
+  margin: 0 0 0.5rem;
+  font-family: var(--slipr-font-heading);
+  font-size: 1.3rem;
+  color: var(--slipr-color-primary);
+}
+.reader-welcome-intro { margin: 0 0 0.75rem; line-height: 1.5; }
+.reader-welcome-hint { margin: 0 0 1rem; font-size: 0.9rem; color: var(--slipr-color-muted); }
+.reader-dialog-actions { display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem; }
+
+.reader-panel {
+  box-sizing: border-box;
+  position: fixed;
+  inset: calc(3.25rem + 0.5rem) 0.75rem auto auto;
+  width: min(24rem, calc(100vw - 1.5rem));
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+  margin: 0;
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--slipr-color-primary) 15%, transparent);
+  border-radius: 0.6rem;
+  background: var(--slipr-color-bg);
+  color: var(--slipr-color-text);
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 0.2);
+}
+
+/* ---------- choice groups (welcome + tailor) ---------- */
+.reader-choices { margin: 0 0 1rem; padding: 0; border: 0; }
+.reader-choices legend { margin: 0 0 0.4rem; padding: 0; font-weight: 700; color: var(--slipr-color-primary); }
+.reader-choice { display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.3rem 0; }
+.reader-choice input { margin: 0.25rem 0 0; accent-color: var(--slipr-color-primary); }
+.reader-choice label { display: flex; flex-direction: column; cursor: pointer; }
+.reader-choice-label { font-weight: 600; }
+.reader-choice-hint { font-size: 0.85rem; color: var(--slipr-color-muted); }
+.reader-choice--check { border-top: 1px solid var(--slipr-color-surface); padding-top: 0.75rem; }
+
+/* ---------- contents: progress, marks, bookmarks ---------- */
+.reader-progress { margin: 0 0 1.25rem; font-size: 0.8rem; color: var(--slipr-color-muted); }
+.reader-progress-text { display: block; margin: 0 0 0.3rem; }
+.reader-progress-bar { display: block; height: 4px; border-radius: 2px; background: var(--slipr-color-surface); overflow: hidden; }
+.reader-progress-fill { display: block; height: 100%; width: 0; background: var(--slipr-color-accent); transition: width 0.3s; }
+.reader-toc a { display: flex; align-items: baseline; gap: 0.45rem; }
+.reader-toc-text { flex: 1; }
+.reader-toc-mark {
+  flex: none;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  border: 1.5px solid color-mix(in srgb, var(--slipr-color-muted) 60%, transparent);
+  transform: translateY(-0.05rem);
+}
+.reader-toc a.is-visited .reader-toc-mark { background: var(--slipr-color-accent); border-color: var(--slipr-color-accent); }
+.reader-toc a[aria-current] .reader-toc-mark { background: var(--slipr-color-primary); border-color: var(--slipr-color-primary); }
+.reader-toc-bookmark { display: none; color: var(--slipr-color-accent); font-size: 0.8rem; }
+.reader-toc a.is-bookmarked .reader-toc-bookmark { display: inline; }
+.reader-bookmarks { margin: 0 0 1.25rem; }
+.reader-bookmarks-list { list-style: none; margin: 0; padding: 0; }
+.reader-bookmarks-list a { display: block; padding: 0.25rem 0; color: var(--slipr-color-text); text-decoration: none; }
+.reader-bookmarks-list a:hover { text-decoration: underline; }
+
+/* ---------- bookmark button on each slide ---------- */
+.reader-slide-head { display: flex; align-items: flex-start; justify-content: flex-end; gap: 0.5rem; }
+.reader-slide-head .reader-slide-title:not(.visually-hidden) { flex: 1; }
+.reader-bookmark {
+  flex: none;
+  margin: 0 0 0.4rem;
+  padding: 0.15rem 0.45rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: none;
+  color: color-mix(in srgb, var(--slipr-color-muted) 55%, transparent);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.reader-bookmark:hover { color: var(--slipr-color-accent); border-color: var(--slipr-color-surface); }
+.reader-bookmark[aria-pressed="true"] { color: var(--slipr-color-accent); }
+.reader-bookmark:focus-visible { outline: 3px solid var(--slipr-color-accent); }
+
+/* ---------- My notes panel ---------- */
+.reader-notes {
+  box-sizing: border-box;
+  position: fixed;
+  top: 3.25rem;
+  right: 0;
+  bottom: 0;
+  z-index: 26;
+  width: min(22rem, 92vw);
+  overflow-y: auto;
+  padding: 1.25rem 1.1rem 2rem;
+  border-left: 1px solid color-mix(in srgb, var(--slipr-color-primary) 12%, transparent);
+  background: var(--slipr-color-bg);
+  box-shadow: -0.5rem 0 2rem rgb(0 0 0 / 0.08);
+}
+.reader-notes[hidden] { display: none; }
+@media (min-width: 1400px) {
+  /* Wide screens: the panel docks beside the article instead of covering it. */
+  body.reader-notes-open .reader { grid-template-columns: var(--reader-contents) minmax(0, 1fr) 22rem; }
+  body.reader-notes-open .reader-notes {
+    position: sticky;
+    grid-column: 3;
+    grid-row: 2;
+    height: calc(100vh - var(--reader-topbar));
+    width: auto;
+    box-shadow: none;
+  }
+}
+.reader-notes-header { display: flex; align-items: center; justify-content: space-between; }
+.reader-notes-header h2 { margin: 0; font-family: var(--slipr-font-heading); font-size: 1.2rem; color: var(--slipr-color-primary); }
+.reader-panel-close { font: inherit; font-size: 1.5rem; line-height: 1; padding: 0 0.3rem; border: 0; background: none; color: var(--slipr-color-muted); cursor: pointer; }
+.reader-notes-hint { font-size: 0.85rem; color: var(--slipr-color-muted); }
+.reader-notes-empty { color: var(--slipr-color-muted); font-style: italic; }
+.reader-notes h3 { margin: 1.25rem 0 0.25rem; font-size: 0.8rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--slipr-color-muted); }
+.reader-note {
+  margin: 0 0 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.45rem;
+  background: var(--slipr-color-surface);
+  border-left: 3px solid var(--slipr-color-accent);
+}
+.reader-note.is-hidden, .reader-note.is-orphan { border-left-color: var(--slipr-color-muted); opacity: 0.85; }
+.reader-note-slide { margin: 0 0 0.3rem; font-size: 0.75rem; font-weight: 700; color: var(--slipr-color-muted); }
+.reader-note blockquote { margin: 0 0 0.5rem; font-size: 0.9rem; line-height: 1.45; }
+.reader-note textarea {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--slipr-color-primary) 20%, transparent);
+  border-radius: 0.3rem;
+  background: var(--slipr-color-bg);
+  resize: vertical;
+}
+.reader-note-actions { display: flex; gap: 1rem; margin-top: 0.4rem; font-size: 0.85rem; }
+.reader-notes-actions { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; }
+
+/* Selection toolbar */
+.reader-selection-tools {
+  position: fixed;
+  z-index: 40;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 0.45rem;
+  background: var(--slipr-color-primary);
+  box-shadow: 0 0.4rem 1rem rgb(0 0 0 / 0.25);
+}
+.reader-selection-tools[hidden] { display: none; }
+.reader-selection-tools button {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  border: 0;
+  border-radius: 0.3rem;
+  background: none;
+  color: var(--slipr-color-on-primary);
+  cursor: pointer;
+}
+.reader-selection-tools button:hover,
+.reader-selection-tools button:focus-visible { background: rgb(255 255 255 / 0.15); }
+
+/* Highlights (CSS Custom Highlight API) */
+::highlight(slipr-annotation) { background-color: rgb(242 169 0 / 0.38); }
+::highlight(slipr-search) { background-color: #FFE27A; color: #1E2329; }
+
+/* ---------- search dialog ---------- */
+.reader-search { padding: 0; width: min(40rem, calc(100vw - 2rem)); margin-top: 10vh; }
+.reader-search-form { margin: 0; padding: 0.75rem; border-bottom: 1px solid var(--slipr-color-surface); }
+.reader-search-input {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  font-size: 1.1rem;
+  padding: 0.6rem 0.8rem;
+  border: 2px solid color-mix(in srgb, var(--slipr-color-primary) 25%, transparent);
+  border-radius: 0.45rem;
+}
+.reader-search-input:focus { outline: none; border-color: var(--slipr-color-primary); }
+.reader-search-status { margin: 0; padding: 0.5rem 1rem 0; font-size: 0.85rem; color: var(--slipr-color-muted); }
+.reader-search-status:empty { display: none; }
+.reader-search-results { list-style: none; margin: 0; padding: 0.5rem; max-height: 60vh; overflow-y: auto; }
+.reader-search-result {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  padding: 0.6rem 0.75rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: none;
+  color: var(--slipr-color-text);
+  cursor: pointer;
+}
+.reader-search-result:hover,
+.reader-search-result:focus-visible { background: var(--slipr-color-surface); outline: none; }
+.reader-search-result-title { display: block; font-weight: 700; color: var(--slipr-color-primary); }
+.reader-search-result-snippet { display: block; font-size: 0.9rem; line-height: 1.45; color: var(--slipr-color-muted); }
+.reader-search-result-snippet mark { background: #FFE27A; color: inherit; border-radius: 2px; }
+.reader-search-result.is-glossary { cursor: default; }
+
+/* ---------- toast ---------- */
+.reader-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  z-index: 50;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 2rem);
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  background: var(--slipr-color-primary);
+  color: var(--slipr-color-on-primary);
+  font-size: 0.9rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(0 0 0 / 0.25);
+}
+.reader-toast[hidden] { display: none; }
+.reader-toast .reader-link-button { color: var(--slipr-color-accent); }

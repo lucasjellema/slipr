@@ -29,7 +29,7 @@ index.html
 
 ## File structure
 
-Built so far (Phases 1–2) is marked ✅. Everything else is planned.
+Built so far (Phases 1–3) is marked ✅. Everything else is planned.
 
 ```
 viewer/
@@ -48,17 +48,21 @@ viewer/
 │   └── visuals.js          build-up of charts/diagrams on fragment events (with the chart slot type)
 └── reader/
     ├── reader.js           ✅ app shell: top bar, contents, article; routing (#s-05/b3); keys
-    ├── state.js            reader state + persistence
+    ├── state.js            ✅ reader state: pure store + migrate(); IndexedDB → localStorage → memory adapters
     ├── personalize.js      ✅ pure: (show, prefs) → visible model; prefs from URL; nearest visible slide
-    ├── nav.js              ✅ chapter contents + scroll-spy (progress marks, tag filter: Phase 3)
+    ├── nav.js              ✅ contents with progress marks + bookmarks, scroll-spy, visit tracker
     ├── interactions.js     ✅ popover wiring (glossary, footnotes, hotspots), ARIA tabs
-    ├── search.js           index build + search UI
-    ├── annotations.js      selection → highlight/note, margin rendering, export/import
-    ├── welcome.js          first-visit profile / depth / path chooser
+    ├── search-index.js     ✅ pure: build index, search, snippets (accent-insensitive, word-prefix)
+    ├── search.js           ✅ search dialog + on-page highlight of matches
+    ├── quote.js            ✅ pure: text-quote anchoring (describe / locate)
+    ├── annotations.js      ✅ selection toolbar, highlights, "My notes" panel, export/import
+    ├── notes-export.js     ✅ pure: Markdown / JSON export, JSON merge-import
+    ├── tailor.js           ✅ choices form, first-visit welcome dialog, Tailor panel
     └── reader.css          ✅ page structure; block and popover styling comes from the template
 
 viewer/test/
-    └── personalize.test.js ✅ node --test
+    ├── personalize.test.js ✅ node --test
+    └── phase3.test.js      ✅ state, quote, search, notes export
 ```
 
 ## Start-up (`main.js`)
@@ -88,12 +92,14 @@ viewer/test/
 ```
 show + URL params ──► personalize(show, prefs) ──► visible model ──► render ──► DOM
                               ▲                                                │
-                         (Phase 3) stored prefs + toolbar controls ◄───────────┘
+                       stored prefs + Tailor panel / welcome ◄──────────────────┘
 ```
 
 - **`personalize.js`** is pure and DOM-free (tests in `viewer/test/`). It applies the path (selection and order; `"*"` = all), drops `reader.hidden` slides, filters blocks by `for` (no profile chosen = show all) and `depth ≤ level` (default 2), and groups consecutive slides by chapter. `nearestVisibleSlide()` maps a requested id onto what is visible: the nearest earlier visible slide in show order, then the nearest later one.
 - **Rendering** (`reader.js`): a hero header from `meta` (plus a "Tailored: …" note with a link back to the standard version when prefs differ from the default), one `<section>` per chapter run, and per slide an `<article id="{slide.id}">`. Each article holds a heading (visually hidden when the slide visual is shown), the slide visual (`shared/render.js`, `mode: 'reader'`, lazy images), the summary, blocks (`shared/blocks.js`, HTML strings), a collapsed "What the presenter said" panel, and "See also" links.
-- **Phase 3:** `state.js` will hold prefs, position, visited slides, bookmarks and annotations, persisted per `show.id` in IndexedDB, with URL parameters overriding them for the current visit.
+- **State** (`state.js`): `{ prefs, showNotes, welcomed, position, visited, bookmarks, annotations }` per `show.id`. A small pure store (`get` / `update` / `subscribe`) saves with a 300 ms debounce, and flushes on `pagehide` and when the tab is hidden. The adapter is IndexedDB (`slipr-reader` database), else localStorage, else memory (private modes). `migrate()` repairs anything stored, so a corrupt or old state never breaks the page.
+- **Effective prefs** = stored prefs overlaid with URL parameters. URL parameters apply for the visit. Once the reader changes something in the Tailor panel, they are removed from the URL (`replaceState`) and the stored prefs take over.
+- **Re-rendering** (`render()`): on any prefs change the article and contents are rebuilt, the scroll-spy, visit tracker and highlights are re-created, and the reader is scrolled back to the slide they were on (or the nearest visible one).
 
 ### Routing
 
@@ -110,18 +116,23 @@ show + URL params ──► personalize(show, prefs) ──► visible model ─
 - **Details** are native `<details>/<summary>`. **Tabs** use the ARIA tablist pattern with roving `tabindex` and ←/→/Home/End.
 - **Embeds** are `<iframe sandbox="allow-scripts allow-forms allow-popups" loading="lazy">`. Without `allow-same-origin`, an embedded page cannot touch the reader page.
 
-### Search *(Phase 3)*
-- `search.js` builds an in-memory inverted index at load (lower-cased, accent-folded tokens) over slide titles, slot text, block text, summaries and glossary. Notes are only included when enabled. Shows are small (hundreds of slides at most), so no library is needed.
-- Results are ranked by field weight (title > summary > body) and term proximity. Clicking a result navigates to `#slide/block` and highlights the match with the CSS Custom Highlight API.
+### Search
+- `search-index.js` (pure) builds one document per slide (title, summary, slot text), per reader block (titles, captions, tab and hotspot labels, Markdown bodies), per presenter-notes text and per glossary entry. Text is folded (lower case, accents stripped) with an index map back to the original, so snippets and highlights point at the right characters.
+- Matching: every query word must match the start of a word in the document (AND). Score = the best field weight per word (title 5 > summary / label 3 > content 2 > body 1), plus 2 for the full phrase. Shows are small, so a linear scan is fast enough and no inverted index is needed.
+- Results respect the tailoring: matches in hidden content are only counted, with a "show everything" action. Presenter notes are searched only while they are shown.
+- `search.js`: a modal `<dialog>` that searches as you type (↑/↓/Enter). The chosen result is reached through the normal routing, and the query words inside the target are marked with the CSS Custom Highlight API (`slipr-search`) for 5 s.
 
-### Annotations *(Phase 3)*
-- Anchoring follows the W3C Web Annotation idea: **block id + text-quote selector** (`prefix`, `exact`, `suffix`). This lets highlights survive small edits to the show. Orphaned annotations (text no longer found) are kept and listed separately.
-- Highlights are drawn with the CSS Custom Highlight API, so the content DOM is not modified.
-- Export/import: Markdown (readable) and JSON (lossless).
+### Annotations
+- Annotatable scopes: every reader block (`.slipr-block[data-block-id]`) and the slide summary (`data-block-id="_summary"`, DOM id `slide--_summary`). Slide visuals are not annotatable.
+- Creating: the selection must start and end in one scope. Its offsets in `scope.textContent` are computed with a `Range` (so hidden footnote text counts consistently), trimmed, and stored as a **text-quote selector** (`exact`, plus 32 characters of `prefix` / `suffix`, in `quote.js`) together with `slideId` and `blockId`.
+- Drawing: after every render, each annotation is re-anchored with `locateQuote()` (the best-matching occurrence wins) and mapped back to a DOM `Range`. All ranges go into one `Highlight` (`slipr-annotation`), so the content DOM is never modified. A click on highlighted text (`caretPositionFromPoint` → `Range.isPointInRange`) opens its note.
+- The "My notes" panel lists notes in show order, plus two separate groups: *hidden by your tailoring* (the block exists but isn't visible) and *text no longer found* (the block is gone or the quote can't be located). Notes are never deleted automatically.
+- Export: Markdown (with bookmarks) and JSON `{ slipr: "notes", version, show, annotations }`. Import merges by id, and the most recently `updated` version wins. Files for another show are refused.
 
-### Progress *(Phase 3)*
-- A slide counts as *visited* once ≥ 50 % of it has been in view for 3 s (IntersectionObserver).
-- `nav.js` will add progress marks to the contents entries it already renders (filtered by the active path).
+### Progress & bookmarks
+- `trackVisits()`: a slide counts as *read* once ≥ 50 % of it (or half the viewport, for tall slides) has been in view for 3 s. The contents list shows the marks and "n of m read".
+- The position (last slide read) is saved by the scroll-spy. On a visit without a hash, a toast offers "Continue with …".
+- Bookmarks: the ★ button per slide, or `M`. They are listed at the top of the contents and included in the Markdown export.
 
 ## Dependencies
 

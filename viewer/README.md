@@ -9,7 +9,7 @@ The viewer makes one show available in two very different ways:
 | Character | Linear, presenter-driven, with animations and visualizations | Interactive and explorative, tailored to the reader |
 | Feels like | PowerPoint / Keynote | An interactive article or a small learning site |
 
-> Status: **audience mode** and the **reader core** work (roadmap Phases 1–2). Reader personalisation controls, progress, search and annotations come in Phase 3. Features not built yet are marked *(planned)*.
+> Status: **audience mode** and **reader mode** work, including personalisation, progress, bookmarks, search and annotations (roadmap Phases 1–3). Features not built yet are marked *(planned)*.
 
 ## Opening a show
 
@@ -64,17 +64,15 @@ Most presentation clickers send `PageUp`/`PageDown`, so they work out of the box
 
 Built from scratch (no Reveal.js). The aim is a rich, personal reading and exploring experience.
 
-**Works today:** the article layout with chapters and a contents list (a drawer on phones), slide visuals that reflow on narrow screens, all reader blocks, popups, the presenter's notes, "See also" links, deep links, tailoring through URL parameters, and switching to audience mode at the same slide.
-
-### Getting started *(planned)*
-On first visit the reader gets a short welcome showing the show's title and description, plus up to three optional choices. Readers can skip them, and they can be changed at any time from the toolbar:
+### Getting started
+On first visit the reader gets a short welcome showing the show's title and description, plus up to three optional choices. Readers can skip them, and they can be changed at any time with **⚙ Tailor** in the top bar. A link that already contains `profile`, `depth` or `path` skips the welcome, and those parameters apply until the reader changes them in the Tailor panel:
 - **Who are you?** Choose a profile (e.g. *Developer*, *Manager*) and content is tailored to it.
 - **How deep?** *Overview*, *Standard* or *Deep dive*.
-- **Which route?** A path such as *5-minute overview* or *The full story*.
+- **Which route?** A path such as *5-minute overview* or *Under the hood*, or *Everything*.
 
 ### Screen layout
 
-Today the layout has the contents list and the article. The "My notes" margin arrives with annotations in Phase 3.
+On screens of 1400 px and wider, "My notes" docks beside the article. On smaller screens it slides in over the article from the right.
 
 ```
 ┌───────────────┬───────────────────────────────────────────┬──────────────┐
@@ -99,32 +97,34 @@ Today the layout has the contents list and the article. The "My notes" margin ar
 
 ### Tailored information
 - Blocks can be meant for specific **profiles**. A developer sees code and a manager sees trade-offs. Without a chosen profile you see everything, with a small "For Developer" badge on targeted blocks.
-- The **detail level** shows or hides deeper blocks. Today it is set with `?depth=`. *(planned)* A toolbar control that keeps your place.
-- Speaker notes appear as a collapsed *"What the presenter said"* panel under each slide.
+- The **detail level** shows or hides deeper blocks without losing your place (Tailor panel, `D`, or `?depth=`).
+- Speaker notes appear as a collapsed *"What the presenter said"* panel under each slide. They can be switched off in the Tailor panel.
 
 ### Personalised navigation
-- **Table of contents** by chapter. The slide you are reading is highlighted, and the address bar follows it, so you can copy a link at any time. *(planned)* Progress marks (✓ read, ● current, ○ not yet).
-- **Paths**: curated routes through the show (today via `?path=`). `J` / `K` follow your path.
+- **Table of contents** by chapter, with progress marks (filled = read, dark = current, open = not yet) and "n of m read" at the top. A slide counts as read once you've had it substantially in view for 3 seconds. The address bar follows the slide you're reading, so you can copy a link at any time.
+- **Paths**: curated routes through the show (Tailor panel or `?path=`). `J` / `K` follow your path.
 - **Related slides**: "see also / go deeper" links at the end of a slide.
-- *(planned)* **Resume where you left off**, plus **bookmarks**.
+- **Resume where you left off**: on return, a "Welcome back. Continue with …" message takes you to your last slide.
+- **Bookmarks**: the ★ next to each slide (or `M`). Bookmarked slides are listed at the top of the contents.
 - *(planned)* **Tag filter**: show only slides about a topic.
 
-### Search (`/`) *(planned)*
-Full-text search across slides, reader blocks, glossary and (optionally) notes. Results show the slide title and the matching snippet, and clicking one jumps there with the match highlighted.
+### Search (`/`)
+Full-text search across slides, reader blocks, glossary and presenter notes (when shown), as you type. It is case- and accent-insensitive and matches word beginnings ("temp" finds "template"). Results show where the match is with a marked snippet. ↑/↓ and Enter work, and opening a result jumps there with the words highlighted. Matches in content hidden by your current tailoring are counted, with a one-click "show everything".
 
-### Annotations *(planned)*
-- Select text to **highlight** it or **add a note**. Notes appear in the margin.
+### Annotations
+- Select text in the article to **highlight** it or **add a note**. Notes appear in the "My notes" panel (`N`), grouped by slide. Clicking highlighted text opens its note.
+- Highlights stay attached to their text when the show is edited a little. Notes on text that's hidden by your tailoring, or that no longer exists, are listed separately and never silently lost.
 - **Bookmark** any slide.
-- Everything is stored **only in your own browser**. It can be **exported** as Markdown (and imported again).
+- Everything (choices, progress, bookmarks, notes) is stored **only in your own browser**. Notes can be **exported** as Markdown (to read or share) or JSON, and a JSON export can be **imported** in another browser (it merges, and the newest version of a note wins).
 
 ### Keys
 
 | Key | Action |
 |---|---|
-| `/` | *(planned)* Search |
+| `/` | Search |
 | `J` / `K` | Next / previous slide on the current path |
-| `D` | *(planned)* Cycle detail level |
-| `N` | *(planned)* Toggle the notes panel |
-| `M` | *(planned)* Bookmark the current slide |
+| `D` | Cycle detail level (Overview → Standard → Deep dive) |
+| `N` | Toggle "My notes" |
+| `M` | Bookmark the current slide |
 | `A` | Switch to audience mode at this slide |
-| `Esc` | Close a popup or the contents drawer |
+| `Esc` | Close a popup, a panel, or the contents drawer |
