@@ -127,7 +127,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | `slipr` | string | yes | Format version of this file, currently `"0.1"` |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
-| `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json`. `version`: semver range |
+| `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json` (see *Template references* below). `version`: semver range |
 | `settings` | object | no | `aspectRatio` (`"16:9"` default, `"4:3"`), `transition` (`none`, `fade`, `slide`, `convex`, `concave`, `zoom`), `slideNumbers` (bool), `agenda` (bool: audience mode inserts a generated agenda slide before each chapter) |
 | `chapters` | array | no | `{ id, title, summary? }` in display order. They drive the audience agenda and progress, and the reader table of contents |
 | `glossary` | object | no | id → `{ term, definition, link? }`. Referenced from Markdown as `[[id]]` and shown as a popup in reader mode |
@@ -203,6 +203,16 @@ The template defines which slots a layout has and the type of each slot.
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
 | `diagram` | object | *(planned)* `{ "mermaid": "graph LR; A-->B" }` |
+
+## Template references
+
+`template.ref` is a URL reference resolved against `show.json`, so all of these work when the show is loaded by URL:
+
+- `../../templates/default`: relative, for shows inside the Slipr repository (the demos, converter output).
+- `/templates/default`: **root-relative**. The editor writes this for new shows (D-012), because a folder picked on disk has no known path relative to Slipr. It assumes Slipr is served at the root of its host.
+- `https://…/templates/brand`: a template on another host.
+
+When a show is opened **from a folder** (the editor's *Open…*, File System Access), only files inside the folder can be read. A ref that leaves the folder is then resolved **by name**: its last segment picks Slipr's own `templates/<name>/`, and the editor shows a notice unless the ref is already `/templates/<name>`. Templates stored inside a show folder are not supported yet.
 
 ## Validation rules
 

@@ -28,15 +28,18 @@ editor/
 │   └── editor.css        ✅
 ├── test/                 ✅ actions.test.js, store.test.js (node --test)
 └── js/
-    ├── main.js           ✅ bootstrap: load the show (?show=…) via shared/load.js, create store, mount panels, wire shortcuts
+    ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
+    ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+Enter, Ctrl+D, Alt+↑/↓, F5
-    ├── io/                  (planned, E-002)
-    │   ├── fs-access.js     File System Access API: open dir, read/write show.json, copy images
-    │   └── draft-store.js   IndexedDB drafts for crash recovery
+    ├── io/
+    │   ├── fs-access.js  ✅ File System Access API: pick folder, permission, write show.json, create a new show (copying images: E-006)
+    │   ├── serialize.js  ✅ DOM-free: show.json text with schema key order and 2-space indent
+    │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
+    │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
         ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete
@@ -48,10 +51,10 @@ editor/
         ├── hotspot-editor.js   (planned, E-006) click on an image to place and edit hotspots
         ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
         ├── field-editors.js    (planned, E-004) one editor per slot type, including a cards editor (I-035)
-        └── dialogs.js          (planned) new-show, alt-text, confirm
+        └── dialogs.js       ✅ start screen, access screen, new-show and choose-folder dialogs, banners (alt-text dialog: E-006)
 ```
 
-**Current limits (E-001, E-010):** Save only marks the store clean; nothing is written to disk until E-002. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
+**Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). Present and Read work for shows opened by URL; for shows opened from a folder they come with E-007. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
 
 ## Key components
 
@@ -77,12 +80,13 @@ Like the slide form, block editors are chosen by block `type`, so a new block ty
 ### Preview (`preview.js`)
 In **audience** mode it renders the selected slide with `shared/render.js` into a fixed 1920×1080 container that is CSS-scaled to fit the pane. In **reader** mode it renders the slide visual plus its blocks via `shared/blocks.js`, after filtering with the viewer's `personalize.js` for the profile and depth chosen in the preview toolbar. Re-renders debounced at 150 ms. It also shows `validate.js` warnings for that slide. Thumbnails in the slide list use the same renderer at a smaller scale.
 
-### Persistence (`io/`)
-- **Open**: `showDirectoryPicker()` → read `show.json` → `load.js` resolves the template.
-- **Save**: write `show.json` (pretty-printed, 2-space indent, stable key order for clean git diffs).
+### Persistence (`io/`, `files.js`)
+- **Open**: `showDirectoryPicker()` → check for `show.json` → remember the handle in IndexedDB (`shared/folder-handles.js`) → reload as `?folder=<key>`. On load, `loadShowFromFolder()` reads the show and its images through the handle and resolves the template by name (D-012). Reloading keeps working; if the browser dropped the permission, an access screen asks for it with one click.
+- **New**: title + template (from `templates/index.json`) → pick an empty folder → write `show.json` (template ref `/templates/<id>`) and `images/` → open it like *Open*.
+- **Save**: write `show.json` (`io/serialize.js`: 2-space indent, key order from the JSON Schema, like the converter's output). Saving a hand-formatted file reformats it once. A show opened by URL (`?show=`) first asks for its folder and checks the show id. Edits made while saving stay dirty (`store.markSaved()`).
 - **Images**: written to `images/<slug>-<hash8>.<ext>` to avoid name collisions.
 - **Drafts**: the current show goes to IndexedDB every 5 s while dirty. On open, if a newer draft exists, the editor offers to restore it.
-- Folder handles are remembered in IndexedDB for "recent shows". Permission is re-requested on reopen.
+- Folder handles are remembered in IndexedDB for "recent shows" (start screen). Permission is re-requested on reopen, from a click.
 
 ### Viewer integration
 "Present" and "Read" save first, then open the viewer on the same show. A show opened by URL opens `viewer/?show=<path>`. A show opened from a folder opens `viewer/?folder=<key>`: the folder handle is shared through IndexedDB, and the viewer reads the folder itself (D-012, E-007).

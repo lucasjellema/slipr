@@ -59,13 +59,13 @@ export function mountSlideList(container, store) {
       const badges = [];
       if (slide.chapter) {
         const chapterTitle = state.show?.chapters?.find((c) => c.id === slide.chapter)?.title ?? slide.chapter;
-        badges.push(h('span', { class: 'slipr-badge slipr-badge-chapter' }, [chapterTitle]));
+        badges.push(h('span', { class: 'slipr-item-badge slipr-item-badge--chapter' }, [chapterTitle]));
       }
       if (isAudienceHidden) {
-        badges.push(h('span', { class: 'slipr-badge slipr-badge-dim' }, ['No Audience']));
+        badges.push(h('span', { class: 'slipr-item-badge slipr-item-badge--dim' }, ['No Audience']));
       }
       if (isReaderHidden) {
-        badges.push(h('span', { class: 'slipr-badge slipr-badge-dim' }, ['No Reader']));
+        badges.push(h('span', { class: 'slipr-item-badge slipr-item-badge--dim' }, ['No Reader']));
       }
 
       const item = h(

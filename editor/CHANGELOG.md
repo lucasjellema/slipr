@@ -4,6 +4,14 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Open, save and new-from-template (E-002)
+- **Added** Open… (pick a show folder), New… (title and template, then an empty folder: `show.json` with `"ref": "/templates/<id>"`, and `images/`), and Save / `Ctrl+S` (writes `show.json` through the File System Access API). Folder shows reopen as `editor/?folder=<key>` (D-012); after a reload the browser may ask for access again with one click.
+- **Added** a start screen (open, new, recent shows, demo link) when the editor opens without a show, and banners for notices, errors and "Saved".
+- **Added** `io/serialize.js` (schema key order, 2-space indent, like the converter), `io/new-show.js`, `io/fs-access.js`, `files.js`, `ui/dialogs.js`, `store.markSaved()` / `store.setFolderHandle()`, and tests (`editor/test/io.test.js`, store).
+- **Added** saving a show that was opened by URL: the editor asks for its folder and checks the show id first.
+- **Added** a warning before closing the tab with unsaved changes.
+- **Fixed** the editor never loading the template's `reader.css` and ignoring `template.theme` (it read a non-existent `template.styles`). Its slide-list chips are now `slipr-item-badge`, because `slipr-badge` belongs to reader blocks and is styled by templates.
+
 ### 2026-10-10: Slide form writes valid slot values (E-010)
 - **Fixed** the slide form corrupting non-text slots. An `image` slot has a path and an alt-text input and always writes `{ src, alt, … }` (keeping `fit` and `focus`); an empty path removes the slot. `quote`, `code`, `cards` and unknown slot types are read-only with a short summary instead of a text input showing `[object Object]`. A `list` stored as an array stays an array. Emptying a text field removes the slot instead of writing `""`.
 - **Added** `editor/js/slot-values.js`: the DOM-free rules for which editor a slot gets and which value shape it writes, with tests (`editor/test/slot-values.test.js`).

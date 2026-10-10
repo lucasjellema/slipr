@@ -248,6 +248,26 @@ export class EditorStore {
   }
 
   /**
+   * Mark the store clean after a save, but only if the show is still the one
+   * that was written: edits made while the save was running stay dirty.
+   * @param {any} savedShow  The show object that was written.
+   */
+  markSaved(savedShow) {
+    if (this.state.show !== savedShow) return;
+    this.markClean();
+  }
+
+  /**
+   * Remember the folder the show is saved to (E-002).
+   * @param {any} folderHandle  A FileSystemDirectoryHandle, or null.
+   */
+  setFolderHandle(folderHandle) {
+    if (this.state.folderHandle === folderHandle) return;
+    this.state.folderHandle = folderHandle;
+    this._notify(['folderHandle']);
+  }
+
+  /**
    * Select a slide by ID.
    * @param {string | null} slideId
    */

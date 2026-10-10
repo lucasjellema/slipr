@@ -7,6 +7,17 @@ const demo = readJson('shows/demo/show.json');
 const template = readJson('templates/default/template.json');
 
 describe('editor store', () => {
+  test('markSaved clears dirty only if nothing changed during the save', () => {
+    const store = createStore(demo, { template });
+    store.dispatch('setSlot', { slideId: 's-title', slot: 'title', value: 'A' });
+    const saving = store.state.show;
+    store.dispatch('setSlot', { slideId: 's-title', slot: 'title', value: 'B' });
+    store.markSaved(saving);
+    assert.equal(store.state.dirty, true, 'an edit during the save stays unsaved');
+    store.markSaved(store.state.show);
+    assert.equal(store.state.dirty, false);
+  });
+
   test('issuesForSlide matches slides by index and keeps show-level issues', () => {
     const validation = {
       errors: [{ path: 'slides[1].content.image' }, { path: 'slides[10].content' }],

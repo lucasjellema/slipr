@@ -19,7 +19,7 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 
 ## Smoke-test checklist
 
-Steps 1, 4, 6 and 7 need folder access (E-002) and can't be run yet. Until then, open a show with `editor/?show=../shows/demo/show.json` and check steps 2, 3, 5 and 9, plus the preview in both modes.
+Steps 4 (E-006), 7 (I-020) and 8 for folder shows (E-007) can't be run yet. Shows by URL: `editor/?show=../shows/demo/show.json`. The native folder picker can't be driven from Claude's browser pane; there, test steps 1 and 6 with a folder in the origin-private file system (`navigator.storage.getDirectory()`) remembered via `shared/folder-handles.js` and opened as `editor/?folder=<key>`, and clean it up afterwards.
 
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one.

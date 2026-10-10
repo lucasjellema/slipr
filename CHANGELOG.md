@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Show folders opened from anywhere (D-012, E-002)
+- **Added** `shared/folder-source.js` (read a show folder through a File System Access handle) and `shared/folder-handles.js` (remember folder handles in IndexedDB under a key).
+- **Added** `loadShowFromFolder()` and `resolveFolderTemplate()` in `shared/load.js`. `loadShow()` is unchanged apart from a new `notices` field (always empty for URLs).
+- **Added** `templates/index.json`, the list of templates the editor offers for a new show. A test keeps it in sync with the template folders.
+- **Changed** the template-ref convention, with no format change: new shows reference their template root-relative (`/templates/<id>`). Documented in `docs/show-format.md`.
+- **Decided** D-012: shows outside the server root are shared with the viewer as a folder handle, and their template is resolved by name.
+
 ### 2026-10-10: Documentation pass (handover)
 - **Changed** README, ROADMAP, ARCHITECTURE (new *Templates* section), OVERVIEW (specs and template READMEs), CLAUDE.md (company material, parallel sessions), and the component docs, to match the current state: Phases 0–4 done, the Conclusion template with 17 layouts, and the editor's first version (E-001) with its known limits.
 - **Added** backlog items E-010 (the editor's slide form overwrites image/quote/code/cards values with text), I-035 (cards editor) and I-058 (Facts icons).

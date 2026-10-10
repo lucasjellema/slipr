@@ -17,14 +17,14 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 5 (Editor MVP)
 
-- [ ] **E-002** [editor] Open, save and new-from-template via File System Access API · todo · —
 - [ ] **E-003** [editor] Slide list: add, duplicate, delete, reorder, hide · in progress (basic version in E-001) · —
 - [ ] **E-004** [editor] Slide tab: generated slot form + layout picker. Needs a field editor per slot type, including cards (I-035) · in progress (text/richtext/list inputs in E-001) · —
 - [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
 - [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 - [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · todo · —
-- [ ] **E-007** [editor] Present / Read buttons · todo · —
+- [ ] **E-007** [editor] Present / Read buttons. Approach decided (D-012, `docs/specs/E-007-shows-outside-server-root.md`): `viewer/?folder=<key>` reading the shared handle via `shared/folder-source.js`; save first · todo · —
+- [ ] **E-011** [editor] Bug: "+ Add" and `Ctrl+Enter` always add a slide with layout `bullets`, which the Conclusion template doesn't have (the new slide is invalid). Use the current slide's layout or the template's first content layout · todo · —
 
 ## Pending verification & chores from earlier phases
 
@@ -32,8 +32,8 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Spec: `docs/specs/I-043-conclusion-template.md`. **Done so far**: first version (12 layouts) and the card layouts (I-043b): 17 layouts, and all 20 PowerPoint layouts convert. Left: I-043c, I-043d, I-058 · in progress · claude
 - [ ] **I-043c** [converter] `slipr-template-from-pptx`: generate a draft template from a PowerPoint template (for business-unit variants) · todo · —
 - [ ] **I-043d** [templates] Review of the Conclusion template by Lucas, and later by the brand team, before external use · todo · lucas
-- [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
-- [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
+- [X] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · done · lucas
+- [X] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · done · lucas
 
 ## Later
 
@@ -167,6 +167,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-002** [editor] Open, save and new-from-template via the File System Access API: start screen with recent shows, `?folder=<key>` with permission re-request from a click, Save/`Ctrl+S` with schema key order, saving URL-opened shows after picking their folder, `templates/index.json`, shared folder loader (D-012) · done 2026-10-10 · claude
 - [x] **E-010** [editor] Bug: the slide form corrupted non-text slots. Image slots now get a path and an alt-text input and always write `{ src, alt, … }`; `quote`, `code`, `cards` (and unknown types) are read-only with a summary; array lists stay arrays. Also fixed on the way: the store passed the template to `validateShow` in the wrong argument (template checks never ran), the preview's diagnostics never matched slide warnings and hid errors, and wrong import paths in `ui/preview.js` / `ui/slide-list.js` stopped the editor from loading · done 2026-10-10 · claude
 - [x] **I-043b** [format/templates] `cards` slot type (template format 0.2) + the five card layouts of the Conclusion template (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction): schemas, specs, validator, renderer, viewer (fragments, search, pins), converter card roles, demo slides, tests · done 2026-10-10 · claude
 - [x] **E-001** [editor] Shell, store, actions, undo/redo: 3-column app, pure actions with reference cleanup, store with coalescing, live preview, shortcuts, 24 tests · done 2026-10-10 · claude
