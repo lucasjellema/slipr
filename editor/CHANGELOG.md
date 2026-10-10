@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Hotspots and image blocks (E-006, done)
+- **Added** the hotspot editor (`ui/hotspot-editor.js`) for reader image blocks: click on the image to place a hotspot (its title is focused and selected), drag a numbered marker to move it (one undo step), or with a marker focused nudge it with the arrow keys (Shift: 5 %) and remove it with `Delete`. "+ Add hotspot" places one in the middle for keyboard users. Each hotspot has a title and Markdown popup text.
+- **Added** an image-block editor: the same image field as image slots (choose, drop, paste, alt-text dialog), alt text and caption.
+- **Added** actions `setBlockType` (with `convertBlock()`), `addHotspot`, `updateHotspot`, `deleteHotspot`; `updateBlock` removes keys patched to `undefined`. Tests in `editor/test/blocks-hotspots.test.js`.
+- **Fixed** the Reader tab writing invalid blocks: changing a block's type only changed `type` (leftover fields, missing required ones); callouts were written with `kind` (note/warning/tip) instead of the format's `variant` (info/tip/warning/quote); and tabs, embed, slide-ref and image blocks got a Markdown box that added an `md` field. Type changes now convert the block, the callout editor uses `variant` (plus an optional title), and tabs, embed and slide-ref are read-only until they get editors. The type picker now offers *Embedded Page* too.
+- **Changed** the image field into `ui/image-field.js`, shared by image slots and image blocks; `image-input.js` gains `addImageToBlock()`.
+
 ### 2026-10-10: Images: choose, drop and paste (E-006, first part)
 - **Added** to every image field a preview and three ways to add an image: **Choose…**, dropping an image file, and pasting from the clipboard (`Ctrl+V` in the field, the **Paste** button, or `Ctrl+V` anywhere outside a text field, which fills the slide's first empty image slot). The image is copied into `images/<slug>-<hash8>.<ext>`; an image already in the folder (same content hash) is reused. Then the alt-text dialog asks for a description. Large images (over 3 MB) get a notice.
 - **Added** `io/images.js` (names, types; tests), `image-input.js`, `writeImage()` / `findImageBySuffix()` in `io/fs-access.js`, and the alt-text dialog.

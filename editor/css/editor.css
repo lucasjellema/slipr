@@ -842,3 +842,112 @@ body.is-screen #slipr-editor-banners {
   border-radius: 4px;
   background: var(--slipr-editor-bg);
 }
+
+/* ---------- Reader image blocks and hotspots (E-006) ---------- */
+
+.slipr-image-block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-hs-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.slipr-hs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slipr-hs-head .slipr-label {
+  margin: 0;
+}
+
+.slipr-hs-frame {
+  position: relative;
+  width: 100%;
+  line-height: 0;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 4px;
+  overflow: visible;
+}
+
+.slipr-hs-image {
+  display: block;
+  /* Full width with the natural aspect ratio, so marker percentages match the image. */
+  width: 100%;
+  height: auto;
+  cursor: crosshair;
+  user-select: none;
+}
+
+.slipr-hs-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  background: var(--slipr-editor-accent);
+  color: #FFFFFF;
+  font: 600 12px/1 var(--slipr-font-sans);
+  cursor: grab;
+  touch-action: none;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.5);
+}
+
+.slipr-hs-marker:active {
+  cursor: grabbing;
+}
+
+.slipr-hs-marker.is-selected,
+.slipr-hs-marker:focus-visible {
+  outline: 3px solid var(--slipr-editor-warning);
+  outline-offset: 1px;
+}
+
+.slipr-hs-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-hs-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+}
+
+.slipr-hs-row.is-selected {
+  border-color: var(--slipr-editor-warning);
+}
+
+.slipr-hs-number {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--slipr-editor-accent);
+  color: #FFFFFF;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.slipr-hs-fields {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}

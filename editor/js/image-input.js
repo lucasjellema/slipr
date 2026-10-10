@@ -72,11 +72,13 @@ export function pasteTargetSlot(template, slide) {
 }
 
 /**
- * Copy an image into the show folder and put it in a slot, then ask for alt text.
+ * Copy an image into the show folder, store it with `write`, then ask for alt text.
  * @param {import('./store.js').EditorStore} store
- * @param {{ slideId: string, slot: string, file: File }} target
+ * @param {{ slideId: string, file: File, fallbackName: string,
+ *   read: (slide: any) => any, write: (image: any) => void }} target
+ *   `read` returns the current image value of the target, `write` stores a new one.
  */
-export async function addImageToSlot(store, { slideId, slot, file }) {
+async function addImage(store, { slideId, file, fallbackName, read, write }) {
   const handle = store.state.folderHandle;
   if (!handle) {
     showBanner('To add images, Slipr needs to write to the show folder. Choose it, then add the image again.', 'info', { timeout: 6000 });
@@ -88,11 +90,9 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
   if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
 
   const slideOf = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
-  const slide = slideOf();
-  if (!slide) return;
+  if (!slideOf()) return;
   const bytes = await file.arrayBuffer();
   const blob = file.type === type ? file : new Blob([bytes], { type });
-  const fallbackName = `${slugify(slide.content?.title ?? '') || slide.id}-${slot}`;
   const newPath = await imagePath({ name: file.name, type, bytes }, fallbackName);
   // The same image may already be in the folder under another name: reuse it.
   const suffix = contentSuffix(newPath);
@@ -100,9 +100,9 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
   if (path === newPath) await writeImage(handle, path, blob);
   store.state.registerAsset?.(path, blob);
 
-  const previous = slide.content?.[slot];
+  const previous = read(slideOf());
   const keepAlt = previous?.src === path;
-  store.dispatch('setSlot', { slideId, slot, value: imageValue(keepAlt ? previous : { ...previous, alt: undefined }, { src: path }) });
+  write(imageValue(keepAlt ? previous : { ...previous, alt: undefined }, { src: path }));
 
   if (file.size > LARGE_IMAGE_BYTES) {
     showBanner(`This image is ${(file.size / 1024 / 1024).toFixed(1)} MB. Large images make shows slow to open; consider a smaller or compressed version.`, 'info', { timeout: 8000 });
@@ -115,9 +115,41 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
     alt: keepAlt ? previous?.alt ?? '' : '',
     onClose: () => URL.revokeObjectURL(previewUrl),
     onSave: (alt) => {
-      const current = slideOf()?.content?.[slot];
+      const current = read(slideOf());
       if (current?.src !== path) return; // changed meanwhile
-      store.dispatch('setSlot', { slideId, slot, value: imageValue(current, { alt }) });
+      write(imageValue(current, { alt }));
     },
+  });
+}
+
+/**
+ * Copy an image into the show folder and put it in an image slot, then ask for alt text.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, slot: string, file: File }} target
+ */
+export async function addImageToSlot(store, { slideId, slot, file }) {
+  const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${slot}`,
+    read: (s) => s?.content?.[slot],
+    write: (value) => store.dispatch('setSlot', { slideId, slot, value }),
+  });
+}
+
+/**
+ * Copy an image into the show folder and put it in a reader image block, then ask for alt text.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, blockId: string, file: File }} target
+ */
+export async function addImageToBlock(store, { slideId, blockId, file }) {
+  const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-reader`,
+    read: (s) => s?.reader?.blocks?.find((/** @type {any} */ b) => b.id === blockId)?.image,
+    write: (image) => store.dispatch('updateBlock', { slideId, blockId, patch: { image } }),
   });
 }

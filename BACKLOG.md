@@ -22,7 +22,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
 - [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
-- [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · in progress (choose / drop / paste into image slots, alt-text dialog, dedup by content: done 2026-10-10; left: hotspot placement on reader image blocks) · claude
 
 ## Pending verification & chores from earlier phases
 
@@ -77,6 +76,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
+- [ ] **I-036** [editor] Block editors for `tabs` (add, rename, reorder tabs), `embed` (URL, title, height) and `slide-ref` (slide picker, label). They are read-only in the Reader tab since E-006
 - [ ] **I-035** [editor] Cards editor for `cards` slots in the generated slot form: add, remove and reorder cards, one input per field (by field type), `maxItems` and `maxLength` hints. Needed by E-004 for the five Conclusion card layouts
 
 ### Converter
@@ -165,6 +165,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-006** [editor] Images and hotspots: choose / drop / paste images into image slots and reader image blocks, alt-text dialog, dedup by content; hotspot editor (click to place, drag or arrow keys to move, title + Markdown). Also fixed the Reader tab writing invalid blocks (type change, callout `kind` → `variant`, `md` on non-text blocks) · done 2026-10-10 · claude
 - [x] **E-013** [editor] Bug: after changing a slide's layout the form kept the old layout's fields (no image field for `text-image`); buttons and undo inside the inspector tabs showed stale content. Forms now re-render for everything except the echo of the user's own typing, keeping focus · done 2026-10-10 · claude
 - [x] **E-012** [editor] Bug: the slide list did not scroll, so slides beyond the window could not be reached; the toolbar hid its buttons in narrow windows. Fixed, plus a slide navigator ("Go to slide" filter, keyboard navigation, PageUp/PageDown) · done 2026-10-10 · claude
 - [x] **E-007** [editor/viewer] Present / Read: save first, then open the viewer at the current slide, `viewer/?folder=<key>` for folder shows (D-012) or `?show=` for URL shows. Viewer: `?folder=`, access page, "Open a show folder…" on the help page · done 2026-10-10 · claude

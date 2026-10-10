@@ -47,11 +47,12 @@ editor/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
         ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
-        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile/depth controls, related slides
+        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile/depth controls, related slides; block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
+        ├── image-field.js   ✅ image preview + choose / drop / paste, used by image slots and image blocks (E-006)
         ├── show-settings.js ✅ "Settings" tab: meta, settings, chapters, glossary, profiles, paths
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
-        ├── block-editors.js    (planned) one editor per reader block type
-        ├── hotspot-editor.js   (planned, E-006) click on an image to place and edit hotspots
+        ├── block-editors.js    (planned) block editors moved out of reader-form.js, incl. tabs, embed, slide-ref
+        ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
         ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
         ├── field-editors.js    (planned, E-004) one editor per slot type, including a cards editor (I-035)
         └── dialogs.js       ✅ start screen, access screen, new-show, choose-folder and alt-text dialogs, banners
@@ -78,6 +79,8 @@ Pure and unit-testable in Node:
 The form is generated, not hand-built. For the selected slide's layout it iterates over `layout.slots` and mounts the matching field editor. This means a new layout in a template appears in the editor automatically.
 
 ### Reader tab (`reader-form.js` + `block-editors.js`)
+Changing a block's type goes through `setBlockType` / `convertBlock()` in `actions.js`, which gives the block a valid shape for the new type (keeping id, `for`, `depth`, and the text where it fits). Types without an editor are read-only, never a Markdown box. Hotspots (`hotspot-editor.js`) are edited with `addHotspot` / `updateHotspot` / `deleteHotspot`; coordinates are fractions 0–1, clamped and rounded to 4 decimals. A drag moves the marker locally and stores the position on release, so it is one undo step.
+
 Like the slide form, block editors are chosen by block `type`, so a new block type means a new editor module plus support in `shared/blocks.js`. Every block editor carries the common controls: profiles (`for`) and depth. Markdown fields get a small toolbar for inserting `[[glossary]]` references (with autocomplete from the glossary), `^[popups]` and slide links.
 
 ### Preview (`preview.js`)

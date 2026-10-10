@@ -5,9 +5,13 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+import { addImageToBlock } from '../image-input.js';
+import { imageValue } from '../slot-values.js';
+import { imageField, runImage } from './image-field.js';
+import { hotspotEditor } from './hotspot-editor.js';
 
 /** Actions the reader form dispatches while the user types. */
-const TYPING_ACTIONS = new Set(['setSummary', 'updateBlock']);
+const TYPING_ACTIONS = new Set(['setSummary', 'updateBlock', 'updateHotspot']);
 
 const BLOCK_TYPES = [
   { type: 'text', label: 'Text (Markdown)' },
@@ -15,7 +19,15 @@ const BLOCK_TYPES = [
   { type: 'callout', label: 'Callout Box' },
   { type: 'tabs', label: 'Tabs' },
   { type: 'image', label: 'Image with Hotspots' },
+  { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
+];
+
+const CALLOUT_VARIANTS = [
+  { value: 'info', label: 'Info' },
+  { value: 'tip', label: 'Tip' },
+  { value: 'warning', label: 'Warning' },
+  { value: 'quote', label: 'Quote' },
 ];
 
 /**
@@ -90,12 +102,9 @@ export function mountReaderForm(container, store) {
         {
           class: 'slipr-select slipr-select-sm',
           onchange: (e) => {
+            // setBlockType converts the block to a valid shape for the new type.
             const newType = /** @type {HTMLSelectElement} */ (e.target).value;
-            store.dispatch('updateBlock', {
-              slideId: slide.id,
-              blockId: block.id,
-              patch: { type: newType },
-            });
+            store.dispatch('setBlockType', { slideId: slide.id, blockId: block.id, type: newType });
           },
         },
         BLOCK_TYPES.map((bt) =>
@@ -190,21 +199,29 @@ export function mountReaderForm(container, store) {
         );
         bodyEl.append(titleInput, mdArea);
       } else if (block.type === 'callout') {
+        const variant = block.variant ?? 'info';
         const kindSelect = h(
           'select',
           {
             class: 'slipr-select slipr-select-sm',
+            'aria-label': 'Callout kind',
             onchange: (e) => {
               const val = /** @type {HTMLSelectElement} */ (e.target).value;
-              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { kind: val } });
+              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { variant: val } });
             },
           },
-          [
-            h('option', { value: 'note', selected: block.kind === 'note' ? true : undefined }, ['Note']),
-            h('option', { value: 'warning', selected: block.kind === 'warning' ? true : undefined }, ['Warning']),
-            h('option', { value: 'tip', selected: block.kind === 'tip' ? true : undefined }, ['Tip']),
-          ]
+          CALLOUT_VARIANTS.map((v) => h('option', { value: v.value, selected: v.value === variant ? true : undefined }, [v.label]))
         );
+        const calloutTitle = h('input', {
+          type: 'text',
+          class: 'slipr-input slipr-input-sm',
+          placeholder: 'Title (optional)',
+          value: block.title ?? '',
+          oninput: (e) => {
+            const val = /** @type {HTMLInputElement} */ (e.target).value;
+            store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { title: val || undefined } });
+          },
+        });
         const mdArea = h(
           'textarea',
           {
@@ -217,7 +234,15 @@ export function mountReaderForm(container, store) {
           },
           [block.md ?? '']
         );
-        bodyEl.append(kindSelect, mdArea);
+        bodyEl.append(kindSelect, calloutTitle, mdArea);
+      } else if (block.type === 'image') {
+        bodyEl.append(imageBlockEditor(store, slide.id, block));
+      } else if (block.type !== 'text') {
+        // tabs, embed, slide-ref: no editor yet. Read-only, so their shape is never broken.
+        bodyEl.append(
+          h('div', { class: 'slipr-readonly' }, [describeBlock(block)]),
+          h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
+        );
       } else {
         // Default text markdown editor
         const mdArea = h(
@@ -265,4 +290,61 @@ export function mountReaderForm(container, store) {
   });
 
   render();
+}
+
+/**
+ * Editor for a reader image block: the image (choose, drop or paste), alt
+ * text, caption, and the hotspot editor (E-006).
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function imageBlockEditor(store, slideId, block) {
+  const update = (/** @type {Record<string, any>} */ patch) =>
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch });
+  return h('div', { class: 'slipr-image-block' }, [
+    imageField({
+      label: 'Reader image',
+      image: block.image,
+      resolveAsset: store.state.resolveAsset,
+      onFile: (file) => runImage(() => addImageToBlock(store, { slideId, blockId: block.id, file })),
+    }),
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm slipr-input-alt',
+      placeholder: 'Alt text: what the image shows',
+      'aria-label': 'Reader image: alt text',
+      value: block.image?.alt ?? '',
+      disabled: block.image?.src ? undefined : true,
+      oninput: (/** @type {Event} */ e) => {
+        if (!block.image?.src) return;
+        const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+          ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.image;
+        update({ image: imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value }) });
+      },
+    }),
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm slipr-input-alt',
+      placeholder: 'Caption (optional)',
+      'aria-label': 'Reader image: caption',
+      value: block.caption ?? '',
+      oninput: (/** @type {Event} */ e) => update({ caption: /** @type {HTMLInputElement} */ (e.target).value || undefined }),
+    }),
+    block.image?.src
+      ? hotspotEditor({ store, slideId, block })
+      : h('p', { class: 'slipr-help' }, ['Add an image first; then you can place hotspots on it.']),
+  ]);
+}
+
+/**
+ * One-line summary of a block without an editor.
+ * @param {any} block
+ * @returns {string}
+ */
+function describeBlock(block) {
+  if (block.type === 'tabs') return `${block.tabs?.length ?? 0} tab(s): ${(block.tabs ?? []).map((/** @type {any} */ t) => t.label).join(', ')}`;
+  if (block.type === 'embed') return `${block.title || 'Embedded page'}: ${block.url || '(no URL yet)'}`;
+  if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
+  return block.type;
 }

@@ -425,7 +425,8 @@ export function addBlock(show, { slideId, block, afterBlockId = null }) {
 }
 
 /**
- * Update an existing block in a slide's reader layer.
+ * Update an existing block in a slide's reader layer. Keys patched to
+ * `undefined` are removed.
  * @param {any} show
  * @param {{ slideId: string, blockId: string, patch: Record<string, any> }} payload
  * @returns {any}
@@ -436,7 +437,10 @@ export function updateBlock(show, { slideId, blockId, patch }) {
     if (s.id !== slideId || !Array.isArray(s.reader?.blocks)) return s;
     const blocks = s.reader.blocks.map((b) => {
       if (b.id !== blockId) return b;
-      return { ...b, ...patch };
+      const next = { ...b, ...patch };
+      // A field patched to undefined is removed (an emptied optional field).
+      for (const [key, value] of Object.entries(patch)) if (value === undefined) delete next[key];
+      return next;
     });
     return { ...s, reader: { ...s.reader, blocks } };
   });
@@ -481,6 +485,147 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
     return { ...s, reader: { ...s.reader, blocks } };
   });
   return { ...show, slides };
+}
+
+/** Block types and the order of the type picker. */
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref'];
+
+/**
+ * A block converted to another type, in a valid shape for that type (see the
+ * block definitions in shared/schema/show.schema.json). Keeps id, `for` and
+ * `depth`, and carries text over where the new type has a place for it.
+ * Fields the new type has no place for are dropped (undo brings them back).
+ * @param {any} block
+ * @param {string} type
+ * @param {{ slideId?: string }} [defaults]  `slideId`: target for a new slide-ref.
+ * @returns {any}
+ */
+export function convertBlock(block, type, defaults = {}) {
+  const base = {
+    id: block.id,
+    type,
+    ...(block.for !== undefined ? { for: block.for } : {}),
+    ...(block.depth !== undefined ? { depth: block.depth } : {}),
+  };
+  const md = typeof block.md === 'string'
+    ? block.md
+    : Array.isArray(block.tabs) ? block.tabs.map((/** @type {any} */ t) => t.md ?? '').filter(Boolean).join('\n\n') : '';
+  const title = typeof block.title === 'string' && block.title ? block.title : undefined;
+  switch (type) {
+    case 'text':
+      return { ...base, md };
+    case 'details':
+      return { ...base, title: title ?? 'More details', md, ...(block.open ? { open: true } : {}) };
+    case 'callout':
+      return { ...base, variant: block.variant ?? 'info', ...(title ? { title } : {}), md };
+    case 'tabs':
+      return { ...base, tabs: Array.isArray(block.tabs) ? block.tabs : [{ label: title ?? 'Tab 1', md }] };
+    case 'image':
+      return {
+        ...base,
+        ...(block.image ? { image: block.image } : {}),
+        ...(block.caption ? { caption: block.caption } : {}),
+        ...(Array.isArray(block.hotspots) ? { hotspots: block.hotspots } : {}),
+      };
+    case 'embed':
+      return { ...base, url: block.url ?? '', title: title ?? 'Embedded page', ...(block.height ? { height: block.height } : {}) };
+    case 'slide-ref':
+      return { ...base, slide: block.slide ?? defaults.slideId ?? '', ...(block.label ? { label: block.label } : {}) };
+    default:
+      return { ...block, type };
+  }
+}
+
+/**
+ * Change a block's type, converting it to a valid shape (see convertBlock).
+ * A new slide-ref points at the next slide (or the previous one for the last).
+ * @param {any} show
+ * @param {{ slideId: string, blockId: string, type: string }} payload
+ * @returns {any}
+ */
+export function setBlockType(show, { slideId, blockId, type }) {
+  if (!Array.isArray(show.slides)) return show;
+  const index = show.slides.findIndex((/** @type {any} */ s) => s.id === slideId);
+  const neighbour = show.slides[index + 1] ?? show.slides[index - 1];
+  return mapBlock(show, slideId, blockId, (b) => (b.type === type ? b : convertBlock(b, type, { slideId: neighbour?.id })));
+}
+
+/**
+ * @param {any} show @param {string} slideId @param {string} blockId
+ * @param {(block: any) => any} fn
+ * @returns {any}
+ */
+function mapBlock(show, slideId, blockId, fn) {
+  if (!Array.isArray(show.slides)) return show;
+  let changed = false;
+  const slides = show.slides.map((/** @type {any} */ s) => {
+    if (s.id !== slideId || !Array.isArray(s.reader?.blocks)) return s;
+    const blocks = s.reader.blocks.map((/** @type {any} */ b) => {
+      if (b.id !== blockId) return b;
+      const next = fn(b);
+      if (next !== b) changed = true;
+      return next;
+    });
+    return changed ? { ...s, reader: { ...s.reader, blocks } } : s;
+  });
+  return changed ? { ...show, slides } : show;
+}
+
+/**
+ * A hotspot coordinate: a fraction 0–1 of the image size, rounded to 4 decimals.
+ * @param {number} value
+ * @returns {number}
+ */
+export function hotspotCoordinate(value) {
+  const n = Number.isFinite(value) ? value : 0.5;
+  return Math.round(Math.min(1, Math.max(0, n)) * 10000) / 10000;
+}
+
+/**
+ * Add a hotspot to an image block (E-006). x and y are fractions of the image.
+ * @param {any} show
+ * @param {{ slideId: string, blockId: string, x: number, y: number, title?: string, md?: string }} payload
+ * @returns {any}
+ */
+export function addHotspot(show, { slideId, blockId, x, y, title, md = '' }) {
+  return mapBlock(show, slideId, blockId, (b) => {
+    if (b.type !== 'image') return b;
+    const hotspots = Array.isArray(b.hotspots) ? b.hotspots : [];
+    const spot = { x: hotspotCoordinate(x), y: hotspotCoordinate(y), title: title || `Hotspot ${hotspots.length + 1}`, md };
+    return { ...b, hotspots: [...hotspots, spot] };
+  });
+}
+
+/**
+ * Change a hotspot: position (x, y), title or text.
+ * @param {any} show
+ * @param {{ slideId: string, blockId: string, index: number, patch: { x?: number, y?: number, title?: string, md?: string } }} payload
+ * @returns {any}
+ */
+export function updateHotspot(show, { slideId, blockId, index, patch }) {
+  return mapBlock(show, slideId, blockId, (b) => {
+    if (!Array.isArray(b.hotspots) || !b.hotspots[index]) return b;
+    const spot = { ...b.hotspots[index], ...patch };
+    if (patch.x !== undefined) spot.x = hotspotCoordinate(patch.x);
+    if (patch.y !== undefined) spot.y = hotspotCoordinate(patch.y);
+    const hotspots = b.hotspots.map((/** @type {any} */ h, /** @type {number} */ i) => (i === index ? spot : h));
+    return { ...b, hotspots };
+  });
+}
+
+/**
+ * Remove a hotspot. An image block without hotspots loses the `hotspots` key.
+ * @param {any} show
+ * @param {{ slideId: string, blockId: string, index: number }} payload
+ * @returns {any}
+ */
+export function deleteHotspot(show, { slideId, blockId, index }) {
+  return mapBlock(show, slideId, blockId, (b) => {
+    if (!Array.isArray(b.hotspots) || !b.hotspots[index]) return b;
+    const hotspots = b.hotspots.filter((/** @type {any} */ _, /** @type {number} */ i) => i !== index);
+    const { hotspots: _old, ...rest } = b;
+    return hotspots.length ? { ...rest, hotspots } : rest;
+  });
 }
 
 /**
@@ -712,6 +857,10 @@ export function deletePath(show, { pathId }) {
 
 /** Action registry lookup */
 export const actions = {
+  setBlockType,
+  addHotspot,
+  updateHotspot,
+  deleteHotspot,
   addSlide,
   duplicateSlide,
   deleteSlide,

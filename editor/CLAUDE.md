@@ -29,6 +29,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 6. `Ctrl+S`, reload the page, reopen the folder. Everything is intact.
 7. Kill the tab while dirty and reopen. The draft restore is offered.
 8. "Present" opens the viewer at the current slide.
+8a. Reader tab: add a block, switch it to *Image with Hotspots*, paste an image, click the image to add a hotspot (its title field gets focus with the default selected), drag a marker, nudge it with the arrow keys, delete one with `Delete`. The reader preview and `viewer/?…&mode=reader` show the hotspots.
 9. The browser console is free of errors.
 
 ## Common pitfalls
@@ -37,4 +38,5 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 - `actions.js` must stay DOM-free so it can be tested with `node --test`.
 - A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input. The rules live in `js/slot-values.js`; extend them (with a test) when you add a field editor.
 - A form must not skip re-rendering just because it has focus: that leaves stale fields after a layout change, a button press or undo (bug E-013). Skip only the echo of the user's own typing (`isTypingEcho()`), and re-render with `rerenderKeepingFocus()` from `dom.js`. Add new typing actions to the form's `TYPING_ACTIONS`.
+- Reader blocks follow the same rule as slots: a block editor writes only the fields its type allows (`variant`, not `kind`, for callouts), and a type change goes through `setBlockType`. Block types without an editor are read-only.
 - Large images make the whole store slow if inlined. Keep only paths in the show, never data URLs.
