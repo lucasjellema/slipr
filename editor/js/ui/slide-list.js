@@ -9,6 +9,7 @@
 import { h } from '../dom.js';
 import { slideTitle } from '../../../shared/render.js';
 import { matchSlides, navigateIndex } from '../slide-filter.js';
+import { openLayoutPicker } from './layout-picker.js';
 
 /**
  * Mount the slide list sidebar into container.
@@ -102,6 +103,16 @@ export function mountSlideList(container, store) {
             onclick: () => store.dispatch('addSlide', { afterSlideId: store.state.selectedSlideId, templateLayouts: store.state.template?.layouts }),
           },
           ['+ Add']
+        ),
+        h(
+          'button',
+          {
+            class: 'slipr-btn slipr-btn-sm',
+            title: 'Add a slide with a layout you choose',
+            'aria-label': 'Add a slide with a layout you choose',
+            onclick: () => openLayoutPicker({ store, mode: 'add', slideId: store.state.selectedSlideId }),
+          },
+          ['▾']
         ),
         h(
           'button',

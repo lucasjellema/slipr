@@ -18,7 +18,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 ## Now: Phase 5 (Editor MVP)
 
 - [ ] **E-003** [editor] Slide list: add, duplicate, delete, reorder, hide · in progress (basic version in E-001) · —
-- [ ] **E-004** [editor] Slide tab: generated slot form + layout picker · in progress (field editors for every slot type done: text, rich text, list, image, quote, code, cards; left: a layout picker with previews) · claude
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 
 ## Pending verification & chores from earlier phases
@@ -74,6 +73,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
+- [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
 - [ ] **I-036** [editor] Block editors for `tabs` (add, rename, reorder tabs), `embed` (URL, title, height) and `slide-ref` (slide picker, label). They are read-only in the Reader tab since E-006
 
 ### Converter
@@ -162,6 +162,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-004** [editor] Slide tab: generated slot form with a field editor for every slot type, and a layout picker with live previews of the slide in each layout (what is hidden, brought back, needed); "▾" to add a slide in a chosen layout · done 2026-10-10 · claude
 - [x] **E-009** [editor] Show settings: chapters (with summary), profiles, glossary and reading routes: edit, reorder, usage counts, deletes that explain their effect (glossary: keep the words as plain text) · done 2026-10-10 · claude
 - [x] **E-008** [editor] Reader tab: summary, block editors with profile (`for`) and depth, related slides, `showSlide`, Markdown toolbar (glossary, popup, slide link). Editors for tabs, embed and slide-ref blocks are I-036 · done 2026-10-10 · claude
 - [x] **I-035** [editor] Cards editor for `cards` slots: fields per card by type, length counters, move / remove / add up to `maxItems`, card images; plus quote and code editors · done 2026-10-10 · claude

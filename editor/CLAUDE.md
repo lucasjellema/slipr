@@ -23,7 +23,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one. With a long show (20+ slides), the list scrolls to the last slide, "Go to slide" finds a slide by number and by title, and the list keeps its scroll position after an edit.
-3. Switch a slide from `bullets` to `two-column` and back. The content survives, and the form shows the new layout's fields at once (with focus still on the layout select).
+3. Switch a slide from `bullets` to `two-column` and back with the layout picker (Layout button). The previews show the slide's content, the notes say what is hidden or brought back, the content survives the round trip, and the form shows the new layout's fields at once. "▾" next to "+ Add" adds a slide in a chosen layout.
 4. Drop an image, paste one (`Ctrl+V` in the image field and on the page), and choose one. The file is copied into `images/` and the alt-text dialog appears. The same image on another slide reuses the file. Undo restores the previous image.
 5. Undo/redo through all of the above.
 6. `Ctrl+S`, reload the page, reopen the folder. Everything is intact.

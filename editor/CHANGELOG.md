@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Layout picker with previews (E-004, done)
+- **Added** the layout picker (`ui/layout-picker.js`): the Slide tab's layout dropdown is now a button with the layout's name (and description) that opens a grid of every template layout, rendered by the shared renderer with **this slide's content**. Each layout says what switching does: "Keeps all content", "Hides Text (kept; switch back to restore)", "Brings back Photo", "Needs Agenda items". Arrow keys move through the grid (by row and column), Home / End, Enter chooses, Esc closes; the current layout is focused first.
+- **Added** "▾" next to "+ Add" in the slide list: add a slide with a layout chosen from the same grid, previewed with sample text; the new slide is selected.
+- **Added** `layout-choice.js` (DOM-free: the slide in another layout, the effects of a switch, sample content; tests in `editor/test/layout-choice.test.js`), and `openDialog()` is exported from `ui/dialogs.js` (with a wide variant).
+- **Fixed** the layout dropdown showing layout ids (`text-image`) instead of names ("Text + image"): templates call it `name`, the form read `title`.
+
 ### 2026-10-10: Show settings: chapters, profiles, glossary and reading routes (E-009)
 - **Added** editing of profiles (name, description), glossary terms (term, Markdown definition with the insert toolbar, link) and reading routes (name, description, "all slides" or an ordered list of slides), next to chapters, which gain a summary. Chapters, profiles and routes can be reordered (new action `moveShowItem`). New items get an id from their name and their name field gets focus with the text selected; ids never change afterwards.
 - **Added** usage shown per item ("3 slides", "2 blocks tailored for it", "used 4×"), and deletes that explain their consequences: a chapter's slides lose their chapter; a profile is removed from blocks (a block only for that profile becomes visible to everyone); a glossary term lists where it is used and offers to keep the words as plain text (`deleteGlossaryTerm` with `unlink`).

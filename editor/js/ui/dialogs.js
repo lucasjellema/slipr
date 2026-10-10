@@ -71,14 +71,15 @@ export function renderAccessScreen(container, { name, message, onGrant, onCancel
 }
 
 /**
- * Modal dialog shell. Resolves when it closes.
+ * Modal dialog shell: a title, the body, and an error line. Removed when closed.
  * @param {string} title
  * @param {(close: () => void, setError: (msg: string) => void) => HTMLElement[]} body
+ * @param {{ wide?: boolean }} [options]  wide: for grids (the layout picker).
  * @returns {HTMLDialogElement}
  */
-function openDialog(title, body) {
+export function openDialog(title, body, { wide = false } = {}) {
   const error = h('p', { class: 'slipr-screen-error', role: 'alert', hidden: true });
-  const dialog = /** @type {HTMLDialogElement} */ (h('dialog', { class: 'slipr-dialog', 'aria-label': title }));
+  const dialog = /** @type {HTMLDialogElement} */ (h('dialog', { class: `slipr-dialog ${wide ? 'slipr-dialog--wide' : ''}`, 'aria-label': title }));
   const close = () => dialog.close();
   const setError = (/** @type {string} */ msg) => {
     error.textContent = msg;

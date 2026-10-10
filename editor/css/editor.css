@@ -1287,3 +1287,115 @@ body.is-screen #slipr-editor-banners {
   max-height: 160px;
   overflow: auto;
 }
+
+/* ---------- Layout picker (E-004) ---------- */
+
+.slipr-layout-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 10px;
+  background: var(--slipr-editor-bg);
+  color: var(--slipr-editor-text);
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.slipr-layout-button:hover,
+.slipr-layout-button:focus-visible {
+  border-color: var(--slipr-editor-accent);
+}
+
+.slipr-layout-button-action {
+  font-size: 12px;
+  color: var(--slipr-editor-accent-hover);
+  flex-shrink: 0;
+}
+
+.slipr-dialog.slipr-dialog--wide {
+  width: min(1100px, 96vw);
+  max-height: 92vh;
+}
+
+.slipr-layout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  overflow: auto;
+  max-height: 68vh;
+  padding: 4px;
+}
+
+.slipr-layout-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: var(--slipr-editor-surface-raised);
+  color: var(--slipr-editor-text);
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.slipr-layout-card:hover {
+  border-color: #444C56;
+}
+
+.slipr-layout-card:focus-visible {
+  outline: none;
+  border-color: var(--slipr-editor-accent-hover);
+}
+
+.slipr-layout-card.is-current {
+  border-color: var(--slipr-editor-accent);
+}
+
+/* The rendered slide sizes itself (container queries); the thumb only sets the width. */
+.slipr-layout-thumb {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #FFFFFF;
+  pointer-events: none;
+}
+
+.slipr-layout-thumb-error {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  font-size: 12px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-layout-name {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.slipr-layout-description {
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-layout-note {
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-layout-note.is-hidden,
+.slipr-layout-note.is-needed {
+  color: var(--slipr-editor-warning);
+}
+
+.slipr-layout-note.is-restored {
+  color: #3FB950;
+}

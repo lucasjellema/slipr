@@ -36,6 +36,7 @@ editor/
     ├── card-values.js    ✅ DOM-free: value shapes for cards (add, remove, move, set field), quote, code; length hints (I-035)
     ├── markdown-insert.js ✅ DOM-free: insert glossary references, popups and slide links into Markdown text (E-008)
     ├── show-entities.js  ✅ DOM-free: unique ids, glossary references and unlinking, profile / chapter usage (E-009)
+    ├── layout-choice.js  ✅ DOM-free: the slide in another layout, what a switch hides / brings back / still needs, sample content (E-004)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -57,7 +58,7 @@ editor/
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
         ├── block-editors.js    (planned) block editors moved out of reader-form.js, incl. tabs, embed, slide-ref
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
-        ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
+        ├── layout-picker.js ✅ grid of template layouts, each rendering the current slide (or sample text for a new slide), with the effect of switching (E-004)
         ├── field-editors.js ✅ quote, code and cards editors (E-004, I-035); text, rich text, list and image fields are in slide-form.js
         └── dialogs.js       ✅ start screen, access screen, new-show, choose-folder and alt-text dialogs, banners
 ```

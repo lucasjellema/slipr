@@ -54,6 +54,7 @@ A show is a folder with `show.json` and an `images/` folder. It can live anywher
 * **Select a slide:** Click any slide in the list to open it in the inspector and preview. The list scrolls, and keeps its place while you edit.
 * **Go to slide:** Type in the box above the list: a slide number (`12`), words from the title (`ai act`), a layout name or a chapter. Press `Enter` to jump to the first match, `Esc` to clear the box.
 * **Move through slides with the keyboard:** In the list, `↑` / `↓` move one slide, `PageUp` / `PageDown` five, `Home` / `End` to the first or last slide. Outside text fields, `PageUp` / `PageDown` go to the previous or next slide.
+* **Add a slide with a chosen layout:** Click **▾** next to **+ Add** and pick a layout from the grid (previewed with sample text).
 * **Add a slide:** Click the **+ Add** button at the top of the sidebar (or press `Ctrl+Enter`). The new slide is inserted immediately after the currently selected slide. It gets the same layout as the current slide; after a title or section slide it gets the template's plain content layout (`bullets` in the default template, `text` in the Conclusion template).
 * **Reorder slides:** Click the **▲** (move up) or **▼** (move down) buttons on a slide (or press `Alt+↑` / `Alt+↓`).
 * **Duplicate a slide:** Click the **⎘** button (or press `Ctrl+D`). The slide and all its reader blocks are duplicated with fresh unique IDs and inserted after the original.
@@ -62,7 +63,7 @@ A show is a folder with `show.json` and an `images/` folder. It can live anywher
 
 ### 3. Editing the Slide (Center Pane: "Slide" Tab)
 
-* **Choose a layout:** Select a layout from the **Layout** dropdown (e.g. `title`, `bullets`, `section`, `two-column`, `image-full`). The fields of the new layout appear at once.
+* **Choose a layout:** Click the **Layout** button. A grid shows every layout of the template with **this slide's content** in it, and what switching would do ("Keeps all content", "Hides Text", "Needs Photo"). Click one, or use the arrow keys and `Enter`. The fields of the new layout appear at once.
   * *Smart slot retention:* When you switch layouts, fields with matching names are preserved. Content for slots not in the new layout is safely preserved in the background (`_orphaned`), so switching back restores your text.
 * **Fill in slots:** The form automatically generates fields based on the selected layout's slot definitions:
   * **Text & headings:** Single-line inputs for titles, subtitles, or captions.

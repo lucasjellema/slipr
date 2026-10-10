@@ -9,6 +9,8 @@ import { describeValue, imageValue, listValue, slotEditorKind, textareaText, tex
 import { addImageToSlot, imageFileFrom } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
+import { openLayoutPicker } from './layout-picker.js';
+import { layoutName } from '../layout-choice.js';
 
 /** Actions the slide form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSlot', 'setNotes']);
@@ -32,29 +34,26 @@ export function mountSlideForm(container, store) {
       return;
     }
 
-    // 1. Layout Picker
+    // 1. Layout: a button that opens the layout picker with previews (E-004)
     const templateLayouts = state.template?.layouts ?? [];
-    const layoutOptions = templateLayouts.map((l) =>
-      h('option', { value: l.id, selected: l.id === slide.layout ? true : undefined }, [l.title ?? l.id])
-    );
-
+    const currentDef = templateLayouts.find((l) => l.id === slide.layout);
     const layoutRow = h('div', { class: 'slipr-form-group' }, [
-      h('label', { class: 'slipr-label' }, ['Layout']),
+      h('span', { class: 'slipr-label', id: 'slipr-layout-label' }, ['Layout']),
       h(
-        'select',
+        'button',
         {
-          class: 'slipr-select',
-          onchange: (e) => {
-            const nextLayout = /** @type {HTMLSelectElement} */ (e.target).value;
-            store.dispatch('setLayout', {
-              slideId: slide.id,
-              layout: nextLayout,
-              templateLayouts: state.layouts,
-            });
-          },
+          type: 'button',
+          class: 'slipr-layout-button',
+          'aria-describedby': 'slipr-layout-label',
+          title: 'Choose another layout',
+          onclick: () => openLayoutPicker({ store, mode: 'change', slideId: slide.id }),
         },
-        layoutOptions
+        [
+          h('span', { class: 'slipr-layout-button-name' }, [currentDef ? layoutName(currentDef) : `${slide.layout} (not in this template)`]),
+          h('span', { class: 'slipr-layout-button-action' }, ['Change…']),
+        ]
       ),
+      currentDef?.description ? h('span', { class: 'slipr-help' }, [currentDef.description]) : null,
     ]);
 
     // 2. Slots Form
