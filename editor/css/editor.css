@@ -951,3 +951,75 @@ body.is-screen #slipr-editor-banners {
   flex-direction: column;
   gap: 4px;
 }
+
+/* ---------- Cards, quote and code editors (E-004, I-035) ---------- */
+
+.slipr-cards-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.slipr-card-editor {
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  padding: 8px 10px 10px;
+  background: var(--slipr-editor-surface-raised);
+  min-width: 0;
+}
+
+.slipr-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.slipr-card-legend {
+  float: left;
+  padding: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--slipr-editor-text);
+}
+
+.slipr-card-tools {
+  display: flex;
+  gap: 2px;
+}
+
+.slipr-card-field {
+  margin-bottom: 6px;
+}
+
+.slipr-card-field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.slipr-counter {
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.slipr-counter.is-over {
+  color: var(--slipr-editor-warning);
+  font-weight: 600;
+}
+
+.slipr-cards-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slipr-code-input {
+  font-family: var(--slipr-font-mono);
+  font-size: 12px;
+  min-height: 120px;
+  tab-size: 2;
+  white-space: pre;
+}

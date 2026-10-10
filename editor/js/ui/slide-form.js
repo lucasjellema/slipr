@@ -8,6 +8,7 @@ import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
 import { addImageToSlot, imageFileFrom } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
+import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
 
 /** Actions the slide form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSlot', 'setNotes']);
@@ -229,6 +230,12 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
         oninput: (e) => write(imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value })),
       }),
     ];
+  } else if (kind === 'quote') {
+    inputs = quoteEditor({ label: labelText, read: () => current, write });
+  } else if (kind === 'code') {
+    inputs = codeEditor({ label: labelText, read: () => current, write });
+  } else if (kind === 'cards') {
+    inputs = cardsEditor({ store, slideId, slotName, slotDef, label: labelText });
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [
@@ -248,9 +255,10 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     ? `This ${slotDef.type ?? ''} slot can't be edited here yet. Edit show.json directly.`.replace('  ', ' ')
     : helpText;
 
-  return h('div', { class: 'slipr-form-group' }, [
-    labelEl,
-    ...inputs,
-    help ? h('span', { class: 'slipr-help' }, [help]) : null,
-  ]);
+  const helpEl = help ? h('span', { class: 'slipr-help' }, [help]) : null;
+  // A cards slot is a group of card editors: its help goes above them.
+  if (kind === 'cards') {
+    return h('section', { class: 'slipr-form-group slipr-cards-group' }, [labelEl, helpEl, ...inputs]);
+  }
+  return h('div', { class: 'slipr-form-group' }, [labelEl, ...inputs, helpEl]);
 }

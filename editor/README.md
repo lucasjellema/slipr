@@ -2,7 +2,7 @@
 
 The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, configure the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); and the fixes E-010 to E-013. Not yet: a layout picker with previews (E-004), editing cards (I-035), editors for tabs, embed and slide-ref blocks (I-036), and draft autosave (I-020).
+> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); and the fixes E-010 to E-013. Also done: editors for cards, quotes and code (I-035). Not yet: a layout picker with previews (E-004), editors for tabs, embed and slide-ref blocks (I-036), and draft autosave (I-020).
 >
 > **Quick Start:** Run `npm run serve` in the repository root, then open <http://localhost:8080/editor/>. Choose **Open show folder…** for a show on your disk, **New show…** to start one from a template, or open the demo by URL: <http://localhost:8080/editor/?show=../shows/demo/show.json>
 
@@ -68,7 +68,9 @@ A show is a folder with `show.json` and an `images/` folder. It can live anywher
   * **Text & headings:** Single-line inputs for titles, subtitles, or captions.
   * **Rich text & lists:** Multiline text areas supporting Markdown formatting (`**bold**`, `*italic*`, `` `code` ``) and bullet lists (`- item`).
   * **Images:** A preview, the image path and its alt text. See *Adding images* below.
-  * **Quote, code and cards:** Shown read-only for now, with a short summary (for example "4 cards"). Edit them in `show.json`.
+  * **Quote:** The quote text and its source.
+  * **Code:** The language (e.g. `js`) and the code. `Tab` indents; press `Esc`, then `Tab`, to leave the field.
+  * **Cards** (layouts with repeated items, such as the Conclusion template's columns, numbered boxes, facts, image cards and people): one group of fields per card. A counter (`7 / 18`) shows how much room a field has and turns yellow when the text is too long. Move cards with **▲** / **▼**, remove one with **🗑**, and add one with **+ Add card**, up to the number the layout has room for. Image fields in cards work like any image field.
 * **Speaker notes:** Add private presenter notes in the **Speaker Notes** box. These appear in Reveal's presenter view (`S` key in audience mode).
 * **Chapter:** Assign the slide to a chapter to drive the agenda slide in audience mode and the table of contents in reader mode.
 * **Audience visibility:** Check **Hide from audience mode** to make a slide reader-only (useful for backup slides or in-depth reference material).

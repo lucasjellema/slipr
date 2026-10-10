@@ -4,10 +4,11 @@
  *
  * The form must write the value shape the format requires (docs/show-format.md,
  * "Slot value types"). Slot types without a real editor yet are read-only (E-010).
+ * Quote, code and cards values are built by card-values.js (E-004, I-035).
  */
 
 /** Slot types with an editable input in the slide form. */
-const EDITABLE = new Set(['text', 'richtext', 'list', 'image']);
+const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 'cards']);
 
 /**
  * Decide how the slide form edits a slot.
@@ -15,14 +16,14 @@ const EDITABLE = new Set(['text', 'richtext', 'list', 'image']);
  * anything else is read-only.
  * @param {string | undefined} slotType
  * @param {any} [value]
- * @returns {'text' | 'textarea' | 'image' | 'readonly'}
+ * @returns {'text' | 'textarea' | 'image' | 'quote' | 'code' | 'cards' | 'readonly'}
  */
 export function slotEditorKind(slotType, value) {
   if (slotType === undefined) {
     return value === undefined || typeof value === 'string' ? 'text' : 'readonly';
   }
   if (!EDITABLE.has(slotType)) return 'readonly';
-  if (slotType === 'image') return 'image';
+  if (slotType === 'image' || slotType === 'quote' || slotType === 'code' || slotType === 'cards') return slotType;
   return slotType === 'text' ? 'text' : 'textarea';
 }
 

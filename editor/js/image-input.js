@@ -10,6 +10,7 @@ import { contentSuffix, imagePath, imageType, IMAGE_TYPES, LARGE_IMAGE_BYTES } f
 import { ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
+import { cardsValue, withCardField } from './card-values.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
 
@@ -151,5 +152,26 @@ export async function addImageToBlock(store, { slideId, blockId, file }) {
     fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-reader`,
     read: (s) => s?.reader?.blocks?.find((/** @type {any} */ b) => b.id === blockId)?.image,
     write: (image) => store.dispatch('updateBlock', { slideId, blockId, patch: { image } }),
+  });
+}
+
+/**
+ * Copy an image into the show folder and put it in an image field of one card
+ * of a cards slot, then ask for alt text (I-035).
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, slot: string, index: number, field: string, file: File }} target
+ */
+export async function addImageToCard(store, { slideId, slot, index, field, file }) {
+  const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  const cardsOf = (/** @type {any} */ s) => s?.content?.[slot];
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-card-${index + 1}-${field}`,
+    read: (s) => cardsOf(s)?.[index]?.[field],
+    write: (image) => {
+      const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+      store.dispatch('setSlot', { slideId, slot, value: cardsValue(withCardField(cardsOf(current), index, field, image)) });
+    },
   });
 }

@@ -33,6 +33,7 @@ editor/
     ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
+    ├── card-values.js    ✅ DOM-free: value shapes for cards (add, remove, move, set field), quote, code; length hints (I-035)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -54,11 +55,11 @@ editor/
         ├── block-editors.js    (planned) block editors moved out of reader-form.js, incl. tabs, embed, slide-ref
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
         ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
-        ├── field-editors.js    (planned, E-004) one editor per slot type, including a cards editor (I-035)
+        ├── field-editors.js ✅ quote, code and cards editors (E-004, I-035); text, rich text, list and image fields are in slide-form.js
         └── dialogs.js       ✅ start screen, access screen, new-show, choose-folder and alt-text dialogs, banners
 ```
 
-**Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
+**Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code` and `cards` have their own editors (`ui/field-editors.js`, values from `card-values.js`); `chart`, `diagram` and unknown slot types are shown read-only.
 
 ## Key components
 

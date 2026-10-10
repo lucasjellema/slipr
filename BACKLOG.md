@@ -18,7 +18,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 ## Now: Phase 5 (Editor MVP)
 
 - [ ] **E-003** [editor] Slide list: add, duplicate, delete, reorder, hide · in progress (basic version in E-001) · —
-- [ ] **E-004** [editor] Slide tab: generated slot form + layout picker. Needs a field editor per slot type, including cards (I-035) · in progress (text/richtext/list inputs in E-001) · —
+- [ ] **E-004** [editor] Slide tab: generated slot form + layout picker · in progress (field editors for every slot type done: text, rich text, list, image, quote, code, cards; left: a layout picker with previews) · claude
 - [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
 - [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
@@ -77,7 +77,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
 - [ ] **I-036** [editor] Block editors for `tabs` (add, rename, reorder tabs), `embed` (URL, title, height) and `slide-ref` (slide picker, label). They are read-only in the Reader tab since E-006
-- [ ] **I-035** [editor] Cards editor for `cards` slots in the generated slot form: add, remove and reorder cards, one input per field (by field type), `maxItems` and `maxLength` hints. Needed by E-004 for the five Conclusion card layouts
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -165,6 +164,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **I-035** [editor] Cards editor for `cards` slots: fields per card by type, length counters, move / remove / add up to `maxItems`, card images; plus quote and code editors · done 2026-10-10 · claude
 - [x] **E-006** [editor] Images and hotspots: choose / drop / paste images into image slots and reader image blocks, alt-text dialog, dedup by content; hotspot editor (click to place, drag or arrow keys to move, title + Markdown). Also fixed the Reader tab writing invalid blocks (type change, callout `kind` → `variant`, `md` on non-text blocks) · done 2026-10-10 · claude
 - [x] **E-013** [editor] Bug: after changing a slide's layout the form kept the old layout's fields (no image field for `text-image`); buttons and undo inside the inspector tabs showed stale content. Forms now re-render for everything except the echo of the user's own typing, keeping focus · done 2026-10-10 · claude
 - [x] **E-012** [editor] Bug: the slide list did not scroll, so slides beyond the window could not be reached; the toolbar hid its buttons in narrow windows. Fixed, plus a slide navigator ("Go to slide" filter, keyboard navigation, PageUp/PageDown) · done 2026-10-10 · claude
