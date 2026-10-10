@@ -72,6 +72,20 @@ export function registerShortcuts(store, { onSave, onPresent, onRead } = {}) {
       return;
     }
 
+    // Previous / next slide: PageUp / PageDown, when not typing in a field
+    // (the slide list handles its own keys, including PageUp/PageDown by pages).
+    if (!mod && !e.altKey && (e.key === 'PageUp' || e.key === 'PageDown')) {
+      const target = /** @type {HTMLElement} */ (e.target);
+      if (target.closest?.('input, textarea, select, [contenteditable], .slipr-slide-items')) return;
+      const slides = store.state.show?.slides;
+      if (!Array.isArray(slides) || slides.length === 0) return;
+      const idx = slides.findIndex((s) => s.id === store.state.selectedSlideId);
+      const next = Math.max(0, Math.min(slides.length - 1, idx + (e.key === 'PageUp' ? -1 : 1)));
+      e.preventDefault();
+      store.selectSlide(slides[next].id);
+      return;
+    }
+
     // Present: F5
     if (e.key === 'F5') {
       e.preventDefault();

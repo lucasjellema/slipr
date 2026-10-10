@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Slide list scrolls, slide navigator (E-012)
+- **Fixed** the slide list not scrolling: with more slides than fit, the rest could not be reached. Its panel was not a bounded flex column. The list also keeps its scroll position when it re-renders after an edit, and scrolls the selected slide into view.
+- **Fixed** the toolbar hiding Open, New, Save, Present and Read in narrower windows: it now wraps.
+- **Added** a slide navigator: "Go to slide" filter above the list (number, title words, layout, chapter; `Enter` jumps, `Esc` clears), keyboard navigation in the list (`↑`/`↓`, `PageUp`/`PageDown`, `Home`/`End`, focus visible), and `PageUp`/`PageDown` for previous/next slide outside text fields. Matching and key logic in the DOM-free `slide-filter.js`, with tests.
+
 ### 2026-10-10: Present and Read (E-007)
 - **Added** Present (`F5`) and Read save unsaved changes first, then open the viewer at the selected slide: `viewer/?folder=<key>` for a show opened from a folder (D-012), `viewer/?show=<url>` for a show opened by URL. A dirty show opened by URL first asks for its folder; nothing opens until it is saved.
 - **Changed** `save()` resolves to whether the show is on disk.

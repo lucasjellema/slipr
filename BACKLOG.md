@@ -165,6 +165,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-012** [editor] Bug: the slide list did not scroll, so slides beyond the window could not be reached; the toolbar hid its buttons in narrow windows. Fixed, plus a slide navigator ("Go to slide" filter, keyboard navigation, PageUp/PageDown) · done 2026-10-10 · claude
 - [x] **E-007** [editor/viewer] Present / Read: save first, then open the viewer at the current slide, `viewer/?folder=<key>` for folder shows (D-012) or `?show=` for URL shows. Viewer: `?folder=`, access page, "Open a show folder…" on the help page · done 2026-10-10 · claude
 - [x] **E-011** [editor] Bug: "+ Add" / `Ctrl+Enter` always used layout `bullets`. The layout now comes from the template (`layoutForNewSlide()`): the current slide's layout after a content slide, else the template's plain content layout · done 2026-10-10 · claude
 - [x] **E-002** [editor] Open, save and new-from-template via the File System Access API: start screen with recent shows, `?folder=<key>` with permission re-request from a click, Save/`Ctrl+S` with schema key order, saving URL-opened shows after picking their folder, `templates/index.json`, shared folder loader (D-012) · done 2026-10-10 · claude

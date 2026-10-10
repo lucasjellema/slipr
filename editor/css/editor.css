@@ -40,14 +40,15 @@ body.slipr-editor-app {
 /* ---------- Toolbar ---------- */
 
 .slipr-toolbar {
-  height: 48px;
+  min-height: 48px;
   background: var(--slipr-editor-surface);
   border-bottom: 1px solid var(--slipr-editor-border);
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
-  gap: 12px;
+  padding: 6px 16px;
+  gap: 8px 12px;
   flex-shrink: 0;
 }
 
@@ -55,6 +56,7 @@ body.slipr-editor-app {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .slipr-logo-text {
@@ -227,7 +229,24 @@ body.slipr-editor-app {
   background: var(--slipr-editor-surface);
   display: flex;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
+}
+
+/* The panel must be a bounded flex column, or the list grows instead of scrolling. */
+.slipr-slide-list-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.slipr-slide-filter-row {
+  padding: 8px 8px 0;
+}
+
+.slipr-slide-filter {
+  width: 100%;
 }
 
 .slipr-panel-header {
@@ -256,6 +275,7 @@ body.slipr-editor-app {
   list-style: none;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
   padding: 8px 6px;
   display: flex;
   flex-direction: column;
@@ -282,6 +302,11 @@ body.slipr-editor-app {
 .slipr-slide-item.is-selected {
   background: #1C2128;
   border-color: var(--slipr-editor-accent);
+}
+
+.slipr-slide-item:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent-hover);
+  outline-offset: 1px;
 }
 
 .slipr-slide-item-num {

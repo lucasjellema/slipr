@@ -32,6 +32,7 @@ editor/
     ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
+    ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+Enter, Ctrl+D, Alt+↑/↓, F5
@@ -42,7 +43,7 @@ editor/
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
-        ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete
+        ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile/depth controls, related slides
         ├── show-settings.js ✅ "Settings" tab: meta, settings, chapters, glossary, profiles, paths

@@ -53,3 +53,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 | `Ctrl+D` | Duplicate slide |
 | `Alt+↑` / `Alt+↓` | Move slide up / down |
 | `F5` | Present from the current slide |
+| `PageUp` / `PageDown` | Previous / next slide (outside text fields) |
+| In the slide list: `↑` / `↓`, `PageUp` / `PageDown`, `Home` / `End` | Move through the slides (`Tab` into the list first) |
+
+**Go to slide**: the box above the slide list filters by slide number (`12`), words from the title (`ai act`), layout or chapter. `Enter` jumps to the first match, `Esc` clears it.
