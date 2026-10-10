@@ -19,6 +19,8 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 
 ## Smoke-test checklist
 
+Steps 1, 4, 6 and 7 need folder access (E-002) and can't be run yet. Until then, open a show with `editor/?show=../shows/demo/show.json` and check steps 2, 3, 5 and 9, plus the preview in both modes.
+
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one.
 3. Switch a slide from `bullets` to `two-column` and back. The content survives.
@@ -33,4 +35,5 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 
 - File System Access permissions are per session. After a reload, call `handle.requestPermission({ mode: 'readwrite' })` from a user gesture (click), never on page load.
 - `actions.js` must stay DOM-free so it can be tested with `node --test`.
+- A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input.
 - Large images make the whole store slow if inlined. Keep only paths in the show, never data URLs.

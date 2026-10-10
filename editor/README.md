@@ -2,10 +2,12 @@
 
 The editor is a browser application for creating and changing Slipr shows. You never have to touch JSON. You pick layouts, fill in their fields, drop in images, and see the result immediately, rendered exactly as the viewer will show it.
 
-> Status: **planned**. Sections are marked *(planned)* until they are implemented.
-> Requires **Microsoft Edge or Google Chrome**, because the editor reads and writes folders on your disk directly.
+> Status: **in progress (Phase 5: Editor MVP)**. The 3-column shell, store, actions, undo/redo, slide inspector, reader inspector, live preview and keyboard shortcuts are implemented (E-001). Direct folder read/write via the File System Access API is next (E-002).
+> Try it: run `npm run serve` and open <http://localhost:8080/editor/?show=../shows/demo/show.json>.
+>
+> **Not yet:** saving to disk (Save only clears the "unsaved" dot), opening or creating a show folder, image drop, hotspots, a layout picker with previews. Only text, rich-text and list fields have proper inputs. **Don't edit image, quote, code or card fields yet**: the current form replaces their value with plain text (bug E-010). The sections below describe the MVP as planned; the screen layout and shortcuts already work.
 
-## Screen layout *(planned)*
+## Screen layout
 
 ```
 ┌──────────────┬──────────────────────────┬──────────────────────────────┐
@@ -41,7 +43,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 - **Warnings** appear for things like a missing title, missing alt text or too many bullets.
 - **Present** or **Read** opens the viewer on your show.
 
-## Keyboard shortcuts *(planned)*
+## Keyboard shortcuts
 
 | Keys | Action |
 |---|---|

@@ -17,34 +17,40 @@ The editor is a single-page app in vanilla JS. All state lives in one **store** 
    ui/preview.js ── shared/render.js + shared/validate.js
 ```
 
-## Planned file structure
+## File structure
+
+✅ = exists (E-001, 2026-10-10). Everything else is planned.
 
 ```
 editor/
-├── index.html
+├── index.html            ✅ 3-column shell: toolbar, sidebar, inspector, preview
 ├── css/
-│   └── editor.css
+│   └── editor.css        ✅
+├── test/                 ✅ actions.test.js, store.test.js (node --test)
 └── js/
-    ├── main.js               bootstrap: create store, mount panels, wire shortcuts
-    ├── store.js              state, dispatch, subscribe, history
-    ├── actions.js            pure functions: (show, payload) → new show
-    ├── io/
-    │   ├── fs-access.js      File System Access API: open dir, read/write show.json, copy images
-    │   └── draft-store.js    IndexedDB drafts for crash recovery
-    ├── ui/
-    │   ├── toolbar.js        open / new / save / present / read
-    │   ├── slide-list.js     thumbnails, selection, drag-reorder, context menu
-    │   ├── slide-form.js     "Slide" tab: form generated from layout slot definitions
-    │   ├── reader-form.js    "Reader" tab: summary, block list, related slides
-    │   ├── block-editors.js  one editor per reader block type, plus for/depth controls
-    │   ├── hotspot-editor.js click on an image to place and edit hotspots
-    │   ├── show-settings.js  meta, chapters, glossary, profiles, paths
-    │   ├── layout-picker.js  grid of template layouts with previews
-    │   ├── field-editors.js  one editor per slot type (text, richtext, list, image, code, quote)
-    │   ├── preview.js        live render: audience slide, or reader view as profile X at depth N
-    │   └── dialogs.js        new-show, alt-text, confirm
-    └── shortcuts.js          keyboard bindings → actions
+    ├── main.js           ✅ bootstrap: load the show (?show=…) via shared/load.js, create store, mount panels, wire shortcuts
+    ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics
+    ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
+    ├── dom.js            ✅ h() element builder, addStylesheet()
+    ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+Enter, Ctrl+D, Alt+↑/↓, F5
+    ├── io/                  (planned, E-002)
+    │   ├── fs-access.js     File System Access API: open dir, read/write show.json, copy images
+    │   └── draft-store.js   IndexedDB drafts for crash recovery
+    └── ui/
+        ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
+        ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete
+        ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
+        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile/depth controls, related slides
+        ├── show-settings.js ✅ "Settings" tab: meta, settings, chapters, glossary, profiles, paths
+        ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
+        ├── block-editors.js    (planned) one editor per reader block type
+        ├── hotspot-editor.js   (planned, E-006) click on an image to place and edit hotspots
+        ├── layout-picker.js    (planned, E-004) grid of template layouts with previews
+        ├── field-editors.js    (planned, E-004) one editor per slot type, including a cards editor (I-035)
+        └── dialogs.js          (planned) new-show, alt-text, confirm
 ```
+
+**Current limits (E-001):** Save only marks the store clean; nothing is written to disk until E-002. The slide form has real inputs only for `text`, `richtext` and `list` slots. An `image` slot is edited as a bare path string (the format needs `{ src, alt }`), and `quote`, `code` and `cards` slots fall back to a one-line text input that overwrites their object/array value. See chore E-010; field editors per slot type come with E-004 / I-035.
 
 ## Key components
 
