@@ -1,0 +1,754 @@
+{
+  "$schema": "../../../shared/schema/show.schema.json",
+  "slipr": "0.1",
+  "id": "impact-autonomy-agents-lucasjellema-20260930",
+  "meta": {
+    "title": "titel slide (afbeelding)",
+    "author": "Lucas Jellema",
+    "date": "2026-10-04",
+    "language": "en"
+  },
+  "template": {
+    "ref": "../../../templates/conclusion",
+    "version": "^0.1"
+  },
+  "settings": {
+    "aspectRatio": "16:9",
+    "transition": "fade",
+    "slideNumbers": true
+  },
+  "chapters": [
+    {
+      "id": "default-section",
+      "title": "Default Section"
+    },
+    {
+      "id": "background",
+      "title": "background"
+    }
+  ],
+  "slides": [
+    {
+      "id": "s-01",
+      "layout": "title-image",
+      "chapter": "default-section",
+      "content": {
+        "title": "Fundament voor autonome (agentic) systemen",
+        "byline": "Lucas Jellema, CTO Conclusion",
+        "image": {
+          "src": "images/slide01-1.jpg",
+          "alt": ""
+        }
+      }
+    },
+    {
+      "id": "s-02",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Dat doet ‘ie anders nooit hoor.."
+      },
+      "notes": "_[Converter] Not converted from PowerPoint: media._"
+    },
+    {
+      "id": "s-03",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "De mens (en het bedrijf) achter de agent",
+        "kicker": "Baasje is de baas (of in elk geval verantwoordelijk)"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide03-1.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-04",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "De mens (en het bedrijf) achter de agent",
+        "kicker": "Baasje is de baas (of in elk geval verantwoordelijk)"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide03-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide04-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-05",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {},
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide05-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide05-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-06",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {},
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide05-1.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-07",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {},
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide07-1.jpg",
+              "alt": "Burgerlijk Wetboek | 9789013055566 | Onbekend | Boeken | bol"
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide05-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide07-3.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-08",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "AI Act"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-3.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-4",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-4.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-09",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "AI Act"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-3.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-4.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-10",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Autonomous ai agentic systeem",
+        "kicker": "Toenemende autonomie & besluitvorming",
+        "body": "Digitale Medewerker, Doel (wat & waarom), HOTL, initiatief en handelingsvrijheid,\n\nAutonomie + gedelegeerde verantwoordelijkheid\n\nAssistent, Instructie (hoe), HITL, direct toezicht en ingrijpen"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide10-1.jpg",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-11",
+      "layout": "text-image",
+      "chapter": "default-section",
+      "content": {
+        "title": "Waarom willen we autonome agents?",
+        "body": "- Snelheid\n- 24/7\n- Onvermoeibaarheid\n- Schaalbaarheid\n- Kosten?\n- Kwaliteit?\n- Flexibiliteit\n- Diepgang\n- Onhaalbare haalbaar\n- Schaarste personeel\n- Medewerkers vrijspelen voor belangrijk werk  – waar EI nodig is\n- AI washing?"
+      },
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide10-1.jpg",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-12",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Het 5D model: Basis van een AI Agent",
+        "kicker": "Wat is een AI Agent?",
+        "body": "- **Doel** – wat moet de agent bereiken\n- **Denken** – LLM / reasoning\n- **Doen** – tools / acties & waarnemen\n- **Dossier** – uitgangspunt, context & geheugen\n- **Dirigent** – orkestratie / regie, al klaar / wat nu?"
+      },
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-text-1",
+            "type": "text",
+            "md": "**D**\n\n**D**\n\n**D**\n\n**D**\n\n**D**"
+          },
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide12-1.jpg",
+              "alt": "5D Realities (@5DRealities) • Facebook"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-13",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Het 5D model: Basis van een AI Agent",
+        "kicker": "Wat is een AI Agent?",
+        "body": "- **Doel** – wat moet de agent bereiken\n- **Denken** – LLM / reasoning\n- **Doen** – tools / acties & waarnemen\n- **Dossier** – uitgangspunt, context & geheugen\n- **Dirigent** – orkestratie / regie, al klaar / wat nu?"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-text-1",
+            "type": "text",
+            "md": "**D**\n\n**D**\n\n**D**\n\n**D**\n\n**D**"
+          },
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide12-1.jpg",
+              "alt": "5D Realities (@5DRealities) • Facebook"
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide13-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-14",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Waar zit Risico van autonoom gedrag?",
+        "body": "- Als de stagiaire de telefoon pakt, het internet op gaat, apparatuur gaat bedienen, over het terrein gaat dwalen"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide14-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide14-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-15",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Wat “doet” een AI Agent?"
+      },
+      "notes": "Email sturen\n\nTelefoongesprek / WhatsApp conversatie voeren\n\nTicket insturen bij service desk\n\nCode schrijven\n\nDocument bewerken\n\nFiles bewerken\n\nWorkflow starten\n\nAPI aanroepen\n\nOpvraging uit CRM systeem\n\nZoek-actie op internet\n\nBestelling plaatsen\n\nUitbetaling factuur aanvragen\n\nVia IoT een fysiek systeem uitlezen en/of aansturen\n\nEen mens vragen\n\nOm informatie\n\nOm een beslissing\n\nOm een actie\n\nAndere agent inschakelen",
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide14-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide15-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide15-3.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-4",
+            "type": "image",
+            "image": {
+              "src": "images/slide15-4.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-5",
+            "type": "image",
+            "image": {
+              "src": "images/slide15-5.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-6",
+            "type": "image",
+            "image": {
+              "src": "images/slide14-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-16",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Hoe neem je verantwoordelijkheid?",
+        "kicker": "Autonomous AI Agent valt onder artikel 6:170 BW",
+        "body": "- Iedere AI Agent is onder supervisie van *iemand (de gebruiksverantwoordelijke)*\n  - *Geldt dat niet ook voor iedere (junior) medewerker, iedere slagboom en pastamachine)*\n- Onder welke voorwaarden accepteer *jij* die verantwoordelijkheid?"
+      },
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide16-1.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-17",
+      "layout": "agenda",
+      "chapter": "default-section",
+      "content": {
+        "title": "Temmen van de agents",
+        "items": "- *iedere agent is van iemand*; er is altijd *iemand* accountable voor wat de agent doet (en wat deze operationeel; kost).\n  - die accountability leidt er toe dat er eisen worden gesteld aan de agent en de context waarin deze functioneert - wie zou anders die verantwoordelijkheid willen hebben\n- om de accountability invulling te kunnen geven is behoefte aan\n  - *inzicht* in wat de agent zal gaan doen, doet en deed (welke acties/resultaten bij welke input)\n  - mogelijkheid tot *ingrijpen* (bijsturen, tegenhouden, uitzetten)\n  - *beperking* in wat een agent kan zien, doen en als resultaat veroorzaken; ook mogelijkheid tot vertragen (tot menselijke proporties) en pauzeren",
+        "image": {
+          "src": "images/slide16-1.png",
+          "alt": ""
+        }
+      },
+      "notes": "**Lucas Jellema on Viva Engage:** [Hoe moeten Agents getemd worden? Ik vertelde dit weekend aan Madelon over de mooie opdracht die ik had gemaakt voor het Slimmer Werken programma over...](https://engage.cloud.microsoft/main/org/conclusion.nl/threads/eyJfdHlwZSI6IlRocmVhZCIsImlkIjoiMzc3MDAwOTkyODU4MTEyMCJ9?trk_copy_link=V2_HTML) Posted in AI Gilde on Mar 16, 2026",
+      "audience": {
+        "fragments": true
+      }
+    },
+    {
+      "id": "s-18",
+      "layout": "agenda",
+      "chapter": "default-section",
+      "content": {
+        "title": "Temmen van de agents",
+        "items": "*Voorzicht, inzicht en toezicht*\n\n- inzicht in instructie / prompt en beschikbare tools / skills\n- testen voordat de agent in echte actie gaat (en misschien ook  wel testen in productie)\n- observability - monitoring en real-time analyse/ anomaly en  trend detectie\n  - Nauwgezet monitoren welk netwerkverkeer plaatsvindt\n- audit trail/ log\n- guardian agents kunnen worden ingezet om de agent in real-time te controleren en over het gedrag te rapporteren",
+        "image": {
+          "src": "images/slide18-1.jpg",
+          "alt": "When AI Wants to Spend Money but is Trapped in a Human Cage: I Understand  What Kite AI is Solving | 小楼 on Binance Square"
+        }
+      },
+      "notes": "**Lucas Jellema on Viva Engage:** [Hoe moeten Agents getemd worden? Ik vertelde dit weekend aan Madelon over de mooie opdracht die ik had gemaakt voor het Slimmer Werken programma over...](https://engage.cloud.microsoft/main/org/conclusion.nl/threads/eyJfdHlwZSI6IlRocmVhZCIsImlkIjoiMzc3MDAwOTkyODU4MTEyMCJ9?trk_copy_link=V2_HTML) Posted in AI Gilde on Mar 16, 2026",
+      "audience": {
+        "fragments": true
+      }
+    },
+    {
+      "id": "s-19",
+      "layout": "agenda",
+      "chapter": "default-section",
+      "content": {
+        "title": "Temmen van de agents",
+        "items": "*Ingrijpen, bijsturen, noodrem*\n\n- human in the loop voor \"belangrijke\" beslissingen (de definitie daarvan moet helder zijn en hard geïmplementeerd worden: geen agent-actie mag de wereld ingaan zonder menselijke toestemming als het een belangrijke beslissing betreft\n- waar mogelijk moeten acties terug te rollen zijn - en daar moet een mechanisme voor beschikbaar zijn\n- er is een kill switch - de agent kan instantaan gestopt worden\n- acties/resultaten die buiten de ingestelde bandbreedte vallen worden tegengehouden; een opdracht van een agent wordt altijd gecontroleerd tegen regels voordat deze ter uitvoering wordt aangeboden",
+        "image": {
+          "src": "images/slide18-1.jpg",
+          "alt": "When AI Wants to Spend Money but is Trapped in a Human Cage: I Understand  What Kite AI is Solving | 小楼 on Binance Square"
+        }
+      },
+      "notes": "**Lucas Jellema on Viva Engage:** [Hoe moeten Agents getemd worden? Ik vertelde dit weekend aan Madelon over de mooie opdracht die ik had gemaakt voor het Slimmer Werken programma over...](https://engage.cloud.microsoft/main/org/conclusion.nl/threads/eyJfdHlwZSI6IlRocmVhZCIsImlkIjoiMzc3MDAwOTkyODU4MTEyMCJ9?trk_copy_link=V2_HTML) Posted in AI Gilde on Mar 16, 2026",
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide19-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-20",
+      "layout": "agenda",
+      "chapter": "default-section",
+      "content": {
+        "title": "Temmen van de agents",
+        "items": "*Inbedden, begrenzen, keurslijf*\n\n- heel strikt gedefinieerde set aan handelingsruimte geven:  wat een agent domweg niet kan, kan hij ook niet doen.\n- een agent heeft een \"identity\" en autorisaties die worden  afgedwongen - bijvoorbeeld bij raadplegen van documenten,  versturen van emails en uitvoeren van transacties  (data-manipulatie, API aanroep)\n  - least privilege: de agent mag zo min mogelijk\n  - shortest privilege: de agent mag iets zo kort mogelijk  (belangrijke privileges worden per keer verstrekt)\n  - privileges worden gekoppeld aan taken / workflows (context-afhankelijk)\n- agent mag niet code creëren en uitvoeren. Of (maar al een stuk spannender): alleen met strikte controles op de code en alleen in een speciale runtime omgeving mag een agent code uitvoeren\n- agent heeft een beperkte set van acties (tools en skills) die in de \"echte wereld\" dingen kunnen doen\n- als niet-bedoelde acties worden geconstateerd dan wordt de agent direct in quarantaine geplaatst en kan deze geen acties meer uitvoeren\n- Bij voorkeur wordt zoveel mogelijk functionaliteit hard, deterministisch gecodeerd; agent bepaalt vooral wanneer welke actie met welke input wordt geïnitieerd\n\nBij voorkeur wordt zoveel mogelijk functionaliteit hard, deterministisch gecodeerd; agent bepaalt vooral wanneer welke actie met welke input wordt geïnitieerd",
+        "image": {
+          "src": "images/slide18-1.jpg",
+          "alt": "When AI Wants to Spend Money but is Trapped in a Human Cage: I Understand  What Kite AI is Solving | 小楼 on Binance Square"
+        }
+      },
+      "notes": "**Lucas Jellema on Viva Engage:** [Hoe moeten Agents getemd worden? Ik vertelde dit weekend aan Madelon over de mooie opdracht die ik had gemaakt voor het Slimmer Werken programma over...](https://engage.cloud.microsoft/main/org/conclusion.nl/threads/eyJfdHlwZSI6IlRocmVhZCIsImlkIjoiMzc3MDAwOTkyODU4MTEyMCJ9?trk_copy_link=V2_HTML) Posted in AI Gilde on Mar 16, 2026",
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide20-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-21",
+      "layout": "agenda",
+      "chapter": "default-section",
+      "content": {
+        "title": "Autonomie alleen waar nodig",
+        "items": "*Deterministische automatisering ‘to the max’*\n\nBij voorkeur wordt zoveel mogelijk functionaliteit hard, deterministisch gecodeerd; agent bepaalt vooral wanneer welke actie met welke input wordt geïnitieerd",
+        "image": {
+          "src": "images/slide20-2.png",
+          "alt": ""
+        }
+      }
+    },
+    {
+      "id": "s-22",
+      "layout": "quote-box",
+      "chapter": "default-section",
+      "content": {
+        "title": "AI agents: organisatorische Skill atrofie",
+        "kicker": "Use it or lose it – de autonomie van de organisatie",
+        "quote": "Wat je uitbesteedt aan derden dreig je zelf te verleren Wat AI Agents overnemen van je eigen medewerkers - kunnen en durven jullie zelf steeds minder Muscle- & Brain-memory slijt Wat heb je minimaal nodig om te instrueren, toezicht te houden, bij te sturen en eventueel te vervangen?",
+        "image": {
+          "src": "images/slide22-1.jpg",
+          "alt": "How Artificial Intelligence May Be Rewiring Our Brains | Magazine |  Davidson Institute of Science Education"
+        }
+      }
+    },
+    {
+      "id": "s-23",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "digitalE Autonomie van organisatie",
+        "kicker": "Autonomie betekent controle over je afhankelijkheden",
+        "body": "- Maak je niet afhankelijk van één LLM leverancier\n  - Kosten, continuïteit\n- Maak je niet afhankelijk van 3rd party LLM leveranciers\n  - Gebruik een self-hosted, open weights LLM\n- Maak je niet afhankelijk van LLM & AI Agents\n  - Kan het (ook) zelf?!"
+      },
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide14-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide23-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide23-3.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-24",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "Fundament voor autonome (agentic) systemen",
+        "body": "- Autonomie - binnen grenzen\n- Iedere agent rapporteert aan / valt onder een mens\n- Verantwoordelijkheid kan je alleen nemen op voorwaarde van:\n  - Beperken, Testen, Observeren, (kunnen) Ingrijpen\n- Zo min mogelijk door LLM/Agent: dirigent – geen muzikant leve deterministische automatisering en “het harnas”\n- Pas voor neveneffecten:  ondermijning van autonomie"
+      },
+      "audience": {
+        "fragments": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide24-1.png",
+              "alt": "Liechtenstein - Wikipedia"
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide24-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide24-3.jpg",
+              "alt": "Een veilige baby box in de woonkamer – 24Baby.nl"
+            }
+          },
+          {
+            "id": "converted-image-4",
+            "type": "image",
+            "image": {
+              "src": "images/slide24-4.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-5",
+            "type": "image",
+            "image": {
+              "src": "images/slide24-5.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-25",
+      "layout": "text",
+      "chapter": "background",
+      "content": {},
+      "audience": {
+        "hidden": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide04-2.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide25-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "s-26",
+      "layout": "text",
+      "chapter": "background",
+      "content": {},
+      "audience": {
+        "hidden": true
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide26-1.gif",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
