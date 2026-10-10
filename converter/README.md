@@ -1,18 +1,30 @@
 # Slipr Converter (PPTX → Slipr)
 
-The converter turns a PowerPoint file into a Slipr show folder. It keeps the **content** (titles, text, bullets, images, speaker notes) and maps every slide onto a **layout of a Slipr template**. The show then takes on the look of that template, not the look of the original deck.
+The converter turns a PowerPoint file into a Slipr show folder. It keeps the **content** (titles, text, bullets, images, speaker notes, sections) and maps every slide onto a **layout of a Slipr template**. The show then takes on the look of that template, not the look of the original deck.
 
-> Status: **planned**. Requires Node.js 20 or newer.
+> Status: **planned**. Requires Python 3.11 or newer.
+
+## Installation *(planned)*
+
+Run this once, from the `converter/` folder:
+
+```
+python -m venv .venv
+.venv\Scripts\activate          # Windows; on macOS/Linux: source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+This installs the `slipr-convert` command inside the virtual environment.
 
 ## Usage *(planned)*
 
 ```
-node converter/bin/pptx2slipr.js <deck.pptx> --template <template-folder> --out <show-folder> [options]
+slipr-convert <deck.pptx> --template <template-folder> --out <show-folder> [options]
 ```
 
 | Option | Meaning |
 |---|---|
-| `--template` | The Slipr template to map onto (required), e.g. `templates/default` |
+| `--template` | The Slipr template to map onto (required), e.g. `../templates/default` |
 | `--out` | Output folder. It is created if missing, and existing files are only overwritten with `--force` |
 | `--mapping <file.json>` | Extra layout mapping (PowerPoint layout name → Slipr layout id), which overrides the template's `pptxMapping` |
 | `--id <show-id>` | Show id (default: derived from the file name) |
@@ -23,7 +35,7 @@ node converter/bin/pptx2slipr.js <deck.pptx> --template <template-folder> --out 
 Example:
 
 ```
-node converter/bin/pptx2slipr.js "C:\talks\cloud-native.pptx" --template templates/default --out shows/cloud-native
+slipr-convert "C:\talks\cloud-native.pptx" --template ..\templates\default --out ..\shows\cloud-native
 ```
 
 ## What gets converted
@@ -31,18 +43,19 @@ node converter/bin/pptx2slipr.js "C:\talks\cloud-native.pptx" --template templat
 | PowerPoint element | Result in Slipr | MVP? |
 |---|---|---|
 | Slide order | `slides[]` order | ✅ |
+| Sections | `chapters` + `slide.chapter` | ✅ |
 | Hidden slides | `audience.hidden: true` | ✅ |
 | Title placeholder | `title` slot | ✅ |
 | Subtitle | `subtitle` slot | ✅ |
 | Body text with bullet levels | `body` (Markdown list) | ✅ |
 | Bold / italic / hyperlinks | Markdown | ✅ |
 | Pictures | copied to `images/`, `image` slot. Alt text comes from the picture's description | ✅ |
-| Speaker notes | `notes` | ✅ |
-| Presentation title / author | `meta` | ✅ |
-| PowerPoint sections | `chapters` + `slide.chapter` | ✅ |
-| Tables | *(later)* `table` slot | ❌ |
-| Charts, SmartArt, diagrams | *(later)* image fallback | ❌ |
-| Animations, transitions | ignored. Bullet build-ins become `fragments: true` | partly |
+| Speaker notes | `notes` (and optionally a reader block) | ✅ |
+| Presentation title / author / date | `meta` | ✅ |
+| Tables | *(next)* `table` block/slot | ❌ |
+| Charts | *(next)* `chart` slot with the **chart's real data** (categories, series, values) | ❌ |
+| SmartArt, diagrams | *(later)* image fallback via LibreOffice | ❌ |
+| Animations, transitions | ignored. Bullet build-ins become `audience.fragments: true` | partly |
 | Colors, fonts, positions | ignored on purpose, because the template decides | n/a |
 
 ## The conversion report

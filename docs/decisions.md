@@ -43,11 +43,18 @@ Status · Date
 **Decision**: `shared/render.js` is the only code that turns slide data into HTML. The audience view wraps its output in Reveal.js sections, reader mode in article sections, and the editor in a scaled preview frame.
 **Consequences**: What you see in the editor is what you present. Mode-specific differences must be expressed through CSS classes, not separate renderers.
 
-## D-006: Converter in Node.js with an environment-agnostic core
-**Proposed** · 2026-10-10
-**Context**: PPTX is a zip of XML files. Parsing it needs a zip library and an XML parser. The converter is a batch tool, not part of the live presenting path.
-**Decision**: The converter is written in JavaScript (Node.js ≥ 20). The core (`converter/src/`) takes a `Uint8Array` and returns `{ show, assets[], report }` without touching the filesystem. A thin CLI wraps it. Dependencies: `jszip`, `fast-xml-parser`.
-**Consequences**: There is one language across Slipr, and the converter can reuse `shared/validate.js`. The same core can later run in the browser (drag a `.pptx` onto the editor) because both dependencies work there. *Alternative considered:* Python with `python-pptx`. It is more mature for reading PPTX but would split the stack.
+## D-006: Converter in Python with python-pptx
+**Accepted** · 2026-10-10 (first proposed as Node.js, changed the same day)
+**Context**: PPTX is a zip of XML files. The converter is a batch tool, not part of the live presenting path. JavaScript has no well-maintained library for *reading* PPTX, so a Node converter would parse OOXML by hand (relationships, placeholder inheritance, namespaces, text runs).
+**Decision**: The converter is a Python (≥ 3.11) package `slipr_convert` built on `python-pptx`, with `jsonschema` for validation and `pytest` for tests. It has a pure core (`convert()` → `ConversionResult`) and a thin CLI `slipr-convert`.
+**Consequences**:
+- Much simpler extraction code, and robust handling of real-world decks.
+- Tables and real chart data become cheap to support.
+- Test decks can be generated in code.
+- Slipr now has two languages and toolchains (npm for the web side, venv/pip for the converter).
+- The converter cannot reuse `shared/validate.js`. The shared JSON Schema is the contract instead.
+- Importing a PPTX inside the editor (I-023) would need Pyodide or a small local helper process instead of running the same JS core.
+*Alternative rejected:* Node.js with `jszip` + `fast-xml-parser`, which would mean one language but much more hand-written OOXML parsing.
 
 ## D-007: Editor saves through the File System Access API
 **Accepted** · 2026-10-10

@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Converter in Python
+- **Changed** decision D-006: the converter is written in Python with `python-pptx` instead of Node.js. It is now *Accepted*.
+- **Changed** the docs to match: two toolchains (npm for the web side, venv/pip/pytest for the converter). The shared JSON Schema is the contract between them.
+- **Added** Python entries to `.gitignore`.
+
 ### 2026-10-10: Repository setup
 - **Added** git repository, `.gitignore`, and root `package.json` with `npm run serve` (static dev server on port 8080) and `npm test` (Node built-in test runner).
 - **Changed** decisions D-001 to D-005 and D-007 to D-010 to *Accepted*. D-006 (converter language) is still *Proposed*.

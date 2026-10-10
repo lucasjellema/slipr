@@ -2,70 +2,79 @@
 
 ## Overview
 
-The converter is a pipeline of pure stages. The **core** (`src/`) has no filesystem access: it takes the bytes of a `.pptx` and returns a result object. The **CLI** (`bin/`) handles files and arguments. This split lets the same core run in the browser later (import a PPTX inside the editor, backlog I-023).
+The converter is a Python package (`slipr_convert`) built on **`python-pptx`**. It is a pipeline of stages. The **core** has no filesystem side effects: it takes a `.pptx` (path, bytes or file-like object) and returns a `ConversionResult`. Only the **CLI** writes files. This keeps the core easy to test, and leaves the door open to running it in the browser later via Pyodide (backlog I-023).
 
 ```
- deck.pptx (bytes)
+ deck.pptx
       │
       ▼
  ┌──────────────┐   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
- │ pptx-reader  │──►│   extract    │──►│     map      │──►│    emit      │
- │ unzip + XML  │   │ → neutral    │   │ → Slipr      │   │ show.json +  │
- │ parse, rels  │   │   slide model│   │   layouts    │   │ assets+report│
+ │   reader     │──►│   extract    │──►│   mapping    │──►│    emit      │
+ │ python-pptx  │   │ → neutral    │   │ → Slipr      │   │ show dict +  │
+ │ + raw XML    │   │   slide model│   │   layouts    │   │ assets+report│
  └──────────────┘   └──────────────┘   └──────────────┘   └──────────────┘
                                               ▲                   │
-                                     template.json            shared/validate.js
+                                     template.json     shared/schema/show.schema.json
+                                                         (validated with jsonschema)
 ```
 
 ## Planned file structure
 
 ```
 converter/
-├── package.json          dependencies: jszip, fast-xml-parser
-├── bin/
-│   └── pptx2slipr.js     CLI: parse args, read file, call convert(), write output
-├── src/
-│   ├── index.js          convert(bytes, template, options) → { show, assets, report }
-│   ├── pptx-reader.js    zip → { presentation, slides[], layouts, masters, notes, media, rels }
-│   ├── extract.js        OOXML → intermediate model (IM), one object per slide
-│   ├── text.js           DrawingML text runs/paragraphs → Markdown (levels, bold, italic, links)
-│   ├── map.js            IM slide → Slipr slide (layout choice + slot filling)
-│   ├── emit.js           assemble show.json, asset list, conversion report
-│   └── report.js         collects decisions and warnings during all stages
-└── test/
-    ├── fixtures/*.pptx   small hand-made decks, one feature each
-    └── *.test.js         node --test
+├── pyproject.toml            package metadata; deps: python-pptx, jsonschema; dev: pytest
+│                             console script: slipr-convert = slipr_convert.cli:main
+├── src/slipr_convert/
+│   ├── __init__.py           exposes convert()
+│   ├── cli.py                argparse, read input, call convert(), write output folder
+│   ├── convert.py            convert(source, template, options) → ConversionResult
+│   ├── model.py              dataclasses: intermediate model + ConversionResult
+│   ├── reader.py             open Presentation; helpers for things python-pptx has no API for
+│   │                         (sections, hidden flag, alt text). The only module touching raw XML
+│   ├── extract.py            python-pptx objects → intermediate model, one SlideModel per slide
+│   ├── text.py               paragraphs/runs → Markdown (levels, bold, italic, links, escaping)
+│   ├── mapping.py            SlideModel → Slipr slide dict (layout choice + slot filling)
+│   ├── emit.py               assemble show dict, asset list, chapters; write_show() for the CLI
+│   ├── report.py             collects decisions and warnings during all stages → Markdown
+│   └── validate.py           jsonschema validation against shared/schema/show.schema.json
+└── tests/
+    ├── conftest.py           builds small fixture decks *in code* with python-pptx
+    ├── fixtures/             a few real-world .pptx files for edge cases (no confidential content)
+    └── test_*.py             pytest
 ```
 
 ## Stages
 
-### 1. `pptx-reader.js`: reading OOXML
-- Unzips with `jszip` and parses XML with `fast-xml-parser` (attributes preserved, namespaces kept as prefixes).
-- `ppt/presentation.xml` → slide order via `p:sldIdLst` + `ppt/_rels/presentation.xml.rels`.
-- For each slide: `ppt/slides/slideN.xml`, its `.rels` (→ layout, images, notes), the layout XML (→ layout name `p:cSld/@name`, placeholder types).
-- `docProps/core.xml` → title, author, date.
-- PowerPoint sections (`p14:sectionLst` in the `p:extLst` of `presentation.xml`) → Slipr `chapters`.
+### 1. `reader.py`: opening the deck
+- `Presentation(source)` from python-pptx gives slides in order, layouts (`slide.slide_layout.name`), shapes, placeholders, text frames, pictures, notes and core properties.
+- Gaps in python-pptx's public API, filled here with lxml XPath on the underlying elements:
+  - **Sections**: `p14:sectionLst/p14:section` in the presentation element (namespace `http://schemas.microsoft.com/office/powerpoint/2010/main`), matched to slides via `slide.slide_id`.
+  - **Hidden slides**: attribute `show="0"` on the slide element.
+  - **Alt text**: `descr` attribute on the shape's `p:cNvPr`.
+- Keeping all private (`_element`) access in this one module limits the damage when python-pptx changes.
 
-### 2. `extract.js`: intermediate model
-For each slide it produces a neutral model, independent of both PowerPoint and Slipr:
+### 2. `extract.py`: intermediate model
+For each slide it produces a neutral `SlideModel` (dataclass), independent of Slipr:
 
-```js
-{
-  index: 3, hidden: false,
-  pptxLayoutName: "Title and Content",
-  title: "Why Slipr?",
-  subtitle: null,
-  bodies: [ { markdown: "- one\n  - nested", placeholderType: "body" } ],
-  images: [ { mediaPath: "ppt/media/image4.png", alt: "…", bbox: {x,y,w,h} } ],
-  notes: "…",
-  unsupported: [ "chart", "smartArt" ],
-  hasBuildAnimations: true
-}
+```python
+SlideModel(
+    index=3, hidden=False, section="How it works",
+    pptx_layout_name="Title and Content",
+    title="Why Slipr?", subtitle=None,
+    bodies=[Body(markdown="- one\n  - nested", placeholder="body")],
+    images=[Image(blob=b"...", ext="png", sha1="...", alt="...", bbox=(x, y, w, h))],
+    notes="...",
+    tables=[], charts=[],              # filled once tables/charts are supported
+    unsupported=["smartArt"],
+    has_build_animations=True,
+)
 ```
 
-Placeholder types (`title`, `ctrTitle`, `subTitle`, `body`, `pic`, `obj`) decide what goes where. Non-placeholder text boxes are added to `bodies` in reading order (top-to-bottom, left-to-right by bounding box).
+- Placeholder types (`PP_PLACEHOLDER.TITLE`, `CENTER_TITLE`, `SUBTITLE`, `BODY`, `OBJECT`, `PICTURE`) decide what goes where. python-pptx resolves inherited positions from the layout and master.
+- Group shapes are walked recursively. Non-placeholder text boxes are added to `bodies` in reading order (top-to-bottom, then left-to-right by bounding box).
+- `text.py` converts paragraphs to Markdown: `paragraph.level` gives the bullet depth, and runs give `**bold**`, `*italic*` and `[links](url)`. Markdown special characters in the source text are escaped.
 
-### 3. `map.js`: choosing the layout
+### 3. `mapping.py`: choosing the layout
 1. **Explicit mapping**: CLI `--mapping`, then the template's `pptxMapping`, keyed by PowerPoint layout name.
 2. **Heuristics** when no mapping applies:
    - title + subtitle, no body → `title`
@@ -73,19 +82,26 @@ Placeholder types (`title`, `ctrTitle`, `subTitle`, `body`, `pic`, `obj`) decide
    - one image, little or no text → `image-full`
    - two bodies, or body + image → `two-column`
    - otherwise → `bullets`
-3. Slot filling matches IM fields to the chosen layout's slots by name and type. Anything left over is appended to `notes` with a marker, so no content is silently lost, and is recorded in the report.
+3. Slot filling matches model fields to the chosen layout's slots by name and type. Anything left over is appended to `notes` with a marker, so no content is silently lost, and is recorded in the report.
 
-### 4. `emit.js`: output
-- Builds `show.json` per `docs/show-format.md` with slide ids `s-01`, `s-02`, ...
-- Assets: `[{ from: "ppt/media/image4.png", to: "images/slide03-1.png", bytes }]`. Duplicate images (same hash) are written once.
-- Validates the result with `shared/validate.js`, and any warnings go into the report.
-- Report: Markdown, one section per slide: chosen layout + reason, skipped elements, warnings.
+### 4. `emit.py`: output
+- Builds the show dict per `docs/show-format.md`: slide ids `s-01`, `s-02`, ..., and `chapters` from sections.
+- Assets: `[Asset(path="images/slide03-1.png", data=b"...")]`. Images are deduplicated by `sha1`.
+- `validate.py` checks the result against the shared JSON Schema, and violations go into the report.
+- `write_show(result, out_dir, force)` is used by the CLI only. It writes `show.json` (UTF-8, 2-space indent, `ensure_ascii=False`), `images/` and `conversion-report.md`.
 
 ## Error handling
 
-- A corrupt zip or missing `presentation.xml` is a fatal error with a clear message.
+- An unreadable or corrupt file is a fatal error with a clear message (exit code 1).
 - Anything slide-level is never fatal: the slide falls back to `bullets` with whatever text was found, plus a report entry.
 
 ## Testing
 
-Each fixture deck covers one feature (bullet levels, notes, images, hidden slide, two-content layout, unsupported chart). The tests assert on the intermediate model and on the final `show.json`, not on the internals.
+- **pytest**. Most fixture decks are **generated in `conftest.py` with python-pptx**, one feature each: bullet levels, notes, pictures, hidden slide, two-content layout, sections. They are readable, diffable and contain no binary blobs.
+- A handful of real-world `.pptx` files in `tests/fixtures/` cover things python-pptx cannot create easily (SmartArt, charts, odd masters).
+- Tests assert on the intermediate model and on the final show dict, not on internals.
+
+## Relation to the rest of Slipr
+
+- The **JSON Schema** in `shared/schema/` is the contract between the converter (Python) and the viewer/editor (JS). The converter loads it from the repository at runtime, so there is no copy to drift.
+- Slipr-specific semantic checks that the schema cannot express (e.g. an unknown layout) are done by `mapping.py` itself, because it only emits layouts that exist in the template.

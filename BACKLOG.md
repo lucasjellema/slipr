@@ -23,7 +23,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **S-002** [shared] `validate.js` with errors/warnings + tests · todo · claude
 - [ ] **T-001** [templates] `templates/default`: 5 layouts, `theme.css`, `reader.css` · todo · claude
 - [ ] **T-002** [shows] `shows/demo`: sample show exercising both layers fully · todo · claude
-- [ ] **C-003** [decisions] Confirm D-006 (converter language) and the phase order (see ROADMAP.md). D-001…D-005 and D-007…D-010 were accepted on 2026-10-10 · todo · lucas
+- [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 
 ## Next: Phases 1–5 (see ROADMAP.md)
 
@@ -91,7 +91,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-020** [editor] Autosave draft to IndexedDB with crash recovery
 - [ ] **I-021** [editor] Text-overflow detection: warn when content does not fit the layout at 1920×1080
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
-- [ ] **I-023** [editor] Import a PPTX inside the editor (run the converter core in the browser)
+- [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
 - [ ] **I-024** [editor] Keyboard-first editing shortcuts
 - [ ] **I-025** [editor] Find & replace across slides, blocks and notes
 - [ ] **I-026** [editor] Image handling: resize/compress to WebP, crop, focal point
@@ -101,7 +101,8 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
 
 ### Converter
-- [ ] **I-040** [converter] Tables → a `table` slot/block type
+- [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
+- [ ] **I-046** [converter] Charts → `chart` slot with the chart's real data (categories, series, values), so it is rendered and animated natively by Slipr
 - [ ] **I-041** [converter] Charts and SmartArt → image fallback (via LibreOffice headless, optional)
 - [ ] **I-042** [converter] Whole-slide image fallback for slides that cannot be mapped
 - [ ] **I-043** [converter] Extract colors and fonts from the PPTX master as a starting point for a new template

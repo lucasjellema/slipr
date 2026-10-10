@@ -54,7 +54,9 @@ This document describes how the Slipr components relate to each other and to the
 | `markdown.js` | Markdown subset with Slipr extensions: `[[glossary]]` references, `^[inline popups]`, `#slide` links. Takes a `mode` option: audience mode renders the extensions as plain text |
 | `migrate.js` | Upgrade older show-format versions to the current one *(once a version 2 exists)* |
 
-The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so the Node-based converter and the tests can import them.
+The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so they can be unit-tested in Node.
+
+The converter is written in **Python** (D-006) and does not import the JS core. Its contract with the rest of Slipr is the **JSON Schema** in `shared/schema/`, which it loads directly from the repository to validate its output.
 
 ## Formats and versioning
 
@@ -69,5 +71,6 @@ The core is environment-agnostic where possible. `validate.js`, `markdown.js` (s
 
 ## Testing strategy
 
-- `shared/` and `converter/`: unit tests with the Node built-in test runner (`node --test`), with fixture shows and fixture `.pptx` files.
+- `shared/` (and pure viewer/editor modules): unit tests with the Node built-in test runner (`npm test`), with fixture shows.
+- `converter/`: `pytest`, with fixture decks mostly generated in code by python-pptx.
 - `viewer/` and `editor/`: a manual smoke-test checklist in each component's `CLAUDE.md` at first. Playwright end-to-end tests can come later (backlog).

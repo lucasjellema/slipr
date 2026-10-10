@@ -19,7 +19,7 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 |---|---|---|---|
 | **Viewer** | [viewer/](viewer/README.md) | Presents a show in audience mode (Reveal.js) or lets a reader explore it in the interactive reader mode | HTML, CSS, vanilla JS, Reveal.js (audience mode only) |
 | **Editor** | [editor/](editor/README.md) | Creates and edits shows in the browser | HTML, CSS, vanilla JS |
-| **Converter** | [converter/](converter/README.md) | Turns a PowerPoint file (`.pptx`) into a Slipr show | Node.js (CLI), with a core that can also run in the browser |
+| **Converter** | [converter/](converter/README.md) | Turns a PowerPoint file (`.pptx`) into a Slipr show | Python (CLI), `python-pptx` |
 | *Shared core* | `shared/` | Loads, validates and renders shows. All components use it | Vanilla JS (ES modules) |
 
 ## Key concepts

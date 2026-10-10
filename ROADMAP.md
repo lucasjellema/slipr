@@ -75,11 +75,11 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Goal**: Turn your real decks into Slipr shows.
 
-1. `pptx-reader.js`: unzip, slide order, sections, layouts, relationships, notes. [P-001]
-2. `extract.js` + `text.js`: intermediate model with Markdown text and bullet levels. [P-002]
-3. `map.js`: layout mapping + heuristics. [P-003]
-4. CLI `pptx2slipr.js` + `conversion-report.md`, with `--notes-to-reader`. [P-004]
-5. Fixture-based tests. [P-005]
+1. Python package skeleton (`pyproject.toml`, venv, pytest) + `reader.py`: open the deck, plus XPath helpers for sections, hidden slides and alt text. [P-001]
+2. `extract.py` + `text.py`: intermediate model with Markdown text and bullet levels. [P-002]
+3. `mapping.py`: layout mapping + heuristics. [P-003]
+4. `emit.py`, `validate.py` (shared JSON Schema), CLI `slipr-convert` + `conversion-report.md`, with `--notes-to-reader`. [P-004]
+5. Tests with fixture decks generated in code. [P-005]
 
 **Done when**: A real deck converts, validates, and presents with text, images, notes and chapters intact.
 
@@ -107,11 +107,10 @@ Pick from the *Next* section of the backlog. Likely candidates: PDF export, hous
 
 ## Decisions to confirm before Phase 0
 
-These are in `docs/decisions.md` as *Proposed*. A quick yes, no or change is enough:
+All format and technology decisions (D-001 … D-010) were accepted on 2026-10-10. D-006 was changed to Python. The table below is kept for reference, and only the rows marked n/a are still open:
 
 | # | Question | Proposal |
 |---|---|---|
-| D-006 | Converter language? | Node.js (JavaScript, same as the rest) |
 | D-007 | Editor only on Chromium (Edge/Chrome)? | Yes, for the File System Access API. The viewer works in all modern browsers |
 | D-002 | Reveal.js vendored, no CDN? | Yes, for offline presenting |
 | D-008 | Reader mode as its own app (not Reveal scroll view)? | Yes |

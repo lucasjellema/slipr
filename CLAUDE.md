@@ -32,7 +32,7 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 
 1. Pick or create an item in `BACKLOG.md` and mark it `in progress`.
 2. Make the change and keep it focused.
-3. Run the tests (`npm test` once it exists) and run through the component's smoke-test checklist.
+3. Run the tests (`npm test`, and `pytest` for the converter) and run through the component's smoke-test checklist.
 4. Update the docs in the same change:
    - `CHANGELOG.md` of the component (and the root one for format or shared-core changes)
    - `ARCHITECTURE.md` if you added or moved modules or changed data flow
@@ -56,8 +56,11 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 | Task | Command |
 |---|---|
 | Serve everything locally | `npm run serve` (then open `http://localhost:8080/viewer/?show=../shows/demo/show.json`) |
-| Run tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
-| Convert a PPTX | `node converter/bin/pptx2slipr.js <file.pptx> --template templates/default --out shows/<name>` *(planned)* |
+| Run JS tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
+| Run converter tests | `pytest` in `converter/` with its venv active *(planned)* |
+| Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` *(planned)* |
+
+Two toolchains: the web side uses npm and Node (dev tooling only), and the converter is **Python** (D-006, see `converter/CLAUDE.md`).
 
 ## When in doubt
 
