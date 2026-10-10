@@ -43,6 +43,28 @@ describe('valid inputs', () => {
   });
 });
 
+describe('template format 0.2', () => {
+  test('placeholder roles in pptxMapping are accepted and checked', () => {
+    const t = clone(template);
+    t.slipr = '0.2';
+    t.pptxIgnore = [15, 16, 85];
+    t.pptxMapping['Text'] = { layout: 'bullets', placeholders: { 0: 'title', 13: 'body', 35: null } };
+    assert.deepEqual(validateTemplate(t), { ok: true, errors: [], warnings: [] });
+
+    t.pptxMapping['Bad'] = { layout: 'bullets', placeholders: { 7: 'nope' } };
+    t.pptxMapping['Worse'] = { layout: 'missing' };
+    const { warnings } = validateTemplate(t);
+    assert.deepEqual(warnings.map((w) => w.code).sort(), ['unknown-layout', 'unknown-slot']);
+  });
+
+  test('malformed roles are errors', () => {
+    const t = clone(template);
+    t.pptxMapping['Text'] = { layout: 'bullets', placeholders: { abc: 'title' }, extra: 1 };
+    const { errors } = validateTemplate(t);
+    assert.ok(errors.length >= 1);
+  });
+});
+
 describe('errors', () => {
   test('the broken fixture reports duplicate ids, unknown layout, bad slot type and unknown block type', () => {
     const broken = readJson('shows/fixtures/broken/show.json');

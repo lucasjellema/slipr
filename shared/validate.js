@@ -154,9 +154,20 @@ export function validateTemplate(template) {
     });
   });
   if (isObject(template.pptxMapping)) {
-    for (const [pptxName, layoutId] of Object.entries(template.pptxMapping)) {
+    const layoutsById = new Map(arrayOf(template.layouts).filter(isObject).map((l) => [l.id, l]));
+    for (const [pptxName, target] of Object.entries(template.pptxMapping)) {
+      const path = `pptxMapping[${JSON.stringify(pptxName)}]`;
+      const layoutId = typeof target === 'string' ? target : target?.layout;
       if (!layoutIds.has(layoutId)) {
-        warnings.push({ path: `pptxMapping[${JSON.stringify(pptxName)}]`, code: 'unknown-layout', message: `maps to unknown layout "${layoutId}"` });
+        warnings.push({ path, code: 'unknown-layout', message: `maps to unknown layout "${layoutId}"` });
+        continue;
+      }
+      // 0.2: placeholder roles must name slots of the target layout
+      const slots = new Set(arrayOf(layoutsById.get(layoutId)?.slots).map((s) => s?.name));
+      for (const [idx, slot] of Object.entries(isObject(target?.placeholders) ? target.placeholders : {})) {
+        if (slot !== null && !slots.has(slot)) {
+          warnings.push({ path: `${path}.placeholders["${idx}"]`, code: 'unknown-slot', message: `layout "${layoutId}" has no slot "${slot}"` });
+        }
       }
     }
   }

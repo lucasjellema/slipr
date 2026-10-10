@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Template-styled agenda and footer
+- **Changed** `audience/agenda.js`: when the template has an `agenda` layout with a list slot, generated agenda slides are rendered with that layout. The chapter items get `slipr-agenda-item is-done|is-current|is-next`.
+- **Changed** `audience/audience.css`: slide-number position, colour and size, and chapter-bar visibility, are now tokens a template can set (`--slipr-slide-number-*`, `--slipr-chapter-bar-visibility`, `--slipr-controls-color`).
+
 ### 2026-10-10: Annotate slides and objects on slides
 - **Added** notes about a whole slide (✎ Note), shown as a "✎ n notes" chip on the slide.
 - **Added** pins (📍 Pin): click anywhere on a slide visual, or choose an object from a keyboard-accessible list, to attach a numbered pin to that object (a bullet, the image, the title…). Pins follow their object when the slide reflows and fall back to their spot on the canvas if the object disappears. Pure geometry in `reader/pin.js`.

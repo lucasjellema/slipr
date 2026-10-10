@@ -51,17 +51,25 @@ def is_hidden(slide) -> bool:
 
 
 _FILE_NAME = re.compile(r"[\w\-. ()]+\.(png|jpe?g|gif|bmp|svg|emf|wmf|tiff?|webp)", re.I)
+# Office's automatic descriptions carry a disclaimer like these (NL / EN / DE).
+_AUTO_ALT = re.compile(
+    r"(door ai gegenereerde inhoud|ai-generated content may be incorrect|automatisch gegenereerde beschrijving"
+    r"|description automatically generated|ki-generierte inhalte)", re.I)
 
 
 def alt_text(shape) -> str:
     """The picture's description (alt text), or '' when there is none.
 
-    A bare file name ("image.png", "IMG_0042.JPG") is what tools fill in
-    automatically; it is not a description, so it counts as missing.
+    Counted as missing, because they are not real descriptions:
+    - a bare file name ("image.png", "IMG_0042.JPG"), which tools fill in;
+    - Office's automatic description ("Afbeelding met … Door AI gegenereerde
+      inhoud is mogelijk onjuist.").
     """
     for el in shape._element.iter(f"{{{NS['p']}}}cNvPr"):  # noqa: SLF001
         descr = (el.get("descr") or "").strip()
-        return "" if _FILE_NAME.fullmatch(descr) else descr
+        if _FILE_NAME.fullmatch(descr) or _AUTO_ALT.search(descr):
+            return ""
+        return descr
     return ""
 
 

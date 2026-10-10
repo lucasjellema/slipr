@@ -126,6 +126,19 @@ describe('blocks', () => {
       '<pre><code class="language-json">{ &quot;a&quot;: &quot;&lt;b&gt;&quot; }\n**x**</code></pre>');
   });
 
+  test('letter lists: A. / a) become ordered lists with a type', () => {
+    assert.equal(markdown('A. first\nB. second'), '<ol type="A"><li>first</li><li>second</li></ol>');
+    assert.equal(markdown('a) one\nb) two'), '<ol type="a"><li>one</li><li>two</li></ol>');
+    assert.equal(markdown('1. x\n  a. nested'), '<ol><li>x<ol type="a"><li>nested</li></ol></li></ol>');
+  });
+
+  test('an entirely bold paragraph is a subheading', () => {
+    assert.equal(markdown('**Key findings**\n\nText'), '<p class="slipr-md-subheading"><strong>Key findings</strong></p>\n<p>Text</p>');
+    assert.equal(markdown('**Bold** and more'), '<p><strong>Bold</strong> and more</p>', 'partly bold is not a subheading');
+    assert.equal(markdown('**a** and **b**'), '<p><strong>a</strong> and <strong>b</strong></p>');
+    assert.equal(markdown('**two**\nlines'), '<p><strong>two</strong><br>lines</p>', 'only one-line paragraphs');
+  });
+
   test('CRLF input', () => {
     assert.equal(markdown('- a\r\n- b'), '<ul><li>a</li><li>b</li></ul>');
   });

@@ -1,4 +1,4 @@
-# Template format: version 0.1 (draft)
+# Template format: version 0.2 (draft)
 
 A **template** is the reusable look and feel for shows. It combines a **style guide** (colors, fonts, illustrations, logos) and a set of **layouts**, the base slide formats a show can use.
 
@@ -155,3 +155,28 @@ Layouts can adapt to reader mode with `.slipr-mode-reader` selectors. In particu
 ## `pptxMapping`
 
 This maps PowerPoint slide-layout names to Slipr layout IDs and is used by the converter. Unmapped PowerPoint layouts fall back to the converter's heuristics (see `converter/ARCHITECTURE.md`).
+
+A value is either a layout id (`"Title and Content": "bullets"`), or, **since format 0.2**, an object with **placeholder roles**:
+
+```json
+"pptxMapping": {
+  "Title slide (wave) magenta": {
+    "layout": "title-wave",
+    "placeholders": { "36": "title", "35": "byline", "0": null }
+  }
+},
+"pptxIgnore": [15, 16, 34, 84, 85, 86, 87, 91, 92]
+```
+
+- `placeholders` maps a PowerPoint placeholder **idx** (as a string) to a slot of the Slipr layout. Content in that placeholder goes straight into that slot: plain text for `text` slots, Markdown for `list` / `richtext`, the picture for `image`. `null` means *ignore this placeholder*: it is decoration or instructions, not content.
+- `pptxIgnore` (template-wide) lists placeholder idx values that are never content in this template, such as the footer, slide number, theme bar, gradient overlays and logo. It also applies to slides whose PowerPoint layout has no mapping entry.
+- Content in placeholders without a role is placed by the converter's normal best-fit rules.
+
+Roles matter for corporate templates, where structural elements are often "body" placeholders and the visible title can even be a body placeholder. Without roles, these would be converted as content. `validateTemplate` warns about roles that name a slot the layout doesn't have.
+
+## Versions
+
+| Version | Change |
+|---|---|
+| 0.1 | Initial format |
+| 0.2 | `pptxMapping` values may be objects with placeholder roles; new `pptxIgnore`. 0.1 templates remain valid unchanged |

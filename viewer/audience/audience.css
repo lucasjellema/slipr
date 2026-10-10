@@ -21,16 +21,17 @@ body.slipr-audience { background: #0E1116; }
 /* Fragments: keep list markers in place while items fade in. */
 .reveal .slipr-slide li.fragment { display: list-item; }
 
-/* Controls and slide number in the template's colours. */
-.reveal .controls { color: var(--slipr-color-accent, #F2A900); }
+/* Controls and slide number: templates can place and colour them with tokens. */
+.reveal .controls { color: var(--slipr-controls-color, var(--slipr-color-accent, #F2A900)); }
 .reveal .slide-number {
   font-family: var(--slipr-font-body, system-ui);
-  font-size: 14px;
+  font-size: var(--slipr-slide-number-size, 14px);
   background: transparent;
-  color: var(--slipr-color-muted, #5B6573);
-  bottom: 14px;
-  left: 18px;
-  right: auto; /* bottom-right belongs to the template logo and Reveal's controls */
+  color: var(--slipr-slide-number-color, var(--slipr-color-muted, #5B6573));
+  top: var(--slipr-slide-number-top, auto);
+  bottom: var(--slipr-slide-number-bottom, 14px);
+  left: var(--slipr-slide-number-left, 18px);  /* bottom-right belongs to the logo and controls */
+  right: var(--slipr-slide-number-right, auto);
 }
 
 /* ---------- generated agenda slide ---------- */
@@ -79,6 +80,7 @@ body.slipr-audience { background: #0E1116; }
 
 .slipr-chapter-bar {
   position: absolute;
+  visibility: var(--slipr-chapter-bar-visibility, visible); /* a template may hide it */
   left: 0;
   right: 0;
   bottom: 0;

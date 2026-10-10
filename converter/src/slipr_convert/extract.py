@@ -79,6 +79,7 @@ def _walk(shapes):
 
 def _extract_shape(shape, model: SlideModel) -> None:
     ph_type = shape.placeholder_format.type if shape.is_placeholder else None
+    idx = shape.placeholder_format.idx if shape.is_placeholder else None
     if ph_type in _IGNORED:
         return
     top, left = int(shape.top or 0), int(shape.left or 0)
@@ -89,7 +90,7 @@ def _extract_shape(shape, model: SlideModel) -> None:
         blob, ext, sha1 = image
         model.images.append(ImageRef(
             blob=blob, ext=ext, sha1=sha1, alt=reader.alt_text(shape),
-            top=top, left=left, width=int(shape.width or 0), height=int(shape.height or 0),
+            top=top, left=left, width=int(shape.width or 0), height=int(shape.height or 0), idx=idx,
         ))
         return
 
@@ -103,9 +104,11 @@ def _extract_shape(shape, model: SlideModel) -> None:
 
     if ph_type in _TITLE and model.title is None:
         model.title = text.plain_text(shape.text_frame)
+        model.title_idx = idx
         return
     if ph_type in _SUBTITLE and model.subtitle is None:
         model.subtitle = text.plain_text(shape.text_frame)
+        model.subtitle_idx = idx
         return
 
     as_list = ph_type in _LIST_PLACEHOLDERS or (shape.is_placeholder and ph_type is None)
@@ -114,7 +117,7 @@ def _extract_shape(shape, model: SlideModel) -> None:
     if markdown:
         placeholder = ph_type.name.lower() if ph_type is not None else None
         model.bodies.append(TextBody(markdown=markdown, is_list=markdown.lstrip().startswith("- "),
-                                     placeholder=placeholder, top=top, left=left))
+                                     placeholder=placeholder, top=top, left=left, idx=idx))
 
 
 def _image_of(shape):

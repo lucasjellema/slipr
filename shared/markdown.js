@@ -25,7 +25,10 @@
  * @property {(slideId: string) => string} [slideHref] Href for [x](#slide-id) links. Default `#id`.
  */
 
-/** @typedef {{ text: string, ordered: boolean, children: ListItem[] }} ListItem */
+/**
+ * marker: 'bullet' (- * +), 'number' (1. 1)), 'upper' (A. A)), 'lower' (a. a)).
+ * @typedef {{ text: string, marker: 'bullet' | 'number' | 'upper' | 'lower', children: ListItem[] }} ListItem
+ */
 
 const SAFE_URL = /^(https?:|mailto:|#|\.{0,2}\/|[\w.-]+(\/|$|\?|#))/i;
 
@@ -43,7 +46,12 @@ export function markdown(src, options = {}) {
   /** @type {string[]} */
   let para = [];
   const flush = () => {
-    if (para.length) out.push(`<p>${para.map((l) => inline(l.trim(), ctx)).join('<br>')}</p>`);
+    if (para.length === 1 && SUBHEADING.test(para[0].trim())) {
+      // A paragraph that is entirely bold is a subheading (templates style it).
+      out.push(`<p class="slipr-md-subheading">${inline(para[0].trim(), ctx)}</p>`);
+    } else if (para.length) {
+      out.push(`<p>${para.map((l) => inline(l.trim(), ctx)).join('<br>')}</p>`);
+    }
     para = [];
   };
 
@@ -86,7 +94,7 @@ export function markdown(src, options = {}) {
 export function markdownListItems(value, options = {}) {
   const ctx = context(options);
   const items = Array.isArray(value)
-    ? value.map((text) => ({ text, ordered: false, children: [] }))
+    ? value.map((text) => ({ text, marker: /** @type {const} */ ('bullet'), children: [] }))
     : parseListLines(normalise(value).split('\n').filter((l) => l.trim() !== ''));
   return items.map((item) => renderItem(item, ctx)).join('');
 }
@@ -125,7 +133,11 @@ export function escape(/** @type {string} */ text) {
 // ---------------------------------------------------------------------------
 // Lists
 
-const LIST_ITEM = /^(\s*)([-*+]|\d+[.)])\s+(.*)$/;
+/** A whole line in bold, with no other text: "**Key findings**". */
+const SUBHEADING = /^\*\*(?=\S)(?:[^*]|\*(?!\*))+?\*\*$/;
+
+// Bullets (- * +), numbers (1. / 1)) and single letters (A. / a) …) for letter lists.
+const LIST_ITEM = /^(\s*)([-*+]|\d+[.)]|[A-Za-z][.)])\s+(.*)$/;
 
 /** @param {string} line */
 function indentOf(line) {
@@ -155,7 +167,7 @@ function parseListLines(lines) {
       continue;
     }
     /** @type {ListItem} */
-    const item = { text: m ? m[3] : line.trim(), ordered: m ? /\d/.test(m[2]) : false, children: [] };
+    const item = { text: m ? m[3] : line.trim(), marker: m ? markerOf(m[2]) : 'bullet', children: [] };
 
     while (stack.length > 1 && indent < stack[stack.length - 1].indent) stack.pop();
     let level = stack[stack.length - 1];
@@ -171,10 +183,20 @@ function parseListLines(lines) {
   return root;
 }
 
+/** @param {string} token @returns {ListItem['marker']} */
+function markerOf(token) {
+  if (/^\d/.test(token)) return 'number';
+  if (/^[A-Z]/.test(token)) return 'upper';
+  if (/^[a-z]/.test(token)) return 'lower';
+  return 'bullet';
+}
+
 /** @param {ListItem[]} items @param {Ctx} ctx */
 function renderList(items, ctx) {
-  const tag = items[0]?.ordered ? 'ol' : 'ul';
-  return `<${tag}>${items.map((item) => renderItem(item, ctx)).join('')}</${tag}>`;
+  const marker = items[0]?.marker ?? 'bullet';
+  const open = { bullet: '<ul>', number: '<ol>', upper: '<ol type="A">', lower: '<ol type="a">' }[marker];
+  const tag = marker === 'bullet' ? 'ul' : 'ol';
+  return `${open}${items.map((item) => renderItem(item, ctx)).join('')}</${tag}>`;
 }
 
 /** @param {ListItem} item @param {Ctx} ctx */

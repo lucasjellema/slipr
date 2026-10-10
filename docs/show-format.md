@@ -180,7 +180,8 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 
 Used in `richtext` and `list` slots, `notes` and all block `md` fields:
 
-- `**bold**`, `*italic*`, `` `code` ``, `[link](url)`, line breaks, `- bullet` lists (nested with two spaces), fenced code blocks (blocks only)
+- `**bold**`, `*italic*`, `` `code` ``, `[link](url)`, line breaks, `- bullet` lists (nested with two spaces), `1.` numbered lists, `A.` / `a.` letter lists, fenced code blocks (blocks only)
+- **Subheading**: a paragraph that is entirely bold (`**Key findings**` on a line of its own) is rendered as `<p class="slipr-md-subheading">`, which templates style as a subheading. It's still plain bold Markdown elsewhere.
 - **Glossary reference**: `[[reveal-js]]` shows the term, and `[[reveal-js|the framework]]` shows custom text. Both get a popup with the definition in reader mode and plain text in audience mode
 - **Inline popup** (footnote): `^[text shown in a popup]`. In reader mode it is a small marker that opens a popover. In audience mode it is omitted
 - **Slide link**: `[see the demo](#s-05)`. It navigates within the show in both modes

@@ -19,6 +19,7 @@ class TextBody:
     placeholder: str | None  # 'body', 'object', … or None for a plain text box
     top: int = 0
     left: int = 0
+    idx: int | None = None  # placeholder idx (for template placeholder roles), None for text boxes
 
     @property
     def plain_length(self) -> int:
@@ -35,6 +36,7 @@ class ImageRef:
     left: int = 0
     width: int = 0
     height: int = 0
+    idx: int | None = None  # placeholder idx when the picture fills a placeholder
 
 
 @dataclass
@@ -46,6 +48,8 @@ class SlideModel:
     section: str | None = None
     title: str | None = None
     subtitle: str | None = None
+    title_idx: int | None = None
+    subtitle_idx: int | None = None
     bodies: list[TextBody] = field(default_factory=list)
     images: list[ImageRef] = field(default_factory=list)
     notes: str | None = None

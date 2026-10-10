@@ -1,6 +1,8 @@
 """Layout choice and slot filling, on hand-made intermediate models."""
 from __future__ import annotations
 
+import json
+
 from slipr_convert.mapping import choose_layout, map_slide, markdown_to_plain
 from slipr_convert.model import ImageRef, SlideModel, TextBody
 
@@ -53,6 +55,61 @@ def test_more_bodies_than_slots_merge_into_the_last(template):
     assert mapped.layout == "two-column"
     assert mapped.slide["content"]["left"] == "- a"
     assert mapped.slide["content"]["right"] == "- b\n\n- c"
+
+
+def role_template(template):
+    """The default template plus 0.2 roles, shaped like the Conclusion template."""
+    t = json.loads(json.dumps(template))
+    t["slipr"] = "0.2"
+    t["pptxIgnore"] = [16, 85, 91]
+    t["pptxMapping"]["Title slide (wave)"] = {"layout": "title", "placeholders": {"0": None, "36": "title", "35": "byline"}}
+    t["pptxMapping"]["Text"] = {"layout": "bullets", "placeholders": {"0": "title", "13": "body", "35": None}}
+    return t
+
+
+def body_at(md, idx, is_list=False):
+    return TextBody(markdown=md, is_list=is_list, placeholder="body", idx=idx)
+
+
+def test_roles_put_content_in_the_named_slots(template):
+    t = role_template(template)
+    model = sm(index=0, layout_name="Title slide (wave)", title="Title slide (wave)", title_idx=0,
+               bodies=[body_at("QUARTERLY REVIEW", 36), body_at("*Jane Doe*", 35), body_at("BUSINESS DONE DIFFERENTLY", 16)])
+    mapped = map_slide(model, "s-01", t, images=[])
+    assert mapped.layout == "title"
+    assert mapped.slide["content"] == {"title": "QUARTERLY REVIEW", "byline": "Jane Doe"}
+    assert "reader" not in mapped.slide, "footer (idx 16) and the off-slide title (idx 0) are ignored, not moved"
+    assert not any("no title" in r for r in mapped.remarks)
+
+
+def test_roles_with_ignored_logo_picture(template):
+    t = role_template(template)
+    logo = ImageRef(blob=b"x", ext="png", sha1="logo", alt="", idx=91)
+    model = sm(layout_name="Text", title="Highlights", title_idx=0,
+               bodies=[body_at("Context", 35), body_at("- a\n- b", 13, is_list=True)], images=[logo])
+    mapped = map_slide(model, "s-02", t, images=["images/logo.png"])
+    assert mapped.layout == "bullets"
+    assert mapped.slide["content"] == {"title": "Highlights", "body": "- a\n- b"}
+    assert "reader" not in mapped.slide
+    assert not any("alt text" in r for r in mapped.remarks), "the ignored logo is not reported"
+
+
+def test_unmapped_layouts_still_drop_template_wide_ignores(template):
+    t = role_template(template)
+    model = sm(layout_name="Something else", title="T", title_idx=0,
+               bodies=[body_at("- point", 2, is_list=True), body_at("FOOTER", 16)])
+    mapped = map_slide(model, "s-03", t, images=[])
+    assert mapped.slide["content"]["body"] == "- point"
+    assert "reader" not in mapped.slide
+
+
+def test_role_for_unknown_slot_is_reported(template):
+    t = role_template(template)
+    t["pptxMapping"]["Text"]["placeholders"]["13"] = "nope"
+    model = sm(layout_name="Text", title="T", title_idx=0, bodies=[body_at("- a", 13, is_list=True)])
+    mapped = map_slide(model, "s-04", t, images=[])
+    assert any("unknown slot" in r for r in mapped.remarks)
+    assert mapped.slide["content"]["body"] == "- a", "falls back to generic filling"
 
 
 def test_markdown_to_plain():

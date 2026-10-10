@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string" },
-    "slipr": { "const": "0.1" },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Template format version. 0.2 adds placeholder roles to pptxMapping and pptxIgnore." },
     "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
     "name": { "type": "string", "minLength": 1 },
     "version": {
@@ -34,12 +34,41 @@
     },
     "pptxMapping": {
       "type": "object",
-      "description": "PowerPoint layout name -> Slipr layout id (used by the converter).",
-      "additionalProperties": { "type": "string" }
+      "description": "PowerPoint layout name -> Slipr layout id, or (0.2) an object with placeholder roles. Used by the converter.",
+      "additionalProperties": {
+        "anyOf": [
+          { "type": "string" },
+          { "$ref": "#/$defs/pptxLayoutMapping" }
+        ]
+      }
+    },
+    "pptxIgnore": {
+      "type": "array",
+      "description": "(0.2) PowerPoint placeholder idx values that are never content in this template (footer, slide number, theme bar, overlays, logo).",
+      "items": { "type": "integer", "minimum": 0 }
     }
   },
   "$defs": {
     "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
+    "pptxLayoutMapping": {
+      "type": "object",
+      "required": ["layout"],
+      "additionalProperties": false,
+      "properties": {
+        "layout": { "$ref": "#/$defs/id" },
+        "placeholders": {
+          "type": "object",
+          "description": "Placeholder idx (as a string) -> slot name of the Slipr layout, or null to ignore that placeholder.",
+          "propertyNames": { "type": "string", "pattern": "^\\d+$" },
+          "additionalProperties": {
+            "anyOf": [
+              { "$ref": "#/$defs/id" },
+              { "type": "null" }
+            ]
+          }
+        }
+      }
+    },
     "layout": {
       "type": "object",
       "required": ["id", "name", "file", "slots"],

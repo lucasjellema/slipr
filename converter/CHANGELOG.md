@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Placeholder roles (template format 0.2)
+- **Added** the placeholder idx in the intermediate model (`TextBody.idx`, `ImageRef.idx`, `SlideModel.title_idx` / `subtitle_idx`).
+- **Added** `mapping.py` support for `pptxMapping` objects with placeholder roles (content goes straight into the named slot, `null` = ignore) and template-wide `pptxIgnore` (also for unmapped layouts). Ignored placeholders, such as a logo, aren't reported as missing alt text.
+- **Changed** the alt text: Office's automatic descriptions ("… Door AI gegenereerde inhoud is mogelijk onjuist.", "Description automatically generated", …) count as missing.
+- **Added** 4 tests (28 in total).
+
 ### 2026-10-10: Converter MVP (Phase 4)
 - **Added** the Python package `slipr_convert` (`pyproject.toml`, console script `slipr-convert`), with modules `reader`, `extract`, `text`, `mapping`, `emit`, `report`, `validate`, `convert` and `cli`.
 - **Added** extraction of titles, subtitles, text with bullet levels (including bullets inherited from the layout/master), bold/italic/links with Markdown escaping, line breaks, pictures with alt text (file-name descriptions count as missing), speaker notes, sections → chapters, hidden slides → backup slides, build animations → fragments, metadata, and aspect ratio.

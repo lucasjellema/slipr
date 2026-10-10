@@ -73,6 +73,10 @@ Per slide a `SlideModel`: `index`, `slide_id`, `layout_name`, `hidden`, `section
 - `\ ` `` ` `` `*` `_` `[` `]` in the source text are escaped, so a literal "*" or "[x]" stays literal in Slipr.
 
 ### 4. `mapping.py`: choosing the layout and filling it
+**Placeholder roles first** (template format 0.2):
+- `pptxIgnore`, plus `null` roles, drop decorative placeholders (footer, theme bar, overlays, logo) before anything else. That includes the off-slide title some corporate templates use.
+- Roles (`idx → slot`) put content straight into the named slot. The rest goes through the generic rules below, which only see the slots that are still free (`capacity(layout, filled)`).
+
 Layout choice (template-agnostic: it only looks at slot *types*):
 1. **Explicit**: `--mapping`, then `template.pptxMapping`, by PowerPoint layout name. Skipped when the slide has pictures and the mapped layout has no image slot (while another layout does).
 2. **Title-only slides**: `title` for the first slide, `section` later (if the template has them).

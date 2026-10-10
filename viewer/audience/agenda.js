@@ -5,6 +5,7 @@
  *  - a chapter progress bar along the bottom edge
  */
 import { h } from '../js/dom.js';
+import { renderSlide } from '../../shared/render.js';
 
 const AGENDA_LABEL = { en: 'Agenda', nl: 'Agenda', de: 'Agenda', fr: 'Programme' };
 
@@ -16,9 +17,34 @@ export function buildAgendaSlide(ctx, currentChapterId) {
   const chapters = ctx.show.chapters ?? [];
   const currentIndex = chapters.findIndex((/** @type {any} */ c) => c.id === currentChapterId);
   const lang = String(ctx.show.meta?.language ?? 'en').slice(0, 2);
+  const label = AGENDA_LABEL[/** @type {keyof AGENDA_LABEL} */ (lang)] ?? AGENDA_LABEL.en;
+  const stateOf = (/** @type {number} */ i) => (i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'next');
+  const section = (/** @type {HTMLElement} */ slide) => h('section', {
+    class: 'slipr-agenda-slide',
+    'data-chapter': currentChapterId,
+    'data-agenda': '',
+  }, [slide]);
+
+  // A template may provide its own "agenda" layout (house style); use it when
+  // it has a list slot for the chapter titles.
+  const layout = ctx.layouts.get('agenda');
+  const listSlot = layout?.def.slots?.find((/** @type {any} */ s) => s.name === 'items' && s.type === 'list')
+    ?? layout?.def.slots?.find((/** @type {any} */ s) => s.type === 'list');
+  if (layout && listSlot) {
+    const slide = renderSlide({
+      id: `agenda-${currentChapterId}`,
+      layout: 'agenda',
+      content: { title: label, [listSlot.name]: chapters.map((/** @type {any} */ c) => c.title) },
+    }, ctx, { mode: 'audience' });
+    slide.querySelectorAll(`[data-slot="${listSlot.name}"] > li`).forEach((li, i) => {
+      li.classList.add('slipr-agenda-item', `is-${stateOf(i)}`);
+      if (stateOf(i) === 'current') li.setAttribute('aria-current', 'step');
+    });
+    return section(slide);
+  }
 
   const items = chapters.map((/** @type {any} */ chapter, /** @type {number} */ i) => {
-    const state = i < currentIndex ? 'done' : i === currentIndex ? 'current' : 'next';
+    const state = stateOf(i);
     return h('li', { class: `slipr-agenda-item is-${state}`, 'aria-current': state === 'current' ? 'step' : undefined }, [
       h('span', { class: 'slipr-agenda-number' }, [String(i + 1)]),
       h('span', { class: 'slipr-agenda-text' }, [
@@ -35,17 +61,12 @@ export function buildAgendaSlide(ctx, currentChapterId) {
   }, [
     h('div', { class: 'slipr-canvas' }, [
       h('div', { class: 'slipr-layout slipr-layout--agenda' }, [
-        h('h2', { class: 'slipr-title', 'data-id': 'agenda-title' }, [AGENDA_LABEL[/** @type {keyof AGENDA_LABEL} */ (lang)] ?? AGENDA_LABEL.en]),
+        h('h2', { class: 'slipr-title', 'data-id': 'agenda-title' }, [label]),
         h('ol', { class: 'slipr-agenda', 'data-id': 'agenda-list' }, items),
       ]),
     ]),
   ]);
-
-  return h('section', {
-    class: 'slipr-agenda-slide',
-    'data-chapter': currentChapterId,
-    'data-agenda': '',
-  }, [slide]);
+  return section(slide);
 }
 
 /**

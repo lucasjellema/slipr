@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Groundwork for the Conclusion template (I-043)
+- **Added** template format **0.2**: `pptxMapping` values can be objects with placeholder roles (`{ "layout", "placeholders": { "<idx>": "<slot>" | null } }`), plus a template-wide `pptxIgnore`. 0.1 templates stay valid. Updated the schema, `validateTemplate` (checks that role slots exist), the spec and tests.
+- **Added** Markdown: letter lists (`A.` / `a.`, rendered as `<ol type="A">`) and subheadings (an entirely bold paragraph → `p.slipr-md-subheading`). Documented in the show-format spec.
+- **Added** viewer support: generated agenda slides use the template's own `agenda` layout when it has one. The slide-number position/colour and chapter-bar visibility are now template tokens.
+- **Added** converter support: placeholder roles and `pptxIgnore`, and Office's automatic alt text counts as missing.
+- **Added** `docs/specs/I-043-conclusion-template.md` (analysis, proposal, Lucas's decisions).
+
 ### 2026-10-10: Phase 4, PPTX converter
 - **Added** the Python converter `slipr-convert` (see `converter/CHANGELOG.md`). It converts PowerPoint decks into Slipr shows, with a per-run conversion report. Content that doesn't fit a layout goes to the reader layer.
 - **Added** a cross-language contract test: the converter's output must pass both the JSON Schema (Python `jsonschema`) and `shared/validate.js` (Node).
