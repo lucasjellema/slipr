@@ -85,9 +85,9 @@ In **audience** mode it renders the selected slide with `shared/render.js` into 
 - Folder handles are remembered in IndexedDB for "recent shows". Permission is re-requested on reopen.
 
 ### Viewer integration
-"Present" and "Read" save first, then open `viewer/?show=<path>`. File System Access handles don't give a URL, so this requires that the show folder sits under the dev server's root. *(See open questions.)*
+"Present" and "Read" save first, then open the viewer on the same show. A show opened by URL opens `viewer/?show=<path>`. A show opened from a folder opens `viewer/?folder=<key>`: the folder handle is shared through IndexedDB, and the viewer reads the folder itself (D-012, E-007).
 
 ## Open questions
 
-- Presenting an unsaved or out-of-tree show: hand the show JSON to the viewer via `postMessage` / BroadcastChannel instead of a URL?
+- ~~Presenting an out-of-tree show~~: decided in D-012 (shared folder handle; templates by name). Presenting *unsaved* drafts by snapshot hand-off was left for later.
 - Should the editor be able to edit templates too, or is that a separate tool? The current plan: no, templates are edited by hand.
