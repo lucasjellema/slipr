@@ -1,6 +1,6 @@
 # I-043: Slipr template from the Conclusion PowerPoint template: analysis and proposal
 
-Status: **analysis, awaiting Lucas's decisions** (see the end of this document) · 2026-10-10
+Status: **first version built** (decisions in §7). Template: `templates/conclusion/`, demo: `shows/conclusion-demo/` · 2026-10-10
 
 Source: `ConclusionTemplatePresentation.pptx` (12 MB, kept out of git). Analysed with python-pptx, slides exported to PNG via PowerPoint, and cross-checked with the house-style rules in the `conclusion-slides` skill (`brand.json`, `layouts.md`). Those rules were measured on the Conclusion Intelligence variant of the same template, which has an identical structure.
 

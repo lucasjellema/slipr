@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Conclusion template, first version (I-043)
+- **Added** `templates/conclusion/` (template format 0.2): 12 layouts on the exact grid of the official Conclusion PowerPoint template; `theme.css` (tokens, fonts, square corners, magenta bullets, text styles, gradient overlays, reflow for phones); `reader.css` (house style for reader mode); original assets (logo, stripe mark, footer band, waves; the title wave converted losslessly from the original geometry); Source Serif 4 (OFL); `pptxMapping` with placeholder roles for all 20 PowerPoint layouts; README.
+- **Added** `shows/conclusion-demo/`: one slide per layout, with neutral placeholder images instead of brand photos, and generated agendas in the template's agenda layout.
+- **Verified** visually against PowerPoint's own export of the template's example slides, and by converting those 20 slides with the converter (output kept local, not committed, because of the brand photos).
+
 ### 2026-10-10: Groundwork for the Conclusion template (I-043)
 - **Added** template format **0.2**: `pptxMapping` values can be objects with placeholder roles (`{ "layout", "placeholders": { "<idx>": "<slot>" | null } }`), plus a template-wide `pptxIgnore`. 0.1 templates stay valid. Updated the schema, `validateTemplate` (checks that role slots exist), the spec and tests.
 - **Added** Markdown: letter lists (`A.` / `a.`, rendered as `<ol type="A">`) and subheadings (an entirely bold paragraph → `p.slipr-md-subheading`). Documented in the show-format spec.

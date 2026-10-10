@@ -1,0 +1,155 @@
+{
+  "$schema": "../../shared/schema/show.schema.json",
+  "slipr": "0.1",
+  "id": "conclusion-demo",
+  "meta": {
+    "title": "Slipr in Conclusion style",
+    "subtitle": "Every layout of the Conclusion template",
+    "author": "Lucas Jellema",
+    "date": "2026-10-10",
+    "language": "en",
+    "description": "A tour of the Conclusion (magenta) Slipr template: one slide per layout. The photos are neutral placeholders; real shows use photography from the brand library."
+  },
+  "template": { "ref": "../../templates/conclusion", "version": "^0.1" },
+  "settings": { "aspectRatio": "16:9", "transition": "fade", "slideNumbers": true, "agenda": true },
+
+  "chapters": [
+    { "id": "intro", "title": "Introduction" },
+    { "id": "text", "title": "Text and quotes" },
+    { "id": "sections", "title": "Sections and visuals" }
+  ],
+
+  "slides": [
+    {
+      "id": "s-title",
+      "layout": "title-wave",
+      "chapter": "intro",
+      "content": { "title": "Slipr in house style", "byline": "Lucas Jellema" },
+      "notes": "Opening slide: title-wave layout.",
+      "reader": {
+        "summary": "The Conclusion PowerPoint template, rebuilt as a Slipr template.",
+        "blocks": [
+          { "id": "about", "type": "text", "md": "This show demonstrates every layout of the **Conclusion** template for Slipr. It uses the original logo, footer band and wave artwork from the official PowerPoint template, on the same grid." }
+        ]
+      }
+    },
+    {
+      "id": "s-agenda",
+      "layout": "agenda",
+      "chapter": "intro",
+      "content": {
+        "kicker": "Today",
+        "title": "Agenda",
+        "items": ["Introduction", "Text and quotes", "Sections and visuals", "Questions"],
+        "intro": "A short tour of the template.",
+        "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-text",
+      "layout": "text",
+      "chapter": "text",
+      "content": {
+        "kicker": "Context",
+        "title": "Text on white",
+        "body": "One clear message per slide, left-aligned.\n\n**Subheading in capitals**\n\n- First-level bullet\n  - Second level\n    - Third level\n- Back to the first level\n\n*A line in Source Serif italic*\n\nA. Letter list\nB. Second item\n\n1. Numbered list\n2. Second item"
+      },
+      "reader": {
+        "blocks": [
+          { "id": "styles", "type": "callout", "variant": "info", "title": "Text styles", "md": "The body supports the template's text styles: bullets up to four levels, a **bold line as subheading**, *serif italic*, letter lists and numbered lists." }
+        ]
+      }
+    },
+    {
+      "id": "s-text-dark",
+      "layout": "text-dark",
+      "chapter": "text",
+      "content": {
+        "kicker": "Context",
+        "title": "Text on black",
+        "body": "The black variant of the standard text slide.\n\n**What it is for**\n\n- Most content slides in the template are dark\n- Magenta bullets, white text\n  - Up to four levels deep"
+      }
+    },
+    {
+      "id": "s-text-image",
+      "layout": "text-image",
+      "chapter": "text",
+      "content": {
+        "kicker": "Example",
+        "title": "Text and image",
+        "body": "- A text column on the left\n- The photo fills the slide behind it\n- A dark gradient keeps the text readable",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-text-quote-image",
+      "layout": "text-quote-image",
+      "chapter": "text",
+      "content": {
+        "kicker": "Example",
+        "title": "Text, quote and image",
+        "body": "- Text on the left\n- A quote on the right\n- The wave lines over the photo",
+        "quote": "One source, two very different experiences.",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-quote-box",
+      "layout": "quote-box",
+      "chapter": "text",
+      "content": {
+        "kicker": "Key message",
+        "title": "Quote in a box",
+        "quote": "Slides for the room, depth for the reader, and the house style for both.",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-quote-image",
+      "layout": "quote-image",
+      "chapter": "text",
+      "content": {
+        "kicker": "Key message",
+        "title": "Quote with image",
+        "quote": "The template owns the looks; the show owns the content.",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-section-wave",
+      "layout": "section-wave",
+      "chapter": "sections",
+      "content": { "kicker": "Chapter three", "title": "Sections and visuals" }
+    },
+    {
+      "id": "s-title-only",
+      "layout": "title-only",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Overview",
+        "title": "From PowerPoint to Slipr",
+        "image": { "src": "images/diagram.svg", "alt": "Diagram: the converter turns a PowerPoint deck into a Slipr show, which the viewer presents to an audience or a reader", "fit": "contain" }
+      }
+    },
+    {
+      "id": "s-section-image",
+      "layout": "section-image",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Client case",
+        "title": "Section with photo",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-closing",
+      "layout": "title-image",
+      "chapter": "sections",
+      "content": {
+        "title": "Thank you",
+        "byline": "Questions?",
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    }
+  ]
+}

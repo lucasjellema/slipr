@@ -7,11 +7,15 @@ from __future__ import annotations
 
 import io
 import re
+from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO
 
 from pptx import Presentation
+from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.presentation import Presentation as PresentationType
+
+_TITLE_TYPES = {PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE, PP_PLACEHOLDER.VERTICAL_TITLE}
 
 P14 = "http://schemas.microsoft.com/office/powerpoint/2010/main"
 NS = {
@@ -114,32 +118,73 @@ def paragraph_parts(paragraph):
             yield "run", _Run(child, paragraph)
 
 
-def inherited_bullet(shape, level: int) -> str | None:
-    """Bullet setting a placeholder inherits for a paragraph level:
-    'none' / 'on' from the layout placeholder, then the master placeholder,
-    else None. (Placeholders often get "no bullets" from their layout.)"""
-    current = shape
-    for _ in range(2):  # slide → layout → master
-        base = getattr(current, "_base_placeholder", None)
-        if base is None:
-            return None
-        lvl = base._element.find(f".//{{{NS['a']}}}lstStyle/{{{NS['a']}}}lvl{level + 1}pPr")  # noqa: SLF001
-        if lvl is not None:
-            if lvl.find(f"{{{NS['a']}}}buNone") is not None:
-                return "none"
-            if lvl.find(f"{{{NS['a']}}}buChar") is not None or lvl.find(f"{{{NS['a']}}}buAutoNum") is not None:
-                return "on"
-        current = base
-    return None
+@dataclass
+class ParaStyle:
+    """The effective style of a paragraph, as far as Slipr cares.
+
+    bullet: 'none' | 'char' | 'upper' (A.) | 'lower' (a.) | 'number' (1.) | None (unknown)
+    """
+
+    bullet: str | None = None
+    bold: bool = False
+    caps: bool = False
+    serif: bool = False
 
 
-def bullet_setting(paragraph) -> str | None:
-    """'none' when bullets are explicitly off, 'on' when explicitly on, else None (inherited)."""
-    ppr = paragraph._p.pPr  # noqa: SLF001
-    if ppr is None:
+def paragraph_style(shape, paragraph) -> ParaStyle:
+    """Resolve a paragraph's bullet / bold / caps / serif settings along the
+    PowerPoint inheritance chain: the paragraph itself, then the layout
+    placeholder, the master placeholder and the master's body text style.
+
+    Corporate templates use outline levels as text styles (e.g. level 5 =
+    intro line, 6 = bold capitals subheading, 8 = A. list), so this matters.
+    """
+    level = paragraph.level
+    chain = [paragraph._p.pPr]  # noqa: SLF001
+    if shape.is_placeholder:
+        current = shape
+        for _ in range(2):  # slide → layout → master placeholder
+            base = getattr(current, "_base_placeholder", None)
+            if base is None:
+                break
+            chain.append(base._element.find(f".//{{{NS['a']}}}lstStyle/{{{NS['a']}}}lvl{level + 1}pPr"))  # noqa: SLF001
+            current = base
+        if shape.placeholder_format.type not in _TITLE_TYPES:
+            master = _master_of(shape)
+            if master is not None:
+                chain.append(master._element.find(  # noqa: SLF001
+                    f"{{{NS['p']}}}txStyles/{{{NS['p']}}}bodyStyle/{{{NS['a']}}}lvl{level + 1}pPr"))
+
+    style = ParaStyle()
+    found = {"bullet": False, "bold": False, "caps": False, "serif": False}
+    a = NS["a"]
+    for ppr in chain:
+        if ppr is None:
+            continue
+        if not found["bullet"]:
+            if ppr.find(f"{{{a}}}buNone") is not None:
+                style.bullet, found["bullet"] = "none", True
+            elif (auto := ppr.find(f"{{{a}}}buAutoNum")) is not None:
+                kind = auto.get("type") or ""
+                style.bullet = "upper" if kind.startswith("alphaUc") else "lower" if kind.startswith("alphaLc") else "number"
+                found["bullet"] = True
+            elif ppr.find(f"{{{a}}}buChar") is not None:
+                style.bullet, found["bullet"] = "char", True
+        rpr = ppr.find(f"{{{a}}}defRPr")
+        if rpr is not None:
+            if not found["bold"] and rpr.get("b") is not None:
+                style.bold, found["bold"] = rpr.get("b") == "1", True
+            if not found["caps"] and rpr.get("cap") is not None:
+                style.caps, found["caps"] = rpr.get("cap") == "all", True
+            latin = rpr.find(f"{{{a}}}latin")
+            if not found["serif"] and latin is not None and latin.get("typeface"):
+                face = latin.get("typeface")
+                style.serif, found["serif"] = ("serif" in face.lower() and "sans" not in face.lower()), True
+    return style
+
+
+def _master_of(shape):
+    try:
+        return shape.part.slide.slide_layout.slide_master
+    except AttributeError:
         return None
-    if ppr.find(f"{{{NS['a']}}}buNone") is not None:
-        return "none"
-    if ppr.find(f"{{{NS['a']}}}buChar") is not None or ppr.find(f"{{{NS['a']}}}buAutoNum") is not None:
-        return "on"
-    return None

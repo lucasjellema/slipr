@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1640 740" role="img" aria-labelledby="t">
+  <title id="t">From PowerPoint to Slipr: the converter turns a deck into a show, the viewer presents it to an audience or a reader</title>
+  <g font-family="Arial, sans-serif" font-size="30" text-anchor="middle">
+    <rect x="20" y="300" width="360" height="140" fill="#F2F2F2" stroke="#000" stroke-width="3"/>
+    <text x="200" y="380">PowerPoint deck</text>
+    <rect x="640" y="300" width="360" height="140" fill="#000"/>
+    <text x="820" y="380" fill="#fff">Slipr show</text>
+    <rect x="1260" y="160" width="360" height="140" fill="#BC448C"/>
+    <text x="1440" y="240" fill="#fff">Audience</text>
+    <rect x="1260" y="440" width="360" height="140" fill="#BC448C"/>
+    <text x="1440" y="520" fill="#fff">Reader</text>
+  </g>
+  <g stroke="#000" stroke-width="4" fill="none">
+    <path d="M380 370 H630"/>
+    <path d="M1000 350 L1250 240 M1000 390 L1250 500"/>
+  </g>
+  <g font-family="Arial, sans-serif" font-size="24" fill="#555" text-anchor="middle">
+    <text x="505" y="350">converter</text>
+    <text x="1120" y="270">viewer</text>
+    <text x="1120" y="500">viewer</text>
+  </g>
+</svg>

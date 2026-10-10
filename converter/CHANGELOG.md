@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Real-template run (Conclusion)
+- **Added** full paragraph-style resolution (`reader.paragraph_style`): bullets, auto-numbering type, bold, caps and serif font from the paragraph, layout placeholder, master placeholder and master body style. Template text styles become Markdown: `A.` / `1.` lists, `**subheading**`, `*serif line*`. Bullets nest at most 4 levels deep. This replaces `bullet_setting` / `inherited_bullet`.
+- **Changed** placeholder-role mappings now always win over best fit (extra pictures go to the reader layer). Text boxes holding only a number (decorative numbering) are left out and reported.
+- **Fixed** a crash on linked (not embedded) pictures: python-pptx raises `ValueError` from `shape.image`, which `hasattr()` doesn't catch.
+- **Verified** with the 20 example slides of the Conclusion template: every slide maps by name and role, and the output passes the JS validator (only missing-alt warnings, because the template's photos have no descriptions). 30 tests.
+
 ### 2026-10-10: Placeholder roles (template format 0.2)
 - **Added** the placeholder idx in the intermediate model (`TextBody.idx`, `ImageRef.idx`, `SlideModel.title_idx` / `subtitle_idx`).
 - **Added** `mapping.py` support for `pptxMapping` objects with placeholder roles (content goes straight into the named slot, `null` = ignore) and template-wide `pptxIgnore` (also for unmapped layouts). Ignored placeholders, such as a logo, aren't reported as missing alt text.

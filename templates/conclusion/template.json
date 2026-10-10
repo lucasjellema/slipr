@@ -1,0 +1,420 @@
+{
+  "$schema": "../../shared/schema/template.schema.json",
+  "slipr": "0.2",
+  "id": "conclusion",
+  "name": "Conclusion (magenta)",
+  "version": "0.1.0",
+  "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
+  "theme": "theme.css",
+  "reader": "reader.css",
+  "styleguide": {
+    "colors": {
+      "black": "#000000",
+      "white": "#FFFFFF",
+      "magenta": "#BC448C",
+      "magenta-10": "#F8ECF3",
+      "red": "#E63232",
+      "cyan": "#00AACB",
+      "blue": "#1369AF",
+      "yellow": "#F1CA13",
+      "green": "#529F45",
+      "purple": "#5A3F8C",
+      "light-grey": "#F2F2F2"
+    },
+    "fonts": {
+      "heading": "Arial Black (uppercase)",
+      "body": "Arial",
+      "quote": "Source Serif 4 (italic, optical size 48)"
+    }
+  },
+  "layouts": [
+    {
+      "id": "title-wave",
+      "name": "Title slide (wave)",
+      "description": "Opener without a photo: magenta wave on black.",
+      "file": "layouts/title-wave.html",
+      "slots": [
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 52,
+          "help": "Up to two lines of about 26 characters."
+        },
+        {
+          "name": "byline",
+          "type": "text",
+          "label": "Speaker",
+          "maxLength": 40
+        }
+      ]
+    },
+    {
+      "id": "title-image",
+      "name": "Title slide (image)",
+      "description": "Opener with a full-bleed photo.",
+      "file": "layouts/title-image.html",
+      "slots": [
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 52,
+          "help": "Up to two lines of about 26 characters."
+        },
+        {
+          "name": "byline",
+          "type": "text",
+          "label": "Speaker",
+          "maxLength": 40
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true,
+          "help": "Real photography from the brand library."
+        }
+      ]
+    },
+    {
+      "id": "agenda",
+      "name": "Agenda",
+      "description": "Numbered agenda (up to 8 items) with a photo on the right. Also used for generated agenda slides.",
+      "file": "layouts/agenda.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "items",
+          "type": "list",
+          "label": "Agenda items",
+          "required": true,
+          "maxItems": 8
+        },
+        {
+          "name": "intro",
+          "type": "text",
+          "label": "Line on the photo",
+          "maxLength": 90
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (about 1:1)"
+        }
+      ]
+    },
+    {
+      "id": "text",
+      "name": "Text (white)",
+      "description": "Standard text slide on white.",
+      "file": "layouts/text.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "body",
+          "type": "richtext",
+          "label": "Text",
+          "help": "Bullets (up to 4 levels), paragraphs, a bold line as subheading, A. and 1. lists. At most 12 bullets."
+        }
+      ]
+    },
+    {
+      "id": "text-dark",
+      "name": "Text (black)",
+      "description": "Standard text slide on black.",
+      "file": "layouts/text-dark.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "body",
+          "type": "richtext",
+          "label": "Text",
+          "help": "Bullets (up to 4 levels), paragraphs, a bold line as subheading, A. and 1. lists. At most 12 bullets."
+        }
+      ]
+    },
+    {
+      "id": "text-image",
+      "name": "Text + image",
+      "description": "Text column on the left, photo as background.",
+      "file": "layouts/text-image.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "body",
+          "type": "richtext",
+          "label": "Text"
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "text-quote-image",
+      "name": "Text, quote & image",
+      "description": "Text on the left, quote on the right, photo as background.",
+      "file": "layouts/text-quote-image.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "body",
+          "type": "richtext",
+          "label": "Text"
+        },
+        {
+          "name": "quote",
+          "type": "text",
+          "label": "Quote",
+          "maxLength": 170
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "quote-box",
+      "name": "Quote in box",
+      "description": "Quote in a magenta box over a photo.",
+      "file": "layouts/quote-box.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "maxLength": 46
+        },
+        {
+          "name": "quote",
+          "type": "text",
+          "label": "Quote",
+          "required": true,
+          "maxLength": 200
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "quote-image",
+      "name": "Quote with image",
+      "description": "Quote over a photo, without a box.",
+      "file": "layouts/quote-image.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "maxLength": 46
+        },
+        {
+          "name": "quote",
+          "type": "text",
+          "label": "Quote",
+          "required": true,
+          "maxLength": 170
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "section-wave",
+      "name": "Section (wave)",
+      "description": "Section divider without a photo (client case slide).",
+      "file": "layouts/section-wave.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 32
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 52
+        }
+      ]
+    },
+    {
+      "id": "section-image",
+      "name": "Section (image)",
+      "description": "Section divider with a full-bleed photo.",
+      "file": "layouts/section-image.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 32
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 52
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "title-only",
+      "name": "Title only",
+      "description": "Title with free content area (e.g. a map, diagram or illustration).",
+      "file": "layouts/title-only.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Illustration or diagram",
+          "help": "Shown in full (contain), not cropped."
+        }
+      ]
+    }
+  ],
+  "pptxIgnore": [
+    15,
+    16,
+    34,
+    84,
+    85,
+    86,
+    87,
+    91,
+    92
+  ],
+  "pptxMapping": {
+    "Title slide (image)": { "layout": "title-image", "placeholders": { "0": null, "36": "title", "35": "byline", "14": "image" } },
+    "Title slide (wave) magenta": { "layout": "title-wave", "placeholders": { "0": null, "36": "title", "35": "byline" } },
+    "Agenda (8x)": { "layout": "agenda", "placeholders": { "0": "title", "35": "kicker", "45": "intro", "14": "image" } },
+    "Text": { "layout": "text", "placeholders": { "0": "title", "35": "kicker", "13": "body" } },
+    "Text (zwart)": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body" } },
+    "Quote in textbox": { "layout": "quote-box", "placeholders": { "0": "title", "35": "kicker", "36": "quote", "14": "image" } },
+    "Quote with image": { "layout": "quote-image", "placeholders": { "0": "title", "35": "kicker", "36": "quote", "14": "image" } },
+    "Text, quote & image": { "layout": "text-quote-image", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "quote", "14": "image" } },
+    "Text + image": { "layout": "text-image", "placeholders": { "0": "title", "35": "kicker", "13": "body", "14": "image" } },
+    "Alleen titel": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
+    "Client intermediate #1": { "layout": "section-image", "placeholders": { "0": null, "36": "title", "35": "kicker", "14": "image" } },
+    "Client intermediate #2": { "layout": "section-wave", "placeholders": { "0": null, "36": "title", "35": "kicker" } },
+    "Facts & figures": { "layout": "text-image", "placeholders": { "0": "title", "35": "kicker", "14": "image", "13": "body", "87": "body", "88": "body", "89": "body", "90": "body", "91": "body" } },
+    "Textbox 4x": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "body", "37": "body", "38": "body" } },
+    "Textbox 9x": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body", "37": "body", "39": "body", "41": "body", "43": "body", "45": "body", "47": "body", "49": "body", "51": "body", "36": null, "38": null, "40": null, "42": null, "44": null, "46": null, "48": null, "50": null, "52": null } },
+    "Introduction": { "layout": "text", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "body" } },
+    "Onze markten": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
+    "3 images + logo's": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
+    "Logo's 30x": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
+    "Logo's 36x": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } }
+  }
+}

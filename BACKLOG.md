@@ -18,7 +18,10 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 ## Now: finishing Phase 4, then the company template
 
 - [ ] **P-006** [converter] Convert one of Lucas's real decks end-to-end (Lucas supplies a deck without confidential content) · todo · lucas
-- [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Analysis + proposal: `docs/specs/I-043-conclusion-template.md` · in progress (waiting for Lucas's 7 decisions) · claude
+- [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Spec: `docs/specs/I-043-conclusion-template.md`. **First version done** (12 layouts, conversion of all 20 PowerPoint layouts); left: see I-043b/c/d · in progress · claude
+- [ ] **I-043b** [format/templates] `cards` slot type + the card layouts (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction) · todo · —
+- [ ] **I-043c** [converter] `slipr-template-from-pptx`: generate a draft template from a PowerPoint template (for business-unit variants) · todo · —
+- [ ] **I-043d** [templates] Review of the Conclusion template by Lucas, and later by the brand team, before external use · todo · lucas
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 - [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
 

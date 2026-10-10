@@ -1,0 +1,307 @@
+/*
+ * Conclusion template: theme.
+ * Derived from the official Conclusion PowerPoint template (Conclusion 2025,
+ * magenta). Measurements: docs/specs/I-043-conclusion-template.md.
+ *
+ * Grid: positions are % of the 16:9 slide (left/width of the width,
+ * top/height of the height), copied from the PowerPoint placeholders.
+ * Type: 1pt in PowerPoint = 1/960 of the slide width = 0.10417cqw.
+ *
+ * House-style rules enforced here: square corners everywhere, left-aligned
+ * text (quotes may differ), no accent lines under titles, original logo and
+ * wave artwork only, bullets come from the layout (magenta squares).
+ */
+
+/* ---------- fonts ---------- */
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("assets/fonts/source-serif-4-latin-opsz-normal.woff2") format("woff2-variations"),
+       url("assets/fonts/source-serif-4-latin-opsz-normal.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("assets/fonts/source-serif-4-latin-opsz-italic.woff2") format("woff2-variations"),
+       url("assets/fonts/source-serif-4-latin-opsz-italic.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* Style guide (keep in sync with "styleguide" in template.json) */
+  --cnc-black: #000000;
+  --cnc-white: #FFFFFF;
+  --cnc-magenta: #BC448C;
+  --cnc-magenta-10: #F8ECF3;
+  --cnc-red: #E63232;
+  --cnc-cyan: #00AACB;
+  --cnc-blue: #1369AF;
+  --cnc-yellow: #F1CA13;
+  --cnc-green: #529F45;
+  --cnc-purple: #5A3F8C;
+  --cnc-grey: #F2F2F2;
+
+  /* Arial and Arial Black are licensed system fonts (Windows, macOS);
+     Arimo / Liberation Sans are metric-compatible fallbacks for Arial. */
+  --cnc-font-heading: "Arial Black", "Arial Bold", Arial, Arimo, "Liberation Sans", sans-serif;
+  --cnc-font-body: Arial, Arimo, "Liberation Sans", Helvetica, sans-serif;
+  --cnc-font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+
+  /* Generic Slipr tokens, used by the viewer's chrome and reader mode */
+  --slipr-color-primary: var(--cnc-black);
+  --slipr-color-accent: var(--cnc-magenta);
+  --slipr-color-text: var(--cnc-black);
+  --slipr-color-muted: #555555;
+  --slipr-color-bg: var(--cnc-white);
+  --slipr-color-surface: var(--cnc-grey);
+  --slipr-color-on-primary: var(--cnc-white);
+  --slipr-font-heading: var(--cnc-font-heading);
+  --slipr-font-body: var(--cnc-font-body);
+  --slipr-font-code: ui-monospace, Consolas, Menlo, monospace;
+
+  /* Audience mode: slide number in the footer band, no chapter bar */
+  --slipr-slide-number-color: var(--cnc-white);
+  --slipr-slide-number-size: 11px;
+  --slipr-slide-number-bottom: 3px;
+  --slipr-slide-number-left: auto;
+  --slipr-slide-number-right: 2.6%;
+  --slipr-controls-color: var(--cnc-magenta);
+  --slipr-chapter-bar-visibility: hidden;
+
+  /* Type sizes (pt → cqw) */
+  --cnc-pt: 0.10417cqw;
+  --cnc-size-title: calc(24 * var(--cnc-pt));
+  --cnc-size-kicker: calc(18 * var(--cnc-pt));
+  --cnc-size-body: calc(16 * var(--cnc-pt));
+  --cnc-size-subheading: calc(20 * var(--cnc-pt));
+  --cnc-size-hero: calc(54 * var(--cnc-pt));
+  --cnc-size-byline: calc(24 * var(--cnc-pt));
+  --cnc-size-quote: calc(24 * var(--cnc-pt));
+  --cnc-size-intro: calc(28 * var(--cnc-pt));
+  --cnc-size-small: calc(12 * var(--cnc-pt));
+}
+
+/* ---------- slide frame ---------- */
+.slipr-slide {
+  container-type: inline-size;
+  width: 100%;
+  font-family: var(--cnc-font-body);
+  text-align: left;
+}
+.slipr-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--cnc-black);
+}
+.slipr-slide *, .slipr-slide *::before, .slipr-slide *::after { box-sizing: border-box; border-radius: 0; }
+.slipr-slide [data-empty] { display: none !important; }
+.slipr-slide :is(h1, h2, h3, strong, b) { font-weight: 700; }
+.slipr-slide :is(em, i) { font-style: italic; }
+.slipr-slide p { margin: 0; }
+
+.cnc { position: absolute; inset: 0; }
+.cnc-dark { background: var(--cnc-black); color: var(--cnc-white); }
+.cnc-light { background: var(--cnc-white); color: var(--cnc-black); }
+.cnc > * { position: absolute; margin: 0; }
+
+/* ---------- chrome: kicker, title, logo, theme bar, footer ---------- */
+.cnc-kicker {
+  left: 7.2%; top: 3.6%; width: 63%;
+  font-family: var(--cnc-font-serif);
+  font-style: italic;
+  font-variation-settings: "opsz" 48;
+  font-size: var(--cnc-size-kicker);
+  line-height: 1.1;
+}
+.cnc-title {
+  left: 7.2%; top: 8.2%; width: 63%;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: var(--cnc-size-title);
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: var(--cnc-magenta);
+}
+.cnc-kicker--narrow, .cnc-title--narrow { width: 37.9%; }
+.cnc-logo {
+  left: 79.8%; top: 4.9%; width: 13%; height: 7.4%;
+  object-fit: contain;
+  object-position: right center;
+}
+.cnc-bar {
+  left: 0; top: 15.9%; width: 1%; height: 68.2%;
+  background: var(--cnc-magenta);
+}
+.cnc-footer { left: 0; top: 96.6%; width: 100%; height: 3.4%; object-fit: fill; }
+
+/* ---------- body text ---------- */
+.cnc-area-content { left: 7.2%; top: 15.9%; width: 85.6%; height: 68.2%; }
+.cnc-area-column { left: 7.2%; top: 27.4%; width: 37.1%; height: 56.7%; }
+.cnc-body {
+  font-size: var(--cnc-size-body);
+  line-height: 1.2;
+  overflow: hidden;
+}
+.cnc-body p { margin: 0 0 0.6em; }
+.cnc-body ul, .cnc-body ol { margin: 0 0 0.6em; padding-left: 2.25cqw; }
+.cnc-body ul ul, .cnc-body ol ol, .cnc-body ul ol, .cnc-body ol ul { margin: 0.25em 0 0; padding-left: 2.15cqw; }
+.cnc-body li { margin: 0 0 0.35em; padding-left: 0.4em; }
+.cnc-body ul { list-style: square; }
+.cnc-body li::marker { color: var(--cnc-magenta); font-size: 0.95em; }
+.cnc-body ol li::marker { font-size: 1em; }
+.cnc-body .slipr-md-subheading {
+  margin: 0.4em 0 0.3em;
+  font-family: var(--cnc-font-heading);
+  font-size: var(--cnc-size-subheading);
+  text-transform: uppercase;
+  line-height: 1;
+}
+.cnc-body .slipr-md-subheading strong { font-weight: 900; }
+.cnc-body em { font-family: var(--cnc-font-serif); font-variation-settings: "opsz" 48; }
+.cnc-body a { color: inherit; text-decoration-color: var(--cnc-magenta); text-underline-offset: 0.15em; }
+.cnc-body code { font-family: var(--slipr-font-code); font-size: 0.9em; }
+
+/* ---------- photos, overlays and wave artwork ---------- */
+.cnc-photo { left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+.cnc-photo--half { left: 45.1%; width: 54.9%; }
+/* The template's gradient overlay (idx 86): black 100% → 40% → 0% at 340°. */
+.cnc-overlay {
+  left: 0; top: 0; width: 100%; height: 100%;
+  background: linear-gradient(70deg, rgb(0 0 0 / 1) 0%, rgb(0 0 0 / 0.4) 50%, rgb(0 0 0 / 0) 69.6%);
+  pointer-events: none;
+}
+.cnc-overlay--half { left: 45.1%; width: 54.9%; }
+.cnc-decor { pointer-events: none; }
+.cnc-decor--full { left: 0; top: 0; width: 100%; height: 100%; }
+.cnc-decor--wave-a { left: 0; top: 29.1%; width: 100%; height: 64.6%; object-fit: fill; }
+.cnc-decor--wave-b { left: 0; top: 13.6%; width: 100%; height: 83%; object-fit: fill; }
+.cnc-decor--section { left: 0; top: 17.7%; width: 100%; height: 64.6%; object-fit: fill; }
+.cnc-illustration { object-fit: contain; object-position: left top; }
+
+/* ---------- quotes ---------- */
+.cnc-quote {
+  font-family: var(--cnc-font-serif);
+  font-style: italic;
+  font-variation-settings: "opsz" 48;
+  font-size: var(--cnc-size-quote);
+  line-height: 1.15;
+  color: var(--cnc-white);
+}
+.cnc-quote--right { left: 60.2%; top: 56.7%; width: 31.9%; height: 23.9%; display: flex; align-items: center; }
+.cnc-quote--left { left: 7.2%; top: 40%; width: 31.9%; height: 30.3%; display: flex; align-items: center; }
+.cnc-quote-box {
+  left: 7.2%; top: 49.2%; width: 37.7%; height: 34.9%;
+  display: flex; align-items: center;
+  padding: 2.2cqw 2.4cqw;
+  background: var(--cnc-magenta);
+}
+.cnc-quote-box .cnc-quote { position: static; }
+
+/* ---------- openers and section dividers ---------- */
+.cnc-logo--opener { left: 7.2%; top: 15.9%; width: 19.9%; height: 11.3%; object-position: left center; }
+.cnc-logo--section { left: 73%; top: 15.9%; width: 19.9%; height: 11.3%; object-position: right center; }
+.cnc-hero-title {
+  left: 7.2%; top: 55.1%; width: 59.2%; height: 23.5%;
+  display: flex; align-items: flex-end;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: var(--cnc-size-hero);
+  line-height: 0.88;
+  text-transform: uppercase;
+  color: var(--cnc-magenta);
+}
+.cnc-byline {
+  left: 7.2%; top: 79.6%; width: 60%;
+  font-family: var(--cnc-font-serif);
+  font-style: italic;
+  font-variation-settings: "opsz" 48;
+  font-size: var(--cnc-size-byline);
+}
+.cnc-section-kicker {
+  left: 7.3%; top: 36.7%; width: 59.2%;
+  font-family: var(--cnc-font-serif);
+  font-style: italic;
+  font-variation-settings: "opsz" 48;
+  font-size: var(--cnc-size-byline);
+}
+.cnc-section-title {
+  left: 7.3%; top: 43.1%; width: 59.2%;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: var(--cnc-size-hero);
+  line-height: 0.88;
+  text-transform: uppercase;
+  color: var(--cnc-magenta);
+}
+
+/* ---------- agenda ---------- */
+.cnc-agenda {
+  left: 7.2%; top: 16.5%; width: 30%;
+  list-style: none;
+  padding: 0;
+  counter-reset: cnc-agenda;
+  font-size: var(--cnc-size-small);
+}
+.cnc-agenda li {
+  counter-increment: cnc-agenda;
+  display: flex;
+  gap: 2cqw;
+  padding: 1.75cqw 0;  /* rows of ~4.8cqw, as in the PowerPoint agenda */
+  line-height: 1.3;
+  border-bottom: 1px solid rgb(255 255 255 / 0.55);
+}
+.cnc-agenda li:first-child { border-top: 1px solid rgb(255 255 255 / 0.55); }
+.cnc-agenda li::before { content: counter(cnc-agenda); font-weight: 700; min-width: 1.2cqw; }
+.cnc-agenda li.is-current { color: var(--cnc-magenta); font-weight: 700; }
+.cnc-agenda li.is-done { opacity: 0.55; }
+.cnc-agenda-intro {
+  left: 50.6%; top: 71.7%; width: 36.2%; height: 12.4%;
+  display: flex; align-items: flex-end;
+  font-family: var(--cnc-font-serif);
+  font-variation-settings: "opsz" 48;
+  font-size: var(--cnc-size-intro);
+  line-height: 1.05;
+}
+
+/* ---------- reader mode: reflow on narrow screens ----------
+ * Below ~640px the slide becomes flowing content: photo on top, text below,
+ * decorations (bar, footer band, waves, overlays) left out.
+ */
+@container (max-width: 640px) {
+  .slipr-mode-reader .slipr-canvas { aspect-ratio: auto; }
+  .slipr-mode-reader .cnc {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.25rem 1.25rem 1.5rem;
+  }
+  .slipr-mode-reader .cnc > * { position: static; width: auto; height: auto; }
+  .slipr-mode-reader :is(.cnc-bar, .cnc-footer, .cnc-decor, .cnc-overlay, .cnc-logo) { display: none; }
+  .slipr-mode-reader .cnc-photo {
+    order: -1;
+    width: calc(100% + 2.5rem);
+    margin: -1.25rem -1.25rem 0.5rem;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+  .slipr-mode-reader .cnc-kicker,
+  .slipr-mode-reader .cnc-section-kicker,
+  .slipr-mode-reader .cnc-byline { font-size: 1.05rem; }
+  .slipr-mode-reader .cnc-title { font-size: 1.35rem; line-height: 1; }
+  .slipr-mode-reader :is(.cnc-hero-title, .cnc-section-title) { font-size: 1.9rem; line-height: 0.95; }
+  .slipr-mode-reader .cnc-body { font-size: 1rem; overflow: visible; }
+  .slipr-mode-reader .cnc-body ul, .slipr-mode-reader .cnc-body ol { padding-left: 1.2rem; }
+  .slipr-mode-reader .cnc-body .slipr-md-subheading { font-size: 1.1rem; }
+  .slipr-mode-reader .cnc-quote { font-size: 1.2rem; }
+  .slipr-mode-reader .cnc-quote-box { padding: 1rem 1.1rem; }
+  .slipr-mode-reader .cnc-agenda { font-size: 0.95rem; }
+  .slipr-mode-reader .cnc-agenda li { gap: 0.8rem; padding: 0.5rem 0; }
+  .slipr-mode-reader .cnc-agenda-intro { font-size: 1.15rem; }
+  .slipr-mode-reader .cnc-illustration { max-height: 60vh; }
+}

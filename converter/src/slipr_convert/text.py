@@ -69,30 +69,45 @@ def runs_markdown(paragraph, *, breaks_as: str = "\n") -> str:
     return re.sub(r"[ \t]+\n", "\n", "".join(out)).strip()
 
 
-def frame_markdown(text_frame, *, as_list: bool, inherited=None) -> str:
-    """A whole text frame as Markdown: bullet lists and/or paragraphs.
+_MARKERS = {"upper": "A.", "lower": "a.", "number": "1."}
 
-    Bullets per paragraph: its own setting, else `inherited(level)` (the
-    layout / master placeholder's setting), else `as_list` (placeholders
-    usually have bullets from the master; text boxes don't).
+
+def frame_markdown(text_frame, *, as_list: bool, style_of=None) -> str:
+    """A whole text frame as Markdown: lists and/or paragraphs.
+
+    `style_of(paragraph)` returns the resolved reader.ParaStyle (paragraph →
+    layout → master inheritance). Without a known bullet setting, `as_list`
+    decides (placeholders usually have bullets from the master; text boxes
+    don't). Template text styles map onto Slipr Markdown:
+      - automatic numbering A. / a. / 1.  → letter / numbered list
+      - bold capitals without a bullet    → subheading (**…** on its own line)
+      - a serif font                      → *…* (templates render em in serif)
     """
-    blocks: list[tuple[str, list[str]]] = []  # ("list", lines) or ("para", [text])
+    blocks: list[tuple[str, list[str]]] = []  # (kind, lines); kind: bullet/upper/lower/number/para
     for paragraph in text_frame.paragraphs:
-        setting = reader.bullet_setting(paragraph)
-        if setting is None and inherited is not None:
-            setting = inherited(paragraph.level)
-        bulleted = setting == "on" or (setting is None and as_list)
-        text = runs_markdown(paragraph, breaks_as=" " if bulleted else "\n")
+        style = style_of(paragraph) if style_of else reader.ParaStyle()
+        bullet = style.bullet if style.bullet is not None else ("char" if as_list else "none")
+        listed = bullet != "none"
+        text = runs_markdown(paragraph, breaks_as=" " if listed else "\n")
         if not text:
             continue
-        if bulleted:
-            line = f"{'  ' * max(0, min(paragraph.level, 8))}- {text}"
-            if blocks and blocks[-1][0] == "list":
-                blocks[-1][1].append(line)
-            else:
-                blocks.append(("list", [line]))
+        if bullet in _MARKERS:
+            kind, line = bullet, f"{_MARKERS[bullet]} {text}"
+        elif bullet == "char":
+            # Bullet levels 0–3 nest; deeper "levels" in templates are styles, not depth.
+            kind, line = "bullet", f"{'  ' * max(0, min(paragraph.level, 3))}- {text}"
         else:
-            blocks.append(("para", [text]))
+            kind = "para"
+            if style.bold and style.caps and "**" not in text:
+                line = f"**{text}**"
+            elif style.serif and not text.startswith("*"):
+                line = f"*{text}*"
+            else:
+                line = text
+        if kind != "para" and blocks and blocks[-1][0] == kind:
+            blocks[-1][1].append(line)
+        else:
+            blocks.append((kind, [line]))
     return "\n\n".join("\n".join(lines) for _, lines in blocks).strip()
 
 

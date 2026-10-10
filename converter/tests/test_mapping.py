@@ -103,6 +103,14 @@ def test_unmapped_layouts_still_drop_template_wide_ignores(template):
     assert "reader" not in mapped.slide
 
 
+def test_an_explicit_role_overrides_the_template_wide_ignore(template):
+    t = role_template(template)
+    t["pptxMapping"]["Facts"] = {"layout": "bullets", "placeholders": {"0": "title", "91": "body"}}
+    model = sm(layout_name="Facts", title="Facts", title_idx=0, bodies=[body_at("3.000+ colleagues", 91)])
+    mapped = map_slide(model, "s-05", t, images=[])
+    assert mapped.slide["content"]["body"] == "3.000+ colleagues"
+
+
 def test_role_for_unknown_slot_is_reported(template):
     t = role_template(template)
     t["pptxMapping"]["Text"]["placeholders"]["13"] = "nope"

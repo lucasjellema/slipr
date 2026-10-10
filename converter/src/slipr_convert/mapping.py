@@ -27,6 +27,7 @@ from dataclasses import dataclass, field, replace
 from .model import ImageRef, SlideModel, TextBody
 
 LIST_TYPES = {"list", "richtext"}
+_NUMBER_ONLY = re.compile(r"^\d{1,2}[.)]?$")
 
 
 @dataclass
@@ -88,9 +89,11 @@ def choose_layout(sm: SlideModel, template: dict, mapping: dict | None = None) -
 
     entry = lookup_entry(sm.layout_name, template, mapping)
     if entry.layout in layouts:
-        has_role_images = any(im.idx in entry.roles for im in sm.images)
-        if sm.images and not has_role_images and not capacity(layouts[entry.layout]).image_slots and any_image_layout:
-            pass  # the mapped layout would push the pictures out: use best fit instead
+        # A plain name mapping yields to best fit when it would push pictures
+        # out. A mapping with placeholder roles is the template author's
+        # explicit choice and always wins (extra pictures go to the reader layer).
+        if sm.images and not entry.roles and not capacity(layouts[entry.layout]).image_slots and any_image_layout:
+            pass
         else:
             return entry.layout, f'PowerPoint layout "{sm.layout_name}" mapped to "{entry.layout}" ({entry.source})'
 
@@ -140,13 +143,22 @@ def map_slide(
 ) -> MappedSlide:
     """`images`: the asset path for each of `sm.images`, in the same order."""
     entry = lookup_entry(sm.layout_name, template, mapping)
-    ignore = set(template.get("pptxIgnore", []) or []) | entry.ignore
+    # An explicit role for this layout wins over the template-wide ignore list
+    # (idx numbers mean different things per layout, e.g. 91 = logo or a text box).
+    ignore = (set(template.get("pptxIgnore", []) or []) | entry.ignore) - set(entry.roles)
     sm, image_paths = _drop_ignored(sm, images, ignore)
+    # Text boxes holding only a number ("1", "2.") are decorative numbering
+    # (agendas, numbered cards); the Slipr layout numbers its own items.
+    numbering = [b for b in sm.bodies if _NUMBER_ONLY.match(markdown_to_plain(b.markdown))]
+    if numbering:
+        sm = replace(sm, bodies=[b for b in sm.bodies if b not in numbering])
 
     layout_id, reason = choose_layout(sm, template, mapping)
     layout = next(l for l in template["layouts"] if l["id"] == layout_id)
     slot_types = {s["name"]: s["type"] for s in layout.get("slots", [])}
     result = MappedSlide(slide={"id": slide_id, "layout": layout_id}, layout=layout_id, reason=reason)
+    if numbering:
+        result.remarks.append(f"{len(numbering)} numbering text box(es) left out (the layout numbers its own items)")
     content: dict = {}
     blocks: list[dict] = []
     had_title = sm.title is not None or any(r == "title" for r in entry.roles.values())

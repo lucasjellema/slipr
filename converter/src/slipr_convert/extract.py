@@ -112,8 +112,8 @@ def _extract_shape(shape, model: SlideModel) -> None:
         return
 
     as_list = ph_type in _LIST_PLACEHOLDERS or (shape.is_placeholder and ph_type is None)
-    inherited = (lambda level: reader.inherited_bullet(shape, level)) if shape.is_placeholder else None
-    markdown = text.frame_markdown(shape.text_frame, as_list=as_list, inherited=inherited)
+    markdown = text.frame_markdown(shape.text_frame, as_list=as_list,
+                                   style_of=lambda paragraph: reader.paragraph_style(shape, paragraph))
     if markdown:
         placeholder = ph_type.name.lower() if ph_type is not None else None
         model.bodies.append(TextBody(markdown=markdown, is_list=markdown.lstrip().startswith("- "),
@@ -121,11 +121,17 @@ def _extract_shape(shape, model: SlideModel) -> None:
 
 
 def _image_of(shape):
-    """(blob, ext, sha1) for shapes that carry a picture, else None."""
-    if shape.shape_type != MSO_SHAPE_TYPE.PICTURE and not (shape.is_placeholder and hasattr(shape, "image")):
+    """(blob, ext, sha1) for shapes that carry a picture, else None.
+
+    `shape.image` raises ValueError for linked (not embedded) pictures and
+    for empty picture placeholders, so hasattr() cannot be used to probe it.
+    """
+    if shape.shape_type != MSO_SHAPE_TYPE.PICTURE and not shape.is_placeholder:
         return None
     try:
         img = shape.image
     except (AttributeError, ValueError, KeyError):
-        return None  # e.g. an empty picture placeholder
+        if shape.shape_type == MSO_SHAPE_TYPE.PICTURE:
+            return None  # a linked picture: nothing to copy
+        return None  # an empty picture placeholder, or not a picture at all
     return img.blob, (img.ext or "png").lower(), img.sha1

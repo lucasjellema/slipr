@@ -56,7 +56,7 @@ converter/
   - **Build animations**: `p:timing//p:bldP`.
   - **Graphic frames**: `a:graphicData/@uri` → table, chart, SmartArt, OLE.
   - **Line breaks**: `paragraph_parts()` yields runs, fields and `<a:br>` in order (python-pptx's `runs` drops breaks).
-  - **Bullets**: the paragraph's explicit `buNone` / `buChar` / `buAutoNum`, else `inherited_bullet()`, which looks up the layout placeholder's and then the master placeholder's `lstStyle/lvlNpPr` (via python-pptx's `_base_placeholder`). This matters: e.g. a "Section Header" description has *no bullets* by layout.
+  - **Paragraph styles**: `paragraph_style()` resolves bullet (`buNone` / `buChar` / `buAutoNum` type), bold, caps and serif font along the chain *paragraph → layout placeholder → master placeholder* (`lstStyle/lvlNpPr`, via python-pptx's `_base_placeholder`) *→ master body style* (`p:txStyles/p:bodyStyle`). This matters: a "Section Header" description has *no bullets* by layout, and corporate templates use outline levels as text styles (intro, subheading, serif line, A. and 1. lists).
 - Keeping all private (`_element`) access in this one module limits the damage when python-pptx changes.
 
 ### 2. `extract.py`: intermediate model
@@ -68,7 +68,7 @@ Per slide a `SlideModel`: `index`, `slide_id`, `layout_name`, `hidden`, `section
 - `slide.has_notes_slide` is checked before `notes_slide`, because merely accessing `notes_slide` creates one.
 
 ### 3. `text.py`: Markdown
-- Bulleted paragraphs become `- item`, with two spaces per level. Other paragraphs become Markdown paragraphs. Line breaks become a space inside list items and a line break in paragraphs.
+- Bulleted paragraphs become `- item`, with two spaces per level (at most 4 levels; deeper outline levels are styles, not depth). Auto-numbered paragraphs become `A.` / `a.` / `1.` list items. Paragraphs without a bullet become Markdown paragraphs: bold + caps → `**subheading**`, serif font → `*…*`. Line breaks become a space inside list items and a line break in paragraphs.
 - Runs: `**bold**`, `*italic*`, `[text](url)` (only http(s)/mailto links). Neighbouring runs with the same formatting are merged first, so there is never `**a****b**`.
 - `\ ` `` ` `` `*` `_` `[` `]` in the source text are escaped, so a literal "*" or "[x]" stays literal in Slipr.
 

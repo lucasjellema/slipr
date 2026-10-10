@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1280" role="img" aria-label="Placeholder for a brand photo (about 1:1)">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5b5f66"/>
+      <stop offset="1" stop-color="#2b2e33"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="1280" fill="url(#g)"/>
+  <g fill="none" stroke="#7d828a" stroke-width="3" opacity="0.6">
+    <path d="M0 0 L1200 1280 M1200 0 L0 1280"/>
+  </g>
+  <text x="600" y="420" fill="#c9ccd1" font-family="Arial, sans-serif" font-size="44" text-anchor="middle">PLACEHOLDER</text>
+  <text x="600" y="480" fill="#c9ccd1" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">brand photo, about 1:1</text>
+</svg>
