@@ -1,0 +1,56 @@
+# CLAUDE.md: Viewer
+
+Read the root `CLAUDE.md` first. This file adds viewer-specific guidance.
+
+## Orientation in 60 seconds
+
+- Two **separate** mode apps behind one entry (`js/main.js`):
+  - `audience/`: a thin layer over Reveal.js. Linear and stateless. Keep it thin.
+  - `reader/`: an interactive app with state, personalisation, search, popovers and annotations. Most viewer code lives here.
+- They share only `shared/` (loading, slide renderer, block renderer, Markdown). Do not import across `audience/` ↔ `reader/`.
+- Slide visuals come from `shared/render.js` and reader blocks from `shared/blocks.js`. If something looks wrong in the editor preview too, the bug is in `shared/` or the template.
+- `reader/personalize.js` is the heart of "tailored" reading. It is pure and has unit tests. Keep DOM code out of it.
+
+## Invariants
+
+- The viewer never modifies the show. It is read-only.
+- Identity is `slide.id` and `block.id`, never an index. Use ids for links, mode switching, progress and annotation anchors.
+- Reveal.js is loaded only in audience mode. Reader mode has no third-party dependencies.
+- Reader personal data (prefs, progress, bookmarks, annotations) stays in the browser (IndexedDB, keyed by `show.id`) and is never sent anywhere (D-010).
+- Audience mode never shows reader-layer content. Glossary references render as plain text and `^[popups]` are omitted.
+- Every interactive element must be reachable by keyboard: popover triggers are `<button>`s, tabs follow the ARIA tablist pattern.
+
+## Smoke-test checklist (run after every viewer change)
+
+With `shows/demo`:
+
+**Audience**
+1. Opens on slide 1. Arrows and PageUp/PageDown navigate. Fragments build one by one.
+2. Auto-animate slides morph. The agenda slide shows the chapters.
+3. `S` opens the presenter view with notes and the next slide.
+4. The backup slide is skipped but visible in the overview (`O`).
+
+**Reader**
+
+5. The welcome chooser appears on first visit and is skipped on the next visit.
+6. Switching profile/depth/path changes the visible blocks and keeps the scroll position.
+7. Glossary terms, footnotes and hotspots open popovers on hover (mouse), on tap (touch emulation) and with Enter (keyboard).
+8. Details panels and tabs work. Embeds load lazily.
+9. `/` search finds text in a reader block and jumps to it with a highlight.
+10. Highlight some text and add a note. After a reload it is still there. Export produces Markdown.
+11. Progress marks update in the TOC. A reload resumes at the last position.
+12. At 375 px width there is no horizontal scrolling and the slide visual reflows.
+
+**Both**
+
+13. `R` / `A` switch modes and keep the position.
+14. An invalid show (`shows/fixtures/broken/`) shows the error page.
+15. The browser console is free of errors.
+
+## Common pitfalls
+
+- Reveal measures slides at init time. Inject the theme CSS and wait for `document.fonts.ready` **before** `Reveal.initialize()`.
+- Relative image paths are relative to `show.json`, not to `viewer/`. Use the `baseUrl` from `load.js`.
+- `file://` will not work because of `fetch()`. Always use the dev server.
+- Re-rendering the reader article after a pref change destroys DOM nodes. Re-apply annotation highlights and restore focus afterwards.
+- Hover-only interactions are invisible on touch devices. Always provide the tap/click path too.

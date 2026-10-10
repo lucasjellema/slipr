@@ -1,0 +1,29 @@
+# Dependencies (converter and dev tooling; browser libraries live in vendor/ and ARE committed)
+node_modules/
+
+# Logs and test output
+*.log
+npm-debug.log*
+coverage/
+test-results/
+
+# OS clutter
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Editors
+.idea/
+*.swp
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Claude Code local settings (shared settings in .claude/settings.json are committed)
+.claude/settings.local.json
+
+# Converter scratch output
+converter/out/
+
+# PowerPoint lock files
+~$*.pptx

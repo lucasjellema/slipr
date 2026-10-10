@@ -1,0 +1,14 @@
+{
+  "name": "slipr",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Slipr (SlidePresenter): one show, two experiences - audience slideshow and interactive reader.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "serve": "npx --yes http-server . -p 8080 -c-1",
+    "test": "node --test --test-reporter=spec"
+  }
+}
