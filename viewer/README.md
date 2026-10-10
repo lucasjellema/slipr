@@ -112,8 +112,11 @@ On screens of 1400 px and wider, "My notes" docks beside the article. On smaller
 Full-text search across slides, reader blocks, glossary and presenter notes (when shown), as you type. It is case- and accent-insensitive and matches word beginnings ("temp" finds "template"). Results show where the match is with a marked snippet. ↑/↓ and Enter work, and opening a result jumps there with the words highlighted. Matches in content hidden by your current tailoring are counted, with a one-click "show everything".
 
 ### Annotations
-- Select text in the article to **highlight** it or **add a note**. Notes appear in the "My notes" panel (`N`), grouped by slide. Clicking highlighted text opens its note.
-- Highlights stay attached to their text when the show is edited a little. Notes on text that's hidden by your tailoring, or that no longer exists, are listed separately and never silently lost.
+- Select text in the article, or in the text on a slide (titles, bullets), to **highlight** it or **add a note**.
+- **✎ Note** next to a slide adds a note about the slide as a whole. A "✎ n notes" chip on the slide opens them.
+- **📍 Pin** turns the slide into a pin board: click any spot, and a numbered pin is attached to the object under it (a specific bullet, the image, the title…). Or pick an object from the list under the slide, which also works with the keyboard. Pins stay on their object when the slide reflows, for example on a phone. Hovering a pin shows its note, and clicking it opens the note.
+- All notes appear in the "My notes" panel (`N`), grouped by slide. Clicking highlighted text or a pin opens its note.
+- Highlights stay attached to their text when the show is edited a little. If a pinned object disappears, the pin falls back to its spot on the slide (shown grey). Notes on content that's hidden by your tailoring, or that no longer exists, are listed separately and never silently lost.
 - **Bookmark** any slide.
 - Everything (choices, progress, bookmarks, notes) is stored **only in your own browser**. Notes can be **exported** as Markdown (to read or share) or JSON, and a JSON export can be **imported** in another browser (it merges, and the newest version of a note wins).
 

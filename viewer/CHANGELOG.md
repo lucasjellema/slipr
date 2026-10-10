@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Annotate slides and objects on slides
+- **Added** notes about a whole slide (✎ Note), shown as a "✎ n notes" chip on the slide.
+- **Added** pins (📍 Pin): click anywhere on a slide visual, or choose an object from a keyboard-accessible list, to attach a numbered pin to that object (a bullet, the image, the title…). Pins follow their object when the slide reflows and fall back to their spot on the canvas if the object disappears. Pure geometry in `reader/pin.js`.
+- **Added** text highlights inside the slide visual (title, bullets, columns), anchored to the slot.
+- **Changed** the annotation model to three kinds (`text`, `slide`, `pin`). Existing highlights remain valid. Export, import and the My notes panel handle all kinds.
+
 ### 2026-10-10: Reader personalisation (Phase 3)
 - **Added** `reader/state.js`: per-show reader state (prefs, presenter-notes toggle, welcome done, position, visited, bookmarks, annotations) in IndexedDB, falling back to localStorage and then memory. A debounced pure store, `migrate()` for robustness, flush when the page is hidden.
 - **Added** `reader/tailor.js`: the first-visit welcome dialog (profile, depth, route), and a ⚙ Tailor panel in the top bar whose changes apply immediately and keep the position. URL parameters override stored prefs until changed in the UI.

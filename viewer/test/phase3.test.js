@@ -7,6 +7,52 @@ import { buildSearchIndex, search, fold, tokens } from '../reader/search-index.j
 import { personalize } from '../reader/personalize.js';
 import { annotationsToMarkdown, annotationsToJson, mergeImportedAnnotations } from '../reader/notes-export.js';
 
+import { pinFromPoint, pinPosition, describeTarget, humanise } from '../reader/pin.js';
+
+describe('slide notes and pins', () => {
+  const pinAnn = { id: 'p1', kind: 'pin', slideId: 's-architecture', note: 'Look here', created: '2026-10-10T12:00:00Z',
+    pin: { slot: 'image', item: null, x: 0.25, y: 0.5, cx: 0.3, cy: 0.6, label: 'Image' } };
+  const slideAnn = { id: 'n1', kind: 'slide', slideId: 's-roadmap', note: 'Ask about dates', created: '2026-10-10T12:01:00Z' };
+
+  test('isAnnotation accepts the three kinds and rejects broken pins', () => {
+    assert.equal(isAnnotation(pinAnn), true);
+    assert.equal(isAnnotation(slideAnn), true);
+    assert.equal(isAnnotation({ ...pinAnn, pin: { ...pinAnn.pin, x: 1.5 } }), false);
+    assert.equal(isAnnotation({ ...pinAnn, pin: undefined }), false);
+    assert.equal(isAnnotation({ ...slideAnn, kind: 'doodle' }), false);
+    assert.deepEqual(migrate({ annotations: [pinAnn, slideAnn, { id: 'x' }] }).annotations.map((a) => a.id), ['p1', 'n1']);
+  });
+
+  test('pinFromPoint: fractions within the object and the canvas', () => {
+    const object = { left: 100, top: 50, width: 200, height: 100 };
+    const canvas = { left: 0, top: 0, width: 1000, height: 500 };
+    assert.deepEqual(pinFromPoint(object, canvas, 150, 75), { x: 0.25, y: 0.25, cx: 0.15, cy: 0.15 });
+    assert.deepEqual(pinFromPoint(object, canvas, -20, 9999), { x: 0, y: 1, cx: 0, cy: 1 }, 'clamped');
+  });
+
+  test('pinPosition follows the object, or falls back to the canvas', () => {
+    const pin = { x: 0.5, y: 0.5, cx: 0.1, cy: 0.2 };
+    const frame = { left: 0, top: 0, width: 1000, height: 500 };
+    const canvas = frame;
+    assert.deepEqual(pinPosition(pin, { left: 200, top: 100, width: 100, height: 50 }, canvas, frame), { left: 25, top: 25, approximate: false });
+    assert.deepEqual(pinPosition(pin, null, canvas, frame), { left: 10, top: 20, approximate: true });
+  });
+
+  test('describeTarget and humanise', () => {
+    assert.equal(describeTarget({ slot: 'body', item: 1, text: 'Linked to a template', isImage: false }), 'Bullet 2: “Linked to a template”');
+    assert.equal(describeTarget({ slot: 'image', item: null, text: '', isImage: true }), 'Image');
+    assert.equal(describeTarget({ slot: 'title', item: null, text: 'Roadmap', isImage: false }), 'Title: “Roadmap”');
+    assert.equal(describeTarget({ slot: null, item: null, text: '', isImage: false }), 'Slide');
+    assert.equal(humanise('leftTitle'), 'Left title');
+  });
+
+  test('Markdown export describes slide notes and pins', () => {
+    const md = annotationsToMarkdown(demo, [pinAnn, slideAnn]);
+    assert.match(md, /## Three components, one shared core\n\n_📍 Pin on Image_\n\nLook here/);
+    assert.match(md, /## Roadmap\n\n_Note on the slide_\n\nAsk about dates/);
+  });
+});
+
 describe('notes export / import', () => {
   const a1 = { id: 'a1', slideId: 's-problem', blockId: 'story', quote: { exact: 'the speaker carries the story', prefix: '', suffix: '' }, note: 'Key point', created: '2026-10-10T10:00:00Z' };
   const a2 = { id: 'a2', slideId: 's-title', blockId: 'intro', quote: { exact: 'reader version', prefix: '', suffix: '' }, note: '', created: '2026-10-10T11:00:00Z' };

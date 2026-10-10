@@ -6,7 +6,7 @@
  * Pure; tested in Node.
  */
 import { slideTitle } from '../../shared/render.js';
-import { isAnnotation } from './state.js';
+import { isAnnotation, annotationKind } from './state.js';
 
 /**
  * @param {any} show
@@ -32,7 +32,10 @@ export function annotationsToMarkdown(show, annotations, extra = {}) {
       const slide = show.slides?.find((/** @type {any} */ s) => s.id === a.slideId);
       lines.push(`## ${slide ? slideTitle(slide) : a.slideId}`, '');
     }
-    lines.push(...a.quote.exact.trim().split('\n').map((l) => `> ${l}`), '');
+    const kind = annotationKind(a);
+    if (kind === 'text' && a.quote) lines.push(...a.quote.exact.trim().split('\n').map((l) => `> ${l}`), '');
+    else if (kind === 'slide') lines.push('_Note on the slide_', '');
+    else if (kind === 'pin' && a.pin) lines.push(`_📍 Pin on ${a.pin.label}_`, '');
     if (a.note.trim()) lines.push(a.note.trim(), '');
   }
   if (!sorted.length && !bookmarks.length) lines.push('_No highlights or notes yet._', '');

@@ -44,6 +44,7 @@ With `shows/demo`:
 8. Details panels and tabs work. Embeds load lazily.
 9. `/` search finds text in a reader block and jumps to it with a highlight.
 10. Select text in a block → Highlight / Add note. After a reload it is still highlighted and the note is back. With a profile that hides that block, the note moves to "Hidden by your tailoring". Export Markdown and JSON download files, and importing the JSON again reports "0 new".
+10a. ✎ Note on a slide → a "✎ 1 note" chip appears. 📍 Pin → click on the image → pin 1 appears where you clicked, and its note opens. 📍 Pin → choose "Bullet 3" from the list → a pin on that bullet. At 375 px the pin is still on the same bullet. Select a slide title → Highlight works there too.
 11. The contents entry of the slide being read is highlighted and the hash follows it. `#s-thanks` (reader-hidden) falls back to the nearest earlier slide. After 3 s on a slide its contents mark fills and "n of m read" goes up. `M` / ★ bookmarks a slide (listed at the top of the contents). Reopening without a hash offers "Continue with …".
 12. At 375 px width there is no horizontal scrolling, the slide visual reflows, and ☰ opens the contents drawer.
 

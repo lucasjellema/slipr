@@ -10,11 +10,33 @@
 export const STATE_VERSION = 1;
 
 /**
+ * What a pin is attached to. Positions are fractions (0–1): `x`/`y` within
+ * the object's box, `cx`/`cy` within the whole slide canvas (fallback when the
+ * object can no longer be found, e.g. after a layout change).
+ * @typedef {object} PinTarget
+ * @property {string | null} slot   Slot name, or null for the slide background.
+ * @property {number | null} item   Index of the list item within the slot, if any.
+ * @property {number} x
+ * @property {number} y
+ * @property {number} cx
+ * @property {number} cy
+ * @property {string} label         Human description, e.g. 'Bullet: "Linked to a template"'.
+ */
+
+/**
+ * An annotation. Three kinds:
+ *  - 'text'  (default when `kind` is absent): a highlighted quote inside a
+ *            reader block (`blockId`), the summary ("_summary") or a slide
+ *            slot ("slot:<name>")
+ *  - 'slide': a note about the slide as a whole
+ *  - 'pin':   a note pinned to an object (or spot) on the slide visual
  * @typedef {object} Annotation
  * @property {string} id
+ * @property {'text' | 'slide' | 'pin'} [kind]
  * @property {string} slideId
- * @property {string} blockId     Block id, or "_summary" for the slide summary.
- * @property {{ exact: string, prefix: string, suffix: string }} quote
+ * @property {string} [blockId]   kind 'text' only.
+ * @property {{ exact: string, prefix: string, suffix: string }} [quote]  kind 'text' only.
+ * @property {PinTarget} [pin]    kind 'pin' only.
  * @property {string} note        Empty for a plain highlight.
  * @property {string} created     ISO timestamp.
  * @property {string} [updated]
@@ -75,10 +97,26 @@ export function migrate(raw) {
 
 /** @param {any} a @returns {a is Annotation} */
 export function isAnnotation(a) {
-  return !!a && typeof a.id === 'string' && typeof a.slideId === 'string' && typeof a.blockId === 'string'
-    && !!a.quote && typeof a.quote.exact === 'string' && a.quote.exact.length > 0
-    && typeof a.quote.prefix === 'string' && typeof a.quote.suffix === 'string'
-    && typeof a.note === 'string' && typeof a.created === 'string';
+  if (!a || typeof a.id !== 'string' || typeof a.slideId !== 'string'
+    || typeof a.note !== 'string' || typeof a.created !== 'string') return false;
+  const kind = a.kind ?? 'text';
+  if (kind === 'text') {
+    return typeof a.blockId === 'string' && !!a.quote && typeof a.quote.exact === 'string' && a.quote.exact.length > 0
+      && typeof a.quote.prefix === 'string' && typeof a.quote.suffix === 'string';
+  }
+  if (kind === 'slide') return true;
+  if (kind === 'pin') {
+    const p = a.pin;
+    const frac = (/** @type {any} */ v) => typeof v === 'number' && v >= 0 && v <= 1;
+    return !!p && frac(p.x) && frac(p.y) && frac(p.cx) && frac(p.cy) && typeof p.label === 'string'
+      && (p.slot === null || typeof p.slot === 'string') && (p.item === null || Number.isInteger(p.item));
+  }
+  return false;
+}
+
+/** @param {Annotation} a */
+export function annotationKind(a) {
+  return a.kind ?? 'text';
 }
 
 /**

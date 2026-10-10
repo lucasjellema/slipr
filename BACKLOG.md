@@ -60,6 +60,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-030** [viewer] Optional sync / shared annotations across devices (needs a backend, revisits D-010)
 - [ ] **I-031** [format] Glossary auto-linking: mark the first occurrence of each term per slide automatically
 - [ ] **I-032** [viewer] Step through a slide's build animations inside reader mode
+- [ ] **I-034** [viewer] Show my pins and notes in audience mode too (presenter's private view, e.g. in the speaker window), and pins on reader-block images (hotspot-style)
 
 ### Editor
 - [ ] **I-020** [editor] Autosave draft to IndexedDB with crash recovery
@@ -160,6 +161,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **V-018** [viewer] Annotate slides and objects on slides: slide notes, pins (click or object list), highlights in slide text · done 2026-10-10 · claude
 - [x] **V-011** [viewer] Reader state: IndexedDB → localStorage → memory, debounced store, `migrate()` · done 2026-10-10 · claude
 - [x] **V-013** [viewer] Welcome chooser and ⚙ Tailor panel (profile / depth / route / presenter notes), `D` key · done 2026-10-10 · claude
 - [x] **V-014** [viewer] Progress marks + "n of m read", resume message, bookmarks (★ / `M`) · done 2026-10-10 · claude

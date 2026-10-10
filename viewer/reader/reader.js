@@ -69,7 +69,7 @@ export async function startReader(app, ctx) {
     store,
     show,
     isVisible: (slideId, blockId) => isVisibleBlock(slideId, blockId),
-    goTo: (slideId, blockId) => go(`#${slideId}/${blockId}`, 'smooth'),
+    goTo: (slideId, blockId) => go(blockId && !blockId.startsWith('slot:') ? `#${slideId}/${blockId}` : `#${slideId}`, 'smooth'),
     toast,
   });
 
@@ -191,9 +191,12 @@ export async function startReader(app, ctx) {
   window.addEventListener('hashchange', () => go(location.hash, 'smooth'));
 
   // ----- visibility helpers (search, notes) -----
-  function isVisibleBlock(/** @type {string} */ slideId, /** @type {string} */ blockId) {
+  /** Is this slide (blockId null), slot ("slot:x"), summary or block currently shown? */
+  function isVisibleBlock(/** @type {string} */ slideId, /** @type {string | null | undefined} */ blockId) {
     const entry = model.slides.find((s) => s.slide.id === slideId);
     if (!entry) return false;
+    if (!blockId) return true;
+    if (blockId.startsWith('slot:')) return entry.slide.reader?.showSlide !== false;
     if (blockId === '_summary') return !!entry.slide.reader?.summary;
     return entry.blocks.some((b) => b.id === blockId);
   }
@@ -327,6 +330,14 @@ function slideArticle(entry, ctx, slideHref, state) {
   const article = h('article', { class: 'reader-slide', id: slide.id, 'data-slide-id': slide.id, 'aria-labelledby': titleId }, [
     h('div', { class: 'reader-slide-head' }, [
       h('h3', { class: showVisual ? 'reader-slide-title visually-hidden' : 'reader-slide-title', id: titleId }, [title]),
+      h('button', {
+        type: 'button', class: 'reader-slide-tool reader-slide-note', 'data-slide-id': slide.id,
+        title: 'Add a note about this slide', 'aria-label': `Add a note about “${title}”`,
+      }, [h('span', { 'aria-hidden': 'true' }, ['✎']), h('span', { class: 'reader-slide-tool-label' }, ['Note'])]),
+      showVisual ? h('button', {
+        type: 'button', class: 'reader-slide-tool reader-slide-pin', 'data-slide-id': slide.id,
+        title: 'Pin a note to something on this slide', 'aria-label': `Pin a note on “${title}”`,
+      }, [h('span', { 'aria-hidden': 'true' }, ['📍']), h('span', { class: 'reader-slide-tool-label' }, ['Pin'])]) : null,
       h('button', {
         type: 'button', class: 'reader-bookmark', 'data-slide-id': slide.id, 'aria-pressed': String(bookmarked),
         title: 'Bookmark this slide (M)', 'aria-label': `Bookmark “${title}”`,

@@ -55,7 +55,8 @@ viewer/
     ├── search-index.js     ✅ pure: build index, search, snippets (accent-insensitive, word-prefix)
     ├── search.js           ✅ search dialog + on-page highlight of matches
     ├── quote.js            ✅ pure: text-quote anchoring (describe / locate)
-    ├── annotations.js      ✅ selection toolbar, highlights, "My notes" panel, export/import
+    ├── pin.js              ✅ pure: pin geometry (point ↔ object/canvas fractions), object labels
+    ├── annotations.js      ✅ text highlights, slide notes, pins; "My notes" panel, export/import
     ├── notes-export.js     ✅ pure: Markdown / JSON export, JSON merge-import
     ├── tailor.js           ✅ choices form, first-visit welcome dialog, Tailor panel
     └── reader.css          ✅ page structure; block and popover styling comes from the template
@@ -123,10 +124,14 @@ show + URL params ──► personalize(show, prefs) ──► visible model ─
 - `search.js`: a modal `<dialog>` that searches as you type (↑/↓/Enter). The chosen result is reached through the normal routing, and the query words inside the target are marked with the CSS Custom Highlight API (`slipr-search`) for 5 s.
 
 ### Annotations
-- Annotatable scopes: every reader block (`.slipr-block[data-block-id]`) and the slide summary (`data-block-id="_summary"`, DOM id `slide--_summary`). Slide visuals are not annotatable.
+- Three kinds (`kind` in `state.js`, absent = `text`):
+  - **text**: a quote in a reader block (`.slipr-block[data-block-id]`), the slide summary (`blockId "_summary"`), or a text slot of the slide visual (`blockId "slot:<name>"`, found via `[data-slot]` inside `.reader-slide-frame`)
+  - **slide**: a note on the slide as a whole, shown as a "✎ n notes" chip in the slide's header row
+  - **pin**: a note attached to an object on the slide visual
 - Creating: the selection must start and end in one scope. Its offsets in `scope.textContent` are computed with a `Range` (so hidden footnote text counts consistently), trimmed, and stored as a **text-quote selector** (`exact`, plus 32 characters of `prefix` / `suffix`, in `quote.js`) together with `slideId` and `blockId`.
-- Drawing: after every render, each annotation is re-anchored with `locateQuote()` (the best-matching occurrence wins) and mapped back to a DOM `Range`. All ranges go into one `Highlight` (`slipr-annotation`), so the content DOM is never modified. A click on highlighted text (`caretPositionFromPoint` → `Range.isPointInRange`) opens its note.
-- The "My notes" panel lists notes in show order, plus two separate groups: *hidden by your tailoring* (the block exists but isn't visible) and *text no longer found* (the block is gone or the quote can't be located). Notes are never deleted automatically.
+- **Pins** (`pin.js` + `annotations.js`): "📍 Pin" puts a transparent capture layer over the slide frame plus a bar listing the slide's objects (filled slots, with list slots split into items), which is the keyboard-accessible way to pin. A click finds the object under the point (`elementsFromPoint` → innermost `li`, else `[data-slot]`, else the canvas) and stores `{ slot, item, x, y, cx, cy, label }`: the position within the object, and within the canvas as a fallback. Pins are drawn as numbered buttons inside the frame, positioned in % of the frame. A `ResizeObserver` recomputes them when the layout changes, so they follow their object through reflow. A pin whose object can't be found falls back to the canvas position and is drawn grey (`is-approximate`).
+- Drawing text: after every render, each annotation is re-anchored with `locateQuote()` (the best-matching occurrence wins) and mapped back to a DOM `Range`. All ranges go into one `Highlight` (`slipr-annotation`), so the content DOM is never modified. A click on highlighted text (`caretPositionFromPoint` → `Range.isPointInRange`) opens its note.
+- The "My notes" panel lists notes in show order, plus two separate groups: *hidden by your tailoring* (the slide, block or slide visual exists but isn't shown) and *no longer found* (the slide or block is gone, or the quote can't be located). Notes are never deleted automatically.
 - Export: Markdown (with bookmarks) and JSON `{ slipr: "notes", version, show, annotations }`. Import merges by id, and the most recently `updated` version wins. Files for another show are refused.
 
 ### Progress & bookmarks

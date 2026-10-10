@@ -6,6 +6,9 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Annotating slides and slide objects
+- **Added** to reader mode: notes on whole slides, pins on objects within slide visuals, and highlights in slide text (see `viewer/CHANGELOG.md`). 5 new tests (133 total).
+
 ### 2026-10-10: Phase 3, reader personalisation
 - **Added** to reader mode: persistent per-reader state, a welcome chooser and Tailor panel, progress tracking with a resume message, bookmarks, full-text search, and highlights with notes (export/import). See `viewer/CHANGELOG.md`.
 - **Added** 19 tests for the pure Phase 3 modules (state store, text-quote anchoring, search, notes export). The total is now 128.
