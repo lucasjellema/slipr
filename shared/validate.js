@@ -162,11 +162,22 @@ export function validateTemplate(template) {
         warnings.push({ path, code: 'unknown-layout', message: `maps to unknown layout "${layoutId}"` });
         continue;
       }
-      // 0.2: placeholder roles must name slots of the target layout
-      const slots = new Set(arrayOf(layoutsById.get(layoutId)?.slots).map((s) => s?.name));
-      for (const [idx, slot] of Object.entries(isObject(target?.placeholders) ? target.placeholders : {})) {
-        if (slot !== null && !slots.has(slot)) {
-          warnings.push({ path: `${path}.placeholders["${idx}"]`, code: 'unknown-slot', message: `layout "${layoutId}" has no slot "${slot}"` });
+      // 0.2: placeholder roles must name slots of the target layout:
+      // "slot", or for cards slots "slot[i]" / "slot[i].field".
+      const slots = new Map(arrayOf(layoutsById.get(layoutId)?.slots).map((s) => [s?.name, s]));
+      for (const [idx, role] of Object.entries(isObject(target?.placeholders) ? target.placeholders : {})) {
+        if (role === null) continue;
+        const where = `${path}.placeholders["${idx}"]`;
+        const m = /^([A-Za-z0-9][A-Za-z0-9_-]*)(?:\[(\d+)\](?:\.([A-Za-z0-9][A-Za-z0-9_-]*))?)?$/.exec(String(role));
+        const slot = m ? slots.get(m[1]) : undefined;
+        if (!slot) {
+          warnings.push({ path: where, code: 'unknown-slot', message: `layout "${layoutId}" has no slot "${m ? m[1] : role}"` });
+        } else if (m?.[2] !== undefined && slot.type !== 'cards') {
+          warnings.push({ path: where, code: 'unknown-slot', message: `"${role}": slot "${m[1]}" is not a cards slot` });
+        } else if (m?.[3] && !arrayOf(slot.fields).some((f) => f?.name === m[3])) {
+          warnings.push({ path: where, code: 'unknown-field', message: `cards in slot "${m[1]}" have no field "${m[3]}"` });
+        } else if (slot.maxItems && m?.[2] !== undefined && Number(m[2]) >= slot.maxItems) {
+          warnings.push({ path: where, code: 'too-many-items', message: `"${role}" is beyond the slot's ${slot.maxItems} cards` });
         }
       }
     }
@@ -186,6 +197,9 @@ export function collectImagePaths(show) {
   for (const slide of arrayOf(show?.slides)) {
     for (const value of Object.values(isObject(slide?.content) ? slide.content : {})) {
       if (isImage(value)) found.push(value.src);
+      if (Array.isArray(value)) {
+        for (const card of value) for (const v of Object.values(isObject(card) ? card : {})) if (isImage(v)) found.push(v.src);
+      }
     }
     for (const block of arrayOf(slide?.reader?.blocks)) {
       if (block?.type === 'image' && isImage(block.image)) found.push(block.image.src);
@@ -249,18 +263,51 @@ function checkSlots(slide, at, layouts, errors, warnings) {
     if (slot.maxLength && typeof value === 'string' && value.length > slot.maxLength) {
       warnings.push({ path, code: 'too-long', message: `is ${value.length} characters; the layout is designed for at most ${slot.maxLength}` });
     }
-    if (slot.maxItems && slot.type === 'list') {
+    if (slot.maxItems && (slot.type === 'list' || slot.type === 'cards')) {
       const count = Array.isArray(value) ? value.length : value.split('\n').filter((l) => /^[-*] /.test(l)).length;
       if (count > slot.maxItems) {
         warnings.push({ path, code: 'too-many-items', message: `has ${count} items; the layout is designed for at most ${slot.maxItems}` });
       }
     }
+    if (slot.type === 'cards') checkCards(value, slot, path, errors, warnings);
   }
   for (const slot of slots.values()) {
     if (slot.required && isEmpty(content[slot.name])) {
       warnings.push({ path: `${at}.content`, code: 'missing-slot', message: `required slot "${slot.name}" of layout "${layout.id}" is empty` });
     }
   }
+}
+
+/**
+ * Cards: each card's fields must exist in the slot definition and have the
+ * right type; required fields and maxLength are checked per card.
+ * @param {any[]} cards @param {any} slot @param {string} path
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ */
+function checkCards(cards, slot, path, errors, warnings) {
+  const fields = new Map(arrayOf(slot.fields).map((f) => [f.name, f]));
+  cards.forEach((card, i) => {
+    const at = `${path}[${i}]`;
+    for (const [name, value] of Object.entries(card)) {
+      const field = fields.get(name);
+      if (!field) {
+        warnings.push({ path: `${at}.${name}`, code: 'unknown-field', message: `cards in slot "${slot.name}" have no field "${name}" (ignored)` });
+        continue;
+      }
+      if (!matchesSlotType(value, field.type)) {
+        errors.push({ path: `${at}.${name}`, code: 'slot-type', message: `card field "${name}" expects ${slotTypeLabel(field.type)}` });
+        continue;
+      }
+      if (field.maxLength && typeof value === 'string' && value.length > field.maxLength) {
+        warnings.push({ path: `${at}.${name}`, code: 'too-long', message: `is ${value.length} characters; the card is designed for at most ${field.maxLength}` });
+      }
+    }
+    for (const field of fields.values()) {
+      if (field.required && isEmpty(card[field.name])) {
+        warnings.push({ path: at, code: 'missing-field', message: `card ${i + 1}: required field "${field.name}" is empty` });
+      }
+    }
+  });
 }
 
 /**
@@ -273,6 +320,13 @@ function checkImages(slide, at, imageExists, warnings) {
   const images = [];
   for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
     if (isImage(value)) images.push([value, `${at}.content.${name}`]);
+    if (Array.isArray(value)) {
+      value.forEach((card, i) => {
+        for (const [field, v] of Object.entries(isObject(card) ? card : {})) {
+          if (isImage(v)) images.push([v, `${at}.content.${name}[${i}].${field}`]);
+        }
+      });
+    }
   }
   arrayOf(slide.reader?.blocks).forEach((block, j) => {
     if (block?.type === 'image' && isImage(block.image)) images.push([block.image, `${at}.reader.blocks[${j}].image`]);
@@ -296,6 +350,9 @@ function forEachMarkdown(show, fn) {
   const visit = (/** @type {any} */ value, /** @type {string} */ path) => {
     if (typeof value === 'string') fn(value, path);
     else if (Array.isArray(value)) value.forEach((v, i) => visit(v, `${path}[${i}]`));
+    else if (isObject(value) && !isImage(value)) {
+      for (const [k, v] of Object.entries(value)) if (typeof v === 'string') fn(v, `${path}.${k}`);
+    }
   };
   if (isObject(show.glossary)) {
     for (const [id, term] of Object.entries(show.glossary)) visit(term?.definition, `glossary.${id}.definition`);
@@ -349,6 +406,7 @@ function matchesSlotType(value, type) {
     case 'quote': return isObject(value) && typeof value.text === 'string';
     case 'chart': return isObject(value) && typeof value.kind === 'string';
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
+    case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
 }
@@ -364,6 +422,7 @@ function slotTypeLabel(type) {
     quote: 'a quote object { "text": ..., "source": ... }',
     chart: 'a chart object { "kind": ..., "data": ... }',
     diagram: 'a diagram object { "mermaid": ... }',
+    cards: 'an array of card objects',
   }[type] ?? type;
 }
 

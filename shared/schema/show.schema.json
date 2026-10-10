@@ -178,8 +178,23 @@
         { "$ref": "#/$defs/code" },
         { "$ref": "#/$defs/quote" },
         { "$ref": "#/$defs/chart" },
-        { "$ref": "#/$defs/diagram" }
+        { "$ref": "#/$defs/diagram" },
+        { "$ref": "#/$defs/cards" }
       ]
+    },
+    "cards": {
+      "type": "array",
+      "description": "Value of a 'cards' slot: one object per card. Field names and types come from the template's slot definition.",
+      "items": {
+        "type": "object",
+        "propertyNames": { "$ref": "#/$defs/id" },
+        "additionalProperties": {
+          "anyOf": [
+            { "type": "string" },
+            { "$ref": "#/$defs/image" }
+          ]
+        }
+      }
     },
     "image": {
       "type": "object",

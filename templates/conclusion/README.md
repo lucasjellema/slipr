@@ -18,8 +18,13 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 | `quote-image` | Quote over a photo | kicker, title, quote (≤ 170), image |
 | `section-wave` / `section-image` | Section divider (client case slide) | kicker (≤ 32), title, (image) |
 | `title-only` | Title with a free illustration or diagram | kicker, title, image (shown in full) |
+| `columns-4` | Four white columns (Textbox 4x) | kicker, title, cards ≤ 4 × (title ≤ 18, text) |
+| `boxes-9` | Nine numbered boxes (Textbox 9x) | kicker, title, cards ≤ 9 × (title ≤ 24, text ≤ 210) |
+| `facts` | Key figures over a photo (Facts & figures); the right column is mirrored | kicker, title, cards ≤ 6 × (value ≤ 8, label ≤ 42, icon), image |
+| `image-cards-8` | Photo cards with a caption (Onze markten) | kicker, title, cards ≤ 8 × (image, title ≤ 26) |
+| `people-2` | Two people (Introduction) | kicker, title, cards ≤ 2 × (portrait, name, role, text) |
 
-The card layouts from PowerPoint (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction) come in phase 2, together with a `cards` slot type. Until then the converter maps them onto `text`, `text-dark`, `text-image` and `title-only`, and puts extra pictures in the reader layer.
+The last five are **card layouts**: their `cards` slot holds one object per card (see `docs/template-format.md`). The icons on `facts` are content in Slipr (a field per card), so each figure can have a fitting icon: use magenta brand icons on a transparent background. In PowerPoint they are fixed in the layout, so converted Facts slides have no icons until you add them. The demo show uses a neutral placeholder icon. The social-media icons on the PowerPoint Introduction slide are not carried over.
 
 ## Writing body text
 

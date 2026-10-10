@@ -53,14 +53,18 @@ export function pinPosition(pin, object, canvas, frame) {
 
 /**
  * A readable name for a pinned object.
- * @param {{ slot: string | null, item: number | null, text: string, isImage: boolean }} target
+ * @param {{ slot: string | null, item: number | null, text: string, isImage: boolean, kind?: 'bullet' | 'card' }} target
  */
 export function describeTarget(target) {
   const short = (/** @type {string} */ t) => {
     const s = t.trim().replace(/\s+/g, ' ');
     return s.length > 48 ? `${s.slice(0, 47)}…` : s;
   };
-  if (target.item !== null) return `Bullet ${target.item + 1}: “${short(target.text)}”`;
+  if (target.item !== null) {
+    const noun = target.kind === 'card' ? 'Card' : 'Bullet';
+    const text = short(target.text);
+    return text ? `${noun} ${target.item + 1}: “${text}”` : `${noun} ${target.item + 1}`;
+  }
   if (!target.slot) return 'Slide';
   const name = humanise(target.slot);
   if (target.isImage) return name.toLowerCase() === 'image' ? 'Image' : `${name} (image)`;

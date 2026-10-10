@@ -65,6 +65,83 @@ describe('template format 0.2', () => {
   });
 });
 
+describe('cards slots', () => {
+  /** The default template plus one cards layout. */
+  function cardsTemplate() {
+    const t = clone(template);
+    t.slipr = '0.2';
+    t.layouts.push({
+      id: 'cards', name: 'Cards', file: 'layouts/bullets.html',
+      slots: [
+        { name: 'title', type: 'text' },
+        { name: 'cards', type: 'cards', maxItems: 3, fields: [
+          { name: 'image', type: 'image' },
+          { name: 'title', type: 'text', required: true, maxLength: 10 },
+          { name: 'text', type: 'richtext' },
+        ] },
+      ],
+    });
+    return t;
+  }
+
+  /** A minimal show with one cards slide. */
+  function cardsShow(cards) {
+    return {
+      slipr: '0.1', id: 'cards', meta: { title: 'Cards' }, template: { ref: 't', version: '^1.0' },
+      slides: [{ id: 's-1', layout: 'cards', content: { title: 'Cards', cards } }],
+    };
+  }
+
+  test('a valid cards value passes, and card images are collected', () => {
+    const show = cardsShow([
+      { title: 'One', text: '**Bold** text', image: { src: 'images/a.png', alt: 'A' } },
+      { title: 'Two' },
+    ]);
+    assert.deepEqual(validateShow(show, { template: cardsTemplate() }), { ok: true, errors: [], warnings: [] });
+    assert.deepEqual(collectImagePaths(show), ['images/a.png']);
+  });
+
+  test('field type errors and card warnings', () => {
+    const show = cardsShow([
+      { title: 42 },
+      { title: 'Far too long a title', extra: 'x' },
+      { text: 'no title' },
+      { title: 'Four' },
+    ]);
+    const { errors, warnings } = validateShow(show, { template: cardsTemplate() });
+    assert.ok(errors.some((e) => e.code === 'slot-type' && e.path === 'slides[0].content.cards[0].title'));
+    const found = codes(warnings);
+    for (const code of ['too-long', 'unknown-field', 'missing-field', 'too-many-items']) {
+      assert.ok(found.includes(code), `expected warning ${code}, got ${found.join(', ')}`);
+    }
+  });
+
+  test('a cards slot rejects a non-array value', () => {
+    const { errors } = validateShow(cardsShow('nope'), { template: cardsTemplate() });
+    assert.ok(errors.some((e) => e.code === 'slot-type' && e.path === 'slides[0].content.cards'));
+  });
+
+  test('card roles in pptxMapping are checked', () => {
+    const t = cardsTemplate();
+    t.pptxMapping['Cards'] = { layout: 'cards', placeholders: { 0: 'title', 13: 'cards[0]', 14: 'cards[1].title', 20: 'cards[2].image' } };
+    assert.deepEqual(validateTemplate(t), { ok: true, errors: [], warnings: [] });
+    t.pptxMapping['Cards'].placeholders = { 1: 'title[0]', 2: 'cards[0].nope', 3: 'cards[3]' };
+    assert.deepEqual(codes(validateTemplate(t).warnings).sort(), ['too-many-items', 'unknown-field', 'unknown-slot']);
+  });
+
+  test('the Conclusion template is valid', () => {
+    const conclusion = readJson('templates/conclusion/template.json');
+    assert.deepEqual(validateTemplate(conclusion), { ok: true, errors: [], warnings: [] });
+  });
+
+  test('the Conclusion demo show is valid, without warnings, and all images exist', () => {
+    const conclusion = readJson('templates/conclusion/template.json');
+    const show = readJson('shows/conclusion-demo/show.json');
+    const result = validateShow(show, { template: conclusion, imageExists: (src) => exists(`shows/conclusion-demo/${src}`) });
+    assert.deepEqual(result, { ok: true, errors: [], warnings: [] });
+  });
+});
+
 describe('errors', () => {
   test('the broken fixture reports duplicate ids, unknown layout, bad slot type and unknown block type', () => {
     const broken = readJson('shows/fixtures/broken/show.json');

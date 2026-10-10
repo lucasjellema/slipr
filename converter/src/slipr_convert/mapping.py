@@ -165,7 +165,7 @@ def map_slide(
 
     # 1. Placeholder roles: content goes straight into the slot the template names.
     if entry.layout == layout_id and entry.roles:
-        sm, image_paths = _apply_roles(sm, image_paths, entry.roles, slot_types, content, result)
+        sm, image_paths = _apply_roles(sm, image_paths, entry.roles, slot_types, content, result, layout)
 
     # 2. Everything else: generic filling of the slots that are still free.
     cap = capacity(layout, set(content))
@@ -262,13 +262,70 @@ def _drop_ignored(sm: SlideModel, paths: list[str], ignore: set[int]) -> tuple[S
     ), [p for _, p in kept]
 
 
+_CARD_ROLE = re.compile(r"^([A-Za-z0-9][\w-]*)\[(\d+)\](?:\.([A-Za-z0-9][\w-]*))?$")
+
+
 def _apply_roles(
     sm: SlideModel, paths: list[str], roles: dict[int, str], slot_types: dict[str, str],
-    content: dict, result: MappedSlide,
+    content: dict, result: MappedSlide, layout: dict | None = None,
 ) -> tuple[SlideModel, list[str]]:
-    """Put role-mapped content into its slot; return what is left for generic filling."""
+    """Put role-mapped content into its slot; return what is left for generic filling.
+
+    Roles: "slot", or for cards slots "slot[i]" (the whole card: the
+    placeholder's paragraphs fill the card's text fields in order, the last
+    text field takes the rest) and "slot[i].field" (one field).
+    """
+    slot_defs = {s["name"]: s for s in (layout or {}).get("slots", [])}
+
+    def card(slot: str, i: int) -> dict:
+        cards = content.setdefault(slot, [])
+        while len(cards) <= i:
+            cards.append({})
+        return cards[i]
+
+    def put_card(role: str, text: str | None, md: str | None, image: dict | None) -> bool:
+        m = _CARD_ROLE.match(role)
+        slot_def = slot_defs.get(m.group(1)) if m else None
+        if not m or not slot_def or slot_def.get("type") != "cards":
+            result.remarks.append(f"placeholder role “{role}” does not name a cards slot (ignored)")
+            return False
+        fields = slot_def.get("fields", [])
+        target = card(m.group(1), int(m.group(2)))
+        if m.group(3):  # one field
+            field = next((f for f in fields if f["name"] == m.group(3)), None)
+            if field is None or field["name"] in target:
+                return False
+            if field["type"] == "image":
+                if image is None:
+                    return False
+                target[field["name"]] = image
+            elif field["type"] == "text":
+                target[field["name"]] = text if text is not None else markdown_to_plain(md or "")
+            else:
+                target[field["name"]] = md if md is not None else _escape(text or "")
+            return True
+        if image is not None:  # a whole card from a picture: its first free image field
+            field = next((f for f in fields if f["type"] == "image" and f["name"] not in target), None)
+            if field is None:
+                return False
+            target[field["name"]] = image
+            return True
+        # A whole card from text: spread the blocks over the free text fields.
+        blocks = [b for b in (md if md is not None else _escape(text or "")).split("\n\n") if b.strip()]
+        free = [f for f in fields if f["type"] != "image" and f["name"] not in target]
+        for n, field in enumerate(free):
+            if not blocks:
+                break
+            last = n == len(free) - 1
+            chunk = "\n\n".join(blocks) if last else blocks.pop(0)
+            if last:
+                blocks = []
+            target[field["name"]] = markdown_to_plain(chunk) if field["type"] == "text" else chunk
+        return True
 
     def put(slot: str, text: str | None, md: str | None) -> bool:
+        if "[" in slot:
+            return put_card(slot, text, md, None)
         kind = slot_types.get(slot)
         if kind is None:
             result.remarks.append(f"placeholder role names unknown slot “{slot}” (ignored)")
@@ -301,18 +358,27 @@ def _apply_roles(
     left_paths: list[str] = []
     for n, (im, path) in enumerate(zip(sm.images, paths), 1):
         slot = roles.get(im.idx) if im.idx is not None else None
+        if slot and "[" in slot and put_card(slot, None, None, _image_value(im, path, result, n)):
+            continue
         if slot and slot_types.get(slot) == "image" and slot not in content:
             content[slot] = _image_value(im, path, result, n)
             continue
         images.append(im)
         left_paths.append(path)
+    # Cards that received nothing (e.g. empty placeholders) are dropped.
+    for name, value in list(content.items()):
+        if slot_types.get(name) == "cards" and isinstance(value, list):
+            content[name] = [c for c in value if c]
+            if not content[name]:
+                del content[name]
     return replace(sm, title=title, subtitle=subtitle, bodies=bodies, images=images), left_paths
 
 
 def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
     if not ref.alt:
         result.remarks.append(f"picture {n} has no alt text (add a description in PowerPoint or in show.json)")
-    return {"src": path, "alt": ref.alt, "fit": "contain"}
+    # No "fit": the template decides how its image slots crop (cover or contain).
+    return {"src": path, "alt": ref.alt}
 
 
 def markdown_to_plain(md: str) -> str:

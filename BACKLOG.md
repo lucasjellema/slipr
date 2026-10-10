@@ -19,7 +19,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 - [ ] **P-006** [converter] Convert one of Lucas's real decks end-to-end (Lucas supplies a deck without confidential content) · todo · lucas
 - [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Spec: `docs/specs/I-043-conclusion-template.md`. **First version done** (12 layouts, conversion of all 20 PowerPoint layouts); left: see I-043b/c/d · in progress · claude
-- [ ] **I-043b** [format/templates] `cards` slot type + the card layouts (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction) · todo · —
 - [ ] **I-043c** [converter] `slipr-template-from-pptx`: generate a draft template from a PowerPoint template (for business-unit variants) · todo · —
 - [ ] **I-043d** [templates] Review of the Conclusion template by Lucas, and later by the brand team, before external use · todo · lucas
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
@@ -73,6 +72,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
+- [ ] **I-035** [editor] Cards editor for `cards` slots in the generated slot form: add, remove and reorder cards, one input per field (by field type), `maxItems` and `maxLength` hints. Needed by E-004 for the five Conclusion card layouts
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -90,6 +90,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-054** [format] Single-file HTML export: show + template + viewer inlined
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
+- [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
 - [ ] **I-070** [format] **Shared foundation for rich embeds** (do this first; I-071…I-075 build on it):
@@ -159,6 +160,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **I-043b** [format/templates] `cards` slot type (template format 0.2) + the five card layouts of the Conclusion template (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction): schemas, specs, validator, renderer, viewer (fragments, search, pins), converter card roles, demo slides, tests · done 2026-10-10 · claude
 - [x] **P-001** [converter] Package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text, builds, inherited bullets) · done 2026-10-10 · claude
 - [x] **P-002** [converter] `extract.py` + `text.py`: intermediate model, Markdown with bullet levels, formatting and escaping · done 2026-10-10 · claude
 - [x] **P-003** [converter] `mapping.py`: name mapping, title/section hints, best-fit scoring, reader-layer leftovers · done 2026-10-10 · claude

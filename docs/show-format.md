@@ -200,6 +200,7 @@ The template defines which slots a layout has and the type of each slot.
 | `image` | object | `{ "src": "images/x.png", "alt": "...", "fit": "contain" \| "cover", "focus": "center" }`. `src` is relative to `show.json` |
 | `code` | object | `{ "language": "js", "code": "..." }` |
 | `quote` | object | `{ "text": "...", "source": "..." }` |
+| `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
 | `diagram` | object | *(planned)* `{ "mermaid": "graph LR; A-->B" }` |
 
@@ -208,7 +209,7 @@ The template defines which slots a layout has and the type of each slot.
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
 - **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items than its `maxItems`, image file not found (only when the caller supplies a file check), missing `alt` text, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 

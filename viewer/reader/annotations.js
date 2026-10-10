@@ -464,8 +464,20 @@ export function createAnnotations(io) {
 // Slide objects
 
 /**
- * The pinnable objects of a slide visual: every filled slot, with list slots
- * split into their items.
+ * The items of a slot that pins can attach to: its cards (cards slots) or its
+ * list items. `kind` decides the label ("Card 2" / "Bullet 2").
+ * @param {Element} slotEl
+ * @returns {{ items: HTMLElement[], kind: 'card' | 'bullet' }}
+ */
+function itemsOf(slotEl) {
+  const cards = /** @type {HTMLElement[]} */ ([...slotEl.querySelectorAll(':scope > .slipr-card')]);
+  if (cards.length) return { items: cards, kind: 'card' };
+  return { items: /** @type {HTMLElement[]} */ ([...slotEl.querySelectorAll('li')]), kind: 'bullet' };
+}
+
+/**
+ * The pinnable objects of a slide visual: every filled slot, with list and
+ * cards slots split into their items.
  * @param {Element} canvas
  * @returns {{ el: HTMLElement, slot: string | null, item: number | null, label: string }[]}
  */
@@ -473,12 +485,13 @@ function slideObjects(canvas) {
   const objects = [];
   for (const slotEl of /** @type {NodeListOf<HTMLElement>} */ (canvas.querySelectorAll('[data-slot]:not([data-empty])'))) {
     const slot = slotEl.dataset.slot ?? null;
-    const items = [...slotEl.querySelectorAll('li')];
+    const { items, kind } = itemsOf(slotEl);
     if (items.length) {
-      const top = items.filter((li) => li.parentElement === slotEl || li.parentElement?.parentElement === slotEl);
-      for (const li of top) {
-        const item = items.indexOf(li);
-        objects.push({ el: /** @type {HTMLElement} */ (li), slot, item, label: describeTarget({ slot, item, text: ownText(li), isImage: false }) });
+      const top = kind === 'card' ? items
+        : items.filter((li) => li.parentElement === slotEl || li.parentElement?.parentElement === slotEl);
+      for (const el of top) {
+        const item = items.indexOf(el);
+        objects.push({ el, slot, item, label: describeTarget({ slot, item, kind, text: itemText(el, kind), isImage: false }) });
       }
     } else {
       objects.push({ el: slotEl, slot, item: null, label: describeTarget({ slot, item: null, text: slotEl.textContent ?? '', isImage: isImage(slotEl) }) });
@@ -488,19 +501,20 @@ function slideObjects(canvas) {
 }
 
 /**
- * The object under a point: the innermost list item, else the slot, else the
- * slide background.
+ * The object under a point: the card or innermost list item, else the slot,
+ * else the slide background.
  * @param {HTMLElement} canvas @param {number} x @param {number} y
  */
 function objectAt(canvas, x, y) {
   const hit = document.elementsFromPoint(x, y).find((el) => canvas.contains(el) && el !== canvas);
-  const slotEl = /** @type {HTMLElement | null} */ (hit?.closest('[data-slot]') ?? null);
+  const slotEl = /** @type {HTMLElement | null} */ (hit?.closest('[data-slot]:not([data-field])') ?? null);
   if (slotEl && canvas.contains(slotEl)) {
     const slot = slotEl.dataset.slot ?? null;
-    const li = /** @type {HTMLElement | null} */ (hit?.closest('li') ?? null);
-    if (li && slotEl.contains(li)) {
-      const item = [...slotEl.querySelectorAll('li')].indexOf(li);
-      return { el: li, slot, item, label: describeTarget({ slot, item, text: ownText(li), isImage: false }) };
+    const { items, kind } = itemsOf(slotEl);
+    const el = /** @type {HTMLElement | null} */ (hit?.closest(kind === 'card' ? '.slipr-card' : 'li') ?? null);
+    if (el && items.includes(el)) {
+      const item = items.indexOf(el);
+      return { el, slot, item, label: describeTarget({ slot, item, kind, text: itemText(el, kind), isImage: false }) };
     }
     return { el: slotEl, slot, item: null, label: describeTarget({ slot, item: null, text: slotEl.textContent ?? '', isImage: isImage(slotEl) }) };
   }
@@ -513,7 +527,16 @@ function findObject(canvas, slot, item) {
   const slotEl = canvas.querySelector(`[data-slot="${CSS.escape(slot)}"]:not([data-empty])`);
   if (!slotEl) return null;
   if (item === null) return slotEl;
-  return slotEl.querySelectorAll('li')[item] ?? null;
+  return itemsOf(slotEl).items[item] ?? null;
+}
+
+/** Label text of a pinnable item: a card's first text field, or a list item's own text. */
+function itemText(/** @type {HTMLElement} */ el, /** @type {'card' | 'bullet'} */ kind) {
+  if (kind === 'card') {
+    const first = [...el.querySelectorAll('[data-field]:not([data-empty])')].find((f) => f.tagName !== 'IMG' && (f.textContent ?? '').trim() && f.getAttribute('data-field') !== '#');
+    return first?.textContent ?? el.textContent ?? '';
+  }
+  return ownText(el);
 }
 
 /** Text of a list item without its nested sub-list. */

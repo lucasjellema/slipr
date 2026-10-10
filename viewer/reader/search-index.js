@@ -42,7 +42,11 @@ export function buildSearchIndex(show) {
     const title = slideTitle(slide);
     const content = Object.values(slide.content ?? {}).map((v) => {
       if (typeof v === 'string') return text(v);
-      if (Array.isArray(v)) return v.map(text).join('\n');
+      if (Array.isArray(v)) {
+        // A list (strings) or cards (objects with text fields and images).
+        return v.map((item) => (typeof item === 'string' ? text(item)
+          : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
+      }
       if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code].filter(Boolean).join(' ');
       return '';
     }).join('\n');

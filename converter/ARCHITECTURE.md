@@ -76,6 +76,8 @@ Per slide a `SlideModel`: `index`, `slide_id`, `layout_name`, `hidden`, `section
 **Placeholder roles first** (template format 0.2):
 - `pptxIgnore`, plus `null` roles, drop decorative placeholders (footer, theme bar, overlays, logo) before anything else. That includes the off-slide title some corporate templates use.
 - Roles (`idx → slot`) put content straight into the named slot. The rest goes through the generic rules below, which only see the slots that are still free (`capacity(layout, filled)`).
+- Card roles (`cards[i]`, `cards[i].field`) build the array value of a `cards` slot (`put_card` in `_apply_roles`). A field role fills one field. A whole-card role puts a picture in the first free image field, and splits text on paragraphs over the free non-image fields in order. Empty cards are dropped afterwards.
+- Images get only `src` and `alt`: cropping (`fit`) is the template's decision.
 
 Layout choice (template-agnostic: it only looks at slot *types*):
 1. **Explicit**: `--mapping`, then `template.pptxMapping`, by PowerPoint layout name. Skipped when the slide has pictures and the mapped layout has no image slot (while another layout does).

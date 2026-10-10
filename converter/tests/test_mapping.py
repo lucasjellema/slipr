@@ -111,6 +111,48 @@ def test_an_explicit_role_overrides_the_template_wide_ignore(template):
     assert mapped.slide["content"]["body"] == "3.000+ colleagues"
 
 
+def cards_template(template):
+    t = role_template(template)
+    t["layouts"].append({
+        "id": "cards4", "name": "Cards", "file": "layouts/bullets.html",
+        "slots": [
+            {"name": "title", "type": "text"},
+            {"name": "cards", "type": "cards", "maxItems": 4, "fields": [
+                {"name": "image", "type": "image"},
+                {"name": "title", "type": "text"},
+                {"name": "text", "type": "richtext"},
+            ]},
+        ],
+    })
+    t["pptxMapping"]["Four columns"] = {"layout": "cards4", "placeholders": {
+        "0": "title", "13": "cards[0]", "14": "cards[1]", "20": "cards[0].image", "21": "cards[1].title"}}
+    return t
+
+
+def test_card_roles_fill_cards(template):
+    t = cards_template(template)
+    pic = ImageRef(blob=b"x", ext="png", sha1="p", alt="A photo", idx=20)
+    model = sm(layout_name="Four columns", title="Columns", title_idx=0, images=[pic], bodies=[
+        body_at("**First**\n\nIntro line\n\n- bullet a\n- bullet b", 13),
+        body_at("Second title", 21),  # field role first, so the whole-card fill only finds 'text' free
+        body_at("Second card text", 14),
+    ])
+    mapped = map_slide(model, "s-06", t, images=["images/p.png"])
+    assert mapped.layout == "cards4"
+    assert mapped.slide["content"]["cards"] == [
+        {"title": "First", "text": "Intro line\n\n- bullet a\n- bullet b", "image": {"src": "images/p.png", "alt": "A photo"}},
+        {"title": "Second title", "text": "Second card text"},
+    ]
+    assert "reader" not in mapped.slide
+
+
+def test_empty_cards_are_dropped(template):
+    t = cards_template(template)
+    model = sm(layout_name="Four columns", title="Columns", title_idx=0, bodies=[body_at("Only one", 14)])
+    mapped = map_slide(model, "s-07", t, images=[])
+    assert mapped.slide["content"]["cards"] == [{"title": "Only one"}]
+
+
 def test_role_for_unknown_slot_is_reported(template):
     t = role_template(template)
     t["pptxMapping"]["Text"]["placeholders"]["13"] = "nope"

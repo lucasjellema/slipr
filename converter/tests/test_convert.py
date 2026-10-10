@@ -64,7 +64,7 @@ def test_two_content(converted):
 def test_picture_with_caption(converted):
     s = slide(converted, 5)
     assert s["layout"] == "image-full"
-    assert s["content"]["image"] == {"src": "images/slide05-1.png", "alt": "The office building at sunrise", "fit": "contain"}
+    assert s["content"]["image"] == {"src": "images/slide05-1.png", "alt": "The office building at sunrise"}
     assert s["content"]["caption"] == "Amsterdam, 2026"
 
 

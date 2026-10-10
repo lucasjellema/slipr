@@ -268,6 +268,105 @@
   line-height: 1.05;
 }
 
+/* ---------- cards (Textbox 4x / 9x, Facts & figures, image cards, people) ---------- */
+.cnc-decor--cards { left: 0; top: 23.1%; width: 100%; height: 64.6%; object-fit: fill; }
+.cnc-cards { left: 7.2%; top: 15.9%; width: 85.6%; height: 68.2%; display: grid; }
+.cnc-card { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.cnc-card-title {
+  margin: 0 0 0.6cqw;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: calc(14 * var(--cnc-pt));
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--cnc-magenta);
+}
+.cnc-card-text { font-size: calc(10.13 * var(--cnc-pt)); line-height: 1.2; }
+.cnc-card-text p { margin: 0 0 0.5em; }
+.cnc-card-text ul, .cnc-card-text ol { margin: 0 0 0.5em; padding-left: 1.1cqw; }
+.cnc-card-text ul { list-style: square; }
+.cnc-card-text li { margin: 0 0 0.3em; }
+.cnc-card-text li::marker { color: var(--cnc-magenta); }
+.cnc-card-text .slipr-md-subheading { font-family: var(--cnc-font-heading); font-weight: 900; text-transform: uppercase; }
+
+/* Textbox 4x: four white columns, 19.5% wide, 2.5% gutters */
+.cnc-cards--columns { grid-template-columns: repeat(4, 1fr); column-gap: 2.92%; }
+.cnc-card--column { background: var(--cnc-white); color: var(--cnc-black); padding: 1.4cqw 1.3cqw; }
+.cnc-card--column .cnc-card-title { font-size: calc(16 * var(--cnc-pt)); }
+
+/* Textbox 9x: 3 × 3 white boxes (26.7% × 19.5%) with a big magenta number */
+.cnc-cards--boxes { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); column-gap: 3.15%; row-gap: 7%; }
+.cnc-card--box { display: flex; gap: 0.9cqw; background: var(--cnc-white); color: var(--cnc-black); padding: 1.1cqw 1.2cqw; }
+.cnc-card-number {
+  flex: none;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: calc(24 * var(--cnc-pt));
+  line-height: 0.9;
+  color: var(--cnc-magenta);
+}
+.cnc-card-content { min-width: 0; }
+
+/* Facts & figures: 2 × 3 key figures over a photo. The right column is
+   mirrored, as in PowerPoint: text right-aligned, icon on the outside. */
+.cnc-cards--facts { left: 7.2%; top: 14.2%; width: 48.3%; height: 71.1%; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(3, 1fr); column-gap: 1.9%; }
+.cnc-card--fact { display: flex; align-items: center; gap: 1.8cqw; }
+.cnc-card--fact:nth-child(2n) { flex-direction: row-reverse; text-align: right; }
+.cnc-card-icon { flex: none; width: 4.2cqw; height: 4.2cqw; object-fit: contain; }
+.cnc-fact-value {
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: calc(24 * var(--cnc-pt));
+  line-height: 1;
+  color: var(--cnc-magenta);
+}
+.cnc-fact-label { font-size: calc(12 * var(--cnc-pt)); line-height: 1.2; color: var(--cnc-white); }
+
+/* Onze markten: 4 × 2 photo cards with a white caption */
+.cnc-cards--images { grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); column-gap: 2.34%; row-gap: 5.3%; }
+.cnc-card--image { background: #222; }
+.cnc-card-photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.cnc-card--image::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0 0;
+  background: linear-gradient(to top, rgb(0 0 0 / 0.75), rgb(0 0 0 / 0));
+}
+.cnc-card-caption {
+  position: absolute;
+  z-index: 1;
+  left: 0.8cqw; right: 0.8cqw; bottom: 0.9cqw;
+  margin: 0;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: calc(14 * var(--cnc-pt));
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--cnc-white);
+}
+
+/* Introduction: two people, portrait + name + role + text */
+.cnc-cards--people { left: 7.1%; width: 85.7%; grid-template-columns: repeat(2, 1fr); column-gap: 4.3%; align-items: start; }
+.cnc-person-photo { display: block; width: 43%; aspect-ratio: 340 / 325; object-fit: cover; }
+.cnc-card--person .cnc-card-text { font-size: calc(16 * var(--cnc-pt)); }
+/* Spacing below the photo on the name: the viewer resets margins on slide images. */
+.cnc-person-name {
+  padding-top: 3cqw;
+  font-family: var(--cnc-font-serif);
+  font-style: italic;
+  font-weight: 600;
+  font-variation-settings: "opsz" 48;
+  font-size: calc(16 * var(--cnc-pt));
+}
+.cnc-person-role {
+  margin: 1cqw 0 1.2cqw;
+  font-family: var(--cnc-font-heading);
+  font-weight: 900;
+  font-size: calc(22 * var(--cnc-pt));
+  text-transform: uppercase;
+  color: var(--cnc-magenta);
+}
+
 /* ---------- reader mode: reflow on narrow screens ----------
  * Below ~640px the slide becomes flowing content: photo on top, text below,
  * decorations (bar, footer band, waves, overlays) left out.
@@ -304,4 +403,18 @@
   .slipr-mode-reader .cnc-agenda li { gap: 0.8rem; padding: 0.5rem 0; }
   .slipr-mode-reader .cnc-agenda-intro { font-size: 1.15rem; }
   .slipr-mode-reader .cnc-illustration { max-height: 60vh; }
+  /* Cards stack (two per row for image cards and figures) */
+  .slipr-mode-reader .cnc-cards { display: grid; grid-template-columns: 1fr; grid-template-rows: none; gap: 0.75rem; }
+  .slipr-mode-reader :is(.cnc-cards--images, .cnc-cards--facts) { grid-template-columns: 1fr 1fr; }
+  .slipr-mode-reader .cnc-card { padding: 0.85rem 0.95rem; }
+  .slipr-mode-reader .cnc-card--fact, .slipr-mode-reader .cnc-card--person { padding: 0; }
+  .slipr-mode-reader .cnc-card--fact:nth-child(2n) { flex-direction: row; text-align: left; }
+  .slipr-mode-reader .cnc-card--image { aspect-ratio: 1; padding: 0; }
+  .slipr-mode-reader .cnc-card-title, .slipr-mode-reader .cnc-card-caption, .slipr-mode-reader .cnc-person-role { font-size: 1rem; }
+  .slipr-mode-reader .cnc-card-caption { left: 0.6rem; right: 0.6rem; bottom: 0.6rem; }
+  .slipr-mode-reader .cnc-card-text, .slipr-mode-reader .cnc-fact-label, .slipr-mode-reader .cnc-person-name { font-size: 0.95rem; }
+  .slipr-mode-reader .cnc-card-number, .slipr-mode-reader .cnc-fact-value { font-size: 1.4rem; }
+  .slipr-mode-reader .cnc-card-icon { width: 2.4rem; height: 2.4rem; }
+  .slipr-mode-reader .cnc-person-photo { width: 50%; }
+  .slipr-mode-reader .cnc-person-name { padding-top: 0.6rem; }
 }

@@ -1,6 +1,6 @@
 # I-043: Slipr template from the Conclusion PowerPoint template: analysis and proposal
 
-Status: **first version built** (decisions in §7). Template: `templates/conclusion/`, demo: `shows/conclusion-demo/` · 2026-10-10
+Status: **first version built, card layouts done** (I-043b; decisions in §7). Template: `templates/conclusion/` (17 layouts), demo: `shows/conclusion-demo/` · 2026-10-10
 
 Source: `ConclusionTemplatePresentation.pptx` (12 MB, kept out of git). Analysed with python-pptx, slides exported to PNG via PowerPoint, and cross-checked with the house-style rules in the `conclusion-slides` skill (`brand.json`, `layouts.md`). Those rules were measured on the Conclusion Intelligence variant of the same template, which has an identical structure.
 
@@ -92,11 +92,11 @@ Three things need a decision before building:
 | L18 | Client intermediate #1 | `section-image` | kicker, title, image | **MVP** |
 | L02 | Agenda (8x) | `agenda` | kicker, title, items (≤ 8), intro, image | **MVP**, and used for Slipr's *generated* agenda slides (see §5) |
 | L10 | Alleen titel | `title-only` | kicker, title, image (free illustration) | **MVP**, the general fallback |
-| L14 | Textbox 4x | `columns-4` | kicker, title, 4 × (heading, text) | phase 2 (cards) |
-| L13 | Textbox 9x | `boxes-9` | kicker, title, 9 × (heading, text) | phase 2 (cards) |
-| L08 | Facts & figures | `facts` | kicker, title, 6 × (value, label), image | phase 2 (cards + icons) |
-| L11 | Onze markten | `image-cards-8` | kicker, title, 8 × (image, title) | phase 2 (cards) |
-| L09 | Introduction | `people-2` | kicker, title, 2 × (portrait, name, function, text) | phase 2 (cards) |
+| L14 | Textbox 4x | `columns-4` | kicker, title, 4 × (heading, text) | done (I-043b) |
+| L13 | Textbox 9x | `boxes-9` | kicker, title, 9 × (heading, text) | done (I-043b) |
+| L08 | Facts & figures | `facts` | kicker, title, 6 × (value, label), image | done (I-043b); icons are a card field |
+| L11 | Onze markten | `image-cards-8` | kicker, title, 8 × (image, title) | done (I-043b) |
+| L09 | Introduction | `people-2` | kicker, title, 2 × (portrait, name, function, text) | done (I-043b) |
 | L12 | 3 images + logo's | — | | **skip** (manual in PowerPoint, per house style) |
 | L15 / L16 | Logo's 30x / 36x | — | | **skip** (same) |
 

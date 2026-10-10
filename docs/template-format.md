@@ -117,10 +117,41 @@ Renderer rules:
 | `image` | `<img>` | `src`, `alt`, plus `object-fit` from `fit` |
 | `code` | `<pre>` | `<code class="language-…">` |
 | `quote` | `<blockquote>` | text plus `<cite>` |
+| `cards` | any container | One clone of the slot's `<template>` blueprint per card (see below) |
 
 - An element whose optional slot is **empty** gets the attribute `data-empty` so CSS can hide it or reflow around it.
 - Relative URLs inside a fragment (logos, illustrations) are resolved against the layout file.
 - The renderer adds the mode class `slipr-mode-audience` or `slipr-mode-reader` to the root, so layouts can adapt. For example, a two-column layout stacks into one column in reader mode on narrow screens.
+
+### Cards slots (since 0.2)
+
+A `cards` slot holds a small, repeated group of fields: columns with a heading and text, numbered boxes, key figures with an icon, photo cards, people. The slot definition lists the fields of one card:
+
+```json
+{ "name": "cards", "type": "cards", "maxItems": 4, "required": true,
+  "fields": [
+    { "name": "title", "type": "text", "required": true, "maxLength": 18 },
+    { "name": "text", "type": "richtext" }
+  ] }
+```
+
+Field types are `text`, `richtext`, `list` and `image`; a field takes `label`, `help`, `required` and `maxLength` like a slot. `maxItems` is the number of cards the layout has room for.
+
+The layout fragment describes **one** card in a `<template>` element inside the slot element. Inside it, `data-field="name"` marks where a field goes, filled with the same rules as a slot of that type. `data-field="#"` receives the card number (1, 2, …).
+
+```html
+<div class="cnc-cards cnc-cards--boxes" data-slot="cards">
+  <template>
+    <div class="cnc-card">
+      <span class="cnc-card-number" data-field="#"></span>
+      <h3 class="cnc-card-title" data-field="title"></h3>
+      <div class="cnc-card-text" data-field="text"></div>
+    </div>
+  </template>
+</div>
+```
+
+The renderer removes the `<template>`, appends one clone of its first element per card, and adds the class `slipr-card` and `data-card-index` (0-based) to each clone. Empty fields get `data-empty`. Because the blueprint is a `<template>`, it is inert: its images do not load and it is never shown. In audience mode, cards are the fragments of a slide with `"audience": { "fragments": true }`, and in reader mode they are the objects you can pin a note to ("Card 2").
 
 ## `theme.css`
 
@@ -169,14 +200,15 @@ A value is either a layout id (`"Title and Content": "bullets"`), or, **since fo
 ```
 
 - `placeholders` maps a PowerPoint placeholder **idx** (as a string) to a slot of the Slipr layout. Content in that placeholder goes straight into that slot: plain text for `text` slots, Markdown for `list` / `richtext`, the picture for `image`. `null` means *ignore this placeholder*: it is decoration or instructions, not content.
+- For a `cards` slot, a role names a card or a card field: `"cards[2].title"` fills one field of the third card, and `"cards[2]"` fills the whole card. A whole-card role for a picture fills the card's first free image field. For text, the placeholder's paragraphs are spread over the card's free non-image fields in order, and the last field takes the rest. So a placeholder with a heading, a role line and a paragraph fills `name`, `role` and `text`.
 - `pptxIgnore` (template-wide) lists placeholder idx values that are never content in this template, such as the footer, slide number, theme bar, gradient overlays and logo. It also applies to slides whose PowerPoint layout has no mapping entry.
 - Content in placeholders without a role is placed by the converter's normal best-fit rules.
 
-Roles matter for corporate templates, where structural elements are often "body" placeholders and the visible title can even be a body placeholder. Without roles, these would be converted as content. `validateTemplate` warns about roles that name a slot the layout doesn't have.
+Roles matter for corporate templates, where structural elements are often "body" placeholders and the visible title can even be a body placeholder. Without roles, these would be converted as content. `validateTemplate` warns about roles that name a slot the layout doesn't have, a card index on a slot that is not a cards slot, an unknown card field, or a card index beyond `maxItems`.
 
 ## Versions
 
 | Version | Change |
 |---|---|
 | 0.1 | Initial format |
-| 0.2 | `pptxMapping` values may be objects with placeholder roles; new `pptxIgnore`. 0.1 templates remain valid unchanged |
+| 0.2 | `pptxMapping` values may be objects with placeholder roles; new `pptxIgnore`. New slot type `cards` with `fields`, and card roles (`cards[i]`, `cards[i].field`). 0.1 templates remain valid unchanged |

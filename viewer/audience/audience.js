@@ -116,7 +116,8 @@ function buildSection(slide, ctx) {
   }
   if (options.fragments) {
     const style = typeof options.fragments === 'string' ? options.fragments : null;
-    for (const li of rendered.querySelectorAll('li')) {
+    // Cards build one by one; list items inside a card come with their card.
+    for (const li of rendered.querySelectorAll('.slipr-card, li:not(.slipr-card li)')) {
       li.classList.add('fragment');
       if (style) li.classList.add(style);
     }

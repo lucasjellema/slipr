@@ -58,11 +58,11 @@
         "layout": { "$ref": "#/$defs/id" },
         "placeholders": {
           "type": "object",
-          "description": "Placeholder idx (as a string) -> slot name of the Slipr layout, or null to ignore that placeholder.",
+          "description": "Placeholder idx (as a string) -> slot name of the Slipr layout ('title'), a card ('cards[2]') or a card field ('cards[2].title'), or null to ignore that placeholder.",
           "propertyNames": { "type": "string", "pattern": "^\\d+$" },
           "additionalProperties": {
             "anyOf": [
-              { "$ref": "#/$defs/id" },
+              { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*(\\[\\d+\\](\\.[A-Za-z0-9][A-Za-z0-9_-]*)?)?$" },
               { "type": "null" }
             ]
           }
@@ -88,12 +88,30 @@
       "additionalProperties": false,
       "properties": {
         "name": { "$ref": "#/$defs/id" },
-        "type": { "enum": ["text", "richtext", "list", "image", "code", "quote", "chart", "diagram"] },
+        "type": { "enum": ["text", "richtext", "list", "image", "code", "quote", "chart", "diagram", "cards"] },
         "label": { "type": "string", "description": "Field label in the editor." },
         "help": { "type": "string", "description": "Help text in the editor." },
         "required": { "type": "boolean" },
         "maxLength": { "type": "integer", "minimum": 1 },
-        "maxItems": { "type": "integer", "minimum": 1 }
+        "maxItems": { "type": "integer", "minimum": 1, "description": "Maximum list items, or (cards) maximum number of cards." },
+        "fields": {
+          "type": "array",
+          "description": "(cards slots) the fields of one card, in order.",
+          "items": { "$ref": "#/$defs/cardField" }
+        }
+      }
+    },
+    "cardField": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["text", "richtext", "list", "image"] },
+        "label": { "type": "string" },
+        "help": { "type": "string" },
+        "required": { "type": "boolean" },
+        "maxLength": { "type": "integer", "minimum": 1 }
       }
     }
   }

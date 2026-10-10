@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Cards slots (I-043b)
+- **Changed** `audience/audience.js`: on slides with fragments, each card is one fragment (bullets inside a card are not split further).
+- **Changed** `reader/search-index.js`: the text fields and image alt text of cards are searchable.
+- **Changed** `reader/annotations.js` and `reader/pin.js`: cards are pin targets ("Card 2: “…”"), like bullets in a list slot.
+
 ### 2026-10-10: Template-styled agenda and footer
 - **Changed** `audience/agenda.js`: when the template has an `agenda` layout with a list slot, generated agenda slides are rendered with that layout. The chapter items get `slipr-agenda-item is-done|is-current|is-next`.
 - **Changed** `audience/audience.css`: slide-number position, colour and size, and chapter-bar visibility, are now tokens a template can set (`--slipr-slide-number-*`, `--slipr-chapter-bar-visibility`, `--slipr-controls-color`).

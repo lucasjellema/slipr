@@ -382,6 +382,239 @@
           "help": "Shown in full (contain), not cropped."
         }
       ]
+    },
+    {
+      "id": "columns-4",
+      "name": "Text boxes 4x",
+      "description": "Four columns, each with a heading and text or bullets.",
+      "file": "layouts/columns-4.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "cards",
+          "type": "cards",
+          "label": "Columns",
+          "required": true,
+          "maxItems": 4,
+          "fields": [
+            {
+              "name": "title",
+              "type": "text",
+              "label": "Heading",
+              "required": true,
+              "maxLength": 18
+            },
+            {
+              "name": "text",
+              "type": "richtext",
+              "label": "Text"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "boxes-9",
+      "name": "Text boxes 9x",
+      "description": "Nine numbered boxes (3 × 3), e.g. steps.",
+      "file": "layouts/boxes-9.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "cards",
+          "type": "cards",
+          "label": "Boxes",
+          "required": true,
+          "maxItems": 9,
+          "fields": [
+            {
+              "name": "title",
+              "type": "text",
+              "label": "Heading",
+              "required": true,
+              "maxLength": 24
+            },
+            {
+              "name": "text",
+              "type": "richtext",
+              "label": "Text",
+              "maxLength": 210
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "facts",
+      "name": "Facts & figures",
+      "description": "Six key figures with an icon, over a photo.",
+      "file": "layouts/facts.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "cards",
+          "type": "cards",
+          "label": "Figures",
+          "required": true,
+          "maxItems": 6,
+          "fields": [
+            {
+              "name": "value",
+              "type": "text",
+              "label": "Value",
+              "required": true,
+              "maxLength": 8
+            },
+            {
+              "name": "label",
+              "type": "text",
+              "label": "Label",
+              "maxLength": 42
+            },
+            {
+              "name": "icon",
+              "type": "image",
+              "label": "Icon",
+              "help": "Brand icon (magenta, transparent background)."
+            }
+          ]
+        },
+        {
+          "name": "image",
+          "type": "image",
+          "label": "Photo (16:9)"
+        }
+      ]
+    },
+    {
+      "id": "image-cards-8",
+      "name": "Image cards 8x",
+      "description": "Eight photo cards with a title (e.g. markets).",
+      "file": "layouts/image-cards-8.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "cards",
+          "type": "cards",
+          "label": "Cards",
+          "required": true,
+          "maxItems": 8,
+          "fields": [
+            {
+              "name": "image",
+              "type": "image",
+              "label": "Photo (about 1:1)",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "text",
+              "label": "Title",
+              "maxLength": 26
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "people-2",
+      "name": "Introduction (2 people)",
+      "description": "Two people with portrait, name, role and a short text.",
+      "file": "layouts/people-2.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "cards",
+          "type": "cards",
+          "label": "People",
+          "required": true,
+          "maxItems": 2,
+          "fields": [
+            {
+              "name": "image",
+              "type": "image",
+              "label": "Portrait (about 1:1)"
+            },
+            {
+              "name": "name",
+              "type": "text",
+              "label": "Name",
+              "maxLength": 40
+            },
+            {
+              "name": "role",
+              "type": "text",
+              "label": "Role",
+              "maxLength": 40
+            },
+            {
+              "name": "text",
+              "type": "richtext",
+              "label": "Text"
+            }
+          ]
+        }
+      ]
     }
   ],
   "pptxIgnore": [
@@ -396,25 +629,213 @@
     92
   ],
   "pptxMapping": {
-    "Title slide (image)": { "layout": "title-image", "placeholders": { "0": null, "36": "title", "35": "byline", "14": "image" } },
-    "Title slide (wave) magenta": { "layout": "title-wave", "placeholders": { "0": null, "36": "title", "35": "byline" } },
-    "Agenda (8x)": { "layout": "agenda", "placeholders": { "0": "title", "35": "kicker", "45": "intro", "14": "image" } },
-    "Text": { "layout": "text", "placeholders": { "0": "title", "35": "kicker", "13": "body" } },
-    "Text (zwart)": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body" } },
-    "Quote in textbox": { "layout": "quote-box", "placeholders": { "0": "title", "35": "kicker", "36": "quote", "14": "image" } },
-    "Quote with image": { "layout": "quote-image", "placeholders": { "0": "title", "35": "kicker", "36": "quote", "14": "image" } },
-    "Text, quote & image": { "layout": "text-quote-image", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "quote", "14": "image" } },
-    "Text + image": { "layout": "text-image", "placeholders": { "0": "title", "35": "kicker", "13": "body", "14": "image" } },
-    "Alleen titel": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
-    "Client intermediate #1": { "layout": "section-image", "placeholders": { "0": null, "36": "title", "35": "kicker", "14": "image" } },
-    "Client intermediate #2": { "layout": "section-wave", "placeholders": { "0": null, "36": "title", "35": "kicker" } },
-    "Facts & figures": { "layout": "text-image", "placeholders": { "0": "title", "35": "kicker", "14": "image", "13": "body", "87": "body", "88": "body", "89": "body", "90": "body", "91": "body" } },
-    "Textbox 4x": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "body", "37": "body", "38": "body" } },
-    "Textbox 9x": { "layout": "text-dark", "placeholders": { "0": "title", "35": "kicker", "13": "body", "37": "body", "39": "body", "41": "body", "43": "body", "45": "body", "47": "body", "49": "body", "51": "body", "36": null, "38": null, "40": null, "42": null, "44": null, "46": null, "48": null, "50": null, "52": null } },
-    "Introduction": { "layout": "text", "placeholders": { "0": "title", "35": "kicker", "13": "body", "36": "body" } },
-    "Onze markten": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
-    "3 images + logo's": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
-    "Logo's 30x": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } },
-    "Logo's 36x": { "layout": "title-only", "placeholders": { "0": "title", "35": "kicker" } }
+    "Title slide (image)": {
+      "layout": "title-image",
+      "placeholders": {
+        "0": null,
+        "36": "title",
+        "35": "byline",
+        "14": "image"
+      }
+    },
+    "Title slide (wave) magenta": {
+      "layout": "title-wave",
+      "placeholders": {
+        "0": null,
+        "36": "title",
+        "35": "byline"
+      }
+    },
+    "Agenda (8x)": {
+      "layout": "agenda",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "45": "intro",
+        "14": "image"
+      }
+    },
+    "Text": {
+      "layout": "text",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "body"
+      }
+    },
+    "Text (zwart)": {
+      "layout": "text-dark",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "body"
+      }
+    },
+    "Quote in textbox": {
+      "layout": "quote-box",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "36": "quote",
+        "14": "image"
+      }
+    },
+    "Quote with image": {
+      "layout": "quote-image",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "36": "quote",
+        "14": "image"
+      }
+    },
+    "Text, quote & image": {
+      "layout": "text-quote-image",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "body",
+        "36": "quote",
+        "14": "image"
+      }
+    },
+    "Text + image": {
+      "layout": "text-image",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "body",
+        "14": "image"
+      }
+    },
+    "Alleen titel": {
+      "layout": "title-only",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker"
+      }
+    },
+    "Client intermediate #1": {
+      "layout": "section-image",
+      "placeholders": {
+        "0": null,
+        "36": "title",
+        "35": "kicker",
+        "14": "image"
+      }
+    },
+    "Client intermediate #2": {
+      "layout": "section-wave",
+      "placeholders": {
+        "0": null,
+        "36": "title",
+        "35": "kicker"
+      }
+    },
+    "Facts & figures": {
+      "layout": "facts",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "14": "image",
+        "13": "cards[0]",
+        "87": "cards[1]",
+        "88": "cards[2]",
+        "89": "cards[3]",
+        "90": "cards[4]",
+        "91": "cards[5]"
+      }
+    },
+    "Textbox 4x": {
+      "layout": "columns-4",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "cards[0]",
+        "36": "cards[1]",
+        "37": "cards[2]",
+        "38": "cards[3]"
+      }
+    },
+    "Textbox 9x": {
+      "layout": "boxes-9",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "13": "cards[0]",
+        "41": "cards[1]",
+        "43": "cards[2]",
+        "37": "cards[3]",
+        "45": "cards[4]",
+        "47": "cards[5]",
+        "39": "cards[6]",
+        "49": "cards[7]",
+        "51": "cards[8]",
+        "36": null,
+        "38": null,
+        "40": null,
+        "42": null,
+        "44": null,
+        "46": null,
+        "48": null,
+        "50": null,
+        "52": null
+      }
+    },
+    "Introduction": {
+      "layout": "people-2",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "14": "cards[0].image",
+        "17": "cards[1].image",
+        "13": "cards[0]",
+        "36": "cards[1]"
+      }
+    },
+    "Onze markten": {
+      "layout": "image-cards-8",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker",
+        "14": "cards[0].image",
+        "37": "cards[1].image",
+        "39": "cards[2].image",
+        "41": "cards[3].image",
+        "36": "cards[4].image",
+        "38": "cards[5].image",
+        "40": "cards[6].image",
+        "42": "cards[7].image",
+        "43": "cards[0].title",
+        "44": "cards[1].title",
+        "45": "cards[2].title",
+        "46": "cards[3].title",
+        "47": "cards[4].title",
+        "48": "cards[5].title",
+        "49": "cards[6].title",
+        "50": "cards[7].title"
+      }
+    },
+    "3 images + logo's": {
+      "layout": "title-only",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker"
+      }
+    },
+    "Logo's 30x": {
+      "layout": "title-only",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker"
+      }
+    },
+    "Logo's 36x": {
+      "layout": "title-only",
+      "placeholders": {
+        "0": "title",
+        "35": "kicker"
+      }
+    }
   }
 }

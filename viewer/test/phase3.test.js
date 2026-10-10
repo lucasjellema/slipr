@@ -190,6 +190,15 @@ describe('search', () => {
     assert.doesNotMatch(search(docs, 'json').results.map((x) => x.snippetHtml).join(''), /<(?!\/?mark>)/);
   });
 
+  test('finds text and image alt text inside cards', () => {
+    const show = { id: 'c', meta: { title: 'C' }, slides: [{ id: 's-cards', layout: 'columns-4', content: {
+      title: 'Our offices', cards: [{ title: 'Utrecht', text: 'Head *office*' }, { image: { src: 'x.png', alt: 'Harbour crane' } }],
+    } }] };
+    const cardDocs = buildSearchIndex(show);
+    assert.ok(search(cardDocs, 'head office').results.some((r) => r.doc.slideId === 's-cards'));
+    assert.ok(search(cardDocs, 'crane').results.some((r) => r.doc.slideId === 's-cards'));
+  });
+
   test('notes are only searched when asked', () => {
     assert.equal(search(docs, 'Pause here').results.length, 0);
     assert.ok(search(docs, 'Pause here', { includeNotes: true }).results.some((r) => r.doc.kind === 'notes'));

@@ -6,6 +6,14 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Cards slots and the card layouts (I-043b)
+- **Added** slot type **`cards`** (template format 0.2, additive; show format stays 0.1): a slot definition lists the `fields` of one card (`text`, `richtext`, `list`, `image`), and the show value is an array of objects. Layouts describe one card in a `<template>` blueprint with `data-field` elements (`data-field="#"` gets the card number). Updated both schemas, both specs, `validate.js` (field types, unknown and empty required fields, `maxLength`, `maxItems`, card images) and `render.js` (`fillCards`; clones get `slipr-card` and `data-card-index`).
+- **Added** card roles in `pptxMapping`: `"cards[i]"` (whole card) and `"cards[i].field"`. `validateTemplate` checks the slot, the field and the index.
+- **Added** five Conclusion layouts: `columns-4` (Textbox 4x), `boxes-9` (Textbox 9x, numbered), `facts` (Facts & figures, mirrored right column), `image-cards-8` (Onze markten) and `people-2` (Introduction), with reader reflow. The template now has 17 layouts. Five demo slides in `shows/conclusion-demo/` (neutral placeholder photos and icon).
+- **Added** viewer support (fragments, search, pins per card) and converter support (card roles). See the component changelogs.
+- **Verified** against PowerPoint's export of the example slides: the 5 card slides convert with no reader leftovers, and photo, grid and text positions match within about 0.5 % of the slide.
+- **Added** tests: cards validation and roles, Conclusion template and demo validate without warnings, card search (JS); card roles and empty cards (Python).
+
 ### 2026-10-10: Conclusion template, first version (I-043)
 - **Added** `templates/conclusion/` (template format 0.2): 12 layouts on the exact grid of the official Conclusion PowerPoint template; `theme.css` (tokens, fonts, square corners, magenta bullets, text styles, gradient overlays, reflow for phones); `reader.css` (house style for reader mode); original assets (logo, stripe mark, footer band, waves; the title wave converted losslessly from the original geometry); Source Serif 4 (OFL); `pptxMapping` with placeholder roles for all 20 PowerPoint layouts; README.
 - **Added** `shows/conclusion-demo/`: one slide per layout, with neutral placeholder images instead of brand photos, and generated agendas in the template's agenda layout.

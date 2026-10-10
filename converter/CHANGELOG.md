@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Card roles (I-043b)
+- **Added** card roles in `mapping._apply_roles`: `cards[i].field` fills that field of card *i* (plain text for `text` fields, Markdown for `richtext` / `list`, the picture for `image`). `cards[i]` fills the whole card: a picture goes to the first free image field, and text is split on paragraphs over the free non-image fields in order, the last field taking the rest. Cards that stay empty are dropped.
+- **Changed** images no longer get a `fit` value: the template decides how a photo is cropped.
+- **Verified** the five card layouts of the Conclusion template (Introduction, Facts & figures, Onze markten, Textbox 9x / 4x) convert with no reader leftovers. 32 tests.
+
 ### 2026-10-10: Real-template run (Conclusion)
 - **Added** full paragraph-style resolution (`reader.paragraph_style`): bullets, auto-numbering type, bold, caps and serif font from the paragraph, layout placeholder, master placeholder and master body style. Template text styles become Markdown: `A.` / `1.` lists, `**subheading**`, `*serif line*`. Bullets nest at most 4 levels deep. This replaces `bullet_setting` / `inherited_bullet`.
 - **Changed** placeholder-role mappings now always win over best fit (extra pictures go to the reader layer). Text boxes holding only a number (decorative numbering) are left out and reported.

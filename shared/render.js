@@ -65,7 +65,7 @@ export function renderSlide(slide, ctx, options = {}) {
       el.setAttribute('data-empty', '');
       continue;
     }
-    fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode });
+    fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode, def });
   }
   return root;
 }
@@ -91,10 +91,14 @@ export function slideTitle(slide) {
  * @param {import('./load.js').ShowContext} ctx
  * @param {import('./markdown.js').MarkdownOptions} md
  * @param {Document} doc
- * @param {{ mode: string }} options
+ * @param {{ mode: string, def?: any }} options
  */
 function fillSlot(el, type, value, ctx, md, doc, options) {
   switch (type) {
+    case 'cards':
+      fillCards(el, options.def ?? {}, value, ctx, md, doc, options);
+      break;
+
     case 'text':
       el.textContent = String(value);
       break;
@@ -142,8 +146,58 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
 }
 
 /**
+ * Fill a `cards` slot. The slot element may contain a `<template>` with the
+ * blueprint of one card; its `[data-field]` elements are filled per card
+ * (`data-field="#"` gets the card number). Without a blueprint, a plain card
+ * with one element per field is built. Every card root gets `slipr-card`.
+ * @param {HTMLElement} el @param {any} def @param {any[]} cards
+ * @param {import('./load.js').ShowContext} ctx
+ * @param {import('./markdown.js').MarkdownOptions} md
+ * @param {Document} doc @param {{ mode: string }} options
+ */
+function fillCards(el, def, cards, ctx, md, doc, options) {
+  const fields = new Map((def.fields ?? []).map((/** @type {any} */ f) => [f.name, f]));
+  const blueprint = /** @type {HTMLTemplateElement | null} */ (el.querySelector(':scope > template'));
+  blueprint?.remove();
+
+  cards.forEach((card, i) => {
+    /** @type {HTMLElement} */
+    let node;
+    if (blueprint) {
+      const clone = /** @type {DocumentFragment} */ (blueprint.content.cloneNode(true));
+      node = /** @type {HTMLElement} */ (clone.firstElementChild ?? doc.createElement('div'));
+    } else {
+      node = doc.createElement('div');
+      for (const f of fields.values()) {
+        const child = doc.createElement(f.type === 'image' ? 'img' : f.type === 'text' ? 'p' : 'div');
+        child.dataset.field = f.name;
+        node.append(child);
+      }
+    }
+    node.classList.add('slipr-card');
+    node.dataset.cardIndex = String(i);
+    for (const target of node.querySelectorAll('[data-field]')) {
+      const name = /** @type {HTMLElement} */ (target).dataset.field ?? '';
+      if (name === '#') {
+        target.textContent = String(i + 1);
+        continue;
+      }
+      const field = fields.get(name);
+      const value = card?.[name];
+      if (!field || isEmpty(value)) {
+        target.setAttribute('data-empty', '');
+        continue;
+      }
+      fillSlot(/** @type {HTMLElement} */ (target), field.type, value, ctx, md, doc, options);
+    }
+    el.append(node);
+  });
+}
+
+/**
  * Rewrite relative src/href attributes in a template fragment to absolute URLs,
  * so logos and illustrations resolve against the layout file, not the page.
+ * Also inside nested <template> elements (card blueprints).
  * @param {DocumentFragment} fragment @param {URL} base
  */
 function resolveRelativeUrls(fragment, base) {
@@ -154,6 +208,9 @@ function resolveRelativeUrls(fragment, base) {
         el.setAttribute(attr, new URL(value, base).href);
       }
     }
+  }
+  for (const nested of fragment.querySelectorAll('template')) {
+    resolveRelativeUrls(/** @type {HTMLTemplateElement} */ (nested).content, base);
   }
 }
 

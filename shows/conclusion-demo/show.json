@@ -16,7 +16,8 @@
   "chapters": [
     { "id": "intro", "title": "Introduction" },
     { "id": "text", "title": "Text and quotes" },
-    { "id": "sections", "title": "Sections and visuals" }
+    { "id": "sections", "title": "Sections and visuals" },
+    { "id": "cards", "title": "Cards" }
   ],
 
   "slides": [
@@ -40,7 +41,7 @@
       "content": {
         "kicker": "Today",
         "title": "Agenda",
-        "items": ["Introduction", "Text and quotes", "Sections and visuals", "Questions"],
+        "items": ["Introduction", "Text and quotes", "Sections and visuals", "Cards", "Questions"],
         "intro": "A short tour of the template.",
         "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
       }
@@ -139,6 +140,97 @@
         "kicker": "Client case",
         "title": "Section with photo",
         "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo", "fit": "cover" }
+      }
+    },
+    {
+      "id": "s-columns",
+      "layout": "columns-4",
+      "chapter": "cards",
+      "audience": { "fragments": true },
+      "content": {
+        "kicker": "Approach",
+        "title": "Four columns",
+        "cards": [
+          { "title": "Analyse", "text": "Read the PowerPoint template and list its layouts.\n\n- Placeholders\n- Text styles" },
+          { "title": "Map", "text": "Give every placeholder a role in a Slipr slot or card." },
+          { "title": "Convert", "text": "Run the converter; leftovers go to the reader layer." },
+          { "title": "Review", "text": "Compare with the PowerPoint export, slide by slide." }
+        ]
+      },
+      "reader": {
+        "blocks": [
+          { "id": "cards-format", "type": "callout", "variant": "info", "title": "Cards", "md": "A **cards** slot holds a list of small records with named fields. The layout decides what one card looks like; the show only provides the fields." }
+        ]
+      }
+    },
+    {
+      "id": "s-boxes",
+      "layout": "boxes-9",
+      "chapter": "cards",
+      "content": {
+        "kicker": "Overview",
+        "title": "Nine numbered boxes",
+        "cards": [
+          { "title": "Template", "text": "Theme, layouts and slots." },
+          { "title": "Show", "text": "Content as JSON, no styling." },
+          { "title": "Audience mode", "text": "A linear slideshow." },
+          { "title": "Reader mode", "text": "Depth, search and notes." },
+          { "title": "Profiles", "text": "Tailored for each reader." },
+          { "title": "Converter", "text": "PowerPoint in, Slipr out." },
+          { "title": "Editor", "text": "Edit shows in the browser." },
+          { "title": "Offline", "text": "No network calls at all." },
+          { "title": "Open format", "text": "A documented JSON schema." }
+        ]
+      }
+    },
+    {
+      "id": "s-facts",
+      "layout": "facts",
+      "chapter": "cards",
+      "content": {
+        "kicker": "In numbers",
+        "title": "Facts and figures",
+        "cards": [
+          { "value": "17", "label": "layouts in this template", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } },
+          { "value": "2", "label": "modes from one show", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } },
+          { "value": "0", "label": "runtime network calls", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } },
+          { "value": "4", "label": "bullet levels", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } },
+          { "value": "9", "label": "slot types", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } },
+          { "value": "1", "label": "renderer for viewer and editor", "icon": { "src": "images/icon-placeholder.svg", "alt": "Placeholder icon" } }
+        ],
+        "image": { "src": "images/photo-16x9.svg", "alt": "Placeholder for a brand photo" }
+      }
+    },
+    {
+      "id": "s-image-cards",
+      "layout": "image-cards-8",
+      "chapter": "cards",
+      "content": {
+        "kicker": "Our markets",
+        "title": "Eight image cards",
+        "cards": [
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Finance" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Public sector" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Healthcare" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Energy" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Logistics" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Retail" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Industry" },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a brand photo" }, "title": "Education" }
+        ]
+      }
+    },
+    {
+      "id": "s-people",
+      "layout": "people-2",
+      "chapter": "cards",
+      "content": {
+        "kicker": "Introduction",
+        "title": "Two people",
+        "cards": [
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a portrait" }, "name": "First Speaker", "role": "Principal consultant", "text": "Works on presentation tooling and the house style." },
+          { "image": { "src": "images/photo-1x1.svg", "alt": "Placeholder for a portrait" }, "name": "Second Speaker", "role": "Designer", "text": "Looks after the brand library and the templates." }
+        ]
       }
     },
     {
