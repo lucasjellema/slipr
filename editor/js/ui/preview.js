@@ -123,8 +123,10 @@ export function mountPreview(container, store) {
       } else {
         // Reader mode preview: slide visual + tailored reader layer
         const readerContainer = h('div', { class: 'slipr-reader-preview-content' });
-        const slideEl = renderSlide(slide, showContext, { mode: 'reader' });
-        readerContainer.append(slideEl);
+        // Like the viewer: no slide visual when reader.showSlide is false (a reader-only text page).
+        if (slide.reader?.showSlide !== false) {
+          readerContainer.append(renderSlide(slide, showContext, { mode: 'reader' }));
+        }
 
         // Filter visible blocks using personalize
         const personalizedModel = personalize(state.show, {

@@ -9,6 +9,8 @@ import { addImageToBlock } from '../image-input.js';
 import { imageValue } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
 import { hotspotEditor } from './hotspot-editor.js';
+import { markdownToolbar } from './markdown-toolbar.js';
+import { slideTitle } from '../../../shared/render.js';
 
 /** Actions the reader form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSummary', 'updateBlock', 'updateHotspot']);
@@ -22,6 +24,9 @@ const BLOCK_TYPES = [
   { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
 ];
+
+/** Block ids whose "For" picker is open, so a re-render keeps it open. */
+const openForPickers = new Set();
 
 const CALLOUT_VARIANTS = [
   { value: 'info', label: 'Info' },
@@ -168,6 +173,7 @@ export function mountReaderForm(container, store) {
       const topRow = h('div', { class: 'slipr-block-header' }, [
         typeSelect,
         depthSelect,
+        forPicker(store, slide.id, block, profiles),
         tools,
       ]);
 
@@ -197,7 +203,7 @@ export function mountReaderForm(container, store) {
           },
           [block.md ?? '']
         );
-        bodyEl.append(titleInput, mdArea);
+        bodyEl.append(titleInput, markdownToolbar(/** @type {HTMLTextAreaElement} */ (mdArea), { show: state.show, slideId: slide.id }), mdArea);
       } else if (block.type === 'callout') {
         const variant = block.variant ?? 'info';
         const kindSelect = h(
@@ -234,7 +240,7 @@ export function mountReaderForm(container, store) {
           },
           [block.md ?? '']
         );
-        bodyEl.append(kindSelect, calloutTitle, mdArea);
+        bodyEl.append(kindSelect, calloutTitle, markdownToolbar(/** @type {HTMLTextAreaElement} */ (mdArea), { show: state.show, slideId: slide.id }), mdArea);
       } else if (block.type === 'image') {
         bodyEl.append(imageBlockEditor(store, slide.id, block));
       } else if (block.type !== 'text') {
@@ -257,7 +263,7 @@ export function mountReaderForm(container, store) {
           },
           [block.md ?? '']
         );
-        bodyEl.append(mdArea);
+        bodyEl.append(markdownToolbar(/** @type {HTMLTextAreaElement} */ (mdArea), { show: state.show, slideId: slide.id }), mdArea);
       }
 
       blockCard.append(topRow, bodyEl);
@@ -278,7 +284,20 @@ export function mountReaderForm(container, store) {
       h('label', {}, [hiddenCheckbox, ' Hide this slide completely from reader mode']),
     ]);
 
-    root.append(summaryRow, blocksHeader, blocksList, visibilityRow);
+    const showSlideCheckbox = h('input', {
+      type: 'checkbox',
+      checked: reader.showSlide !== false,
+      onchange: (e) => {
+        const checked = /** @type {HTMLInputElement} */ (e.target).checked;
+        store.dispatch('setShowSlide', { slideId: slide.id, showSlide: checked });
+      },
+    });
+    const showSlideRow = h('div', { class: 'slipr-form-checkbox' }, [
+      h('label', {}, [showSlideCheckbox, ' Show the slide above its reader blocks']),
+      h('span', { class: 'slipr-help' }, ['Turn off for reader-only text pages.']),
+    ]);
+
+    root.append(summaryRow, blocksHeader, blocksList, relatedEditor(store, slide, state.show), showSlideRow, visibilityRow);
   }
 
   store.subscribe((event) => {
@@ -347,4 +366,107 @@ function describeBlock(block) {
   if (block.type === 'embed') return `${block.title || 'Embedded page'}: ${block.url || '(no URL yet)'}`;
   if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
   return block.type;
+}
+
+/**
+ * Which profiles see a block (`for`): a disclosure with one checkbox per
+ * profile. None checked means everyone. Profiles the show doesn't define
+ * (a typo, or a deleted profile) are listed so they can be unchecked.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ * @param {any[]} profiles
+ */
+function forPicker(store, slideId, block, profiles) {
+  const chosen = Array.isArray(block.for) ? block.for : [];
+  const known = profiles.map((/** @type {any} */ p) => p.id);
+  const unknown = chosen.filter((/** @type {string} */ id) => !known.includes(id));
+  if (profiles.length === 0 && unknown.length === 0) {
+    return h('span', { class: 'slipr-for-none', title: 'Add profiles in Show Settings to tailor blocks per profile' }, ['For everyone']);
+  }
+  const labelOf = (/** @type {string} */ id) => profiles.find((/** @type {any} */ p) => p.id === id)?.label ?? `${id} (unknown)`;
+  const summaryText = chosen.length ? `For: ${chosen.map(labelOf).join(', ')}` : 'For: everyone';
+
+  const options = [...profiles.map((/** @type {any} */ p) => ({ id: p.id, label: p.label ?? p.id })), ...unknown.map((/** @type {string} */ id) => ({ id, label: `${id} (unknown profile)` }))];
+  const boxes = options.map((option) =>
+    h('label', { class: 'slipr-for-option' }, [
+      h('input', {
+        type: 'checkbox',
+        checked: chosen.includes(option.id),
+        onchange: (/** @type {Event} */ e) => {
+          const on = /** @type {HTMLInputElement} */ (e.target).checked;
+          const current = Array.isArray(block.for) ? block.for : [];
+          const next = on ? [...current, option.id] : current.filter((/** @type {string} */ id) => id !== option.id);
+          store.dispatch('setBlockAudience', { slideId, blockId: block.id, forProfiles: next });
+        },
+      }),
+      ` ${option.label}`,
+    ])
+  );
+
+  const details = /** @type {HTMLDetailsElement} */ (h('details', { class: 'slipr-for-picker', open: openForPickers.has(block.id) ? true : undefined }, [
+    h('summary', { class: `slipr-for-summary ${chosen.length ? 'is-tailored' : ''}`, title: 'Which reader profiles see this block' }, [summaryText]),
+    h('div', { class: 'slipr-for-options' }, [
+      ...boxes,
+      h('span', { class: 'slipr-help' }, ['None checked: every reader sees this block.']),
+    ]),
+  ]));
+  details.addEventListener('toggle', () => {
+    if (details.open) openForPickers.add(block.id);
+    else openForPickers.delete(block.id);
+  });
+  return details;
+}
+
+/**
+ * Related slides ("see also" in reader mode): the list in order, with remove
+ * and move, and a picker to add another slide.
+ * @param {import('../store.js').EditorStore} store
+ * @param {any} slide
+ * @param {any} show
+ */
+function relatedEditor(store, slide, show) {
+  const slides = Array.isArray(show?.slides) ? show.slides : [];
+  const related = Array.isArray(slide.reader?.related) ? slide.reader.related : [];
+  const set = (/** @type {string[]} */ next) => store.dispatch('setRelated', { slideId: slide.id, related: next });
+  const label = (/** @type {string} */ id) => {
+    const index = slides.findIndex((/** @type {any} */ s) => s.id === id);
+    return index === -1 ? `${id} (no such slide)` : `${index + 1}. ${slideTitle(slides[index]) || id}`;
+  };
+
+  const items = related.map((/** @type {string} */ id, /** @type {number} */ i) =>
+    h('li', { class: `slipr-related-item ${slides.some((/** @type {any} */ s) => s.id === id) ? '' : 'is-unknown'}` }, [
+      h('span', { class: 'slipr-related-title' }, [label(id)]),
+      h('button', {
+        type: 'button', class: 'slipr-item-btn', 'aria-label': `Move ${label(id)} up`, title: 'Move up',
+        disabled: i === 0 ? true : undefined,
+        onclick: () => set(related.map((/** @type {string} */ x, /** @type {number} */ k) => (k === i - 1 ? id : k === i ? related[i - 1] : x))),
+      }, ['▲']),
+      h('button', {
+        type: 'button', class: 'slipr-item-btn slipr-item-btn-danger', 'aria-label': `Remove ${label(id)}`, title: 'Remove',
+        onclick: () => set(related.filter((/** @type {string} */ x) => x !== id)),
+      }, ['✕']),
+    ])
+  );
+
+  const candidates = slides.filter((/** @type {any} */ s) => s.id !== slide.id && !related.includes(s.id));
+  const picker = /** @type {HTMLSelectElement} */ (h('select', {
+    class: 'slipr-select slipr-select-sm',
+    'aria-label': 'Add a related slide',
+    disabled: candidates.length ? undefined : true,
+    onchange: () => {
+      const id = picker.value;
+      if (id) set([...related, id]);
+    },
+  }, [
+    h('option', { value: '' }, ['+ Add related slide…']),
+    ...candidates.map((/** @type {any} */ s) => h('option', { value: s.id }, [label(s.id)])),
+  ]));
+
+  return h('div', { class: 'slipr-form-group slipr-related' }, [
+    h('h3', { class: 'slipr-subheading' }, [`Related slides (${related.length})`]),
+    h('span', { class: 'slipr-help' }, ['Offered to readers as "see also" below this slide.']),
+    related.length ? h('ol', { class: 'slipr-related-list' }, items) : null,
+    picker,
+  ]);
 }

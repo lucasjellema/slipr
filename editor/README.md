@@ -107,7 +107,11 @@ The Reader tab holds the detailed content for individuals reading the show inter
   * **Keyboard only:** **+ Add hotspot** places one in the middle of the image.
 * **Target Audience & Depth per Block:**
   * **Detail Level:** Choose **Essential (1)**, **Standard (2)**, or **Deep dive (3)**. Readers select their preferred depth, and blocks adjust automatically.
+  * **For:** Click **For: everyone** to choose which reader profiles see the block (one checkbox per profile defined in Show Settings). With none checked, every reader sees it.
   * Reorder blocks using **▲** / **▼**, or remove a block with **🗑**.
+* **Writing reader text:** Above every Markdown field, a small toolbar inserts a **glossary term** (`[[term]]`; with words selected, `[[term|those words]]`), a **popup** (`^[…]` around the selected text, or an empty one to type into) and a **link to another slide** (`[text](#slide-id)`).
+* **Related slides:** Under the blocks, add slides to offer readers as "see also"; reorder them with **▲** or remove them with **✕**.
+* **Show the slide:** Uncheck **Show the slide above its reader blocks** for a reader-only text page.
 * **Reader visibility:** Check **Hide this slide completely from reader mode** if a slide only makes sense during a live speech.
 
 ### 5. Show Settings (Center Pane: "Show Settings" Tab)

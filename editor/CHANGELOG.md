@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Reader tab: profiles per block, related slides, Markdown toolbar (E-008)
+- **Added** a "For" picker on every reader block: one checkbox per reader profile (none checked = everyone). Profiles the show doesn't define are listed so they can be removed.
+- **Added** related slides ("see also") per slide: add from a list of the other slides, reorder, remove; unknown ids are marked.
+- **Added** "Show the slide above its reader blocks" (`reader.showSlide`, new action `setShowSlide`), for reader-only text pages. The editor's reader preview now follows it, like the viewer.
+- **Added** a Markdown toolbar above block text, details, callout and hotspot fields: insert a glossary reference (`[[term]]`, or `[[term|selected words]]`), a popup (`^[…]`, around the selection or empty with the cursor inside) or a link to another slide (`[text](#slide-id)`). Inserts go through the field's input event, so they save and undo like typing. Logic in the DOM-free `markdown-insert.js` (tests in `editor/test/reader-tab.test.js`).
+- **Changed** block headers so type, depth and "For" share a row and wrap only in a narrow inspector.
+
 ### 2026-10-10: Cards, quote and code editors (E-004, I-035)
 - **Added** a cards editor for `cards` slots (the five Conclusion card layouts): one group of fields per card, generated from the slot's `fields` (text, rich text, list, image with the usual choose / drop / paste and alt text), a live "12 / 18" counter that turns yellow past `maxLength`, move up / down, remove (asks first when the card has content), and "+ Add card" up to `maxItems` (the new card's first field gets focus).
 - **Added** editors for `quote` (text and source) and `code` (language and code; Tab indents, Esc then Tab leaves the field) slots.

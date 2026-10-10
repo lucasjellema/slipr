@@ -34,6 +34,7 @@ editor/
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── card-values.js    ✅ DOM-free: value shapes for cards (add, remove, move, set field), quote, code; length hints (I-035)
+    ├── markdown-insert.js ✅ DOM-free: insert glossary references, popups and slide links into Markdown text (E-008)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -48,7 +49,8 @@ editor/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
         ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
-        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile/depth controls, related slides; block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
+        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
+        ├── markdown-toolbar.js ✅ toolbar above Markdown fields: glossary term, popup, slide link (E-008)
         ├── image-field.js   ✅ image preview + choose / drop / paste, used by image slots and image blocks (E-006)
         ├── show-settings.js ✅ "Settings" tab: meta, settings, chapters, glossary, profiles, paths
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
@@ -82,7 +84,7 @@ The form is generated, not hand-built. For the selected slide's layout it iterat
 ### Reader tab (`reader-form.js` + `block-editors.js`)
 Changing a block's type goes through `setBlockType` / `convertBlock()` in `actions.js`, which gives the block a valid shape for the new type (keeping id, `for`, `depth`, and the text where it fits). Types without an editor are read-only, never a Markdown box. Hotspots (`hotspot-editor.js`) are edited with `addHotspot` / `updateHotspot` / `deleteHotspot`; coordinates are fractions 0–1, clamped and rounded to 4 decimals. A drag moves the marker locally and stores the position on release, so it is one undo step.
 
-Like the slide form, block editors are chosen by block `type`, so a new block type means a new editor module plus support in `shared/blocks.js`. Every block editor carries the common controls: profiles (`for`) and depth. Markdown fields get a small toolbar for inserting `[[glossary]]` references (with autocomplete from the glossary), `^[popups]` and slide links.
+Like the slide form, block editors are chosen by block `type`, so a new block type means a new editor module plus support in `shared/blocks.js`. Every block editor carries the common controls: profiles (`for`) and depth. Markdown fields get a small toolbar (`markdown-toolbar.js`) for inserting `[[glossary]]` references (picked from the glossary), `^[popups]` and slide links; the insert is dispatched as the field's own `input` event. The "For" picker keeps its open state per block across re-renders.
 
 ### Preview (`preview.js`)
 In **audience** mode it renders the selected slide with `shared/render.js` into a fixed 1920×1080 container that is CSS-scaled to fit the pane. In **reader** mode it renders the slide visual plus its blocks via `shared/blocks.js`, after filtering with the viewer's `personalize.js` for the profile and depth chosen in the preview toolbar. Re-renders debounced at 150 ms. It also shows `validate.js` warnings for that slide. Thumbnails in the slide list use the same renderer at a smaller scale.

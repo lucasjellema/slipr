@@ -19,7 +19,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 - [ ] **E-003** [editor] Slide list: add, duplicate, delete, reorder, hide · in progress (basic version in E-001) · —
 - [ ] **E-004** [editor] Slide tab: generated slot form + layout picker · in progress (field editors for every slot type done: text, rich text, list, image, quote, code, cards; left: a layout picker with previews) · claude
-- [ ] **E-008** [editor] Reader tab: summary, block editors with profile/depth, related · in progress (basic version in E-001) · —
 - [ ] **E-009** [editor] Show settings: chapters, glossary, profiles, paths · in progress (basic version in E-001) · —
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 
@@ -164,6 +163,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-008** [editor] Reader tab: summary, block editors with profile (`for`) and depth, related slides, `showSlide`, Markdown toolbar (glossary, popup, slide link). Editors for tabs, embed and slide-ref blocks are I-036 · done 2026-10-10 · claude
 - [x] **I-035** [editor] Cards editor for `cards` slots: fields per card by type, length counters, move / remove / add up to `maxItems`, card images; plus quote and code editors · done 2026-10-10 · claude
 - [x] **E-006** [editor] Images and hotspots: choose / drop / paste images into image slots and reader image blocks, alt-text dialog, dedup by content; hotspot editor (click to place, drag or arrow keys to move, title + Markdown). Also fixed the Reader tab writing invalid blocks (type change, callout `kind` → `variant`, `md` on non-text blocks) · done 2026-10-10 · claude
 - [x] **E-013** [editor] Bug: after changing a slide's layout the form kept the old layout's fields (no image field for `text-image`); buttons and undo inside the inspector tabs showed stale content. Forms now re-render for everything except the echo of the user's own typing, keeping focus · done 2026-10-10 · claude

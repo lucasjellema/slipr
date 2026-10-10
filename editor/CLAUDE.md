@@ -29,6 +29,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 6. `Ctrl+S`, reload the page, reopen the folder. Everything is intact.
 7. Kill the tab while dirty and reopen. The draft restore is offered.
 8. "Present" opens the viewer at the current slide.
+8b. Reader tab: give a block a profile ("For"), add and reorder a related slide, untick "Show the slide…" (the reader preview drops the slide visual), and use the Markdown toolbar on a selected word. The preview with that profile shows or hides the block.
 8a. Reader tab: add a block, switch it to *Image with Hotspots*, paste an image, click the image to add a hotspot (its title field gets focus with the default selected), drag a marker, nudge it with the arrow keys, delete one with `Delete`. The reader preview and `viewer/?…&mode=reader` show the hotspots.
 9. The browser console is free of errors.
 

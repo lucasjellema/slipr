@@ -8,6 +8,7 @@
  * image, as in the show format.
  */
 import { h } from '../dom.js';
+import { markdownToolbar } from './markdown-toolbar.js';
 
 /** Selected hotspot per block id, so a re-render keeps the selection. */
 const selected = new Map();
@@ -164,7 +165,7 @@ export function hotspotEditor({ store, slideId, block }) {
             if (title.trim()) store.dispatch('updateHotspot', { ...ids, index, patch: { title } }, { coalesceKey: `hotspot-title-${blockId}-${index}` });
           },
         }),
-        h('textarea', {
+        ...withToolbarFor(h('textarea', {
           class: 'slipr-textarea slipr-textarea-sm',
           placeholder: 'Popup text (Markdown)',
           'aria-label': `Hotspot ${index + 1}: popup text`,
@@ -173,7 +174,7 @@ export function hotspotEditor({ store, slideId, block }) {
             const md = /** @type {HTMLTextAreaElement} */ (e.target).value;
             store.dispatch('updateHotspot', { ...ids, index, patch: { md } }, { coalesceKey: `hotspot-md-${blockId}-${index}` });
           },
-        }, [spot.md ?? '']),
+        }, [spot.md ?? '']), store, slideId),
       ]),
       h('button', {
         type: 'button',
@@ -198,4 +199,15 @@ export function hotspotEditor({ store, slideId, block }) {
     frame,
     spots.length ? h('ol', { class: 'slipr-hs-list' }, rows) : null,
   ]);
+}
+
+/**
+ * A Markdown field preceded by the insert toolbar (glossary, popup, slide link).
+ * @param {HTMLElement} field
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @returns {HTMLElement[]}
+ */
+function withToolbarFor(field, store, slideId) {
+  return [markdownToolbar(/** @type {HTMLTextAreaElement} */ (field), { show: store.state.show, slideId }), field];
 }

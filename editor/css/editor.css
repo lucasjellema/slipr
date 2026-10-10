@@ -1023,3 +1023,114 @@ body.is-screen #slipr-editor-banners {
   tab-size: 2;
   white-space: pre;
 }
+
+/* ---------- Reader tab: profiles, Markdown toolbar, related slides (E-008) ---------- */
+
+.slipr-md-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0;
+}
+
+.slipr-md-tool {
+  width: auto;
+  max-width: 11rem;
+}
+
+.slipr-for-picker {
+  position: relative;
+  font-size: 12px;
+}
+
+.slipr-for-summary {
+  cursor: pointer;
+  padding: 3px 8px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 4px;
+  color: var(--slipr-editor-muted);
+  white-space: nowrap;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.slipr-for-summary.is-tailored {
+  color: #79C0FF;
+  border-color: rgba(47, 129, 247, 0.5);
+}
+
+.slipr-block-header {
+  flex-wrap: wrap;
+}
+
+/* Type and depth share the row with "For" and the tools; wrap only when it is really narrow. */
+.slipr-block-header .slipr-select {
+  width: auto;
+  flex: 1 1 7rem;
+  min-width: 0;
+}
+
+/* The profile options open as a small popover under the "For" button. */
+.slipr-for-options {
+  position: absolute;
+  z-index: 5;
+  top: 100%;
+  left: 0;
+  min-width: 13rem;
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  margin-top: 4px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 4px;
+  background: var(--slipr-editor-bg);
+}
+
+.slipr-for-option {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.slipr-for-none {
+  font-size: 12px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-related {
+  margin-top: 16px;
+}
+
+.slipr-related-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0;
+}
+
+.slipr-related-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--slipr-editor-surface-raised);
+}
+
+.slipr-related-item.is-unknown .slipr-related-title {
+  color: var(--slipr-editor-warning);
+}
+
+.slipr-related-title {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}

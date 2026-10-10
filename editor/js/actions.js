@@ -683,6 +683,27 @@ export function setRelated(show, { slideId, related }) {
   return { ...show, slides };
 }
 
+/**
+ * Show or hide the slide visual above a slide's reader blocks in reader mode
+ * (`reader.showSlide`, default true). Only `false` is stored.
+ * @param {any} show
+ * @param {{ slideId: string, showSlide: boolean }} payload
+ * @returns {any}
+ */
+export function setShowSlide(show, { slideId, showSlide }) {
+  if (!Array.isArray(show.slides)) return show;
+  const slides = show.slides.map((s) => {
+    if (s.id !== slideId) return s;
+    const reader = { ...(s.reader ?? {}) };
+    if (showSlide) delete reader.showSlide;
+    else reader.showSlide = false;
+    const updated = { ...s, reader };
+    if (Object.keys(reader).length === 0) delete updated.reader;
+    return updated;
+  });
+  return { ...show, slides };
+}
+
 // ---------------------------------------------------------------------------
 // Show-level settings actions
 // ---------------------------------------------------------------------------
@@ -878,6 +899,7 @@ export const actions = {
   moveBlock,
   setBlockAudience,
   setRelated,
+  setShowSlide,
   setMeta,
   setSettings,
   upsertChapter,
