@@ -37,16 +37,45 @@ function clone(obj) {
 // ---------------------------------------------------------------------------
 
 /**
- * Add a new slide to the show.
+ * The layout for a new slide (E-011). After a content slide: the same layout.
+ * After a title or section slide (only text slots), or without an anchor: the
+ * template's first plain content layout (text plus list or rich text, no
+ * image), else its first layout with a list or rich text, else its first layout.
  * @param {any} show
- * @param {{ layout?: string, afterSlideId?: string | null, initialContent?: Record<string, any> }} payload
+ * @param {any[]} templateLayouts  `template.layouts`
+ * @param {string | null} [afterSlideId]
+ * @returns {string | undefined}
+ */
+export function layoutForNewSlide(show, templateLayouts, afterSlideId = null) {
+  const layouts = Array.isArray(templateLayouts) ? templateLayouts : [];
+  const types = (/** @type {any} */ l) => new Set((l?.slots ?? []).map((/** @type {any} */ s) => s.type));
+  const slides = Array.isArray(show?.slides) ? show.slides : [];
+  const anchor = slides.find((/** @type {any} */ s) => s.id === afterSlideId) ?? slides.at(-1);
+  const anchorLayout = layouts.find((l) => l.id === anchor?.layout);
+  if (anchorLayout && [...types(anchorLayout)].some((t) => t !== 'text')) return anchorLayout.id;
+
+  const hasBody = (/** @type {Set<string>} */ t) => t.has('list') || t.has('richtext');
+  const plain = layouts.find((l) => {
+    const t = types(l);
+    return hasBody(t) && [...t].every((x) => x === 'text' || x === 'list' || x === 'richtext');
+  });
+  return (plain ?? layouts.find((l) => hasBody(types(l))) ?? layouts[0])?.id;
+}
+
+/**
+ * Add a new slide to the show. Without `layout`, the layout is chosen from
+ * `templateLayouts` by `layoutForNewSlide()`.
+ * @param {any} show
+ * @param {{ layout?: string, templateLayouts?: any[], afterSlideId?: string | null, initialContent?: Record<string, any> }} payload
  * @returns {any}
  */
-export function addSlide(show, { layout = 'bullets', afterSlideId = null, initialContent = {} } = {}) {
+export function addSlide(show, { layout, templateLayouts = [], afterSlideId = null, initialContent = {} } = {}) {
+  const chosen = layout ?? layoutForNewSlide(show, templateLayouts, afterSlideId);
+  if (!chosen) return show;
   const slides = Array.isArray(show.slides) ? [...show.slides] : [];
   const newSlide = {
     id: generateId('s-'),
-    layout,
+    layout: chosen,
     content: { ...initialContent },
   };
 

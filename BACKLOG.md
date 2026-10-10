@@ -24,7 +24,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 - [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · todo · —
 - [ ] **E-007** [editor] Present / Read buttons. Approach decided (D-012, `docs/specs/E-007-shows-outside-server-root.md`): `viewer/?folder=<key>` reading the shared handle via `shared/folder-source.js`; save first · todo · —
-- [ ] **E-011** [editor] Bug: "+ Add" and `Ctrl+Enter` always add a slide with layout `bullets`, which the Conclusion template doesn't have (the new slide is invalid). Use the current slide's layout or the template's first content layout · todo · —
 
 ## Pending verification & chores from earlier phases
 
@@ -167,6 +166,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-011** [editor] Bug: "+ Add" / `Ctrl+Enter` always used layout `bullets`. The layout now comes from the template (`layoutForNewSlide()`): the current slide's layout after a content slide, else the template's plain content layout · done 2026-10-10 · claude
 - [x] **E-002** [editor] Open, save and new-from-template via the File System Access API: start screen with recent shows, `?folder=<key>` with permission re-request from a click, Save/`Ctrl+S` with schema key order, saving URL-opened shows after picking their folder, `templates/index.json`, shared folder loader (D-012) · done 2026-10-10 · claude
 - [x] **E-010** [editor] Bug: the slide form corrupted non-text slots. Image slots now get a path and an alt-text input and always write `{ src, alt, … }`; `quote`, `code`, `cards` (and unknown types) are read-only with a summary; array lists stay arrays. Also fixed on the way: the store passed the template to `validateShow` in the wrong argument (template checks never ran), the preview's diagnostics never matched slide warnings and hid errors, and wrong import paths in `ui/preview.js` / `ui/slide-list.js` stopped the editor from loading · done 2026-10-10 · claude
 - [x] **I-043b** [format/templates] `cards` slot type (template format 0.2) + the five card layouts of the Conclusion template (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction): schemas, specs, validator, renderer, viewer (fragments, search, pins), converter card roles, demo slides, tests · done 2026-10-10 · claude

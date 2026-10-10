@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: New slides use a layout the template has (E-011)
+- **Fixed** "+ Add" and `Ctrl+Enter` always creating a `bullets` slide, which is invalid in templates without that layout (Conclusion). New `layoutForNewSlide()` in `actions.js`: after a content slide the same layout; after a title or section slide (only text slots) the template's first plain content layout (text plus list or rich text, no image), so `bullets` for Default and `text` for Conclusion. `addSlide` takes `templateLayouts` for this.
+
 ### 2026-10-10: Open, save and new-from-template (E-002)
 - **Added** Open… (pick a show folder), New… (title and template, then an empty folder: `show.json` with `"ref": "/templates/<id>"`, and `images/`), and Save / `Ctrl+S` (writes `show.json` through the File System Access API). Folder shows reopen as `editor/?folder=<key>` (D-012); after a reload the browser may ask for access again with one click.
 - **Added** a start screen (open, new, recent shows, demo link) when the editor opens without a show, and banners for notices, errors and "Saved".

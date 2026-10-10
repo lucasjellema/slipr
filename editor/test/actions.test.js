@@ -2,6 +2,7 @@ import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readJson } from '../../shared/test/helpers.js';
 import * as actions from '../js/actions.js';
+import { validateShow } from '../../shared/validate.js';
 
 const demo = readJson('shows/demo/show.json');
 const template = readJson('templates/default/template.json');
@@ -21,6 +22,30 @@ describe('editor actions: slides', () => {
     const appended = actions.addSlide(demo, { layout: 'title' });
     assert.equal(appended.slides.length, demo.slides.length + 1);
     assert.equal(appended.slides[appended.slides.length - 1].layout, 'title');
+  });
+
+  test('addSlide picks a layout the template has (E-011)', () => {
+    const conclusion = readJson('templates/conclusion/template.json');
+    const conclusionDemo = readJson('shows/conclusion-demo/show.json');
+
+    // After a title slide: the plain content layout of the template.
+    assert.equal(actions.layoutForNewSlide(demo, template.layouts, 's-title'), 'bullets');
+    assert.equal(actions.layoutForNewSlide(conclusionDemo, conclusion.layouts, 's-title'), 'text');
+    // After a content slide: the same layout.
+    assert.equal(actions.layoutForNewSlide(conclusionDemo, conclusion.layouts, 's-columns'), 'columns-4');
+    // No anchor: after the last slide.
+    const last = conclusionDemo.slides.at(-1);
+    const expected = actions.layoutForNewSlide(conclusionDemo, conclusion.layouts, last.id);
+    assert.equal(actions.layoutForNewSlide(conclusionDemo, conclusion.layouts, null), expected);
+
+    const added = actions.addSlide(conclusionDemo, { afterSlideId: 's-title', templateLayouts: conclusion.layouts });
+    const slide = added.slides[1];
+    assert.ok(conclusion.layouts.some((l) => l.id === slide.layout), `layout ${slide.layout} exists in the template`);
+    assert.deepEqual(validateShow(added, { template: conclusion }).errors, []);
+  });
+
+  test('addSlide without a layout or template layouts changes nothing', () => {
+    assert.equal(actions.addSlide(demo, {}), demo);
   });
 
   test('duplicateSlide copies content and assigns new IDs', () => {

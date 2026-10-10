@@ -42,7 +42,7 @@ export function registerShortcuts(store, { onSave, onPresent, onRead } = {}) {
     if (mod && e.key === 'Enter') {
       e.preventDefault();
       const currentId = store.state.selectedSlideId;
-      store.dispatch('addSlide', { afterSlideId: currentId });
+      store.dispatch('addSlide', { afterSlideId: currentId, templateLayouts: store.state.template?.layouts });
       return;
     }
 

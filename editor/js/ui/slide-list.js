@@ -31,7 +31,7 @@ export function mountSlideList(container, store) {
           {
             class: 'slipr-btn slipr-btn-sm',
             title: 'Add new slide (Ctrl+Enter)',
-            onclick: () => store.dispatch('addSlide', { afterSlideId: selectedId }),
+            onclick: () => store.dispatch('addSlide', { afterSlideId: selectedId, templateLayouts: state.template?.layouts }),
           },
           ['+ Add']
         ),

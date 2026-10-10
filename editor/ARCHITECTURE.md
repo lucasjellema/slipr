@@ -69,7 +69,7 @@ Pure and unit-testable in Node:
 - reader layer: `setSummary`, `addBlock`, `updateBlock`, `moveBlock`, `deleteBlock`, `setBlockAudience` (for/depth), `setRelated`
 - show: `setMeta`, `upsertChapter`, `upsertGlossaryTerm`, `upsertProfile`, `upsertPath` (and their deletes)
 
-Deleting a slide also removes it from `paths` and `related`. Deleting a profile or glossary term reports the places that referenced it. `setLayout` keeps the values of slots whose name and type also exist in the new layout. Values that don't fit are kept in a hidden `_orphaned` field, so switching back restores them.
+`addSlide` without a layout picks one with `layoutForNewSlide()` (the current slide's layout after a content slide, else the template's plain content layout). Deleting a slide also removes it from `paths` and `related`. Deleting a profile or glossary term reports the places that referenced it. `setLayout` keeps the values of slots whose name and type also exist in the new layout. Values that don't fit are kept in a hidden `_orphaned` field, so switching back restores them.
 
 ### Slide form (`slide-form.js` + `field-editors.js`)
 The form is generated, not hand-built. For the selected slide's layout it iterates over `layout.slots` and mounts the matching field editor. This means a new layout in a template appears in the editor automatically.
