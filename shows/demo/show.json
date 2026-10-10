@@ -351,6 +351,56 @@
     },
 
     {
+      "id": "s-ai",
+      "layout": "image-full",
+      "chapter": "next",
+      "tags": ["ai", "ideas"],
+      "content": {
+        "title": "AI help, kept in its cage",
+        "image": {
+          "src": "images/caged-agent.jpg",
+          "alt": "Illustration of a humanoid robot standing inside a birdcage, surrounded by floating documents and streams of data",
+          "fit": "contain"
+        },
+        "caption": "An assistant that answers only from the show's own content"
+      },
+      "notes": "Idea, not built yet. Emphasise: opt-in, and it never invents content beyond the show.",
+      "reader": {
+        "summary": "A future assistant that helps readers and authors, but only within the show's content.",
+        "blocks": [
+          {
+            "id": "idea",
+            "type": "text",
+            "depth": 1,
+            "md": "Two ideas on the backlog use Claude: readers can **ask the show** a question, and authors get help drafting slides and writing a [[reader-layer]] from their speaker notes."
+          },
+          {
+            "id": "cage",
+            "type": "callout",
+            "variant": "info",
+            "title": "Why the cage?",
+            "md": "The assistant only sees the show itself. It answers from that content, says so when the show has no answer, and never makes things up beyond it."
+          },
+          {
+            "id": "mgr-optin",
+            "type": "text",
+            "for": ["mgr"],
+            "md": "It is strictly opt-in: without an API key configured, Slipr works exactly as before and no data leaves the browser."
+          },
+          {
+            "id": "dev-how",
+            "type": "details",
+            "title": "How would it work?",
+            "for": ["dev"],
+            "depth": 3,
+            "md": "The show's text (slides, reader blocks, glossary) is the only context sent along with the question, and the answer cites the slide ids it used, so reader mode can link straight to them."
+          }
+        ],
+        "related": ["s-roadmap"]
+      }
+    },
+
+    {
       "id": "s-thanks",
       "layout": "title",
       "chapter": "next",

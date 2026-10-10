@@ -135,7 +135,7 @@ describe('robustness', () => {
 
 describe('helpers', () => {
   test('collectImagePaths lists unique image sources', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['images/architecture.svg', 'images/two-modes.svg']);
+    assert.deepEqual(collectImagePaths(demo).sort(), ['images/architecture.svg', 'images/caged-agent.jpg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {
