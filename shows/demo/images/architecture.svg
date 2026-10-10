@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="t d">
+  <title id="t">Slipr architecture</title>
+  <desc id="d">A PowerPoint file goes through the converter into a show folder. The editor reads and writes the show folder. The viewer reads the show and its template. Editor and viewer both use the shared core.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 Z" fill="#5B6573"/>
+    </marker>
+    <style>
+      .box { fill: #FFFFFF; stroke: #1F3A5F; stroke-width: 4; }
+      .box.data { fill: #FFF6DB; stroke: #F2A900; }
+      .box.core { fill: #1F3A5F; stroke: #1F3A5F; }
+      .label { font: 700 40px system-ui, 'Segoe UI', Roboto, Arial, sans-serif; fill: #1F3A5F; text-anchor: middle; }
+      .sub { font: 400 26px system-ui, 'Segoe UI', Roboto, Arial, sans-serif; fill: #5B6573; text-anchor: middle; }
+      .core .label, .label.inv { fill: #FFFFFF; }
+      .sub.inv { fill: #DCE3EC; }
+      .flow { stroke: #5B6573; stroke-width: 4; fill: none; marker-end: url(#arrow); }
+      .uses { stroke: #1F3A5F; stroke-width: 3; stroke-dasharray: 10 10; fill: none; opacity: 0.6; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="900" fill="#F4F6F9"/>
+
+  <!-- pptx -->
+  <text x="100" y="300" class="sub" text-anchor="start" style="text-anchor:start">deck.pptx</text>
+
+  <!-- converter (0.175, 0.444) -->
+  <rect class="box" x="100" y="330" width="360" height="140" rx="18"/>
+  <text x="280" y="395" class="label">Converter</text>
+  <text x="280" y="438" class="sub">Python · python-pptx</text>
+
+  <!-- show folder (0.5, 0.444) -->
+  <rect class="box data" x="620" y="330" width="360" height="140" rx="18"/>
+  <text x="800" y="395" class="label">Show folder</text>
+  <text x="800" y="438" class="sub">show.json + images/</text>
+
+  <!-- editor (0.5, 0.167) -->
+  <rect class="box" x="620" y="90" width="360" height="120" rx="18"/>
+  <text x="800" y="148" class="label">Editor</text>
+  <text x="800" y="188" class="sub">browser app</text>
+
+  <!-- viewer (0.825, 0.444) -->
+  <rect class="box" x="1140" y="330" width="360" height="140" rx="18"/>
+  <text x="1320" y="395" class="label">Viewer</text>
+  <text x="1320" y="438" class="sub">audience · reader</text>
+
+  <!-- template (0.825, 0.8) -->
+  <rect class="box data" x="1140" y="660" width="360" height="120" rx="18"/>
+  <text x="1320" y="718" class="label">Template</text>
+  <text x="1320" y="758" class="sub">style guide + layouts</text>
+
+  <!-- shared core (0.5, 0.8) -->
+  <g class="core">
+    <rect class="box core" x="560" y="660" width="480" height="120" rx="18"/>
+    <text x="800" y="718" class="label inv">Shared core</text>
+    <text x="800" y="758" class="sub inv">load · validate · render</text>
+  </g>
+
+  <!-- flows -->
+  <path class="flow" d="M460 400 H612"/>
+  <path class="flow" d="M770 212 V322"/>
+  <path class="flow" d="M830 328 V218"/>
+  <path class="flow" d="M980 400 H1132"/>
+  <path class="flow" d="M1320 660 V478"/>
+
+  <!-- uses shared core -->
+  <path class="uses" d="M620 150 C 470 150, 470 720, 556 720"/>
+  <path class="uses" d="M1140 430 C 1080 520, 1080 700, 1044 720"/>
+</svg>

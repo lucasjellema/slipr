@@ -123,11 +123,12 @@ On top of the slides, show-level structures power the reader experience: **chapt
 
 | Field | Type | Required | Meaning |
 |---|---|---|---|
+| `$schema` | string | no | Path to `shared/schema/show.schema.json`, for autocomplete in editors outside this repo's VS Code workspace |
 | `slipr` | string | yes | Format version of this file, currently `"0.1"` |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
 | `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json`. `version`: semver range |
-| `settings` | object | no | `aspectRatio` (`"16:9"` default, `"4:3"`), `transition` (Reveal.js transition name), `slideNumbers` (bool) |
+| `settings` | object | no | `aspectRatio` (`"16:9"` default, `"4:3"`), `transition` (`none`, `fade`, `slide`, `convex`, `concave`, `zoom`), `slideNumbers` (bool), `agenda` (bool: audience mode inserts a generated agenda slide before each chapter) |
 | `chapters` | array | no | `{ id, title, summary? }` in display order. They drive the audience agenda and progress, and the reader table of contents |
 | `glossary` | object | no | id → `{ term, definition, link? }`. Referenced from Markdown as `[[id]]` and shown as a popup in reader mode |
 | `profiles` | array | no | `{ id, label, description? }`. A reader picks one, and blocks tagged `for` other profiles are hidden |
@@ -193,7 +194,7 @@ The template defines which slots a layout has and the type of each slot.
 | Type | JSON value | Notes |
 |---|---|---|
 | `text` | string | Plain text, single line |
-| `richtext` | string | Markdown subset |
+| `richtext` | string | Markdown subset, including paragraphs and bullet lists |
 | `list` | string | Markdown bullet list, or an array of strings |
 | `image` | object | `{ "src": "images/x.png", "alt": "...", "fit": "contain" \| "cover", "focus": "center" }`. `src` is relative to `show.json` |
 | `code` | object | `{ "language": "js", "code": "..." }` |
@@ -203,8 +204,10 @@ The template defines which slots a layout has and the type of each slot.
 
 ## Validation rules
 
+The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
+
 - **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, image file not found, missing `alt` text, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items than its `maxItems`, image file not found (only when the caller supplies a file check), missing `alt` text, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 

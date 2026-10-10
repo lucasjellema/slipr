@@ -1,0 +1,243 @@
+/*
+ * Slipr Default template: theme (style guide + layout styles).
+ *
+ * Sizing model: the renderer wraps every layout fragment like this:
+ *   <div class="slipr-slide slipr-mode-audience|slipr-mode-reader" data-layout="…" data-aspect="16:9">
+ *     <div class="slipr-canvas"> …layout fragment… </div>
+ *   </div>
+ * .slipr-slide is a CSS inline-size container; .slipr-canvas is the 16:9 box.
+ * All slide measurements use container query units (cqw = 1% of the slide
+ * width), so the same CSS works on the 1920×1080 Reveal.js canvas, in the
+ * reader's slide frame, and in editor thumbnails. At 1920px wide: 1cqw = 19.2px.
+ */
+
+:root {
+  /* Style guide: keep in sync with "styleguide" in template.json */
+  --slipr-color-primary: #1F3A5F;
+  --slipr-color-accent: #F2A900;
+  --slipr-color-text: #1E2329;
+  --slipr-color-muted: #5B6573;
+  --slipr-color-bg: #FFFFFF;
+  --slipr-color-surface: #F4F6F9;
+  --slipr-color-on-primary: #FFFFFF;
+
+  --slipr-font-heading: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --slipr-font-body: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --slipr-font-code: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+
+  /* Slide metrics (in cqw) */
+  --slipr-pad-x: 6cqw;
+  --slipr-pad-y: 5cqw;
+  --slipr-size-title: 3.6cqw;
+  --slipr-size-title-hero: 5.2cqw;
+  --slipr-size-subtitle: 2.1cqw;
+  --slipr-size-body: 1.9cqw;
+  --slipr-size-small: 1.2cqw;
+  --slipr-radius: 0.6cqw;
+}
+
+/* ---------- Slide frame ---------- */
+
+.slipr-slide {
+  container-type: inline-size;
+  width: 100%;
+  color: var(--slipr-color-text);
+  font-family: var(--slipr-font-body);
+  text-align: left;
+  line-height: 1.3;
+}
+.slipr-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--slipr-color-bg);
+}
+.slipr-slide[data-aspect="4:3"] .slipr-canvas { aspect-ratio: 4 / 3; }
+
+.slipr-slide *,
+.slipr-slide *::before,
+.slipr-slide *::after { box-sizing: border-box; }
+
+.slipr-layout {
+  position: absolute;
+  inset: 0;
+  padding: var(--slipr-pad-y) var(--slipr-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 2.2cqw;
+}
+
+/* Optional slots left empty by the show */
+.slipr-slide [data-empty] { display: none !important; }
+
+/* ---------- Typography ---------- */
+
+.slipr-title {
+  margin: 0;
+  font-family: var(--slipr-font-heading);
+  font-size: var(--slipr-size-title);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--slipr-color-primary);
+  text-transform: none;
+}
+.slipr-subtitle {
+  margin: 0;
+  font-size: var(--slipr-size-subtitle);
+  color: var(--slipr-color-muted);
+}
+.slipr-kicker,
+.slipr-byline {
+  margin: 0;
+  font-size: var(--slipr-size-small);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slipr-color-accent);
+}
+.slipr-body {
+  margin: 0;
+  font-size: var(--slipr-size-body);
+}
+.slipr-body p { margin: 0 0 0.6em; }
+.slipr-slide ul,
+.slipr-slide ol { margin: 0; padding-left: 1.2em; }
+.slipr-slide li { margin: 0.35em 0; }
+.slipr-slide li::marker { color: var(--slipr-color-accent); }
+.slipr-slide li li { font-size: 0.85em; }
+.slipr-slide strong { color: var(--slipr-color-primary); }
+.slipr-slide code {
+  font-family: var(--slipr-font-code);
+  font-size: 0.9em;
+  background: var(--slipr-color-surface);
+  padding: 0.05em 0.3em;
+  border-radius: 0.2em;
+}
+.slipr-slide a { color: var(--slipr-color-primary); text-decoration-color: var(--slipr-color-accent); }
+
+.slipr-logo {
+  position: absolute;
+  right: var(--slipr-pad-x);
+  bottom: 3cqw;
+  height: 2.2cqw;
+  width: auto;
+}
+
+/* ---------- Layout: title ---------- */
+
+.slipr-layout--title {
+  justify-content: center;
+  background: var(--slipr-color-primary);
+  color: var(--slipr-color-on-primary);
+}
+.slipr-layout--title .slipr-stack { display: flex; flex-direction: column; gap: 1.6cqw; max-width: 70%; position: relative; }
+.slipr-layout--title .slipr-title { font-size: var(--slipr-size-title-hero); color: var(--slipr-color-on-primary); }
+.slipr-layout--title .slipr-subtitle { color: color-mix(in srgb, var(--slipr-color-on-primary) 80%, transparent); }
+.slipr-layout--title .slipr-decor {
+  position: absolute;
+  right: -6cqw;
+  top: 50%;
+  height: 120%;
+  transform: translateY(-50%);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.slipr-layout--title .slipr-logo { filter: brightness(0) invert(1); }
+
+/* ---------- Layout: section ---------- */
+
+.slipr-layout--section {
+  justify-content: center;
+  background: linear-gradient(90deg, var(--slipr-color-accent) 0 1.2cqw, var(--slipr-color-surface) 1.2cqw);
+}
+.slipr-layout--section .slipr-stack { display: flex; flex-direction: column; gap: 1.4cqw; }
+.slipr-layout--section .slipr-title { font-size: 4.6cqw; }
+
+/* ---------- Layout: bullets ---------- */
+
+.slipr-layout--bullets .slipr-title {
+  padding-bottom: 1.2cqw;
+  border-bottom: 0.25cqw solid var(--slipr-color-accent);
+  align-self: flex-start;
+}
+.slipr-layout--bullets .slipr-body { max-width: 80%; }
+
+/* ---------- Layout: two-column ---------- */
+
+.slipr-layout--two-column .slipr-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4cqw;
+  flex: 1;
+  min-height: 0;
+}
+.slipr-layout--two-column .slipr-column {
+  background: var(--slipr-color-surface);
+  border-radius: var(--slipr-radius);
+  border-top: 0.35cqw solid var(--slipr-color-primary);
+  padding: 2.2cqw 2.6cqw;
+}
+.slipr-layout--two-column .slipr-column + .slipr-column { border-top-color: var(--slipr-color-accent); }
+.slipr-column-title {
+  margin: 0 0 1cqw;
+  font-family: var(--slipr-font-heading);
+  font-size: 2.2cqw;
+  color: var(--slipr-color-primary);
+}
+.slipr-layout--two-column .slipr-body { font-size: 1.7cqw; }
+
+/* ---------- Layout: image-full ---------- */
+
+.slipr-layout--image-full { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure {
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+}
+.slipr-image {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.slipr-image[data-fit="cover"] { object-fit: cover; border-radius: var(--slipr-radius); }
+.slipr-caption {
+  font-size: var(--slipr-size-small);
+  color: var(--slipr-color-muted);
+  text-align: center;
+}
+
+/* ---------- Reader mode: reflow on narrow screens ----------
+ * Below ~640px the slide stops being a scaled 16:9 picture and becomes
+ * ordinary flowing content with rem-based type.
+ */
+@container (max-width: 640px) {
+  .slipr-mode-reader .slipr-canvas { aspect-ratio: auto; }
+  .slipr-mode-reader .slipr-layout {
+    position: static;
+    padding: 1.25rem;
+    gap: 0.75rem;
+  }
+  .slipr-mode-reader .slipr-title { font-size: 1.5rem; }
+  .slipr-mode-reader .slipr-layout--title .slipr-title { font-size: 1.9rem; }
+  .slipr-mode-reader .slipr-layout--section .slipr-title { font-size: 1.7rem; }
+  .slipr-mode-reader .slipr-subtitle { font-size: 1.05rem; }
+  .slipr-mode-reader .slipr-kicker,
+  .slipr-mode-reader .slipr-byline,
+  .slipr-mode-reader .slipr-caption { font-size: 0.8rem; }
+  .slipr-mode-reader .slipr-body { font-size: 1rem; max-width: none; }
+  .slipr-mode-reader .slipr-column-title { font-size: 1.1rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-columns { grid-template-columns: 1fr; gap: 0.75rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-column { padding: 0.9rem 1rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-body { font-size: 1rem; }
+  .slipr-mode-reader .slipr-layout--title .slipr-stack { max-width: none; }
+  .slipr-mode-reader .slipr-decor,
+  .slipr-mode-reader .slipr-logo { display: none; }
+  .slipr-mode-reader .slipr-image { max-height: 60vh; }
+}

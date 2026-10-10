@@ -64,7 +64,7 @@ Status · Date
 
 ## D-008: Reader mode is its own application, not Reveal.js scroll view
 **Accepted** · 2026-10-10 (revised the same day)
-**Context**: Reveal.js 5 has a built-in *scroll view*. Reader mode, however, is meant to be a very different, highly interactive experience: popups, collapsible panels, tailored content, personalised navigation, search and annotations.
+**Context**: Reveal.js (since version 5) has a built-in *scroll view*. Reader mode, however, is meant to be a very different, highly interactive experience: popups, collapsible panels, tailored content, personalised navigation, search and annotations.
 **Decision**: Reader mode is a separate vanilla-JS app inside `viewer/reader/`. It renders slide visuals via `shared/render.js` and reader blocks via `shared/blocks.js`, and does not use Reveal.js.
 **Consequences**: Full control over interaction, layout and accessibility. More code to own, which is why reader mode gets its own modules and tests. Audience mode stays a thin Reveal.js layer.
 

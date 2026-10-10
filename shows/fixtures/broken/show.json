@@ -1,0 +1,27 @@
+{
+  "$schema": "../../../shared/schema/show.schema.json",
+  "slipr": "0.1",
+  "id": "broken-fixture",
+  "meta": { "subtitle": "Deliberately invalid: used by tests and the viewer's error page" },
+  "template": { "ref": "../../../templates/default", "version": "^1.0" },
+  "slides": [
+    {
+      "id": "s-1",
+      "layout": "title",
+      "content": { "title": "Fine slide" }
+    },
+    {
+      "id": "s-1",
+      "layout": "does-not-exist",
+      "content": { "title": "Duplicate id and unknown layout" }
+    },
+    {
+      "id": "s-3",
+      "layout": "bullets",
+      "content": { "title": 42 },
+      "reader": {
+        "blocks": [ { "id": "b1", "type": "carousel", "md": "Unknown block type" } ]
+      }
+    }
+  ]
+}

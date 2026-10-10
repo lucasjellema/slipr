@@ -1,0 +1,92 @@
+{
+  "$schema": "../../shared/schema/template.schema.json",
+  "slipr": "0.1",
+  "id": "default",
+  "name": "Slipr Default",
+  "version": "1.0.0",
+  "description": "Clean, neutral template used for samples and tests. Uses system fonts, so it needs no font files.",
+  "theme": "theme.css",
+  "reader": "reader.css",
+  "styleguide": {
+    "colors": {
+      "primary": "#1F3A5F",
+      "accent": "#F2A900",
+      "text": "#1E2329",
+      "muted": "#5B6573",
+      "background": "#FFFFFF",
+      "surface": "#F4F6F9"
+    },
+    "fonts": {
+      "heading": "system-ui (Segoe UI, Roboto, Helvetica Neue)",
+      "body": "system-ui (Segoe UI, Roboto, Helvetica Neue)",
+      "code": "ui-monospace (Cascadia Code, Consolas, Menlo)"
+    }
+  },
+  "layouts": [
+    {
+      "id": "title",
+      "name": "Title slide",
+      "description": "Opening slide with title, subtitle and byline.",
+      "file": "layouts/title.html",
+      "slots": [
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 80 },
+        { "name": "subtitle", "type": "text", "label": "Subtitle", "maxLength": 140 },
+        { "name": "byline", "type": "text", "label": "Byline", "help": "Speaker, event or date." }
+      ]
+    },
+    {
+      "id": "section",
+      "name": "Section header",
+      "description": "Divider that opens a chapter.",
+      "file": "layouts/section.html",
+      "slots": [
+        { "name": "kicker", "type": "text", "label": "Kicker", "help": "Small text above the title, e.g. 'Chapter 2'.", "maxLength": 40 },
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 60 },
+        { "name": "subtitle", "type": "text", "label": "Subtitle", "maxLength": 120 }
+      ]
+    },
+    {
+      "id": "bullets",
+      "name": "Title and bullets",
+      "description": "The workhorse: a title and a bullet list.",
+      "file": "layouts/bullets.html",
+      "slots": [
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 70 },
+        { "name": "body", "type": "list", "label": "Bullets", "maxItems": 7 }
+      ]
+    },
+    {
+      "id": "two-column",
+      "name": "Two columns",
+      "description": "Comparison or side-by-side content.",
+      "file": "layouts/two-column.html",
+      "slots": [
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 70 },
+        { "name": "leftTitle", "type": "text", "label": "Left heading", "maxLength": 40 },
+        { "name": "left", "type": "richtext", "label": "Left column", "required": true },
+        { "name": "rightTitle", "type": "text", "label": "Right heading", "maxLength": 40 },
+        { "name": "right", "type": "richtext", "label": "Right column", "required": true }
+      ]
+    },
+    {
+      "id": "image-full",
+      "name": "Full image",
+      "description": "One large image with optional title and caption.",
+      "file": "layouts/image-full.html",
+      "slots": [
+        { "name": "image", "type": "image", "label": "Image", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
+    }
+  ],
+  "pptxMapping": {
+    "Title Slide": "title",
+    "Section Header": "section",
+    "Title and Content": "bullets",
+    "Title Only": "bullets",
+    "Two Content": "two-column",
+    "Comparison": "two-column",
+    "Picture with Caption": "image-full"
+  }
+}

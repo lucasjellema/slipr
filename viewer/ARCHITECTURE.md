@@ -99,7 +99,7 @@ show + template ──► personalize(show, prefs) ──► visible model ─�
 
 ## Dependencies
 
-- `vendor/reveal.js-5.x/` (core + Notes, Zoom, Search plugins), loaded only in audience mode.
+- `vendor/reveal.js-6.0.2/`: imported as ES modules (`dist/reveal.mjs`, `dist/plugin/{notes,zoom,search}.mjs`) plus `dist/reset.css` and `dist/reveal.css`. Loaded only in audience mode. Reveal's own themes are not used, because the Slipr template provides the looks.
 - `shared/` modules. Reader mode has **no third-party dependencies**.
 
 ## Decisions & open questions

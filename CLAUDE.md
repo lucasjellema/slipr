@@ -51,7 +51,9 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 
 ## Commands
 
-> Fill these in as they come into existence (Phase 0 of the roadmap).
+Requires Node ≥ 22 (JSON module imports) and Python ≥ 3.11 (converter).
+
+The demo show `shows/demo/` exercises every format feature. Use it as the reference when building or testing anything. Keep it valid **without warnings**, because a test enforces that.
 
 | Task | Command |
 |---|---|

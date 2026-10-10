@@ -89,6 +89,20 @@ A layout is a small HTML fragment. Elements with a `data-slot` attribute are fil
 </div>
 ```
 
+The renderer wraps each fragment in a fixed structure:
+
+```html
+<div class="slipr-slide slipr-mode-audience" data-layout="bullets" data-aspect="16:9">  <!-- CSS inline-size container -->
+  <div class="slipr-canvas">                                                          <!-- the 16:9 (or 4:3) box -->
+    …layout fragment…
+  </div>
+</div>
+```
+
+Templates size everything inside the slide in **container query units** (`cqw` = 1 % of the slide width). The same CSS then works on the 1920×1080 Reveal.js canvas, in reader mode's slide frame, and in editor thumbnails. Reader mode can reflow a layout on narrow screens with `@container (max-width: …)` rules on `.slipr-mode-reader` descendants (see `templates/default/theme.css`).
+
+Slot definitions in `template.json` can also carry `label` and `help` (shown by the editor), `required`, `maxLength` and `maxItems` (validation warnings).
+
 Renderer rules:
 
 | Slot type | Target element | Filled with |

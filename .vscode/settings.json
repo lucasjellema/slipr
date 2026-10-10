@@ -1,0 +1,15 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": ["/shows/**/show.json"],
+      "url": "./shared/schema/show.schema.json"
+    },
+    {
+      "fileMatch": ["/templates/**/template.json"],
+      "url": "./shared/schema/template.schema.json"
+    }
+  ],
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "editor.tabSize": 2
+}

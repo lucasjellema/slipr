@@ -15,14 +15,10 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 0 (Foundations)
+## Now: Phase 0 (Foundations), nearly done
 
-- [ ] **C-002** [repo] Vendor Reveal.js 5.x into `vendor/` · todo · claude
-- [ ] **S-001** [shared] JSON Schemas for show and template, from `docs/*-format.md` · todo · claude
-- [ ] **C-004** [repo] VS Code schema association for `show.json` (autocomplete while hand-writing) · todo · claude
-- [ ] **S-002** [shared] `validate.js` with errors/warnings + tests · todo · claude
-- [ ] **T-001** [templates] `templates/default`: 5 layouts, `theme.css`, `reader.css` · todo · claude
-- [ ] **T-002** [shows] `shows/demo`: sample show exercising both layers fully · todo · claude
+- [ ] **T-003** [templates] Visual check of the default template's layouts, once `render.js` exists (Phase 1). The CSS has not been rendered yet · todo · claude
+
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 
 ## Next: Phases 1–5 (see ROADMAP.md)
@@ -125,6 +121,13 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **C-002** [repo] Vendor Reveal.js 6.0.2 into `vendor/` (ES modules, unmodified `dist/`) · done 2026-10-10 · claude
+- [x] **S-001** [shared] JSON Schemas for show and template (cross-checked with Python `jsonschema`) · done 2026-10-10 · claude
+- [x] **C-004** [repo] VS Code schema association for `show.json` / `template.json` · done 2026-10-10 · claude
+- [x] **S-002** [shared] `schema-check.js` + `validate.js` with errors/warnings + 43 tests · done 2026-10-10 · claude
+- [x] **T-001** [templates] `templates/default`: 5 layouts, `theme.css`, `reader.css`, logo, illustration · done 2026-10-10 · claude
+- [x] **T-002** [shows] `shows/demo` (13 slides, both layers) + `shows/fixtures/broken` · done 2026-10-10 · claude
+- [x] **C-006** [repo] `.gitattributes`: LF line endings, binary assets · done 2026-10-10 · claude
 - [x] **C-001** [repo] Initialise git, `.gitignore`, root `package.json` with `serve` / `test` scripts · done 2026-10-10 · claude
 - [x] **C-000** [docs] Documentation outline, roadmap and backlog · done 2026-10-10 · claude
 - [x] **C-005** [docs] Reworked design for two distinct experiences (audience vs. interactive reader) · done 2026-10-10 · claude

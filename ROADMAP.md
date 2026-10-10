@@ -23,7 +23,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 **Goal**: The repository, the formats and a rich sample exist, so all later work has something concrete to build against.
 
 1. `git init`, `.gitignore`, root `package.json` (dev scripts only: `serve`, `test`). [C-001]
-2. Vendor Reveal.js 5.x into `vendor/reveal.js-5.x/`. [C-002]
+2. Vendor Reveal.js into `vendor/reveal.js-<version>/` (6.0.2, which ships native ES modules). [C-002]
 3. Write `shared/schema/show.schema.json` and `template.schema.json` from the specs in `docs/`. [S-001]
 4. Add a VS Code setting that associates `show.json` files with the schema, giving autocomplete and validation while hand-writing. [C-004]
 5. Create `templates/default/` with 5 layouts (`title`, `section`, `bullets`, `two-column`, `image-full`), `theme.css` and `reader.css`. [T-001]

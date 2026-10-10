@@ -6,6 +6,20 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Phase 0 foundations
+- **Added** `.gitattributes` (LF line endings in repo and working copy, binary assets marked).
+- **Added** `vendor/reveal.js-6.0.2/`: the unmodified `dist/` of the npm package, with `VENDORED.md` (source, checksum, upgrade procedure). Reveal 6 ships native ES modules, which fits the no-build setup.
+- **Added** `shared/schema/show.schema.json` and `template.schema.json` (JSON Schema draft 2020-12), cross-checked with the Python `jsonschema` reference validator.
+- **Added** `shared/schema-check.js` (a minimal JSON Schema checker for the keywords Slipr uses) and `shared/validate.js` (structural + semantic validation of shows and templates), with 43 tests in `shared/test/`.
+- **Added** `templates/default/`: the template manifest, 5 layouts (`title`, `section`, `bullets`, `two-column`, `image-full`), `theme.css` (container-query sizing with reader reflow), `reader.css` (blocks, popovers, terms), logo and illustration. It uses system fonts.
+- **Added** `shows/demo/`: a 13-slide show exercising chapters, glossary, profiles, paths, fragments, auto-animate, backup slides, reader-only and reader-hidden slides, and every reader block type, plus two SVG images and an embedded demo page.
+- **Added** `shows/fixtures/broken/`: a deliberately invalid show for tests and the viewer's error page.
+- **Added** `.vscode/settings.json`, which associates the schemas with `show.json` / `template.json` for autocomplete.
+- **Changed** the show format 0.1 spec: `$schema` and `settings.agenda` fields, `richtext` may contain paragraphs and lists, and validation is documented.
+- **Changed** the template format 0.1 spec: the documented slide wrapper (`.slipr-slide` > `.slipr-canvas`), `cqw` sizing, and slot `label`/`help`.
+- **Changed** the Node requirement to ≥ 22 (JSON module imports).
+- **Fixed** `.gitignore`: the Python `build/`/`dist/` rules are now scoped to `converter/`, because they also ignored `vendor/*/dist/`.
+
 ### 2026-10-10: Converter in Python
 - **Changed** decision D-006: the converter is written in Python with `python-pptx` instead of Node.js. It is now *Accepted*.
 - **Changed** the docs to match: two toolchains (npm for the web side, venv/pip/pytest for the converter). The shared JSON Schema is the contract between them.

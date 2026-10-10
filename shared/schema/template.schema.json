@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://slipr.local/schema/template.schema.json",
+  "title": "Slipr template",
+  "description": "A Slipr template manifest (template.json), format version 0.1. Spec: docs/template-format.md",
+  "type": "object",
+  "required": ["slipr", "id", "name", "version", "theme", "layouts"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "slipr": { "const": "0.1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "name": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semantic version of the template, e.g. 1.0.0."
+    },
+    "description": { "type": "string" },
+    "theme": { "type": "string", "minLength": 1, "description": "Path to theme.css, relative to template.json." },
+    "reader": { "type": "string", "description": "Path to reader.css, relative to template.json." },
+    "styleguide": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "colors": { "type": "object", "additionalProperties": { "type": "string" } },
+        "fonts": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "layouts": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/layout" }
+    },
+    "pptxMapping": {
+      "type": "object",
+      "description": "PowerPoint layout name -> Slipr layout id (used by the converter).",
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
+    "layout": {
+      "type": "object",
+      "required": ["id", "name", "file", "slots"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "name": { "type": "string", "minLength": 1 },
+        "description": { "type": "string" },
+        "file": { "type": "string", "minLength": 1, "description": "HTML fragment, relative to template.json." },
+        "preview": { "type": "string", "description": "Thumbnail image, relative to template.json." },
+        "slots": { "type": "array", "items": { "$ref": "#/$defs/slot" } }
+      }
+    },
+    "slot": {
+      "type": "object",
+      "required": ["name", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "$ref": "#/$defs/id" },
+        "type": { "enum": ["text", "richtext", "list", "image", "code", "quote", "chart", "diagram"] },
+        "label": { "type": "string", "description": "Field label in the editor." },
+        "help": { "type": "string", "description": "Help text in the editor." },
+        "required": { "type": "boolean" },
+        "maxLength": { "type": "integer", "minimum": 1 },
+        "maxItems": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

@@ -48,13 +48,14 @@ This document describes how the Slipr components relate to each other and to the
 | `schema/show.schema.json` | JSON Schema for `show.json` |
 | `schema/template.schema.json` | JSON Schema for `template.json` |
 | `load.js` | Fetch and parse a show and its template, and resolve relative paths (images, template ref) |
-| `validate.js` | Validate a show against the schema and against its template (unknown layout? missing required slot?). Returns errors and warnings, never throws |
+| `schema-check.js` | Minimal JSON Schema checker for exactly the keywords Slipr's schemas use, so the browser can validate against the shared schema files without a library. A test guards that the schemas use no unsupported keyword |
+| `validate.js` | Validate a show: structure via the schema, then semantics (unique ids, references between slides/glossary/profiles/chapters, slot types and limits from the template, alt text, template version range). Returns `{ ok, errors, warnings }`, never throws |
 | `render.js` | Render one slide visual to an HTML element: clone the layout fragment, fill `data-slot` elements, apply mode-specific classes |
 | `blocks.js` | Render reader blocks (`text`, `details`, `callout`, `tabs`, `image` + hotspots, `embed`, `slide-ref`) to HTML. Used by reader mode and the editor preview |
 | `markdown.js` | Markdown subset with Slipr extensions: `[[glossary]]` references, `^[inline popups]`, `#slide` links. Takes a `mode` option: audience mode renders the extensions as plain text |
 | `migrate.js` | Upgrade older show-format versions to the current one *(once a version 2 exists)* |
 
-The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so they can be unit-tested in Node.
+The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so they can be unit-tested in Node. `validate.js` imports the schemas as JSON modules (`import … with { type: 'json' }`), which works in Node ≥ 22 and all current browsers. Tests live in `shared/test/*.test.js`.
 
 The converter is written in **Python** (D-006) and does not import the JS core. Its contract with the rest of Slipr is the **JSON Schema** in `shared/schema/`, which it loads directly from the repository to validate its output.
 

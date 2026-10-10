@@ -1,0 +1,407 @@
+{
+  "$schema": "../../shared/schema/show.schema.json",
+  "slipr": "0.1",
+  "id": "demo",
+  "meta": {
+    "title": "Introducing Slipr",
+    "subtitle": "One show, two ways to experience it",
+    "author": "Lucas Jellema",
+    "date": "2026-10-10",
+    "language": "en",
+    "description": "A tour of Slipr (SlidePresenter): how one show serves both a live audience and an individual reader. This demo exercises every feature of the show format.",
+    "tags": ["slipr", "demo"]
+  },
+  "template": { "ref": "../../templates/default", "version": "^1.0" },
+  "settings": { "aspectRatio": "16:9", "transition": "fade", "slideNumbers": true, "agenda": true },
+
+  "chapters": [
+    { "id": "why", "title": "Why Slipr", "summary": "Decks are written for the room and fall flat when read alone." },
+    { "id": "how", "title": "How it works", "summary": "A show is data; a template is the looks; one renderer draws both modes." },
+    { "id": "next", "title": "What's next", "summary": "The roadmap from foundations to editor." }
+  ],
+
+  "glossary": {
+    "reveal-js": {
+      "term": "Reveal.js",
+      "definition": "Open-source framework for HTML presentations. Slipr uses it for **audience mode** only.",
+      "link": "https://revealjs.com"
+    },
+    "audience-layer": {
+      "term": "audience layer",
+      "definition": "The slide itself: concise content placed in the slots of a layout. Shown on the big screen."
+    },
+    "reader-layer": {
+      "term": "reader layer",
+      "definition": "Extra, interactive content attached to a slide: panels, callouts, tabs, hotspots, embeds. Shown only in reader mode."
+    },
+    "template": {
+      "term": "template",
+      "definition": "A style guide (colors, fonts, illustrations) plus a set of base slide layouts. Every show links to one."
+    },
+    "layout": {
+      "term": "layout",
+      "definition": "A base slide format in a template, such as *title*, *bullets* or *two-column*. It defines named slots."
+    },
+    "slot": {
+      "term": "slot",
+      "definition": "A named place in a layout that a slide fills with content, e.g. `title` or `body`."
+    }
+  },
+
+  "profiles": [
+    { "id": "dev", "label": "Developer", "description": "Shows the technical details: formats, code and architecture." },
+    { "id": "mgr", "label": "Manager", "description": "Focuses on value, effort and trade-offs." }
+  ],
+
+  "paths": [
+    {
+      "id": "quick",
+      "label": "5-minute overview",
+      "description": "The essentials, nothing more.",
+      "slides": ["s-title", "s-problem", "s-two-modes", "s-architecture", "s-roadmap"]
+    },
+    { "id": "full", "label": "The full story", "slides": "*" },
+    {
+      "id": "deep-dev",
+      "label": "Under the hood",
+      "description": "For developers who want to see how it is built.",
+      "slides": ["s-two-modes", "s-data-2", "s-architecture", "s-tailored", "s-backup-format", "s-further-reading"]
+    }
+  ],
+
+  "slides": [
+    {
+      "id": "s-title",
+      "layout": "title",
+      "chapter": "why",
+      "content": {
+        "title": "Introducing Slipr",
+        "subtitle": "One show, two ways to experience it",
+        "byline": "Lucas Jellema · October 2026"
+      },
+      "notes": "Welcome everyone. Promise a live switch between the two modes at the end.",
+      "reader": {
+        "summary": "Slipr turns one source into a live slideshow and an interactive reading experience.",
+        "blocks": [
+          {
+            "id": "intro",
+            "type": "text",
+            "depth": 1,
+            "md": "Welcome! You are reading the **reader version** of a presentation. Hover or tap the underlined terms, open the panels, and use the controls to choose how deep you want to go."
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "s-problem",
+      "layout": "bullets",
+      "chapter": "why",
+      "tags": ["motivation"],
+      "content": {
+        "title": "Why another presentation tool?",
+        "body": "- Slides are made for the **room**\n- Afterwards they are **read alone**\n  - without the speaker's story\n- Two documents drift apart"
+      },
+      "notes": "Ask the audience: who has ever received a deck afterwards that made no sense without the talk?",
+      "audience": { "fragments": "fade-up" },
+      "reader": {
+        "summary": "Decks are written for the room and fall flat when read alone.",
+        "blocks": [
+          {
+            "id": "story",
+            "type": "text",
+            "depth": 1,
+            "md": "A good talk keeps its slides sparse: the speaker carries the story. But the deck is what people keep, share and read later^[Studies of conference decks consistently find that most views happen after the event, not during it.], and on its own it rarely makes sense."
+          },
+          {
+            "id": "layers",
+            "type": "text",
+            "md": "Slipr gives every slide two layers. The [[audience-layer]] stays concise for the big screen, rendered with [[reveal-js]]. The [[reader-layer]] adds depth for whoever reads it later."
+          },
+          {
+            "id": "vs-pptx",
+            "type": "details",
+            "title": "Isn't this what PowerPoint notes pages are for?",
+            "md": "Notes pages are the closest thing, but they are static, printed below a thumbnail, and not tailored to anyone. Slipr's reader layer is interactive, can be filtered by profile and depth, and is searchable."
+          },
+          {
+            "id": "mgr-value",
+            "type": "callout",
+            "variant": "tip",
+            "title": "The business case",
+            "for": ["mgr"],
+            "md": "One source instead of a deck *plus* a whitepaper: less work, and the two can never contradict each other."
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "s-two-modes",
+      "layout": "two-column",
+      "chapter": "why",
+      "content": {
+        "title": "One show, two experiences",
+        "leftTitle": "Audience mode",
+        "left": "- Linear, presenter-driven\n- Animations and builds\n- High-level overviews\n- Speaker notes and timer",
+        "rightTitle": "Reader mode",
+        "right": "- Explore at your own pace\n- Popups, panels, tabs\n- Tailored to who you are\n- Search, bookmarks, notes"
+      },
+      "notes": "This is the core idea. Pause here.",
+      "reader": {
+        "summary": "Audience mode is a slideshow; reader mode is an interactive, personal experience.",
+        "blocks": [
+          {
+            "id": "picture",
+            "type": "image",
+            "depth": 1,
+            "image": { "src": "images/two-modes.svg", "alt": "A big screen in front of an audience, and a single reader at a laptop" },
+            "caption": "Same source, very different experiences."
+          },
+          {
+            "id": "explain",
+            "type": "text",
+            "md": "The two modes are deliberately **separate applications**. Audience mode is a thin layer over [[reveal-js]]. Reader mode is built from scratch, because popups, tailored content and annotations need full control. See [the architecture](#s-architecture)."
+          }
+        ],
+        "related": ["s-tailored", "s-architecture"]
+      }
+    },
+
+    {
+      "id": "s-how",
+      "layout": "section",
+      "chapter": "how",
+      "content": { "kicker": "Chapter 2", "title": "How it works", "subtitle": "Data, templates and one renderer" },
+      "audience": { "transition": "slide" }
+    },
+
+    {
+      "id": "s-data-1",
+      "layout": "bullets",
+      "chapter": "how",
+      "content": {
+        "title": "A show is just data",
+        "body": "- `show.json` + `images/`\n- Linked to a template"
+      },
+      "notes": "Build-up: this slide morphs into the next one.",
+      "audience": { "autoAnimate": true },
+      "reader": { "hidden": true }
+    },
+
+    {
+      "id": "s-data-2",
+      "layout": "bullets",
+      "chapter": "how",
+      "tags": ["format"],
+      "content": {
+        "title": "A show is just data",
+        "body": "- `show.json` + `images/`\n- Linked to a template\n- Slides name a **layout** and fill its **slots**\n- No styling in the show, ever"
+      },
+      "audience": { "autoAnimate": true },
+      "reader": {
+        "summary": "Shows are plain JSON; the template owns the looks.",
+        "blocks": [
+          {
+            "id": "idea",
+            "type": "callout",
+            "variant": "info",
+            "depth": 1,
+            "md": "Swap the [[template]] and the whole show is restyled, without touching a single slide."
+          },
+          {
+            "id": "mgr-why",
+            "type": "text",
+            "for": ["mgr"],
+            "md": "Because content and looks are separated, a house style is enforced automatically, and shows are easy to keep under version control."
+          },
+          {
+            "id": "dev-code",
+            "type": "tabs",
+            "for": ["dev"],
+            "depth": 3,
+            "tabs": [
+              { "label": "show.json", "md": "```json\n{\n  \"id\": \"s-data-2\",\n  \"layout\": \"bullets\",\n  \"content\": {\n    \"title\": \"A show is just data\",\n    \"body\": \"- show.json + images/\"\n  }\n}\n```" },
+              { "label": "layout", "md": "```html\n<div class=\"slipr-layout slipr-layout--bullets\">\n  <h2 class=\"slipr-title\" data-slot=\"title\"></h2>\n  <ul class=\"slipr-body\" data-slot=\"body\"></ul>\n</div>\n```" },
+              { "label": "template.json", "md": "```json\n{ \"id\": \"bullets\",\n  \"slots\": [\n    { \"name\": \"title\", \"type\": \"text\", \"required\": true },\n    { \"name\": \"body\", \"type\": \"list\", \"maxItems\": 7 }\n  ] }\n```" }
+            ]
+          }
+        ],
+        "related": ["s-backup-format"]
+      }
+    },
+
+    {
+      "id": "s-architecture",
+      "layout": "image-full",
+      "chapter": "how",
+      "tags": ["architecture"],
+      "content": {
+        "title": "Three components, one shared core",
+        "image": { "src": "images/architecture.svg", "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core", "fit": "contain" },
+        "caption": "The converter and editor produce shows; the viewer presents them."
+      },
+      "notes": "Point at each box. Mention the converter is Python, the rest is vanilla JS.",
+      "reader": {
+        "summary": "Converter, editor and viewer share one data format and one renderer.",
+        "blocks": [
+          {
+            "id": "diagram",
+            "type": "image",
+            "depth": 1,
+            "image": { "src": "images/architecture.svg", "alt": "Slipr architecture diagram with clickable components" },
+            "caption": "Click the markers to learn about each part.",
+            "hotspots": [
+              { "x": 0.175, "y": 0.444, "title": "Converter", "md": "Turns a `.pptx` into a show folder. Written in Python with `python-pptx`." },
+              { "x": 0.5, "y": 0.444, "title": "Show folder", "md": "`show.json` plus `images/`. Plain files: easy to inspect, diff and back up." },
+              { "x": 0.5, "y": 0.167, "title": "Editor", "md": "Browser app that edits both layers of a show, with a live preview." },
+              { "x": 0.825, "y": 0.444, "title": "Viewer", "md": "Two apps behind one URL: audience mode (Reveal.js) and reader mode." },
+              { "x": 0.825, "y": 0.8, "title": "Template", "md": "Style guide plus [[layout]]s. Owns every visual decision." },
+              { "x": 0.5, "y": 0.8, "title": "Shared core", "md": "Loading, validation and rendering, used by editor and viewer, so what you edit is what you present." }
+            ]
+          },
+          {
+            "id": "dev-tech",
+            "type": "details",
+            "title": "Technology choices",
+            "for": ["dev"],
+            "depth": 3,
+            "md": "Vanilla HTML, CSS and ES modules: no build step and no framework. Third-party code is vendored so shows present offline. The JSON Schema in `shared/schema/` is the contract between the Python converter and the JavaScript apps."
+          },
+          { "id": "more", "type": "slide-ref", "slide": "s-backup-format", "label": "See the format details", "depth": 3 }
+        ]
+      }
+    },
+
+    {
+      "id": "s-tailored",
+      "layout": "bullets",
+      "chapter": "how",
+      "tags": ["reader"],
+      "content": {
+        "title": "Tailored to every reader",
+        "body": "- **Profiles**: content for who you are\n- **Depth**: overview, standard, deep dive\n- **Paths**: curated routes\n- Search, bookmarks and your own notes"
+      },
+      "audience": { "fragments": true },
+      "reader": {
+        "summary": "Profiles, depth and paths adapt the reader experience.",
+        "blocks": [
+          {
+            "id": "how",
+            "type": "text",
+            "depth": 1,
+            "md": "Every reader block can be aimed at specific profiles and given a depth. Pick a profile and a detail level in the toolbar, and the page adapts without losing your place."
+          },
+          {
+            "id": "dial",
+            "type": "embed",
+            "title": "Interactive depth demo",
+            "url": "embeds/depth-dial.html",
+            "height": 260
+          },
+          {
+            "id": "privacy",
+            "type": "callout",
+            "variant": "warning",
+            "title": "Your data stays with you",
+            "md": "Your choices, progress, bookmarks and notes are stored only in your own browser. Nothing is sent anywhere."
+          },
+          {
+            "id": "dev-personalize",
+            "type": "details",
+            "title": "How filtering works",
+            "for": ["dev"],
+            "depth": 3,
+            "md": "A pure function takes the show and your preferences and returns the visible slides and blocks: path selection first, then `reader.hidden`, then `for` (profile) and `depth ≤ level`."
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "s-next",
+      "layout": "section",
+      "chapter": "next",
+      "content": { "kicker": "Chapter 3", "title": "What's next" }
+    },
+
+    {
+      "id": "s-roadmap",
+      "layout": "two-column",
+      "chapter": "next",
+      "content": {
+        "title": "Roadmap",
+        "leftTitle": "Now",
+        "left": "- Foundations: formats, template, this demo\n- Audience mode",
+        "rightTitle": "Then",
+        "right": "- Reader core and personalisation\n- PPTX converter\n- Editor"
+      },
+      "reader": {
+        "summary": "Formats first, then both viewer modes, then converter and editor.",
+        "blocks": [
+          {
+            "id": "plan",
+            "type": "text",
+            "md": "Each phase ends with something you can run and look at. The viewer comes first because it *is* the product; until the editor exists, shows like this one are written by hand with schema-driven autocomplete."
+          },
+          { "id": "back", "type": "slide-ref", "slide": "s-two-modes", "label": "Back to the two modes" }
+        ],
+        "related": ["s-further-reading"]
+      }
+    },
+
+    {
+      "id": "s-thanks",
+      "layout": "title",
+      "chapter": "next",
+      "content": { "title": "Thank you", "subtitle": "Questions?" },
+      "notes": "Switch to reader mode live (press R) to show the difference.",
+      "reader": { "hidden": true }
+    },
+
+    {
+      "id": "s-backup-format",
+      "layout": "bullets",
+      "chapter": "next",
+      "tags": ["format"],
+      "content": {
+        "title": "Backup: the show format",
+        "body": "- `chapters`, `glossary`, `profiles`, `paths`\n- Per slide: `content` and `reader`\n- Reader blocks: text, details, callout, tabs, image, embed, slide-ref\n- Validated by a JSON Schema"
+      },
+      "notes": "Only if someone asks about the format.",
+      "audience": { "hidden": true },
+      "reader": {
+        "summary": "The building blocks of show.json.",
+        "blocks": [
+          {
+            "id": "spec",
+            "type": "text",
+            "md": "The full specification lives in `docs/show-format.md` in the Slipr repository. Every [[slot]] value and reader block type is described there, with validation rules."
+          }
+        ]
+      }
+    },
+
+    {
+      "id": "s-further-reading",
+      "layout": "bullets",
+      "chapter": "next",
+      "content": {
+        "title": "Further reading",
+        "body": "- Reveal.js documentation\n- W3C Web Annotation model"
+      },
+      "audience": { "hidden": true },
+      "reader": {
+        "showSlide": false,
+        "summary": "Background material for the curious.",
+        "blocks": [
+          {
+            "id": "links",
+            "type": "text",
+            "md": "- [Reveal.js documentation](https://revealjs.com): the engine behind audience mode.\n- [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/): the idea behind how Slipr anchors your highlights.\n- [MDN: Popover API](https://developer.mozilla.org/docs/Web/API/Popover_API): how the popups in reader mode work."
+          }
+        ]
+      }
+    }
+  ]
+}
