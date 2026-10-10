@@ -120,7 +120,12 @@ Click **⚙ Show** to access show-level configurations:
 
 * **Metadata:** Edit show title, subtitle, author, and date.
 * **Audience settings:** Choose aspect ratio (**16:9** widescreen or **4:3**) and slide transitions (**fade**, **slide**, or **none**).
-* **Chapters:** Add, rename, or delete chapters that organize the presentation.
+* **Chapters:** Add, rename, reorder (▲ / ▼) or delete chapters, and give each an optional summary. The agenda and the reader contents follow this order. Deleting a chapter says how many slides lose it.
+* **Profiles:** The kinds of readers (for example *Developer*, *Manager*), with an optional description. Readers pick one; choose per block who sees it with **For** in the Reader tab. Deleting a profile says how many blocks are tailored for it.
+* **Glossary:** Terms with a Markdown definition and an optional link. Reference them in any Markdown as `[[id]]` (the card shows the id and how often it is used). Deleting a term that is used lists where, and offers to keep those words as plain text.
+* **Reading routes:** Curated routes through the show (for example a 5-minute overview): a name, a description, and either all slides or a list you put together and reorder.
+
+New items get a name you can type over right away. Names, titles and terms can't be left empty.
 
 ### 6. Live Preview (Right Pane)
 

@@ -188,7 +188,7 @@ export function mountReaderForm(container, store) {
           value: block.title ?? '',
           oninput: (e) => {
             const val = /** @type {HTMLInputElement} */ (e.target).value;
-            store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { title: val } });
+            store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { title: val } }, { coalesceKey: `block-title-${block.id}` });
           },
         });
         const mdArea = h(
@@ -198,7 +198,7 @@ export function mountReaderForm(container, store) {
             placeholder: 'Markdown content…',
             oninput: (e) => {
               const val = /** @type {HTMLTextAreaElement} */ (e.target).value;
-              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } });
+              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } }, { coalesceKey: `block-md-${block.id}` });
             },
           },
           [block.md ?? '']
@@ -225,7 +225,7 @@ export function mountReaderForm(container, store) {
           value: block.title ?? '',
           oninput: (e) => {
             const val = /** @type {HTMLInputElement} */ (e.target).value;
-            store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { title: val || undefined } });
+            store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { title: val || undefined } }, { coalesceKey: `block-title-${block.id}` });
           },
         });
         const mdArea = h(
@@ -235,7 +235,7 @@ export function mountReaderForm(container, store) {
             placeholder: 'Callout message…',
             oninput: (e) => {
               const val = /** @type {HTMLTextAreaElement} */ (e.target).value;
-              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } });
+              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } }, { coalesceKey: `block-md-${block.id}` });
             },
           },
           [block.md ?? '']
@@ -258,7 +258,7 @@ export function mountReaderForm(container, store) {
             placeholder: 'Write interactive reader text in Markdown…',
             oninput: (e) => {
               const val = /** @type {HTMLTextAreaElement} */ (e.target).value;
-              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } });
+              store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { md: val } }, { coalesceKey: `block-md-${block.id}` });
             },
           },
           [block.md ?? '']
@@ -319,8 +319,8 @@ export function mountReaderForm(container, store) {
  * @param {any} block
  */
 function imageBlockEditor(store, slideId, block) {
-  const update = (/** @type {Record<string, any>} */ patch) =>
-    store.dispatch('updateBlock', { slideId, blockId: block.id, patch });
+  const update = (/** @type {Record<string, any>} */ patch, /** @type {string} */ field) =>
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, { coalesceKey: `block-${field}-${block.id}` });
   return h('div', { class: 'slipr-image-block' }, [
     imageField({
       label: 'Reader image',
@@ -339,7 +339,7 @@ function imageBlockEditor(store, slideId, block) {
         if (!block.image?.src) return;
         const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
           ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.image;
-        update({ image: imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value }) });
+        update({ image: imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value }) }, 'alt');
       },
     }),
     h('input', {
@@ -348,7 +348,7 @@ function imageBlockEditor(store, slideId, block) {
       placeholder: 'Caption (optional)',
       'aria-label': 'Reader image: caption',
       value: block.caption ?? '',
-      oninput: (/** @type {Event} */ e) => update({ caption: /** @type {HTMLInputElement} */ (e.target).value || undefined }),
+      oninput: (/** @type {Event} */ e) => update({ caption: /** @type {HTMLInputElement} */ (e.target).value || undefined }, 'caption'),
     }),
     block.image?.src
       ? hotspotEditor({ store, slideId, block })

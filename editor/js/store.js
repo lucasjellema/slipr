@@ -187,7 +187,8 @@ export class EditorStore {
       }
     }
 
-    this._notify(['show', 'dirty', 'validation', 'canUndo', 'canRedo'], { type, payload });
+    // coalesceKey marks typing: forms use it to tell their own typing echo from other changes.
+    this._notify(['show', 'dirty', 'validation', 'canUndo', 'canRedo'], { type, payload, coalesceKey: options.coalesceKey });
   }
 
   /**

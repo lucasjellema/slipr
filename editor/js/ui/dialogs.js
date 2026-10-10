@@ -208,6 +208,29 @@ export function openAltTextDialog({ path, previewUrl, alt, onSave, onClose }) {
 }
 
 /**
+ * Ask before something with consequences, offering one or more actions.
+ * @param {{ title: string, text: string, items?: string[],
+ *   actions: { label: string, kind?: 'primary' | 'danger', run: () => void }[] }} options
+ */
+export function openConfirmDialog({ title, text, items = [], actions }) {
+  openDialog(title, (close) => [
+    h('p', {}, [text]),
+    items.length ? h('ul', { class: 'slipr-dialog-list' }, items.map((item) => h('li', {}, [item]))) : null,
+    h('div', { class: 'slipr-dialog-actions' }, [
+      h('button', { type: 'button', class: 'slipr-btn', onclick: close }, ['Cancel']),
+      ...actions.map((action) => h('button', {
+        type: 'button',
+        class: `slipr-btn ${action.kind === 'danger' ? 'slipr-btn-danger' : action.kind === 'primary' ? 'slipr-btn-primary' : ''}`,
+        onclick: () => {
+          close();
+          action.run();
+        },
+      }, [action.label])),
+    ]),
+  ].filter(/** @returns {x is HTMLElement} */ (x) => Boolean(x)));
+}
+
+/**
  * A dismissible notice under the toolbar.
  * @param {string} message
  * @param {'info' | 'error' | 'success'} [kind]

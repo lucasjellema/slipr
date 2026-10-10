@@ -1237,3 +1237,53 @@ body.is-screen #slipr-editor-banners {
   white-space: nowrap;
   font-size: 13px;
 }
+
+/* ---------- Show settings: chapters, profiles, glossary, routes (E-009) ---------- */
+
+.slipr-entity-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  background: var(--slipr-editor-surface-raised);
+}
+
+.slipr-entity-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slipr-entity-row > .slipr-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.slipr-entity-tools {
+  display: flex;
+  gap: 2px;
+}
+
+.slipr-input[aria-invalid="true"] {
+  border-color: var(--slipr-editor-danger);
+}
+
+.slipr-btn-danger {
+  background: var(--slipr-editor-danger);
+  border-color: var(--slipr-editor-danger);
+  color: #FFFFFF;
+}
+
+.slipr-btn-danger:hover:not(:disabled) {
+  background: var(--slipr-editor-danger-hover);
+}
+
+.slipr-dialog-list {
+  margin: 0 0 0 18px;
+  font-size: 13px;
+  color: var(--slipr-editor-muted);
+  max-height: 160px;
+  overflow: auto;
+}

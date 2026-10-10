@@ -9,6 +9,8 @@
  * This module has NO DOM or browser dependencies and can be tested with Node.
  */
 
+import { unlinkGlossary } from './show-entities.js';
+
 /**
  * Generate a random short identifier.
  * @param {string} [prefix]
@@ -741,6 +743,18 @@ export function setSettings(show, patch) {
 }
 
 /**
+ * Merge a patch into an item; keys patched to undefined are removed (an emptied optional field).
+ * @param {Record<string, any>} item
+ * @param {Record<string, any>} patch
+ * @returns {Record<string, any>}
+ */
+function mergeDefined(item, patch) {
+  const next = { ...item, ...patch };
+  for (const [key, value] of Object.entries(patch)) if (value === undefined) delete next[key];
+  return next;
+}
+
+/**
  * Upsert a chapter in show.chapters.
  * @param {any} show
  * @param {{ id: string, title: string, summary?: string }} chapter
@@ -750,7 +764,7 @@ export function upsertChapter(show, chapter) {
   const chapters = Array.isArray(show.chapters) ? [...show.chapters] : [];
   const idx = chapters.findIndex((c) => c.id === chapter.id);
   if (idx !== -1) {
-    chapters[idx] = { ...chapters[idx], ...chapter };
+    chapters[idx] = mergeDefined(chapters[idx], chapter);
   } else {
     chapters.push({ ...chapter });
   }
@@ -795,15 +809,37 @@ export function upsertGlossaryTerm(show, { id, term, definition, link }) {
 }
 
 /**
- * Delete a glossary term from show.glossary.
+ * Delete a glossary term from show.glossary. With `unlink`, references to it
+ * become plain text (`[[id]]` the term, `[[id|text]]` the text); without, they
+ * stay and the validator reports them.
  * @param {any} show
- * @param {{ id: string }} payload
+ * @param {{ id: string, unlink?: boolean }} payload
  * @returns {any}
  */
-export function deleteGlossaryTerm(show, { id }) {
+export function deleteGlossaryTerm(show, { id, unlink = false }) {
+  const term = show.glossary?.[id]?.term ?? id;
   const glossary = { ...(show.glossary ?? {}) };
   delete glossary[id];
-  return { ...show, glossary };
+  const next = { ...show, glossary };
+  return unlink ? unlinkGlossary(next, id, term) : next;
+}
+
+/**
+ * Move a chapter, profile or path to another position (their order is the
+ * agenda order and the order readers see them in).
+ * @param {any} show
+ * @param {{ list: 'chapters' | 'profiles' | 'paths', id: string, toIndex: number }} payload
+ * @returns {any}
+ */
+export function moveShowItem(show, { list, id, toIndex }) {
+  const items = Array.isArray(show[list]) ? [...show[list]] : [];
+  const from = items.findIndex((item) => item.id === id);
+  if (from === -1) return show;
+  const to = Math.max(0, Math.min(items.length - 1, toIndex));
+  if (to === from) return show;
+  const [item] = items.splice(from, 1);
+  items.splice(to, 0, item);
+  return { ...show, [list]: items };
 }
 
 /**
@@ -816,7 +852,7 @@ export function upsertProfile(show, profile) {
   const profiles = Array.isArray(show.profiles) ? [...show.profiles] : [];
   const idx = profiles.findIndex((p) => p.id === profile.id);
   if (idx !== -1) {
-    profiles[idx] = { ...profiles[idx], ...profile };
+    profiles[idx] = mergeDefined(profiles[idx], profile);
   } else {
     profiles.push({ ...profile });
   }
@@ -858,7 +894,7 @@ export function upsertPath(show, path) {
   const paths = Array.isArray(show.paths) ? [...show.paths] : [];
   const idx = paths.findIndex((p) => p.id === path.id);
   if (idx !== -1) {
-    paths[idx] = { ...paths[idx], ...path };
+    paths[idx] = mergeDefined(paths[idx], path);
   } else {
     paths.push({ ...path });
   }
@@ -1529,6 +1565,7 @@ export const actions = {
   deleteChapter,
   upsertGlossaryTerm,
   deleteGlossaryTerm,
+  moveShowItem,
   upsertProfile,
   deleteProfile,
   upsertPath,

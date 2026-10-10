@@ -68,17 +68,21 @@ export function isTextEntry(el) {
 
 /**
  * Should a form skip re-rendering for this store event? Only when the event
- * is the echo of the user's own typing: a text field inside `root` has focus
- * and the action is one of the form's typing actions. Everything else (a
- * layout change, a button, undo/redo, another slide) re-renders, otherwise
- * the form shows stale fields.
+ * is the echo of the user's own typing: a text field inside `root` has focus,
+ * the action is one of the form's typing actions, and it was dispatched as
+ * typing (with a `coalesceKey`). Everything else (a layout change, a button,
+ * a select, undo/redo, another slide) re-renders, otherwise the form shows
+ * stale fields.
  * @param {HTMLElement} root
- * @param {{ action?: { type: string } }} event
+ * @param {{ action?: { type: string, coalesceKey?: string } }} event
  * @param {Set<string>} typingActions  e.g. setSlot, setNotes
  */
 export function isTypingEcho(root, event, typingActions) {
   const active = document.activeElement;
-  return Boolean(active && root.contains(active) && isTextEntry(active) && event.action && typingActions.has(event.action.type));
+  return Boolean(
+    active && root.contains(active) && isTextEntry(active)
+    && event.action?.coalesceKey && typingActions.has(event.action.type)
+  );
 }
 
 /**

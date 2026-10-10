@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Show settings: chapters, profiles, glossary and reading routes (E-009)
+- **Added** editing of profiles (name, description), glossary terms (term, Markdown definition with the insert toolbar, link) and reading routes (name, description, "all slides" or an ordered list of slides), next to chapters, which gain a summary. Chapters, profiles and routes can be reordered (new action `moveShowItem`). New items get an id from their name and their name field gets focus with the text selected; ids never change afterwards.
+- **Added** usage shown per item ("3 slides", "2 blocks tailored for it", "used 4×"), and deletes that explain their consequences: a chapter's slides lose their chapter; a profile is removed from blocks (a block only for that profile becomes visible to everyone); a glossary term lists where it is used and offers to keep the words as plain text (`deleteGlossaryTerm` with `unlink`).
+- **Added** `show-entities.js` (DOM-free: unique ids, glossary references, unlinking, usage counts; tests in `editor/test/show-settings.test.js`) and a confirm dialog.
+- **Fixed** emptied optional fields (chapter summary, profile or route description) being kept: `upsertChapter`, `upsertProfile` and `upsertPath` now remove keys patched to `undefined`. Required fields (titles, names, terms) are never stored empty; the field is marked instead.
+- **Fixed** a form sometimes not re-rendering after a non-typing change while a text field had focus (for example a slide added to a route right after creating it): a typing echo is now recognised by its `coalesceKey`, which the store passes in the change event. Reader-block text, titles, caption and alt text now dispatch with a `coalesceKey`, so typing there is one undo step, like elsewhere.
+
 ### 2026-10-10: Reader tab: profiles per block, related slides, Markdown toolbar (E-008)
 - **Added** a "For" picker on every reader block: one checkbox per reader profile (none checked = everyone). Profiles the show doesn't define are listed so they can be removed.
 - **Added** related slides ("see also") per slide: add from a list of the other slides, reorder, remove; unknown ids are marked.

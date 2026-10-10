@@ -140,3 +140,13 @@ describe('editor store', () => {
     assert.equal(store.state.previewDepth, 3);
   });
 });
+
+test('the change event says whether an action was typing (coalesceKey)', () => {
+  const store = createStore(demo, { template });
+  const events = [];
+  store.subscribe((e) => events.push(e.action));
+  store.dispatch('setSlot', { slideId: 's-title', slot: 'title', value: 'A' }, { coalesceKey: 'slot-s-title-title' });
+  store.dispatch('setChapter', { slideId: 's-title', chapter: null });
+  assert.equal(events[0].coalesceKey, 'slot-s-title-title');
+  assert.equal(events[1].coalesceKey, undefined);
+});

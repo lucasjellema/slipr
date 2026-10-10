@@ -35,6 +35,7 @@ editor/
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── card-values.js    ✅ DOM-free: value shapes for cards (add, remove, move, set field), quote, code; length hints (I-035)
     ├── markdown-insert.js ✅ DOM-free: insert glossary references, popups and slide links into Markdown text (E-008)
+    ├── show-entities.js  ✅ DOM-free: unique ids, glossary references and unlinking, profile / chapter usage (E-009)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -52,7 +53,7 @@ editor/
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
         ├── markdown-toolbar.js ✅ toolbar above Markdown fields: glossary term, popup, slide link (E-008)
         ├── image-field.js   ✅ image preview + choose / drop / paste, used by image slots and image blocks (E-006)
-        ├── show-settings.js ✅ "Settings" tab: meta, settings, chapters, glossary, profiles, paths
+        ├── show-settings.js ✅ "Settings" tab: meta, settings; chapters, profiles, glossary and reading routes with usage, reorder and explained deletes (E-009)
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
         ├── block-editors.js    (planned) block editors moved out of reader-form.js, incl. tabs, embed, slide-ref
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
