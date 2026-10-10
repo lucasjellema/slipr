@@ -1,6 +1,6 @@
 # E-007: Present and Read for a show folder outside the server root
 
-Status: **accepted** by Lucas on 2026-10-10: **C** (shared folder handle) and **T1** (root-relative refs plus fallback by name). Recorded as D-012 · 2026-10-10
+Status: **accepted** by Lucas on 2026-10-10: **C** (shared folder handle) and **T1** (root-relative refs plus fallback by name). Recorded as D-012. Built in E-002 (loader) and E-007 (viewer `?folder=`, Present / Read) · 2026-10-10
 Affects: E-007 (Present / Read) and, directly, E-002 (open and new-from-template). Open question in `editor/ARCHITECTURE.md`.
 
 ---

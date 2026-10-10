@@ -5,7 +5,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 > Status: **in progress (Phase 5: Editor MVP)**. The 3-column shell, store, actions, undo/redo, slide inspector, reader inspector, live preview and keyboard shortcuts are implemented (E-001). Direct folder read/write via the File System Access API is next (E-002).
 > Try it: run `npm run serve` and open <http://localhost:8080/editor/?show=../shows/demo/show.json>.
 >
-> **Not yet:** draft autosave, Present/Read for shows opened from a folder (E-007), image drop, hotspots, a layout picker with previews. Text, rich-text, list and image fields (path and alt text) have inputs; quote, code and card fields are shown read-only for now. The sections below describe the MVP as planned; the screen layout and shortcuts already work.
+> **Not yet:** draft autosave, image drop, hotspots, a layout picker with previews. Text, rich-text, list and image fields (path and alt text) have inputs; quote, code and card fields are shown read-only for now. The sections below describe the MVP as planned; the screen layout and shortcuts already work.
 
 ## Screen layout
 
@@ -41,7 +41,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 - **Preview in either mode**: audience slide, or the reader view of the slide *as a chosen profile at a chosen depth*.
 - **Undo / redo** (`Ctrl+Z` / `Ctrl+Y`).
 - **Warnings** appear for things like a missing title, missing alt text or too many bullets.
-- **Present** or **Read** opens the viewer on your show.
+- **Present** or **Read** saves your changes and opens the viewer on your show, at the current slide. This works for shows anywhere on disk: the viewer reads the same folder.
 
 ## Keyboard shortcuts
 

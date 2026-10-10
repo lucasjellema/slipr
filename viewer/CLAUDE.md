@@ -51,6 +51,7 @@ With `shows/demo`:
 **Both**
 
 13. `R` / `A` switch modes and keep the position.
+13a. A show folder: `viewer/?folder=<key>` opens it in both modes, with its images (keys come from the editor or "Open a show folder…"; in Claude's browser pane use an origin-private folder remembered via `shared/folder-handles.js`). An unknown key shows the "not known here" page.
 14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.
 

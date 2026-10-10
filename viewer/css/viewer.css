@@ -65,6 +65,18 @@ body {
 }
 .slipr-issues code { display: inline-block; margin-right: 0.4rem; }
 .slipr-hint { color: var(--viewer-muted); font-size: 0.95rem; }
+.slipr-page-button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 1rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--viewer-primary);
+  color: white;
+  cursor: pointer;
+}
+.slipr-page-button:hover { filter: brightness(1.1); }
+.slipr-page-button:focus-visible { outline: 3px solid var(--viewer-accent); outline-offset: 2px; }
 
 @media (max-width: 600px) {
   .slipr-page { margin: 0; border-radius: 0; padding: 1.25rem 1rem; }

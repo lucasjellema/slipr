@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Present and Read (E-007)
+- **Added** Present (`F5`) and Read save unsaved changes first, then open the viewer at the selected slide: `viewer/?folder=<key>` for a show opened from a folder (D-012), `viewer/?show=<url>` for a show opened by URL. A dirty show opened by URL first asks for its folder; nothing opens until it is saved.
+- **Changed** `save()` resolves to whether the show is on disk.
+- **Added** `viewerUrl()` with tests.
+
 ### 2026-10-10: New slides use a layout the template has (E-011)
 - **Fixed** "+ Add" and `Ctrl+Enter` always creating a `bullets` slide, which is invalid in templates without that layout (Conclusion). New `layoutForNewSlide()` in `actions.js`: after a content slide the same layout; after a title or section slide (only text slots) the template's first plain content layout (text plus list or rich text, no image), so `bullets` for Default and `text` for Conclusion. `addSlide` takes `templateLayouts` for this.
 

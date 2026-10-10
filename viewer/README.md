@@ -20,8 +20,11 @@ http://localhost:8080/viewer/?show=../shows/demo/show.json                 audie
 http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader     reader mode
 ```
 
+A show folder anywhere on your computer opens with **Open a show folder…** on the viewer's start page (`viewer/` without parameters; Chrome or Edge). The viewer remembers the folder in this browser and reopens it as `viewer/?folder=<key>`. The editor's **Present** and **Read** use the same kind of link. After a browser restart, one click on **Allow access** lets the viewer read the folder again.
+
 | URL parameter | Meaning |
 |---|---|
+| `folder` | Instead of `show`: a show folder remembered in this browser (D-012) |
 | `show` | Path or URL to `show.json` (required) |
 | `mode` | `audience` (default) or `reader` |
 | `profile` | Reader mode: preselect a profile, e.g. `profile=dev` |

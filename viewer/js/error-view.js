@@ -6,14 +6,26 @@ import { h } from './dom.js';
 
 const DEMO = '../shows/demo/show.json';
 
-/** @param {HTMLElement} app */
-export function showHelp(app) {
+/**
+ * @param {HTMLElement} app
+ * @param {{ onOpenFolder?: () => Promise<void> }} [options]  Offer "Open a show folder…" (Chromium).
+ */
+export function showHelp(app, { onOpenFolder } = {}) {
   document.title = 'Slipr Viewer';
   const demoLink = `?show=${encodeURIComponent(DEMO)}`;
+  let openFolder = null;
+  if (onOpenFolder) {
+    const button = h('button', { type: 'button', class: 'slipr-page-button' }, ['Open a show folder…']);
+    button.addEventListener('click', () => {
+      onOpenFolder().catch((err) => showLoadError(app, { title: 'The folder could not be opened', message: err instanceof Error ? err.message : String(err) }));
+    });
+    openFolder = h('p', {}, [button, ' A show anywhere on this computer (Chrome or Edge).']);
+  }
   app.replaceChildren(h('article', { class: 'slipr-page' }, [
     h('h1', {}, ['Slipr Viewer']),
     h('p', {}, ['Tell the viewer which show to open with the ', h('code', {}, ['show']), ' parameter:']),
     h('p', {}, [h('code', {}, [`viewer/?show=${DEMO}`])]),
+    openFolder,
     h('h2', {}, ['Try it']),
     h('ul', {}, [
       h('li', {}, [h('a', { href: demoLink }, ['Demo show, audience mode']), ' (press S for speaker notes, O for the overview)']),
@@ -21,6 +33,32 @@ export function showHelp(app) {
       h('li', {}, [h('a', { href: `?show=${encodeURIComponent('../shows/fixtures/broken/show.json')}` }, ['An invalid show']), ' (shows the error page)']),
     ]),
   ]));
+}
+
+/**
+ * Reading a remembered show folder needs permission again: ask from a click.
+ * @param {HTMLElement} app
+ * @param {{ name: string, onGrant: () => Promise<void> }} options
+ */
+export function showAccessPage(app, { name, onGrant }) {
+  document.title = `Slipr: open ${name}`;
+  const button = h('button', { type: 'button', class: 'slipr-page-button' }, ['Allow access']);
+  const status = h('p', { class: 'slipr-hint', role: 'status' });
+  button.addEventListener('click', () => {
+    status.textContent = '';
+    onGrant()
+      .then(() => {
+        if (button.isConnected) status.textContent = 'Access was not granted.';
+      })
+      .catch((err) => showLoadError(app, { title: 'This show could not be loaded', message: err instanceof Error ? err.message : String(err) }));
+  });
+  app.replaceChildren(h('article', { class: 'slipr-page' }, [
+    h('h1', {}, [`Open “${name}”`]),
+    h('p', {}, ['Your browser asks you to allow Slipr to read this show folder again.']),
+    h('p', {}, [button]),
+    status,
+  ]));
+  button.focus();
 }
 
 /**

@@ -39,7 +39,7 @@ viewer/
 ├── js/
 │   ├── main.js             ✅ entry: read URL params, load + validate, start mode app
 │   ├── dom.js              ✅ h() element builder (never parses HTML), addStylesheet()
-│   ├── error-view.js       ✅ help page, load-error page, validation-error page
+│   ├── error-view.js       ✅ help page, load-error page, validation-error page, folder access page
 │   └── mode-switch.js      ✅ audienceUrl() / readerUrl() by slide id, parseReaderHash()
 ├── audience/
 │   ├── audience.js         ✅ build <section>s, configure and start Reveal
@@ -68,10 +68,11 @@ viewer/test/
 
 ## Start-up (`main.js`)
 
-1. No `show` parameter → help page with links to the demo.
-2. `loadShow()` → a `LoadError` (not found, invalid JSON, server unreachable) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.
-3. Validation errors → validation-error page listing each issue with its path. Warnings go to the console (collapsed group) and never block a show.
-4. Set `document.title` and `lang`, load the template's `theme.css`, then dynamically `import()` the mode module, so Reveal.js is only fetched in audience mode.
+1. No `show` or `folder` parameter → help page with links to the demo, and "Open a show folder…" where the File System Access API exists (it remembers the folder and reloads as `?folder=<key>`).
+2. `?folder=<key>` → the handle comes from `shared/folder-handles.js` and the show from `loadShowFromFolder()` (D-012). An unknown key shows the load-error page. Without read permission, an access page asks for it from a click (`showAccessPage()`). Loader notices (template resolved by name) go to the console.
+3. `loadShow()` or `loadShowFromFolder()` → a `LoadError` (not found, invalid JSON, server unreachable) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.
+4. Validation errors → validation-error page listing each issue with its path. Warnings go to the console (collapsed group) and never block a show.
+5. Set `document.title` and `lang`, load the template's `theme.css`, then dynamically `import()` the mode module, so Reveal.js is only fetched in audience mode.
 
 ## Audience mode
 

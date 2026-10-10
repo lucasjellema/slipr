@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-10: Shows from a folder (E-007, D-012)
+- **Added** `?folder=<key>`: the viewer opens a show folder remembered in this browser (by the editor, or by the new **Open a show folder…** on the help page). Images become `blob:` URLs; `R` / `A` keep the parameter. When the browser has dropped read access, an access page asks for it with one click; an unknown key explains that folder links work only in the browser where the folder was opened.
+
 ### 2026-10-10: Cards slots (I-043b)
 - **Changed** `audience/audience.js`: on slides with fragments, each card is one fragment (bullets inside a card are not split further).
 - **Changed** `reader/search-index.js`: the text fields and image alt text of cards are searchable.

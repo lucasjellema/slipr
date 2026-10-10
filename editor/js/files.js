@@ -89,28 +89,83 @@ export async function newShow(store) {
 }
 
 /**
- * Save (Ctrl+S). A show opened by URL first needs its folder on disk.
+ * Save (Ctrl+S). A show opened by URL first needs its folder on disk: that
+ * opens a dialog, and this resolves false (not saved yet).
  * @param {import('./store.js').EditorStore} store
+ * @returns {Promise<boolean>}  true when show.json on disk now matches the editor.
  */
 export async function save(store) {
   const handle = store.state.folderHandle;
   if (!handle) {
     askForShowFolder(store);
-    return;
+    return false;
   }
   if (!(await ensurePermission(handle))) {
     showBanner(`Not saved: no permission to write to the folder "${handle.name}".`, 'error');
-    return;
+    return false;
   }
   const show = store.state.show;
   try {
     await saveShow(handle, show);
   } catch (err) {
     showBanner(`Not saved: ${err instanceof Error ? err.message : String(err)}`, 'error');
-    return;
+    return false;
   }
   store.markSaved(show);
   showBanner(`Saved to the folder "${handle.name}".`, 'success', { timeout: 2500 });
+  return true;
+}
+
+/**
+ * Present / Read (E-007): save first, then open the viewer at the selected
+ * slide. A folder show opens as viewer/?folder=<key> (D-012), a show opened by
+ * URL as viewer/?show=<url>. The tab is opened right away (inside the click),
+ * so the popup blocker allows it, and is pointed at the viewer after saving.
+ * @param {import('./store.js').EditorStore} store
+ * @param {'audience' | 'reader'} mode
+ * @param {string | undefined} showUrl  The ?show= the editor was opened with.
+ */
+export async function openViewer(store, mode, showUrl) {
+  const tab = window.open('', '_blank');
+  try {
+    if (store.state.dirty && !(await save(store))) {
+      tab?.close();
+      if (!store.state.folderHandle) showBanner('Save the show first: the viewer reads it from disk.', 'info', { timeout: 5000 });
+      return;
+    }
+    const url = viewerUrl({
+      folderKey: store.state.folderHandle ? new URLSearchParams(location.search).get('folder') : null,
+      showUrl,
+      mode,
+      slideId: store.state.selectedSlideId,
+    });
+    if (!url) {
+      tab?.close();
+      showBanner('This show has no location the viewer can open.', 'error');
+      return;
+    }
+    const href = new URL(url, location.href).href;
+    if (tab) tab.location.href = href;
+    else window.open(href, '_blank');
+  } catch (err) {
+    tab?.close();
+    throw err;
+  }
+}
+
+/**
+ * The viewer URL for a show, relative to the editor page.
+ * @param {{ folderKey?: string | null, showUrl?: string | null, mode: 'audience' | 'reader', slideId?: string | null }} target
+ * @returns {string | null}
+ */
+export function viewerUrl({ folderKey, showUrl, mode, slideId }) {
+  let query;
+  if (folderKey) query = `folder=${encodeURIComponent(folderKey)}`;
+  else if (showUrl) query = `show=${encodeURIComponent(showUrl)}`;
+  else return null;
+  const id = slideId ?? '';
+  const tail = mode === 'reader' ? `&mode=reader${id ? `#${id}` : ''}` : id ? `#/${id}` : '';
+  return `../viewer/?${query}${tail}`;
 }
 
 /**

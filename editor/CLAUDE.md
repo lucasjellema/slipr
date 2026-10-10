@@ -19,7 +19,7 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 
 ## Smoke-test checklist
 
-Steps 4 (E-006), 7 (I-020) and 8 for folder shows (E-007) can't be run yet. Shows by URL: `editor/?show=../shows/demo/show.json`. The native folder picker can't be driven from Claude's browser pane; there, test steps 1 and 6 with a folder in the origin-private file system (`navigator.storage.getDirectory()`) remembered via `shared/folder-handles.js` and opened as `editor/?folder=<key>`, and clean it up afterwards.
+Steps 4 (E-006) and 7 (I-020) can't be run yet. For step 8, Claude's browser pane blocks popups: stub `window.open` from `javascript_tool` to check the URL, and open that URL in the pane. Shows by URL: `editor/?show=../shows/demo/show.json`. The native folder picker can't be driven from Claude's browser pane; there, test steps 1 and 6 with a folder in the origin-private file system (`navigator.storage.getDirectory()`) remembered via `shared/folder-handles.js` and opened as `editor/?folder=<key>`, and clean it up afterwards.
 
 1. Create a new show from `templates/default` in an empty folder. `show.json` and `images/` appear.
 2. Add 5 slides with different layouts, reorder them by dragging, and delete one.

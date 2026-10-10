@@ -106,3 +106,21 @@ describe('new show from a template (E-002)', () => {
     assert.deepEqual([...listed].sort(), folders.sort());
   });
 });
+
+describe('viewer URLs for Present / Read (E-007)', async () => {
+  const { viewerUrl } = await import('../js/files.js');
+
+  test('a folder show opens by key, a URL show by path', () => {
+    assert.equal(viewerUrl({ folderKey: 'ab12cd34', mode: 'audience', slideId: 's-1' }), '../viewer/?folder=ab12cd34#/s-1');
+    assert.equal(viewerUrl({ showUrl: '../shows/demo/show.json', mode: 'reader', slideId: 's-1' }), '../viewer/?show=..%2Fshows%2Fdemo%2Fshow.json&mode=reader#s-1');
+  });
+
+  test('the folder wins over the URL it was first opened with', () => {
+    assert.equal(viewerUrl({ folderKey: 'k', showUrl: 'x/show.json', mode: 'audience', slideId: null }), '../viewer/?folder=k');
+  });
+
+  test('without a slide there is no hash; without a location there is no URL', () => {
+    assert.equal(viewerUrl({ folderKey: 'k', mode: 'reader' }), '../viewer/?folder=k&mode=reader');
+    assert.equal(viewerUrl({ mode: 'audience', slideId: 's-1' }), null);
+  });
+});

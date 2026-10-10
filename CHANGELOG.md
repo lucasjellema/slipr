@@ -6,6 +6,9 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: The viewer opens show folders (E-007)
+- **Added** `viewer/?folder=<key>`, using the shared folder loader (D-012), so the editor's Present and Read work for shows anywhere on disk. See the viewer and editor changelogs.
+
 ### 2026-10-10: Show folders opened from anywhere (D-012, E-002)
 - **Added** `shared/folder-source.js` (read a show folder through a File System Access handle) and `shared/folder-handles.js` (remember folder handles in IndexedDB under a key).
 - **Added** `loadShowFromFolder()` and `resolveFolderTemplate()` in `shared/load.js`. `loadShow()` is unchanged apart from a new `notices` field (always empty for URLs).

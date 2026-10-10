@@ -29,7 +29,7 @@ editor/
 ├── test/                 ✅ actions.test.js, store.test.js (node --test)
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
-    ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002)
+    ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
@@ -54,7 +54,7 @@ editor/
         └── dialogs.js       ✅ start screen, access screen, new-show and choose-folder dialogs, banners (alt-text dialog: E-006)
 ```
 
-**Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). Present and Read work for shows opened by URL; for shows opened from a folder they come with E-007. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
+**Current limits (E-001, E-002, E-010):** No draft autosave yet (I-020). The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
 
 ## Key components
 
@@ -88,8 +88,8 @@ In **audience** mode it renders the selected slide with `shared/render.js` into 
 - **Drafts**: the current show goes to IndexedDB every 5 s while dirty. On open, if a newer draft exists, the editor offers to restore it.
 - Folder handles are remembered in IndexedDB for "recent shows" (start screen). Permission is re-requested on reopen, from a click.
 
-### Viewer integration
-"Present" and "Read" save first, then open the viewer on the same show. A show opened by URL opens `viewer/?show=<path>`. A show opened from a folder opens `viewer/?folder=<key>`: the folder handle is shared through IndexedDB, and the viewer reads the folder itself (D-012, E-007).
+### Viewer integration (`files.js`: `openViewer()`, `viewerUrl()`)
+"Present" and "Read" save first, then open the viewer on the same show at the selected slide. The viewer tab is opened inside the click (so the popup blocker allows it) and pointed at the viewer once the save is done; if saving fails or still needs a folder, the tab is closed. A show opened by URL opens `viewer/?show=<path>`. A show opened from a folder opens `viewer/?folder=<key>`: the folder handle is shared through IndexedDB, and the viewer reads the folder itself (D-012, E-007).
 
 ## Open questions
 

@@ -10,7 +10,7 @@ import { listFolders, recallFolder, rememberFolder } from '../../shared/folder-h
 import { createStore } from './store.js';
 import { addStylesheet, h } from './dom.js';
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
-import { goToFolder, guardUnsavedChanges, newShow, openFolder, save } from './files.js';
+import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
 import { mountToolbar } from './ui/toolbar.js';
 import { mountSlideList } from './ui/slide-list.js';
 import { mountSlideForm } from './ui/slide-form.js';
@@ -146,15 +146,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   /** @param {() => Promise<void>} action */
   const run = (action) => action().catch((err) => showBanner(err instanceof Error ? err.message : String(err), 'error'));
   /** @param {'audience' | 'reader'} mode */
-  const openViewer = (mode) => {
-    if (!showUrl) {
-      showBanner('Present and Read for a show opened from a folder come with E-007.', 'info', { timeout: 4000 });
-      return;
-    }
-    const slideId = store.state.selectedSlideId ?? '';
-    const hash = mode === 'reader' ? `&mode=reader#${slideId}` : `#/${slideId}`;
-    window.open(`../viewer/?show=${encodeURIComponent(showUrl)}${hash}`, '_blank');
-  };
+  const present = (mode) => run(() => openViewer(store, mode, showUrl));
 
   // 3. Toolbar
   const toolbarEl = document.getElementById('slipr-editor-toolbar');
@@ -163,8 +155,8 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
       onOpen: () => run(() => openFolder(store)),
       onNew: () => run(() => newShow(store)),
       onSave: () => run(() => save(store)),
-      onPresent: () => openViewer('audience'),
-      onRead: () => openViewer('reader'),
+      onPresent: () => present('audience'),
+      onRead: () => present('reader'),
     });
   }
 
@@ -189,7 +181,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   // 7. Global shortcuts
   registerShortcuts(store, {
     onSave: () => run(() => save(store)),
-    onPresent: () => openViewer('audience'),
+    onPresent: () => present('audience'),
   });
 }
 
