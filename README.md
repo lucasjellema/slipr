@@ -11,7 +11,9 @@
 
 Each slide carries both layers: the concise **audience layer** (the slide itself) and the detailed **reader layer** (blocks of interactive content). See [docs/show-format.md](docs/show-format.md).
 
-> Status: **design phase**. The documentation outline is in place and no code has been written yet. See [ROADMAP.md](ROADMAP.md).
+> Status: **Phase 1 done**. Shows, templates and validation work, and **audience mode** presents shows on Reveal.js. Reader mode, the converter and the editor are next. See [ROADMAP.md](ROADMAP.md).
+>
+> Try it: run `npm run serve` in this folder and open <http://localhost:8080/viewer/?show=../shows/demo/show.json>.
 
 ## Components
 

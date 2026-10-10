@@ -27,8 +27,9 @@ With `shows/demo`:
 **Audience**
 1. Opens on slide 1. Arrows and PageUp/PageDown navigate. Fragments build one by one.
 2. Auto-animate slides morph. The agenda slide shows the chapters.
-3. `S` opens the presenter view with notes and the next slide.
-4. The backup slide is skipped but visible in the overview (`O`).
+3. `S` opens the presenter view with notes and the next slide (needs popups allowed; Claude's built-in browser pane blocks popups, so test this in a normal browser).
+4. The backup slides come after "Thank you", are not counted in the slide number, and have a dashed outline in the overview (`O`).
+4a. The chapter bar along the bottom fills as you advance. `#/s-architecture` deep-links to that slide.
 
 **Reader**
 
@@ -43,14 +44,18 @@ With `shows/demo`:
 
 **Both**
 
-13. `R` / `A` switch modes and keep the position.
-14. An invalid show (`shows/fixtures/broken/`) shows the error page.
+13. *(from Phase 2)* `R` / `A` switch modes and keep the position.
+14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.
 
 ## Common pitfalls
 
 - Reveal measures slides at init time. Inject the theme CSS and wait for `document.fonts.ready` **before** `Reveal.initialize()`.
-- Relative image paths are relative to `show.json`, not to `viewer/`. Use the `baseUrl` from `load.js`.
-- `file://` will not work because of `fetch()`. Always use the dev server.
+- Relative image paths are relative to `show.json`, not to `viewer/`. Use `ctx.resolveAsset()` / `ctx.resolveTemplateAsset()` from `load.js`.
+- `file://` will not work because of `fetch()`. Always use the dev server (`npm run serve`, or the `slipr` entry in `.claude/launch.json` for Claude's browser pane).
+- **Never put `<section>` inside a slide.** Reveal treats every nested `<section>` as a vertical slide. A test guards the shipped layouts.
+- Reveal's `reset.css` sets `font: inherit` on everything, which strips bold from `<strong>` and headings. Templates must restore text semantics inside `.slipr-slide` (see `templates/default/theme.css`).
+- Reveal's notes plugin throws `Cannot set properties of null (setting 'marked')` when the popup is blocked. That is the blocked popup, not a Slipr bug.
+- Screenshots of a hidden browser pane freeze CSS transitions mid-way. Check the DOM (`data-auto-animate-target`, opacity) rather than trusting a screenshot of an animation.
 - Re-rendering the reader article after a pref change destroys DOM nodes. Re-apply annotation highlights and restore focus afterwards.
 - Hover-only interactions are invisible on touch devices. Always provide the tap/click path too.

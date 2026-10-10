@@ -18,7 +18,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 ---
 
-## Phase 0: Foundations (≈ 1 session)
+## Phase 0: Foundations (≈ 1 session) ✅ done 2026-10-10
 
 **Goal**: The repository, the formats and a rich sample exist, so all later work has something concrete to build against.
 
@@ -32,7 +32,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Done when**: `npm test` passes, the demo validates, and VS Code autocompletes in `show.json`.
 
-## Phase 1: Audience mode (≈ 1–2 sessions)
+## Phase 1: Audience mode (≈ 1–2 sessions) ✅ done 2026-10-10
 
 **Goal**: Present the demo show on the big screen.
 

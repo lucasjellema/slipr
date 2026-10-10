@@ -9,11 +9,11 @@ The viewer makes one show available in two very different ways:
 | Character | Linear, presenter-driven, with animations and visualizations | Interactive and explorative, tailored to the reader |
 | Feels like | PowerPoint / Keynote | An interactive article or a small learning site |
 
-> Status: **planned**. This README describes the intended behavior. Sections are marked *(planned)* until they are implemented.
+> Status: **audience mode works** (roadmap Phase 1). Reader mode is *planned* (Phases 2–3). Features not built yet are marked *(planned)*.
 
-## Opening a show *(planned)*
+## Opening a show
 
-Start a local static server in the Slipr folder (see the root `CLAUDE.md` → Commands), then open:
+Start the dev server in the Slipr folder with `npm run serve`, then open:
 
 ```
 http://localhost:8080/viewer/?show=../shows/demo/show.json                 audience mode
@@ -24,25 +24,25 @@ http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader     reade
 |---|---|
 | `show` | Path or URL to `show.json` (required) |
 | `mode` | `audience` (default) or `reader` |
-| `profile` | Reader mode: preselect a profile, e.g. `profile=dev` |
-| `path` | Reader mode: preselect a path, e.g. `path=quick` |
-| `depth` | Reader mode: detail level `1`, `2` or `3` |
-| `#/5` | Audience mode: go to slide 5 |
-| `#s-05` / `#s-05/b3` | Reader mode: go to a slide, or to a block within it |
+| `profile` | *(planned)* Reader mode: preselect a profile, e.g. `profile=dev` |
+| `path` | *(planned)* Reader mode: preselect a path, e.g. `path=quick` |
+| `depth` | *(planned)* Reader mode: detail level `1`, `2` or `3` |
+| `#/5` or `#/s-architecture` | Audience mode: go to slide 5 (0-based) or to the slide with that id. `#/s-problem/2` also selects a build step |
+| `#s-05` / `#s-05/b3` | *(planned)* Reader mode: go to a slide, or to a block within it |
 
 Profile, path and depth in the URL let you send a tailored link, for example "the manager's 5-minute version".
 
 ---
 
-## Audience mode *(planned)*
+## Audience mode
 
 Built on Reveal.js. The aim is a polished, linear presentation.
 
 - **Animations**: bullets that build one by one (several fragment styles), slide transitions, and *auto-animate*, where matching elements morph smoothly from one slide to the next.
-- **Visualizations**: charts and diagrams that build up on screen *(planned slot types)*.
-- **High-level overviews**: an agenda slide generated from the show's chapters, a chapter progress bar, and a zoomable overview of all slides (`O`).
-- **Presenter view** (`S`): notes, timer, clock, and next-slide preview in a separate window on your laptop screen.
-- **Backup slides**: hidden from the normal flow but one keystroke away in the overview.
+- **Visualizations**: charts and diagrams that build up on screen *(planned slot types)*. Images and SVG diagrams work today.
+- **High-level overviews**: with `settings.agenda: true`, an agenda slide is generated at the start of every chapter (after the title slide for the first chapter). A thin bar along the bottom shows chapter progress. `O` gives an overview of all slides.
+- **Presenter view** (`S`): notes, timer, clock, and next-slide preview in a separate window on your laptop screen. The browser must allow popups for `localhost`.
+- **Backup slides** (`audience.hidden`): placed after the last slide, not counted in the slide number, and marked with a dashed outline in the overview.
 
 | Key | Action |
 |---|---|
@@ -52,7 +52,9 @@ Built on Reveal.js. The aim is a polished, linear presentation.
 | `O` / `Esc` | Overview of all slides, including backup slides |
 | `F` | Full screen |
 | `B` / `.` | Black screen |
-| `R` | Switch to reader mode at the current slide |
+| `R` | *(planned)* Switch to reader mode at the current slide |
+| `Alt`+click | Zoom into the clicked area (click again to zoom out) |
+| `Ctrl`+`Shift`+`F` | Search the slides |
 
 Most presentation clickers send `PageUp`/`PageDown`, so they work out of the box.
 

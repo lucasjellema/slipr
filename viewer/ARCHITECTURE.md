@@ -27,22 +27,25 @@ index.html
                 shared/markdown.js (incl. [[glossary]] and ^[popup] syntax)
 ```
 
-## Planned file structure
+## File structure
+
+Built so far (Phase 1) is marked ✅. Everything else is planned.
 
 ```
 viewer/
-├── index.html              minimal shell: <div id="app">, <script type="module" src="js/main.js">
+├── index.html              ✅ minimal shell: <div id="app">, <script type="module" src="js/main.js">
 ├── css/
-│   └── viewer.css          chrome shared by both modes (error page, mode switch)
+│   └── viewer.css          ✅ chrome shared by both modes (loading, help and error pages)
 ├── js/
-│   ├── main.js             entry: read URL params, load + validate, start mode app
-│   ├── mode-switch.js      map position between modes (index ↔ slide id), swap modes
-│   └── error-view.js       readable rendering of validation errors
+│   ├── main.js             ✅ entry: read URL params, load + validate, start mode app
+│   ├── dom.js              ✅ h() element builder (never parses HTML), addStylesheet()
+│   ├── error-view.js       ✅ help page, load-error page, validation-error page
+│   └── mode-switch.js      map position between modes (index ↔ slide id), swap modes
 ├── audience/
-│   ├── audience.js         build <section>s, configure and start Reveal
-│   ├── agenda.js           generated agenda slides + chapter progress bar
-│   ├── visuals.js          build-up of charts/diagrams on fragment events
-│   └── audience.css
+│   ├── audience.js         ✅ build <section>s, configure and start Reveal
+│   ├── agenda.js           ✅ generated agenda slides + chapter progress bar
+│   ├── audience.css        ✅ Reveal integration, agenda and progress-bar styles
+│   └── visuals.js          build-up of charts/diagrams on fragment events (with the chart slot type)
 └── reader/
     ├── reader.js           app shell: layout, routing (#s-05/b3), keyboard map
     ├── state.js            reader state + persistence
@@ -55,14 +58,25 @@ viewer/
     └── reader.css          app layout; block styling comes from the template
 ```
 
+## Start-up (`main.js`)
+
+1. No `show` parameter → help page with links to the demo.
+2. `loadShow()` → a `LoadError` (not found, invalid JSON, server unreachable) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.
+3. Validation errors → validation-error page listing each issue with its path. Warnings go to the console (collapsed group) and never block a show.
+4. Set `document.title` and `lang`, load the template's `theme.css`, then dynamically `import()` the mode module, so Reveal.js is only fetched in audience mode.
+
 ## Audience mode
 
-- `audience.js` builds `.reveal > .slides > section` per slide, filled by `renderSlide(slide, template, { mode: 'audience' })`.
-- Notes go in `<aside class="notes">`. Glossary references and `^[popups]` render as plain text or are omitted (handled by `markdown.js` with `mode: 'audience'`).
-- `audience.fragments` adds `class="fragment <style>"` to list items. `audience.autoAnimate` sets `data-auto-animate` on this slide and the next one.
-- Backup slides (`audience.hidden`) get `data-visibility="uncounted"` and are moved to the end.
-- `agenda.js` inserts an agenda slide before each chapter (if enabled in settings) and renders a chapter progress bar from Reveal's `slidechanged` events.
-- Reveal config: `width: 1920, height: 1080` (or 1440×1080 for 4:3), `hash: true`, `slideNumber`, `transition` from settings. Plugins: Notes, Zoom, Search.
+- `audience.js` loads Reveal's `reset.css` + `reveal.css` and `audience.css`, waits for `document.fonts.ready`, then builds `.reveal > .slides > section` per slide, filled by `renderSlide(slide, ctx, { mode: 'audience' })`.
+- Each `<section>` gets `id = slide.id`, so Reveal's own `#/slide-id` deep links work. In-show Markdown links `[x](#s-id)` are rendered with `href="#/s-id"`, so no click handling is needed.
+- Every `[data-slot]` element gets `data-id="slot-<name>"`, so **auto-animate** morphs the same slot between consecutive `audience.autoAnimate` slides. Reveal matches list items and images by content automatically, and unmatched items fade in.
+- `audience.fragments` adds `class="fragment [style]"` to every `<li>`, nested ones included.
+- Notes go in `<aside class="notes">` (Reveal Notes plugin). Glossary references and `^[popups]` render as plain text or are omitted (`markdown.js`, `mode: 'audience'`).
+- Backup slides (`audience.hidden`) are moved to the end with `data-visibility="uncounted"` and class `slipr-backup`.
+- `audience.background` becomes `data-background-color` (when it looks like a CSS colour) or `data-background-image` (resolved against `show.json`).
+- `agenda.js`: with `settings.agenda` and at least two chapters, an agenda slide (built-in markup styled with the template's `--slipr-*` tokens) goes before the first slide of each chapter. The exception is the start of the show, where it goes *after* the first slide (the title slide). The chapter bar sizes each segment by the chapter's slide count and updates on Reveal's `slidechanged` event. It is hidden on backup slides and in the overview.
+- Reveal config: `width: 1920, height: 1080` (1440×1080 for 4:3), `margin: 0`, `center: false`, `hash: true`, `progress: false` (replaced by the chapter bar), `slideNumber: 'c/t'` when `settings.slideNumbers`, `transition` from settings. Plugins: Notes, Zoom, Search.
+- The slide number sits bottom-left, because bottom-right belongs to the template logo and Reveal's controls.
 
 ## Reader mode
 

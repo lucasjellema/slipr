@@ -31,7 +31,7 @@
   --slipr-size-title: 3.6cqw;
   --slipr-size-title-hero: 5.2cqw;
   --slipr-size-subtitle: 2.1cqw;
-  --slipr-size-body: 1.9cqw;
+  --slipr-size-body: 2.2cqw;
   --slipr-size-small: 1.2cqw;
   --slipr-radius: 0.6cqw;
 }
@@ -67,6 +67,11 @@
   flex-direction: column;
   gap: 2.2cqw;
 }
+
+/* Restore text semantics: host pages (e.g. Reveal.js's reset.css) may set
+   `font: inherit` on everything. */
+.slipr-slide :is(h1, h2, h3, h4, h5, h6, strong, b, th) { font-weight: 700; }
+.slipr-slide :is(em, i, cite) { font-style: italic; }
 
 /* Optional slots left empty by the show */
 .slipr-slide [data-empty] { display: none !important; }
@@ -169,8 +174,8 @@
 .slipr-layout--two-column .slipr-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   gap: 4cqw;
-  flex: 1;
   min-height: 0;
 }
 .slipr-layout--two-column .slipr-column {

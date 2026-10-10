@@ -15,30 +15,19 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 0 (Foundations), nearly done
+## Now: Phase 2 (Reader core)
 
-- [ ] **T-003** [templates] Visual check of the default template's layouts, once `render.js` exists (Phase 1). The CSS has not been rendered yet · todo · claude
-
+- [ ] **S-006** [shared] `blocks.js`: render all reader block types · todo · claude
+- [ ] **V-004** [viewer] Reader app shell: contents / article / margin, routing, keys · todo · claude
+- [ ] **V-008** [viewer] Popovers (glossary, footnotes, hotspots), tabs, details, embeds · todo · claude
+- [ ] **V-009** [viewer] Chapter TOC, scroll-spy, related, next/previous · todo · claude
+- [ ] **V-005** [viewer] Mode switch (`R` / `A`) that keeps position · todo · claude
+- [ ] **V-006** [viewer] Deep links in reader mode (`#s-05/b3`); audience mode already has `#/slide-id` · todo · claude
+- [ ] **V-010** [viewer] Responsive pass + layout reflow in reader mode · todo · claude
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
+- [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
 
-## Next: Phases 1–5 (see ROADMAP.md)
-
-**Phase 1: Audience mode**
-- [ ] **S-003** [shared] `load.js`: load show + template, resolve paths · todo · —
-- [ ] **S-004** [shared] `markdown.js`: subset + `[[glossary]]`, `^[popup]`, `#slide` links, mode option · todo · —
-- [ ] **S-005** [shared] `render.js`: slide + layout → element · todo · —
-- [ ] **V-001** [viewer] Audience mode on Reveal.js (fragments, auto-animate, backup slides) · todo · —
-- [ ] **V-007** [viewer] Agenda slides from chapters + chapter progress bar · todo · —
-- [ ] **V-002** [viewer] Readable error page for invalid shows · todo · —
-
-**Phase 2: Reader core**
-- [ ] **S-006** [shared] `blocks.js`: render all reader block types · todo · —
-- [ ] **V-004** [viewer] Reader app shell: contents / article / margin, routing, keys · todo · —
-- [ ] **V-008** [viewer] Popovers (glossary, footnotes, hotspots), tabs, details, embeds · todo · —
-- [ ] **V-009** [viewer] Chapter TOC, scroll-spy, related, next/previous · todo · —
-- [ ] **V-005** [viewer] Mode switch that keeps position · todo · —
-- [ ] **V-006** [viewer] Deep links in both modes (`#/5`, `#s-05/b3`) · todo · —
-- [ ] **V-010** [viewer] Responsive pass + layout reflow in reader mode · todo · —
+## Next: Phases 3–5 (see ROADMAP.md)
 
 **Phase 3: Reader personalisation**
 - [ ] **V-011** [viewer] Reader state + IndexedDB persistence · todo · —
@@ -115,12 +104,19 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 
 ### Tooling
-- [ ] **I-060** [tooling] Playwright smoke tests for viewer and editor
+- [ ] **I-060** [tooling] Playwright smoke tests for viewer and editor (would also give `render.js` automated tests, which need a DOM)
 - [ ] **I-061** [tooling] Claude Code slash commands in `.claude/commands/` (e.g. `/new-layout`, `/new-block-type`)
 - [ ] **I-062** [tooling] Publish script: copy viewer + shared + vendor + template + show to a static host
 
 ## Done
 
+- [x] **S-003** [shared] `load.js`: show + template + layouts, image checks, `LoadError`, 7 tests · done 2026-10-10 · claude
+- [x] **S-004** [shared] `markdown.js`: safe subset + glossary, popups, slide links, mode option, 29 tests · done 2026-10-10 · claude
+- [x] **S-005** [shared] `render.js`: slide + layout → element, all slot types · done 2026-10-10 · claude
+- [x] **V-001** [viewer] Audience mode on Reveal.js 6 (fragments, auto-animate, notes, backup slides, `#/slide-id`) · done 2026-10-10 · claude
+- [x] **V-007** [viewer] Agenda slides from chapters + chapter progress bar · done 2026-10-10 · claude
+- [x] **V-002** [viewer] Help, load-error and validation-error pages · done 2026-10-10 · claude
+- [x] **T-003** [templates] Visual check of the default template in audience mode; fixed `<section>` in two-column, restored bold/italic under Reveal's reset, column height, body size · done 2026-10-10 · claude
 - [x] **C-002** [repo] Vendor Reveal.js 6.0.2 into `vendor/` (ES modules, unmodified `dist/`) · done 2026-10-10 · claude
 - [x] **S-001** [shared] JSON Schemas for show and template (cross-checked with Python `jsonschema`) · done 2026-10-10 · claude
 - [x] **C-004** [repo] VS Code schema association for `show.json` / `template.json` · done 2026-10-10 · claude

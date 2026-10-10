@@ -1,7 +1,9 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { validateShow, validateTemplate, collectImagePaths, satisfies } from '../validate.js';
-import { readJson, exists, clone, codes } from './helpers.js';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { readJson, exists, clone, codes, repoRoot } from './helpers.js';
 
 const demo = readJson('shows/demo/show.json');
 const template = readJson('templates/default/template.json');
@@ -30,9 +32,11 @@ describe('valid inputs', () => {
     assert.equal(result.ok, true);
   });
 
-  test('every layout file referenced by the template exists', () => {
+  test('every layout file referenced by the template exists and contains no <section>', () => {
     for (const layout of template.layouts) {
       assert.ok(exists(`templates/default/${layout.file}`), layout.file);
+      const html = readFileSync(resolve(repoRoot, 'templates/default', layout.file), 'utf8');
+      assert.doesNotMatch(html, /<section\b/i, `${layout.file}: Reveal.js would treat <section> as a vertical slide`);
     }
     assert.ok(exists('templates/default/theme.css'));
     assert.ok(exists('templates/default/reader.css'));

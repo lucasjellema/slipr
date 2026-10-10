@@ -6,6 +6,18 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Phase 1, shared core and audience mode
+- **Added** `shared/markdown.js`: a safe Markdown subset (paragraphs, nested lists, code fences, inline formatting, links) with Slipr extensions (`[[glossary]]`, `^[popup]`, `#slide` links) and an audience/reader mode.
+- **Added** `shared/load.js`: loads a show with its template and layouts, HEAD-checks images, validates, and gives readable `LoadError`s.
+- **Added** `shared/render.js`: the single slide renderer (layout fragment + slot filling, relative-URL rewriting, `data-empty`).
+- **Added** tests for markdown (29) and load (7). The total is now 79.
+- **Added** audience mode in the viewer (see `viewer/CHANGELOG.md`).
+- **Added** `.claude/launch.json` (dev server entry for Claude's browser pane).
+- **Fixed** the default template: the two-column layout used `<section>`, which Reveal treats as vertical slides. It now uses `<div>`, and a test forbids `<section>` in layouts.
+- **Fixed** the default template: bold, italic and heading weights are restored under Reveal's `reset.css`.
+- **Changed** the default template: larger body text (2.2cqw), and two-column cards size to their content.
+- **Changed** the template spec: documents the reset and no-`<section>` rules.
+
 ### 2026-10-10: Phase 0 foundations
 - **Added** `.gitattributes` (LF line endings in repo and working copy, binary assets marked).
 - **Added** `vendor/reveal.js-6.0.2/`: the unmodified `dist/` of the npm package, with `VENDORED.md` (source, checksum, upgrade procedure). Reveal 6 ships native ES modules, which fits the no-build setup.

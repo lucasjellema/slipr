@@ -1,0 +1,107 @@
+/* Audience mode: Reveal.js integration. Slide looks come from the template. */
+
+html, body { height: 100%; overflow: hidden; }
+body.slipr-audience { background: #0E1116; }
+.slipr-audience .slipr-app { height: 100%; }
+.reveal-viewport, .reveal { background: #0E1116; }
+
+/* Our slides fill the Reveal canvas exactly; no Reveal padding or centring. */
+.reveal .slides { text-align: left; }
+.reveal .slides > section {
+  padding: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+.reveal .slides > section > .slipr-slide { height: 100%; }
+
+/* Reveal's default sizing rules would shrink our images unexpectedly. */
+.reveal .slipr-slide img { margin: 0; max-width: none; max-height: none; }
+.reveal .slipr-slide .slipr-image { max-width: 100%; }
+
+/* Fragments: keep list markers in place while items fade in. */
+.reveal .slipr-slide li.fragment { display: list-item; }
+
+/* Controls and slide number in the template's colours. */
+.reveal .controls { color: var(--slipr-color-accent, #F2A900); }
+.reveal .slide-number {
+  font-family: var(--slipr-font-body, system-ui);
+  font-size: 14px;
+  background: transparent;
+  color: var(--slipr-color-muted, #5B6573);
+  bottom: 14px;
+  left: 18px;
+  right: auto; /* bottom-right belongs to the template logo and Reveal's controls */
+}
+
+/* ---------- generated agenda slide ---------- */
+
+.slipr-layout--agenda { justify-content: center; gap: 3cqw; }
+.slipr-agenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6cqw;
+}
+.slipr-agenda-item {
+  display: flex;
+  align-items: baseline;
+  gap: 1.6cqw;
+  font-size: 2.4cqw;
+  color: var(--slipr-color-muted);
+  transition: color 0.4s, opacity 0.4s;
+}
+.slipr-agenda-number {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 3.4cqw;
+  height: 3.4cqw;
+  border-radius: 50%;
+  font-size: 1.6cqw;
+  font-weight: 700;
+  border: 0.18cqw solid currentColor;
+}
+.slipr-agenda-text { display: flex; flex-direction: column; gap: 0.3cqw; }
+.slipr-agenda-title { font-family: var(--slipr-font-heading); font-weight: 700; }
+.slipr-agenda-summary { font-size: 1.4cqw; font-weight: 400; }
+.slipr-agenda-item.is-done { opacity: 0.55; }
+.slipr-agenda-item.is-current { color: var(--slipr-color-primary); }
+.slipr-agenda-item.is-current .slipr-agenda-number {
+  background: var(--slipr-color-accent);
+  border-color: var(--slipr-color-accent);
+  color: var(--slipr-color-primary);
+}
+.slipr-agenda-item.is-next .slipr-agenda-summary { display: none; }
+
+/* ---------- chapter progress bar ---------- */
+
+.slipr-chapter-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  gap: 4px;
+  height: 6px;
+  pointer-events: none;
+}
+.slipr-chapter-segment {
+  position: relative;
+  flex-basis: 0;
+  background: rgb(127 127 127 / 0.28);
+  overflow: hidden;
+}
+.slipr-chapter-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  background: var(--slipr-color-accent, #F2A900);
+  transition: width 0.4s ease;
+}
+.reveal.overview .slipr-chapter-bar { display: none; }
+
+/* Backup slides are marked subtly in the overview. */
+.reveal.overview .slipr-backup { outline: 6px dashed rgb(242 169 0 / 0.7); outline-offset: -6px; }

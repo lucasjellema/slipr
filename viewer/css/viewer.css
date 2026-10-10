@@ -1,0 +1,71 @@
+/* Viewer chrome shared by both modes: loading, help and error pages. */
+
+:root {
+  --viewer-ink: #1E2329;
+  --viewer-muted: #5B6573;
+  --viewer-bg: #F4F6F9;
+  --viewer-card: #FFFFFF;
+  --viewer-accent: #F2A900;
+  --viewer-primary: #1F3A5F;
+  --viewer-error: #B3261E;
+  --viewer-warn: #8A5300;
+}
+
+html, body { margin: 0; }
+body {
+  font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--viewer-ink);
+  background: var(--viewer-bg);
+}
+
+.slipr-loading {
+  margin: 30vh auto 0;
+  text-align: center;
+  color: var(--viewer-muted);
+}
+
+/* ---------- help / error pages ---------- */
+
+.slipr-page {
+  box-sizing: border-box;
+  max-width: 46rem;
+  margin: 8vh auto;
+  padding: 2rem 2.25rem;
+  background: var(--viewer-card);
+  border-radius: 0.75rem;
+  border-top: 5px solid var(--viewer-primary);
+  box-shadow: 0 0.5rem 2rem rgb(0 0 0 / 0.08);
+  line-height: 1.55;
+}
+.slipr-page--error { border-top-color: var(--viewer-error); }
+.slipr-page h1 { margin: 0 0 0.75rem; font-size: 1.6rem; color: var(--viewer-primary); }
+.slipr-page--error h1 { color: var(--viewer-error); }
+.slipr-page h2 { margin: 1.5rem 0 0.5rem; font-size: 1.05rem; }
+.slipr-page p { margin: 0 0 0.75rem; }
+.slipr-page code {
+  font-family: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+  font-size: 0.875em;
+  background: var(--viewer-bg);
+  padding: 0.1em 0.35em;
+  border-radius: 0.25em;
+  overflow-wrap: anywhere;
+}
+.slipr-page a { color: var(--viewer-primary); }
+.slipr-issues { list-style: none; margin: 0; padding: 0; }
+.slipr-issues li {
+  padding: 0.55rem 0.75rem;
+  margin: 0 0 0.4rem;
+  border-left: 3px solid var(--viewer-error);
+  background: color-mix(in srgb, var(--viewer-error) 6%, white);
+  border-radius: 0 0.3rem 0.3rem 0;
+}
+.slipr-issues--warnings li {
+  border-left-color: var(--viewer-accent);
+  background: color-mix(in srgb, var(--viewer-accent) 10%, white);
+}
+.slipr-issues code { display: inline-block; margin-right: 0.4rem; }
+.slipr-hint { color: var(--viewer-muted); font-size: 0.95rem; }
+
+@media (max-width: 600px) {
+  .slipr-page { margin: 0; border-radius: 0; padding: 1.25rem 1rem; }
+}
