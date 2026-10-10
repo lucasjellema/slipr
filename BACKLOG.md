@@ -25,7 +25,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 - [ ] **E-006** [editor] Images and hotspots: drop or paste, alt text, hotspot placement · todo · —
 - [ ] **E-007** [editor] Present / Read buttons · todo · —
-- [ ] **E-010** [editor] Bug: the slide form corrupts non-text slots. An `image` slot is saved as a bare path string (the format needs `{ src, alt }`, so the show fails validation), and `quote`, `code` and `cards` slots get a one-line text input that shows `[object Object]` and overwrites the value with a string. Until E-004 adds real field editors, show these slots read-only · todo · —
 
 ## Pending verification & chores from earlier phases
 
@@ -168,6 +167,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-010** [editor] Bug: the slide form corrupted non-text slots. Image slots now get a path and an alt-text input and always write `{ src, alt, … }`; `quote`, `code`, `cards` (and unknown types) are read-only with a summary; array lists stay arrays. Also fixed on the way: the store passed the template to `validateShow` in the wrong argument (template checks never ran), the preview's diagnostics never matched slide warnings and hid errors, and wrong import paths in `ui/preview.js` / `ui/slide-list.js` stopped the editor from loading · done 2026-10-10 · claude
 - [x] **I-043b** [format/templates] `cards` slot type (template format 0.2) + the five card layouts of the Conclusion template (Textbox 4x / 9x, Facts & figures, Onze markten, Introduction): schemas, specs, validator, renderer, viewer (fragments, search, pins), converter card roles, demo slides, tests · done 2026-10-10 · claude
 - [x] **E-001** [editor] Shell, store, actions, undo/redo: 3-column app, pure actions with reference cleanup, store with coalescing, live preview, shortcuts, 24 tests · done 2026-10-10 · claude
 - [x] **P-001** [converter] Package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text, builds, inherited bullets) · done 2026-10-10 · claude

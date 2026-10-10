@@ -5,7 +5,7 @@ The editor is a browser application for creating and changing Slipr shows. You n
 > Status: **in progress (Phase 5: Editor MVP)**. The 3-column shell, store, actions, undo/redo, slide inspector, reader inspector, live preview and keyboard shortcuts are implemented (E-001). Direct folder read/write via the File System Access API is next (E-002).
 > Try it: run `npm run serve` and open <http://localhost:8080/editor/?show=../shows/demo/show.json>.
 >
-> **Not yet:** saving to disk (Save only clears the "unsaved" dot), opening or creating a show folder, image drop, hotspots, a layout picker with previews. Only text, rich-text and list fields have proper inputs. **Don't edit image, quote, code or card fields yet**: the current form replaces their value with plain text (bug E-010). The sections below describe the MVP as planned; the screen layout and shortcuts already work.
+> **Not yet:** saving to disk (Save only clears the "unsaved" dot), opening or creating a show folder, image drop, hotspots, a layout picker with previews. Text, rich-text, list and image fields (path and alt text) have inputs; quote, code and card fields are shown read-only for now. The sections below describe the MVP as planned; the screen layout and shortcuts already work.
 
 ## Screen layout
 

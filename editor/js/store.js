@@ -44,6 +44,27 @@ export function createStore(initialShow, context = {}) {
   return new EditorStore(initialShow, context);
 }
 
+/**
+ * Validation issues that belong to one slide, or to the show as a whole.
+ * Issue paths name slides by index (`slides[3].content.image`), not by id.
+ * @param {{ errors?: any[], warnings?: any[] } | null | undefined} validation
+ * @param {number} slideIndex
+ * @returns {{ errors: any[], warnings: any[] }}
+ */
+export function issuesForSlide(validation, slideIndex) {
+  const own = `slides[${slideIndex}]`;
+  /** @param {any} issue */
+  const relevant = (issue) => {
+    const path = String(issue.path ?? '');
+    if (!path.startsWith('slides[')) return true;
+    return path === own || path.startsWith(`${own}.`) || path.startsWith(`${own}[`);
+  };
+  return {
+    errors: (validation?.errors ?? []).filter(relevant),
+    warnings: (validation?.warnings ?? []).filter(relevant),
+  };
+}
+
 export class EditorStore {
   /**
    * @param {any} initialShow
@@ -62,7 +83,7 @@ export class EditorStore {
     this._subscribers = new Set();
 
     const template = context.template ?? null;
-    const validation = validateShow(initialShow, template);
+    const validation = validateShow(initialShow, { template });
 
     /** @type {StoreState} */
     this.state = {
@@ -154,7 +175,7 @@ export class EditorStore {
 
     this.state.show = nextShow;
     this.state.dirty = true;
-    this.state.validation = validateShow(nextShow, this.state.template);
+    this.state.validation = validateShow(nextShow, { template: this.state.template });
 
     // If selected slide was deleted, select adjacent slide
     if (this.state.selectedSlideId) {
@@ -179,7 +200,7 @@ export class EditorStore {
 
     this.state.show = prevShow;
     this.state.dirty = true;
-    this.state.validation = validateShow(prevShow, this.state.template);
+    this.state.validation = validateShow(prevShow, { template: this.state.template });
 
     if (this.state.selectedSlideId) {
       const exists = prevShow.slides?.some((s) => s.id === this.state.selectedSlideId);
@@ -204,7 +225,7 @@ export class EditorStore {
 
     this.state.show = nextShow;
     this.state.dirty = true;
-    this.state.validation = validateShow(nextShow, this.state.template);
+    this.state.validation = validateShow(nextShow, { template: this.state.template });
 
     if (this.state.selectedSlideId) {
       const exists = nextShow.slides?.some((s) => s.id === this.state.selectedSlideId);
@@ -294,7 +315,7 @@ export class EditorStore {
     this.state.folderHandle = folderHandle;
     this.state.selectedSlideId = showContext.show?.slides?.[0]?.id ?? null;
     this.state.dirty = false;
-    this.state.validation = validateShow(showContext.show, showContext.template);
+    this.state.validation = validateShow(showContext.show, { template: showContext.template });
 
     this._notify([
       'show',

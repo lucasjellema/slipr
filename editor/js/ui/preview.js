@@ -5,9 +5,10 @@
  */
 
 import { h } from '../dom.js';
-import { renderSlide } from '../../shared/render.js';
-import { renderBlocks } from '../../shared/blocks.js';
-import { personalize } from '../../viewer/reader/personalize.js';
+import { issuesForSlide } from '../store.js';
+import { renderSlide } from '../../../shared/render.js';
+import { renderBlocks } from '../../../shared/blocks.js';
+import { personalize } from '../../../viewer/reader/personalize.js';
 
 /**
  * Mount the live preview pane into container.
@@ -153,11 +154,17 @@ export function mountPreview(container, store) {
     }
 
     // 3. Diagnostics & Warnings
-    const slideWarnings = (state.validation?.warnings ?? []).filter((w) => {
-      return w.path?.includes(slide?.id ?? '') || !w.path?.includes('slides');
-    });
+    const slideIndex = state.show?.slides?.findIndex((s) => s.id === slide?.id) ?? -1;
+    const { errors: slideErrors, warnings: slideWarnings } = issuesForSlide(state.validation, slideIndex);
 
     const diagnostics = h('div', { class: 'slipr-preview-diagnostics' });
+    if (slideErrors.length > 0) {
+      diagnostics.append(
+        h('div', { class: 'slipr-warning-pill slipr-error-pill', role: 'alert' }, [
+          `✖ ${slideErrors.length} error${slideErrors.length > 1 ? 's' : ''}: ${slideErrors[0].message}`,
+        ])
+      );
+    }
     if (slideWarnings.length > 0) {
       diagnostics.append(
         h('div', { class: 'slipr-warning-pill' }, [

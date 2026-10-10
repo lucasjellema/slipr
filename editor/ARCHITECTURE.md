@@ -29,7 +29,8 @@ editor/
 ├── test/                 ✅ actions.test.js, store.test.js (node --test)
 └── js/
     ├── main.js           ✅ bootstrap: load the show (?show=…) via shared/load.js, create store, mount panels, wire shortcuts
-    ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics
+    ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
+    ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+Enter, Ctrl+D, Alt+↑/↓, F5
@@ -50,7 +51,7 @@ editor/
         └── dialogs.js          (planned) new-show, alt-text, confirm
 ```
 
-**Current limits (E-001):** Save only marks the store clean; nothing is written to disk until E-002. The slide form has real inputs only for `text`, `richtext` and `list` slots. An `image` slot is edited as a bare path string (the format needs `{ src, alt }`), and `quote`, `code` and `cards` slots fall back to a one-line text input that overwrites their object/array value. See chore E-010; field editors per slot type come with E-004 / I-035.
+**Current limits (E-001, E-010):** Save only marks the store clean; nothing is written to disk until E-002. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code`, `cards` and unknown slot types are shown read-only until they get real field editors (E-004 / I-035).
 
 ## Key components
 

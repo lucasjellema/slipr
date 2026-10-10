@@ -1,12 +1,30 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readJson } from '../../shared/test/helpers.js';
-import { createStore } from '../js/store.js';
+import { createStore, issuesForSlide } from '../js/store.js';
 
 const demo = readJson('shows/demo/show.json');
 const template = readJson('templates/default/template.json');
 
 describe('editor store', () => {
+  test('issuesForSlide matches slides by index and keeps show-level issues', () => {
+    const validation = {
+      errors: [{ path: 'slides[1].content.image' }, { path: 'slides[10].content' }],
+      warnings: [{ path: 'slides[1]' }, { path: 'slides[2].reader' }, { path: 'paths[0].slides[1]' }, { path: 'template.version' }],
+    };
+    const issues = issuesForSlide(validation, 1);
+    assert.deepEqual(issues.errors.map((e) => e.path), ['slides[1].content.image']);
+    assert.deepEqual(issues.warnings.map((w) => w.path), ['slides[1]', 'paths[0].slides[1]', 'template.version']);
+  });
+
+  test('validation runs the template checks (slot types)', () => {
+    const store = createStore(demo, { template });
+    const slide = demo.slides.find((s) => s.content?.image);
+    store.dispatch('setSlot', { slideId: slide.id, slot: 'image', value: 'images/x.png' });
+    assert.equal(store.state.validation.ok, false);
+    assert.ok(store.state.validation.errors.some((e) => e.code === 'slot-type'));
+  });
+
   test('initial state and subscription', () => {
     const store = createStore(demo, { template });
     assert.equal(store.state.show, demo);

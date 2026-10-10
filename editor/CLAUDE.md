@@ -35,5 +35,5 @@ Steps 1, 4, 6 and 7 need folder access (E-002) and can't be run yet. Until then,
 
 - File System Access permissions are per session. After a reload, call `handle.requestPermission({ mode: 'readwrite' })` from a user gesture (click), never on page load.
 - `actions.js` must stay DOM-free so it can be tested with `node --test`.
-- A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input.
+- A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input. The rules live in `js/slot-values.js`; extend them (with a test) when you add a field editor.
 - Large images make the whole store slow if inlined. Keep only paths in the show, never data URLs.

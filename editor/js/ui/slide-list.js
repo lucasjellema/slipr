@@ -5,7 +5,7 @@
  */
 
 import { h } from '../dom.js';
-import { slideTitle } from '../../shared/render.js';
+import { slideTitle } from '../../../shared/render.js';
 
 /**
  * Mount the slide list sidebar into container.

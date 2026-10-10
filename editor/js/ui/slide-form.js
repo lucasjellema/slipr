@@ -5,6 +5,7 @@
  */
 
 import { h } from '../dom.js';
+import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
 
 /**
  * Mount the slide form into a container.
@@ -61,11 +62,11 @@ export function mountSlideForm(container, store) {
     if (slots.length === 0) {
       // Fallback for custom layouts without slot definitions: render current keys in content
       for (const [key, val] of Object.entries(slide.content ?? {})) {
-        slotsContainer.append(buildSlotField(key, { name: key, type: 'text' }, val, slide.id, store));
+        slotsContainer.append(buildSlotField(key, { name: key }, val, slide.id, store));
       }
     } else {
       for (const slotDef of slots) {
-        const val = slide.content?.[slotDef.name] ?? '';
+        const val = slide.content?.[slotDef.name];
         slotsContainer.append(buildSlotField(slotDef.name, slotDef, val, slide.id, store));
       }
     }
@@ -147,7 +148,8 @@ export function mountSlideForm(container, store) {
 }
 
 /**
- * Build a field input for a layout slot.
+ * Build a field for a layout slot. The value written always has the shape the
+ * slot type requires (see slot-values.js); types without an editor are read-only.
  * @param {string} slotName
  * @param {any} slotDef
  * @param {any} value
@@ -158,63 +160,80 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
   const labelText = slotDef.label ?? slotName;
   const isRequired = Boolean(slotDef.required);
   const helpText = slotDef.help ?? '';
+  const kind = slotEditorKind(slotDef.type, value);
+  const coalesceKey = `slot-${slideId}-${slotName}`;
+
+  // The latest value of this slot, so image and list edits build on it.
+  let current = value;
+  /** @param {any} next */
+  const write = (next) => {
+    current = next;
+    store.dispatch('setSlot', { slideId, slot: slotName, value: next }, { coalesceKey });
+  };
 
   const labelEl = h('label', { class: 'slipr-label' }, [
     labelText,
     isRequired ? h('span', { class: 'slipr-required' }, [' *']) : null,
   ]);
 
-  let inputEl;
+  /** @type {(HTMLElement | null)[]} */
+  let inputs;
 
-  if (slotDef.type === 'richtext' || slotDef.type === 'list') {
-    const textVal = Array.isArray(value) ? value.join('\n') : String(value ?? '');
-    inputEl = h(
+  if (kind === 'textarea') {
+    inputs = [h(
       'textarea',
       {
         class: 'slipr-textarea',
         placeholder: slotDef.type === 'list' ? '- Bullet item\n- Another item' : '',
         oninput: (e) => {
-          let val = /** @type {HTMLTextAreaElement} */ (e.target).value;
-          store.dispatch('setSlot', { slideId, slot: slotName, value: val }, {
-            coalesceKey: `slot-${slideId}-${slotName}`,
-          });
+          const text = /** @type {HTMLTextAreaElement} */ (e.target).value;
+          write(slotDef.type === 'list' ? listValue(current, text) : textValue(text));
         },
       },
-      [textVal]
-    );
-  } else if (slotDef.type === 'image') {
-    const srcVal = typeof value === 'string' ? value : value?.src ?? '';
-    inputEl = h('input', {
-      type: 'text',
-      class: 'slipr-input',
-      placeholder: 'images/example.png',
-      value: srcVal,
-      oninput: (e) => {
-        const val = /** @type {HTMLInputElement} */ (e.target).value;
-        store.dispatch('setSlot', { slideId, slot: slotName, value: val }, {
-          coalesceKey: `slot-${slideId}-${slotName}`,
-        });
-      },
-    });
+      [textareaText(value)]
+    )];
+  } else if (kind === 'image') {
+    const image = imageValue(value, {});
+    inputs = [
+      h('input', {
+        type: 'text',
+        class: 'slipr-input',
+        placeholder: 'images/example.png',
+        'aria-label': `${labelText}: image path`,
+        value: image?.src ?? '',
+        oninput: (e) => write(imageValue(current, { src: /** @type {HTMLInputElement} */ (e.target).value })),
+      }),
+      h('input', {
+        type: 'text',
+        class: 'slipr-input slipr-input-alt',
+        placeholder: 'Alt text: what the image shows',
+        'aria-label': `${labelText}: alt text`,
+        value: image?.alt ?? '',
+        oninput: (e) => write(imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value })),
+      }),
+    ];
+  } else if (kind === 'readonly') {
+    inputs = [
+      h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [
+        describeValue(slotDef.type, value),
+      ]),
+    ];
   } else {
-    inputEl = h('input', {
+    inputs = [h('input', {
       type: 'text',
       class: 'slipr-input',
-      value: String(value ?? ''),
-      oninput: (e) => {
-        const val = /** @type {HTMLInputElement} */ (e.target).value;
-        store.dispatch('setSlot', { slideId, slot: slotName, value: val }, {
-          coalesceKey: `slot-${slideId}-${slotName}`,
-        });
-      },
-    });
+      value: typeof value === 'string' ? value : '',
+      oninput: (e) => write(textValue(/** @type {HTMLInputElement} */ (e.target).value)),
+    })];
   }
 
-  const group = h('div', { class: 'slipr-form-group' }, [
-    labelEl,
-    inputEl,
-    helpText ? h('span', { class: 'slipr-help' }, [helpText]) : null,
-  ]);
+  const help = kind === 'readonly'
+    ? `This ${slotDef.type ?? ''} slot can't be edited here yet. Edit show.json directly.`.replace('  ', ' ')
+    : helpText;
 
-  return group;
+  return h('div', { class: 'slipr-form-group' }, [
+    labelEl,
+    ...inputs,
+    help ? h('span', { class: 'slipr-help' }, [help]) : null,
+  ]);
 }

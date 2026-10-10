@@ -181,6 +181,19 @@ body.slipr-editor-app {
   box-shadow: 0 0 0 2px rgba(47, 129, 247, 0.2);
 }
 
+.slipr-input-alt {
+  margin-top: 6px;
+}
+
+.slipr-readonly {
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--slipr-editor-muted);
+  border: 1px dashed var(--slipr-editor-border);
+  border-radius: 4px;
+  overflow-wrap: anywhere;
+}
+
 .slipr-input-sm,
 .slipr-select-sm {
   padding: 3px 6px;
@@ -598,4 +611,8 @@ body.slipr-editor-app {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.slipr-error-pill {
+  color: var(--slipr-editor-danger);
 }
