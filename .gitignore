@@ -38,3 +38,7 @@ converter/out/
 
 # PowerPoint lock files
 ~$*.pptx
+
+# Source PowerPoint files (company templates, real decks) stay out of git
+/*.pptx
+/*.potx

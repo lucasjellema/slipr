@@ -15,14 +15,10 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 4 (Converter MVP)
+## Now: finishing Phase 4, then the company template
 
-- [ ] **P-001** [converter] Python package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text) · todo · claude
-- [ ] **P-002** [converter] `extract.py` + `text.py`: intermediate model, Markdown text with bullet levels · todo · claude
-- [ ] **P-003** [converter] `mapping.py`: layout mapping + heuristics · todo · claude
-- [ ] **P-004** [converter] `emit.py`, `validate.py`, CLI `slipr-convert`, `conversion-report.md`, `--notes-to-reader` · todo · claude
-- [ ] **P-005** [converter] Tests with fixture decks generated in code · todo · claude
 - [ ] **P-006** [converter] Convert one of Lucas's real decks end-to-end (Lucas supplies a deck without confidential content) · todo · lucas
+- [ ] **I-043** [converter] Derive a Slipr template from the company PowerPoint template (`slipr-template-from-pptx`): theme colours/fonts → tokens, layouts/placeholders → layout fragments, layout names → `pptxMapping`, master images → assets; then refine by hand (reflow, reader.css). Lucas supplies the .potx · todo · claude
 - [ ] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · todo · lucas
 - [ ] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · todo · lucas
 
@@ -80,7 +76,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-046** [converter] Charts → `chart` slot with the chart's real data (categories, series, values), so it is rendered and animated natively by Slipr
 - [ ] **I-041** [converter] Charts and SmartArt → image fallback (via LibreOffice headless, optional)
 - [ ] **I-042** [converter] Whole-slide image fallback for slides that cannot be mapped
-- [ ] **I-043** [converter] Extract colors and fonts from the PPTX master as a starting point for a new template
 - [ ] **I-044** [converter] Batch-convert a folder of decks
 - [ ] **I-045** [converter] Reverse direction: export a Slipr show to PPTX (e.g. via PptxGenJS)
 
@@ -161,6 +156,11 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **P-001** [converter] Package skeleton (`pyproject.toml`, venv, pytest) + `reader.py` (sections, hidden slides, alt text, builds, inherited bullets) · done 2026-10-10 · claude
+- [x] **P-002** [converter] `extract.py` + `text.py`: intermediate model, Markdown with bullet levels, formatting and escaping · done 2026-10-10 · claude
+- [x] **P-003** [converter] `mapping.py`: name mapping, title/section hints, best-fit scoring, reader-layer leftovers · done 2026-10-10 · claude
+- [x] **P-004** [converter] `emit.py`, `validate.py`, CLI `slipr-convert`, `conversion-report.md`, `--notes-to-reader` · done 2026-10-10 · claude
+- [x] **P-005** [converter] 24 tests with a deck generated in code, plus the JS-validator contract test · done 2026-10-10 · claude
 - [x] **V-018** [viewer] Annotate slides and objects on slides: slide notes, pins (click or object list), highlights in slide text · done 2026-10-10 · claude
 - [x] **V-011** [viewer] Reader state: IndexedDB → localStorage → memory, debounced store, `migrate()` · done 2026-10-10 · claude
 - [x] **V-013** [viewer] Welcome chooser and ⚙ Tailor panel (profile / depth / route / presenter notes), `D` key · done 2026-10-10 · claude

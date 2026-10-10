@@ -2,9 +2,9 @@
 
 The converter turns a PowerPoint file into a Slipr show folder. It keeps the **content** (titles, text, bullets, images, speaker notes, sections) and maps every slide onto a **layout of a Slipr template**. The show then takes on the look of that template, not the look of the original deck.
 
-> Status: **planned**. Requires Python 3.11 or newer.
+> Status: **works** (roadmap Phase 4). Requires Python 3.11 or newer.
 
-## Installation *(planned)*
+## Installation
 
 Run this once, from the `converter/` folder:
 
@@ -14,9 +14,9 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-This installs the `slipr-convert` command inside the virtual environment.
+This installs the `slipr-convert` command inside the virtual environment. Without activating the environment you can also run `.venv\Scripts\slipr-convert`.
 
-## Usage *(planned)*
+## Usage
 
 ```
 slipr-convert <deck.pptx> --template <template-folder> --out <show-folder> [options]
@@ -28,36 +28,51 @@ slipr-convert <deck.pptx> --template <template-folder> --out <show-folder> [opti
 | `--out` | Output folder. It is created if missing, and existing files are only overwritten with `--force` |
 | `--mapping <file.json>` | Extra layout mapping (PowerPoint layout name → Slipr layout id), which overrides the template's `pptxMapping` |
 | `--id <show-id>` | Show id (default: derived from the file name) |
+| `--lang <code>` | Language of the deck, e.g. `nl` (default `en`) |
 | `--no-notes` | Skip speaker notes |
-| `--notes-to-reader` | Also copy the speaker notes into a reader `text` block. This gives a quick first reader layer, which you then refine in the editor |
+| `--notes-to-reader` | Also copy the speaker notes into a reader `text` block. This gives a quick first reader layer, which you then refine |
 | `--force` | Overwrite an existing output folder |
 
-Example:
+Example (from `converter/`):
 
 ```
 slipr-convert "C:\talks\cloud-native.pptx" --template ..\templates\default --out ..\shows\cloud-native
 ```
 
+Then open the result with the dev server running: `http://localhost:8080/viewer/?show=../shows/cloud-native/show.json`.
+
+The output folder contains `show.json`, `images/`, and `conversion-report.md`. The `template.ref` and `$schema` paths in `show.json` are written relative to the output folder, so the show works wherever it sits in the Slipr folder.
+
 ## What gets converted
 
-| PowerPoint element | Result in Slipr | MVP? |
+| PowerPoint element | Result in Slipr | Status |
 |---|---|---|
-| Slide order | `slides[]` order | ✅ |
+| Slide order | `slides[]` order, ids `s-01`, `s-02`, … | ✅ |
 | Sections | `chapters` + `slide.chapter` | ✅ |
-| Hidden slides | `audience.hidden: true` | ✅ |
-| Title placeholder | `title` slot | ✅ |
-| Subtitle | `subtitle` slot | ✅ |
-| Body text with bullet levels | `body` (Markdown list) | ✅ |
-| Bold / italic / hyperlinks | Markdown | ✅ |
-| Pictures | copied to `images/`, `image` slot. Alt text comes from the picture's description | ✅ |
+| Hidden slides | backup slides (`audience.hidden: true`) | ✅ |
+| Title / subtitle placeholders | `title` / `subtitle` slots | ✅ |
+| Body text with bullet levels | Markdown list (nested). Bullet settings inherited from the layout/master are respected | ✅ |
+| Paragraphs without bullets, text boxes | Markdown paragraphs | ✅ |
+| Bold / italic / hyperlinks | `**…**` / `*…*` / `[…](url)`. Characters like `*` or `[` in your text are escaped | ✅ |
+| Pictures (placeholders and free pictures) | copied to `images/` (identical pictures only once), `image` slot. Alt text comes from the picture's description; an automatic file-name description counts as missing | ✅ |
 | Speaker notes | `notes` (and optionally a reader block) | ✅ |
-| Presentation title / author / date | `meta` | ✅ |
-| Tables | *(next)* `table` block/slot | ❌ |
-| Charts | *(next)* `chart` slot with the **chart's real data** (categories, series, values) | ❌ |
-| SmartArt, diagrams | *(later)* image fallback via LibreOffice | ❌ |
-| Animations, transitions | ignored. Bullet build-ins become `audience.fragments: true` | partly |
-| Colors, fonts, positions | ignored on purpose, because the template decides | n/a |
+| Bullet build animations | `audience.fragments: true` | ✅ |
+| Presentation title / author / date, slide size | `meta`, `settings.aspectRatio` (16:9 or 4:3) | ✅ |
+| Content that doesn't fit the chosen layout | **reader layer** text/image blocks, so it is never lost | ✅ |
+| Tables | *(next)* `table` block/slot (I-040). Now: reported, plus a warning in the slide notes | ❌ |
+| Charts | *(next)* `chart` slot with the **chart's real data** (I-046). Now: reported | ❌ |
+| SmartArt, diagrams, OLE objects, video | *(later)* image fallback via LibreOffice (I-041). Now: reported | ❌ |
+| Logos and decorations from the master | ignored on purpose: the template provides them | n/a |
+| Colours, fonts, positions | ignored on purpose, because the template decides | n/a |
+
+## How layouts are chosen
+
+1. **By name:** if the PowerPoint layout name is in `--mapping` or in the template's `pptxMapping` (e.g. "Title and Content" → `bullets`), that layout is used. The exception: if the slide has pictures and the mapped layout can't hold any, the best fit is used instead.
+2. **Title-only slides:** the first one becomes `title`, later ones `section`.
+3. **Best fit:** otherwise, the layout whose slots match the slide's text blocks and pictures with the least left over.
+
+Whatever doesn't fit, such as a third text block or a second picture, goes to the slide's reader layer and is listed in the report.
 
 ## The conversion report
 
-Every run writes `conversion-report.md` into the output folder. It lists per slide which layout was chosen and why (mapping or heuristic), and what was **skipped**, so you know which slides to touch up in the editor.
+Every run writes `conversion-report.md` into the output folder. For each slide it lists which layout was chosen and why, what moved to the reader layer, what was **not converted**, and remarks such as missing alt text or a missing title. That tells you which slides to touch up.

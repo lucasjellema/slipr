@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-10: Phase 4, PPTX converter
+- **Added** the Python converter `slipr-convert` (see `converter/CHANGELOG.md`). It converts PowerPoint decks into Slipr shows, with a per-run conversion report. Content that doesn't fit a layout goes to the reader layer.
+- **Added** a cross-language contract test: the converter's output must pass both the JSON Schema (Python `jsonschema`) and `shared/validate.js` (Node).
+- **Changed** the backlog: I-043 (derive a Slipr template from the company PowerPoint template) moves to *Now*.
+
 ### 2026-10-10: Annotating slides and slide objects
 - **Added** to reader mode: notes on whole slides, pins on objects within slide visuals, and highlights in slide text (see `viewer/CHANGELOG.md`). 5 new tests (133 total).
 

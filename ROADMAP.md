@@ -71,7 +71,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 **Done when**: A "Manager / Overview / 5-minute" link and a "Developer / Deep dive / Full story" link visibly produce different experiences, and highlights survive a reload.
 
-## Phase 4: Converter MVP (≈ 2 sessions)
+## Phase 4: Converter MVP (≈ 2 sessions) ✅ done 2026-10-10 (real-deck check P-006 pending)
 
 **Goal**: Turn your real decks into Slipr shows.
 

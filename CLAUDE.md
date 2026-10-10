@@ -59,8 +59,8 @@ The demo show `shows/demo/` exercises every format feature. Use it as the refere
 |---|---|
 | Serve everything locally | `npm run serve` (then open `http://localhost:8080/viewer/?show=../shows/demo/show.json`). In Claude's browser pane: `preview_start` with the `slipr` entry from `.claude/launch.json` |
 | Run JS tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
-| Run converter tests | `pytest` in `converter/` with its venv active *(planned)* |
-| Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` *(planned)* |
+| Run converter tests | `pytest` in `converter/` with its venv active (or `converter/.venv/Scripts/python -m pytest`) |
+| Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` |
 
 Two toolchains: the web side uses npm and Node (dev tooling only), and the converter is **Python** (D-006, see `converter/CLAUDE.md`).
 

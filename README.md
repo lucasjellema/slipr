@@ -11,7 +11,7 @@
 
 Each slide carries both layers: the concise **audience layer** (the slide itself) and the detailed **reader layer** (blocks of interactive content). See [docs/show-format.md](docs/show-format.md).
 
-> Status: **Phase 3 done**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes. The PPTX converter and the editor are next. See [ROADMAP.md](ROADMAP.md).
+> Status: **Phase 3 done**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes. The **PPTX converter** turns PowerPoint decks into Slipr shows. The editor is next. See [ROADMAP.md](ROADMAP.md).
 >
 > Try it: run `npm run serve` in this folder and open <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience) or <http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader> (reader).
 
