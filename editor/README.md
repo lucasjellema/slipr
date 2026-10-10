@@ -2,7 +2,7 @@
 
 The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, configure the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); and the fixes E-010 to E-013. Also done: editors for cards, quotes and code (I-035). Not yet: a layout picker with previews (E-004), editors for tabs, embed and slide-ref blocks (I-036), and draft autosave (I-020).
+> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); global find & replace (I-025); and the fixes E-010 to E-013. Also done: editors for cards, quotes and code (I-035). Not yet: a layout picker with previews (E-004), editors for tabs, embed and slide-ref blocks (I-036), and draft autosave (I-020).
 >
 > **Quick Start:** Run `npm run serve` in the repository root, then open <http://localhost:8080/editor/>. Choose **Open show folder…** for a show on your disk, **New show…** to start one from a template, or open the demo by URL: <http://localhost:8080/editor/?show=../shows/demo/show.json>
 
@@ -138,6 +138,14 @@ The preview pane updates instantly as you type (debounced at 150 ms):
 * **Read 📖:** Saves your changes, then opens reader mode in a new browser tab at the selected slide.
 * Both work for shows anywhere on disk: the viewer opens the same folder (`viewer/?folder=<key>`). A show opened by URL with unsaved changes first asks for its folder.
 
+### 8. Find and Replace
+
+Press **Ctrl+F** or **Ctrl+H** (or click **🔍 Find & Replace** in the toolbar) to open the Find & Replace modal dialog:
+* **Search across the whole show:** Matches are searched across audience slide slot values (text and cards), speaker notes, reader summaries and blocks (text, details, callouts, image captions and hotspot text), and show settings (metadata, chapters, glossary).
+* **Search options:** Toggle **Match case** (case-sensitive) and **Whole word**.
+* **Preview & navigation:** A live list shows matching snippets with `<mark>` highlights and location badges. Clicking any match closes the dialog and immediately navigates to that slide.
+* **Replace:** Click **Replace in Current Slide** to replace occurrences on the currently selected slide, or **Replace All** to replace occurrences throughout the entire show. All replacements are pure, immutable, and fully undoable with `Ctrl+Z`.
+
 ---
 
 ## Keyboard Shortcuts
@@ -147,6 +155,7 @@ The preview pane updates instantly as you type (debounced at 150 ms):
 | `Ctrl+S` / `Cmd+S` | Save show |
 | `Ctrl+Z` / `Cmd+Z` | Undo last change |
 | `Ctrl+Y` / `Cmd+Y` or `Ctrl+Shift+Z` | Redo last undone change |
+| `Ctrl+F` / `Cmd+F` or `Ctrl+H` / `Cmd+H` | Open Find & Replace dialog |
 | `Ctrl+Enter` | Add a new slide after the current one |
 | `Ctrl+D` | Duplicate current slide |
 | `Alt+↑` | Move current slide up |

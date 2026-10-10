@@ -876,6 +876,629 @@ export function deletePath(show, { pathId }) {
   return { ...show, paths };
 }
 
+// ---------------------------------------------------------------------------
+// Global Search and Replace (I-025)
+// ---------------------------------------------------------------------------
+
+/**
+ * Escape regular expression special characters.
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Build a regular expression for text search.
+ * @param {string} query
+ * @param {{ matchCase?: boolean, matchWholeWord?: boolean }} [options]
+ * @returns {RegExp | null}
+ */
+export function buildSearchRegex(query, { matchCase = false, matchWholeWord = false } = {}) {
+  if (!query || typeof query !== 'string') return null;
+  let pattern = escapeRegExp(query);
+  if (matchWholeWord) {
+    pattern = `\\b${pattern}\\b`;
+  }
+  const flags = matchCase ? 'g' : 'gi';
+  return new RegExp(pattern, flags);
+}
+
+/**
+ * Extract a preview snippet around a match index.
+ * @param {string} text
+ * @param {number} index
+ * @param {number} length
+ * @returns {string}
+ */
+function extractSnippet(text, index, length) {
+  const pad = 24;
+  const start = Math.max(0, index - pad);
+  const end = Math.min(text.length, index + length + pad);
+  const prefix = start > 0 ? '…' : '';
+  const suffix = end < text.length ? '…' : '';
+  const before = text.slice(start, index);
+  const match = text.slice(index, index + length);
+  const after = text.slice(index + length, end);
+  return `${prefix}${before}[${match}]${after}${suffix}`;
+}
+
+/**
+ * Scan a text string for matches and push to results array.
+ * @param {string} text
+ * @param {RegExp} regex
+ * @param {Omit<MatchOccurrence, 'snippet'>} info
+ * @param {MatchOccurrence[]} matches
+ */
+function scanString(text, regex, info, matches) {
+  if (typeof text !== 'string') return 0;
+  regex.lastIndex = 0;
+  let m;
+  let count = 0;
+  while ((m = regex.exec(text)) !== null) {
+    count++;
+    matches.push({
+      ...info,
+      snippet: extractSnippet(text, m.index, m[0].length),
+    });
+    if (m.index === regex.lastIndex) regex.lastIndex++;
+  }
+  return count;
+}
+
+/**
+ * @typedef {object} MatchOccurrence
+ * @property {string | null} slideId
+ * @property {number | null} slideIndex
+ * @property {string} slideTitle
+ * @property {string} location
+ * @property {string} field
+ * @property {string} snippet
+ */
+
+/**
+ * @typedef {object} SearchResults
+ * @property {number} totalMatches
+ * @property {MatchOccurrence[]} matches
+ */
+
+/**
+ * Find all occurrences of query across the entire show without modifying it.
+ * @param {any} show
+ * @param {{ query: string, matchCase?: boolean, matchWholeWord?: boolean }} options
+ * @returns {SearchResults}
+ */
+export function findMatches(show, { query, matchCase = false, matchWholeWord = false }) {
+  if (!query || typeof query !== 'string' || query.trim() === '') {
+    return { totalMatches: 0, matches: [] };
+  }
+  const regex = buildSearchRegex(query, { matchCase, matchWholeWord });
+  if (!regex) return { totalMatches: 0, matches: [] };
+
+  /** @type {MatchOccurrence[]} */
+  const matches = [];
+  let total = 0;
+
+  // 1. Show metadata
+  if (show.meta && typeof show.meta === 'object') {
+    for (const field of ['title', 'subtitle', 'author', 'description']) {
+      if (typeof show.meta[field] === 'string') {
+        total += scanString(show.meta[field], regex, {
+          slideId: null,
+          slideIndex: null,
+          slideTitle: 'Show metadata',
+          location: `Metadata: ${field}`,
+          field: `meta.${field}`,
+        }, matches);
+      }
+    }
+  }
+
+  // 2. Chapters
+  if (Array.isArray(show.chapters)) {
+    for (const chap of show.chapters) {
+      const cTitle = chap.title || chap.id;
+      if (typeof chap.title === 'string') {
+        total += scanString(chap.title, regex, {
+          slideId: null,
+          slideIndex: null,
+          slideTitle: `Chapter: ${cTitle}`,
+          location: 'Chapter title',
+          field: `chapters[${chap.id}].title`,
+        }, matches);
+      }
+      if (typeof chap.summary === 'string') {
+        total += scanString(chap.summary, regex, {
+          slideId: null,
+          slideIndex: null,
+          slideTitle: `Chapter: ${cTitle}`,
+          location: 'Chapter summary',
+          field: `chapters[${chap.id}].summary`,
+        }, matches);
+      }
+    }
+  }
+
+  // 3. Glossary
+  if (show.glossary && typeof show.glossary === 'object') {
+    for (const [id, term] of Object.entries(show.glossary)) {
+      if (!term || typeof term !== 'object') continue;
+      const tName = term.term || id;
+      if (typeof term.term === 'string') {
+        total += scanString(term.term, regex, {
+          slideId: null,
+          slideIndex: null,
+          slideTitle: `Glossary: ${tName}`,
+          location: 'Glossary term',
+          field: `glossary[${id}].term`,
+        }, matches);
+      }
+      if (typeof term.definition === 'string') {
+        total += scanString(term.definition, regex, {
+          slideId: null,
+          slideIndex: null,
+          slideTitle: `Glossary: ${tName}`,
+          location: 'Glossary definition',
+          field: `glossary[${id}].definition`,
+        }, matches);
+      }
+    }
+  }
+
+  // 4. Slides
+  if (Array.isArray(show.slides)) {
+    show.slides.forEach((slide, idx) => {
+      const sNum = idx + 1;
+      const sTitle = (slide.content?.title || slide.content?.heading || slide.layout || `Slide ${sNum}`).trim();
+
+      // Content slots
+      if (slide.content && typeof slide.content === 'object') {
+        for (const [slot, val] of Object.entries(slide.content)) {
+          if (typeof val === 'string') {
+            total += scanString(val, regex, {
+              slideId: slide.id,
+              slideIndex: sNum,
+              slideTitle: sTitle,
+              location: `Content: ${slot}`,
+              field: `content.${slot}`,
+            }, matches);
+          } else if (Array.isArray(val)) {
+            val.forEach((item, itemIdx) => {
+              if (typeof item === 'string') {
+                total += scanString(item, regex, {
+                  slideId: slide.id,
+                  slideIndex: sNum,
+                  slideTitle: sTitle,
+                  location: `Content: ${slot} item ${itemIdx + 1}`,
+                  field: `content.${slot}[${itemIdx}]`,
+                }, matches);
+              } else if (item && typeof item === 'object') {
+                // Card item
+                for (const [cardKey, cardVal] of Object.entries(item)) {
+                  if (typeof cardVal === 'string') {
+                    total += scanString(cardVal, regex, {
+                      slideId: slide.id,
+                      slideIndex: sNum,
+                      slideTitle: sTitle,
+                      location: `Card ${itemIdx + 1}: ${cardKey}`,
+                      field: `content.${slot}[${itemIdx}].${cardKey}`,
+                    }, matches);
+                  }
+                }
+              }
+            });
+          }
+        }
+      }
+
+      // Speaker notes
+      if (typeof slide.notes === 'string') {
+        total += scanString(slide.notes, regex, {
+          slideId: slide.id,
+          slideIndex: sNum,
+          slideTitle: sTitle,
+          location: 'Speaker notes',
+          field: 'notes',
+        }, matches);
+      }
+
+      // Reader layer
+      if (slide.reader && typeof slide.reader === 'object') {
+        if (typeof slide.reader.summary === 'string') {
+          total += scanString(slide.reader.summary, regex, {
+            slideId: slide.id,
+            slideIndex: sNum,
+            slideTitle: sTitle,
+            location: 'Reader summary',
+            field: 'reader.summary',
+          }, matches);
+        }
+
+        if (Array.isArray(slide.reader.blocks)) {
+          slide.reader.blocks.forEach((block, bIdx) => {
+            const bType = block.type || 'block';
+            for (const f of ['md', 'title', 'caption', 'label']) {
+              if (typeof block[f] === 'string') {
+                total += scanString(block[f], regex, {
+                  slideId: slide.id,
+                  slideIndex: sNum,
+                  slideTitle: sTitle,
+                  location: `Reader: ${bType} (${f})`,
+                  field: `reader.blocks[${block.id ?? bIdx}].${f}`,
+                }, matches);
+              }
+            }
+            if (Array.isArray(block.items)) {
+              block.items.forEach((it, itIdx) => {
+                if (typeof it === 'string') {
+                  total += scanString(it, regex, {
+                    slideId: slide.id,
+                    slideIndex: sNum,
+                    slideTitle: sTitle,
+                    location: `Reader: ${bType} item ${itIdx + 1}`,
+                    field: `reader.blocks[${block.id ?? bIdx}].items[${itIdx}]`,
+                  }, matches);
+                } else if (it && typeof it === 'object') {
+                  for (const f of ['title', 'md']) {
+                    if (typeof it[f] === 'string') {
+                      total += scanString(it[f], regex, {
+                        slideId: slide.id,
+                        slideIndex: sNum,
+                        slideTitle: sTitle,
+                        location: `Reader: ${bType} tab ${itIdx + 1} (${f})`,
+                        field: `reader.blocks[${block.id ?? bIdx}].items[${itIdx}].${f}`,
+                      }, matches);
+                    }
+                  }
+                }
+              });
+            }
+            if (Array.isArray(block.hotspots)) {
+              block.hotspots.forEach((h, hIdx) => {
+                for (const f of ['title', 'md']) {
+                  if (typeof h[f] === 'string') {
+                    total += scanString(h[f], regex, {
+                      slideId: slide.id,
+                      slideIndex: sNum,
+                      slideTitle: sTitle,
+                      location: `Reader hotspot ${hIdx + 1} (${f})`,
+                      field: `reader.blocks[${block.id ?? bIdx}].hotspots[${hIdx}].${f}`,
+                    }, matches);
+                  }
+                }
+              });
+            }
+          });
+        }
+      }
+    });
+  }
+
+  return { totalMatches: total, matches };
+}
+
+/**
+ * Replace all occurrences of string in target text.
+ * @param {string} text
+ * @param {RegExp} regex
+ * @param {string} replacement
+ * @returns {{ text: string, replaced: number }}
+ */
+function replaceInString(text, regex, replacement) {
+  if (typeof text !== 'string') return { text, replaced: 0 };
+  regex.lastIndex = 0;
+  let count = 0;
+  const replaced = text.replace(regex, () => {
+    count++;
+    return replacement;
+  });
+  return { text: replaced, replaced: count };
+}
+
+/**
+ * Apply search and replace to a single slide.
+ * @param {any} slide
+ * @param {RegExp} regex
+ * @param {string} replacement
+ * @returns {{ slide: any, replaced: number }}
+ */
+function replaceInSlide(slide, regex, replacement) {
+  let count = 0;
+  let updatedSlide = slide;
+
+  // Content
+  if (slide.content && typeof slide.content === 'object') {
+    let contentChanged = false;
+    const nextContent = { ...slide.content };
+    for (const [slot, val] of Object.entries(slide.content)) {
+      if (typeof val === 'string') {
+        const res = replaceInString(val, regex, replacement);
+        if (res.replaced > 0) {
+          count += res.replaced;
+          contentChanged = true;
+          nextContent[slot] = res.text;
+        }
+      } else if (Array.isArray(val)) {
+        let arrChanged = false;
+        const nextArr = val.map((item) => {
+          if (typeof item === 'string') {
+            const res = replaceInString(item, regex, replacement);
+            if (res.replaced > 0) {
+              count += res.replaced;
+              arrChanged = true;
+              return res.text;
+            }
+            return item;
+          }
+          if (item && typeof item === 'object') {
+            let itemChanged = false;
+            const nextItem = { ...item };
+            for (const [k, v] of Object.entries(item)) {
+              if (typeof v === 'string') {
+                const res = replaceInString(v, regex, replacement);
+                if (res.replaced > 0) {
+                  count += res.replaced;
+                  itemChanged = true;
+                  nextItem[k] = res.text;
+                }
+              }
+            }
+            if (itemChanged) arrChanged = true;
+            return nextItem;
+          }
+          return item;
+        });
+        if (arrChanged) {
+          contentChanged = true;
+          nextContent[slot] = nextArr;
+        }
+      }
+    }
+    if (contentChanged) {
+      updatedSlide = { ...updatedSlide, content: nextContent };
+    }
+  }
+
+  // Speaker notes
+  if (typeof updatedSlide.notes === 'string') {
+    const res = replaceInString(updatedSlide.notes, regex, replacement);
+    if (res.replaced > 0) {
+      count += res.replaced;
+      updatedSlide = { ...updatedSlide, notes: res.text };
+    }
+  }
+
+  // Reader layer
+  if (updatedSlide.reader && typeof updatedSlide.reader === 'object') {
+    let readerChanged = false;
+    let nextReader = { ...updatedSlide.reader };
+
+    if (typeof nextReader.summary === 'string') {
+      const res = replaceInString(nextReader.summary, regex, replacement);
+      if (res.replaced > 0) {
+        count += res.replaced;
+        readerChanged = true;
+        nextReader.summary = res.text;
+      }
+    }
+
+    if (Array.isArray(nextReader.blocks)) {
+      let blocksChanged = false;
+      const nextBlocks = nextReader.blocks.map((block) => {
+        let blockChanged = false;
+        let nextBlock = { ...block };
+
+        for (const f of ['md', 'title', 'caption', 'label']) {
+          if (typeof nextBlock[f] === 'string') {
+            const res = replaceInString(nextBlock[f], regex, replacement);
+            if (res.replaced > 0) {
+              count += res.replaced;
+              blockChanged = true;
+              nextBlock[f] = res.text;
+            }
+          }
+        }
+
+        if (Array.isArray(nextBlock.items)) {
+          let itemsChanged = false;
+          const nextItems = nextBlock.items.map((it) => {
+            if (typeof it === 'string') {
+              const res = replaceInString(it, regex, replacement);
+              if (res.replaced > 0) {
+                count += res.replaced;
+                itemsChanged = true;
+                return res.text;
+              }
+              return it;
+            }
+            if (it && typeof it === 'object') {
+              let itChanged = false;
+              const nextIt = { ...it };
+              for (const f of ['title', 'md']) {
+                if (typeof nextIt[f] === 'string') {
+                  const res = replaceInString(nextIt[f], regex, replacement);
+                  if (res.replaced > 0) {
+                    count += res.replaced;
+                    itChanged = true;
+                    nextIt[f] = res.text;
+                  }
+                }
+              }
+              if (itChanged) itemsChanged = true;
+              return nextIt;
+            }
+            return it;
+          });
+          if (itemsChanged) {
+            blockChanged = true;
+            nextBlock.items = nextItems;
+          }
+        }
+
+        if (Array.isArray(nextBlock.hotspots)) {
+          let hotspotsChanged = false;
+          const nextHotspots = nextBlock.hotspots.map((h) => {
+            let hChanged = false;
+            const nextH = { ...h };
+            for (const f of ['title', 'md']) {
+              if (typeof nextH[f] === 'string') {
+                const res = replaceInString(nextH[f], regex, replacement);
+                if (res.replaced > 0) {
+                  count += res.replaced;
+                  hChanged = true;
+                  nextH[f] = res.text;
+                }
+              }
+            }
+            if (hChanged) hotspotsChanged = true;
+            return nextH;
+          });
+          if (hotspotsChanged) {
+            blockChanged = true;
+            nextBlock.hotspots = nextHotspots;
+          }
+        }
+
+        if (blockChanged) blocksChanged = true;
+        return nextBlock;
+      });
+
+      if (blocksChanged) {
+        readerChanged = true;
+        nextReader.blocks = nextBlocks;
+      }
+    }
+
+    if (readerChanged) {
+      updatedSlide = { ...updatedSlide, reader: nextReader };
+    }
+  }
+
+  return { slide: updatedSlide, replaced: count };
+}
+
+/**
+ * Replace all occurrences across all slides, reader blocks, notes, and show settings.
+ * @param {any} show
+ * @param {{ find: string, replaceWith?: string, matchCase?: boolean, matchWholeWord?: boolean }} payload
+ * @returns {any}
+ */
+export function replaceAllText(show, { find, replaceWith = '', matchCase = false, matchWholeWord = false }) {
+  if (!find || typeof find !== 'string') return show;
+  const regex = buildSearchRegex(find, { matchCase, matchWholeWord });
+  if (!regex) return show;
+
+  let totalReplaced = 0;
+  let newShow = { ...show };
+
+  // 1. Meta
+  if (newShow.meta && typeof newShow.meta === 'object') {
+    let metaChanged = false;
+    const nextMeta = { ...newShow.meta };
+    for (const f of ['title', 'subtitle', 'author', 'description']) {
+      if (typeof nextMeta[f] === 'string') {
+        const res = replaceInString(nextMeta[f], regex, replaceWith);
+        if (res.replaced > 0) {
+          totalReplaced += res.replaced;
+          metaChanged = true;
+          nextMeta[f] = res.text;
+        }
+      }
+    }
+    if (metaChanged) newShow.meta = nextMeta;
+  }
+
+  // 2. Chapters
+  if (Array.isArray(newShow.chapters)) {
+    let chaptersChanged = false;
+    const nextChapters = newShow.chapters.map((chap) => {
+      let cChanged = false;
+      let nextChap = { ...chap };
+      for (const f of ['title', 'summary']) {
+        if (typeof nextChap[f] === 'string') {
+          const res = replaceInString(nextChap[f], regex, replaceWith);
+          if (res.replaced > 0) {
+            totalReplaced += res.replaced;
+            cChanged = true;
+            nextChap[f] = res.text;
+          }
+        }
+      }
+      if (cChanged) chaptersChanged = true;
+      return nextChap;
+    });
+    if (chaptersChanged) newShow.chapters = nextChapters;
+  }
+
+  // 3. Glossary
+  if (newShow.glossary && typeof newShow.glossary === 'object') {
+    let glossaryChanged = false;
+    const nextGlossary = { ...newShow.glossary };
+    for (const [id, term] of Object.entries(newShow.glossary)) {
+      if (!term || typeof term !== 'object') continue;
+      let tChanged = false;
+      const nextTerm = { ...term };
+      for (const f of ['term', 'definition']) {
+        if (typeof nextTerm[f] === 'string') {
+          const res = replaceInString(nextTerm[f], regex, replaceWith);
+          if (res.replaced > 0) {
+            totalReplaced += res.replaced;
+            tChanged = true;
+            nextTerm[f] = res.text;
+          }
+        }
+      }
+      if (tChanged) {
+        glossaryChanged = true;
+        nextGlossary[id] = nextTerm;
+      }
+    }
+    if (glossaryChanged) newShow.glossary = nextGlossary;
+  }
+
+  // 4. Slides
+  if (Array.isArray(newShow.slides)) {
+    let slidesChanged = false;
+    const nextSlides = newShow.slides.map((s) => {
+      const res = replaceInSlide(s, regex, replaceWith);
+      if (res.replaced > 0) {
+        totalReplaced += res.replaced;
+        slidesChanged = true;
+        return res.slide;
+      }
+      return s;
+    });
+    if (slidesChanged) newShow.slides = nextSlides;
+  }
+
+  if (totalReplaced === 0) return show;
+  return newShow;
+}
+
+/**
+ * Replace occurrences within a single chosen slide.
+ * @param {any} show
+ * @param {{ slideId: string, find: string, replaceWith?: string, matchCase?: boolean, matchWholeWord?: boolean }} payload
+ * @returns {any}
+ */
+export function replaceSlideText(show, { slideId, find, replaceWith = '', matchCase = false, matchWholeWord = false }) {
+  if (!slideId || !find || typeof find !== 'string' || !Array.isArray(show.slides)) return show;
+  const regex = buildSearchRegex(find, { matchCase, matchWholeWord });
+  if (!regex) return show;
+
+  let totalReplaced = 0;
+  const nextSlides = show.slides.map((s) => {
+    if (s.id !== slideId) return s;
+    const res = replaceInSlide(s, regex, replaceWith);
+    totalReplaced += res.replaced;
+    return res.slide;
+  });
+
+  if (totalReplaced === 0) return show;
+  return { ...show, slides: nextSlides };
+}
+
 /** Action registry lookup */
 export const actions = {
   setBlockType,
@@ -910,4 +1533,6 @@ export const actions = {
   deleteProfile,
   upsertPath,
   deletePath,
+  replaceAllText,
+  replaceSlideText,
 };

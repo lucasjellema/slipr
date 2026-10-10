@@ -16,6 +16,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 - **Added** editors for `quote` (text and source) and `code` (language and code; Tab indents, Esc then Tab leaves the field) slots.
 - **Added** `card-values.js` (DOM-free value shapes, tests in `editor/test/card-values.test.js`), `ui/field-editors.js`, and `addImageToCard()` in `image-input.js`. Only `chart`, `diagram` and unknown slot types are read-only now.
 
+### 2026-10-10: Find and replace across the show (I-025)
+- **Added** global Search & Replace (`ui/find-replace.js`): find text and replace occurrences across audience slide slots, speaker notes, reader summaries and blocks, and show settings (metadata, chapters, glossary).
+- **Added** a Find & Replace dialog opened by clicking the **🔍 Find & Replace** button in the toolbar, or with `Ctrl+F` / `Cmd+F` and `Ctrl+H` / `Cmd+H`. Supports case-sensitive matching, whole-word matching, live match results preview with `<mark>` highlight snippets, and clickable results that jump directly to the target slide.
+- **Added** actions `replaceAllText` and `replaceSlideText` (with pure search helper `findMatches` in `actions.js`), allowing replacement across either the whole show or only within the currently selected slide, fully integrated with undo/redo.
+
 ### 2026-10-10: Hotspots and image blocks (E-006, done)
 - **Added** the hotspot editor (`ui/hotspot-editor.js`) for reader image blocks: click on the image to place a hotspot (its title is focused and selected), drag a numbered marker to move it (one undo step), or with a marker focused nudge it with the arrow keys (Shift: 5 %) and remove it with `Delete`. "+ Add hotspot" places one in the middle for keyboard users. Each hotspot has a title and Markdown popup text.
 - **Added** an image-block editor: the same image field as image slots (choose, drop, paste, alt-text dialog), alt text and caption.

@@ -38,6 +38,13 @@ export function registerShortcuts(store, { onSave, onPresent, onRead } = {}) {
       return;
     }
 
+    // Find & Replace: Ctrl+F / Cmd+F or Ctrl+H / Cmd+H
+    if (mod && !e.altKey && (e.key === 'f' || e.key === 'F' || e.key === 'h' || e.key === 'H')) {
+      e.preventDefault();
+      if (onFindReplace) onFindReplace();
+      return;
+    }
+
     // New slide: Ctrl+Enter
     if (mod && e.key === 'Enter') {
       e.preventDefault();

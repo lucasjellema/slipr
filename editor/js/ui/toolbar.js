@@ -51,6 +51,15 @@ export function mountToolbar(container, store, handlers = {}) {
         },
         ['↷ Redo']
       ),
+      h(
+        'button',
+        {
+          class: 'slipr-btn slipr-btn-icon',
+          title: 'Find and Replace (Ctrl+H or Ctrl+F)',
+          onclick: () => handlers.onFindReplace?.(),
+        },
+        ['🔍 Find & Replace']
+      ),
     ]);
 
     const fileGroup = h('div', { class: 'slipr-toolbar-group' }, [

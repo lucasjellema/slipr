@@ -19,6 +19,7 @@ import { mountReaderForm } from './ui/reader-form.js';
 import { mountShowSettings } from './ui/show-settings.js';
 import { mountPreview } from './ui/preview.js';
 import { renderAccessScreen, renderStartScreen, showBanner } from './ui/dialogs.js';
+import { openFindReplaceDialog } from './ui/find-replace.js';
 import { registerShortcuts } from './shortcuts.js';
 
 /**
@@ -158,6 +159,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
       onSave: () => run(() => save(store)),
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
+      onFindReplace: () => openFindReplaceDialog(store),
     });
   }
 
@@ -201,6 +203,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   registerShortcuts(store, {
     onSave: () => run(() => save(store)),
     onPresent: () => present('audience'),
+    onFindReplace: () => openFindReplaceDialog(store),
   });
 }
 

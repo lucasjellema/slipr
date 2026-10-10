@@ -952,6 +952,109 @@ body.is-screen #slipr-editor-banners {
   gap: 4px;
 }
 
+/* ---------- Find & Replace Dialog (I-025) ---------- */
+
+.slipr-find-replace-dialog {
+  width: min(560px, 95vw);
+  max-height: 85vh;
+}
+
+.slipr-find-replace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.slipr-dialog-close-btn {
+  background: transparent;
+  border: none;
+  color: var(--slipr-editor-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.slipr-dialog-close-btn:hover {
+  background: var(--slipr-editor-surface-raised);
+  color: var(--slipr-editor-text);
+}
+
+.slipr-find-options {
+  display: flex;
+  gap: 16px;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.slipr-checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--slipr-editor-text);
+}
+
+.slipr-find-status {
+  font-size: 12px;
+  color: var(--slipr-editor-muted);
+  font-weight: 500;
+  margin: 4px 0;
+}
+
+.slipr-find-matches {
+  max-height: 220px;
+  overflow-y: auto;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  background: var(--slipr-editor-bg);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slipr-find-match-item {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--slipr-editor-surface);
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.slipr-find-match-item:hover {
+  background: var(--slipr-editor-surface-raised);
+  border-color: var(--slipr-editor-accent);
+}
+
+.slipr-find-match-location {
+  font-weight: 600;
+  color: var(--slipr-editor-muted);
+  font-size: 11px;
+}
+
+.slipr-find-match-snippet {
+  color: var(--slipr-editor-text);
+  font-family: var(--slipr-font-mono);
+  font-size: 11px;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.slipr-find-match-snippet mark {
+  background: rgba(242, 169, 0, 0.4);
+  color: #FFFFFF;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
 /* ---------- Cards, quote and code editors (E-004, I-035) ---------- */
 
 .slipr-cards-group {

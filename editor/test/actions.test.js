@@ -256,3 +256,80 @@ describe('editor actions: show settings', () => {
     assert.ok(!deleted.paths.some((p) => p.id === 'exec'));
   });
 });
+
+describe('editor actions: global search and replace (I-025)', () => {
+  test('findMatches locates text across metadata, slides, notes, and reader blocks', () => {
+    // "Slipr" occurs in show title, slides, etc.
+    const res = actions.findMatches(demo, { query: 'Slipr' });
+    assert.ok(res.totalMatches > 5, `expected multiple matches, got ${res.totalMatches}`);
+    assert.ok(res.matches.some((m) => m.slideTitle === 'Show metadata'));
+    assert.ok(res.matches.some((m) => m.location.includes('title') || m.location.includes('body')));
+
+    // "audience" occurs in speaker notes (e.g. s-problem: "Ask the audience...")
+    const audRes = actions.findMatches(demo, { query: 'audience' });
+    assert.ok(audRes.matches.some((m) => m.location === 'Speaker notes'));
+
+    // Check snippet formatting
+    const match = res.matches[0];
+    assert.ok(match.snippet.includes('[Slipr]'), 'snippet must bracket the matched text');
+  });
+
+  test('findMatches respects matchCase and matchWholeWord', () => {
+    const ci = actions.findMatches(demo, { query: 'slipr', matchCase: false });
+    const cs = actions.findMatches(demo, { query: 'slipr', matchCase: true });
+    // In demo show, "Slipr" is capitalized, so cs should have fewer or different matches than ci
+    assert.ok(ci.totalMatches > cs.totalMatches);
+
+    const part = actions.findMatches(demo, { query: 'mode', matchWholeWord: false });
+    const whole = actions.findMatches(demo, { query: 'mode', matchWholeWord: true });
+    assert.ok(part.totalMatches >= whole.totalMatches);
+
+    // Empty or whitespace returns 0
+    assert.equal(actions.findMatches(demo, { query: '' }).totalMatches, 0);
+    assert.equal(actions.findMatches(demo, { query: '   ' }).totalMatches, 0);
+  });
+
+  test('replaceAllText replaces across show and can be undone', () => {
+    // Replace unique word "SlidePresenter" with "PresentationTool"
+    const replaced = actions.replaceAllText(demo, {
+      find: 'SlidePresenter',
+      replaceWith: 'PresentationTool',
+    });
+
+    assert.notEqual(replaced, demo, 'must return a new show reference');
+
+    const checkBefore = actions.findMatches(demo, { query: 'PresentationTool' });
+    assert.equal(checkBefore.totalMatches, 0);
+
+    const checkAfter = actions.findMatches(replaced, { query: 'PresentationTool' });
+    assert.ok(checkAfter.totalMatches > 0);
+
+    const oldAfter = actions.findMatches(replaced, { query: 'SlidePresenter' });
+    assert.equal(oldAfter.totalMatches, 0);
+
+    // When query is not found, returns same show reference
+    const unchanged = actions.replaceAllText(demo, {
+      find: 'nonexistenttermxyz123',
+      replaceWith: 'abc',
+    });
+    assert.equal(unchanged, demo);
+  });
+
+  test('replaceSlideText replaces only within target slide', () => {
+    const targetSlideId = 's-problem';
+    const replaced = actions.replaceSlideText(demo, {
+      slideId: targetSlideId,
+      find: 'room',
+      replaceWith: 'auditorium',
+    });
+
+    assert.notEqual(replaced, demo);
+    const target = replaced.slides.find((s) => s.id === targetSlideId);
+    assert.ok(target.content.body.includes('auditorium'));
+
+    // Other slides untouched
+    const other = replaced.slides.find((s) => s.id === 's-title');
+    assert.equal(other, demo.slides.find((s) => s.id === 's-title'));
+  });
+});
+
