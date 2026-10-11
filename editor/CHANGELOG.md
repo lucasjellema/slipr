@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Live preview checked (E-005, done)
+- **Checked** the preview against the viewer: reader mode filters blocks with the viewer's own `personalize()` (profile and depth give the same blocks as the viewer), follows `showSlide`, and shows the slide's errors and warnings.
+- **Added** a note above the preview when the viewer would not show the slide the normal way: a backup slide in audience mode ("shown after the last slide, unnumbered"), or a slide hidden from reader mode.
+- **Fixed** the reader preview of a reader-hidden slide showing all its blocks unfiltered: they are now filtered by profile and depth like any other slide's.
+
 ### 2026-10-11: Editors for tabs, embed and slide-ref blocks (I-036)
 - **Added** a tabs editor: one group per tab with a label and Markdown text (with the insert toolbar); add, reorder and remove tabs (a tabs block keeps at least one, and a label is never stored empty).
 - **Added** an embedded-page editor: the address (with a hint when it will not work: empty, a blocked scheme such as `javascript:`, or plain `http:`), a required title, and an optional height (at least 100 px; empty uses the default).

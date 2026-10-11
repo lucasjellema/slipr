@@ -17,7 +17,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 5 (Editor MVP)
 
-- [ ] **E-005** [editor] Live preview in both modes, with profile/depth simulation · in progress (basic version in E-001) · —
 
 ## Pending verification & chores from earlier phases
 
@@ -160,6 +159,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-005** [editor] Live preview in both modes with profile/depth simulation (checked against the viewer: same `personalize()` rules, `showSlide`, diagnostics); notes for backup and reader-hidden slides · done 2026-10-11 · claude
 - [x] **I-036** [editor] Block editors for tabs (labels, Markdown, add / reorder / remove), embed (URL with hints, title, height) and slide-ref (slide picker, label); every block type now has an editor · done 2026-10-11 · claude
 - [x] **E-003** [editor] Slide list: add, duplicate, delete, reorder (buttons, Alt+↑/↓, drag and drop with a drop line and edge scrolling), hide from audience mode (◉ / ◌) · done 2026-10-11 · claude
 - [x] **E-004** [editor] Slide tab: generated slot form with a field editor for every slot type, and a layout picker with live previews of the slide in each layout (what is hidden, brought back, needed); "▾" to add a slide in a chosen layout · done 2026-10-10 · claude

@@ -8,7 +8,7 @@ import { h } from '../dom.js';
 import { issuesForSlide } from '../store.js';
 import { renderSlide } from '../../../shared/render.js';
 import { renderBlocks } from '../../../shared/blocks.js';
-import { personalize } from '../../../viewer/reader/personalize.js';
+import { blockVisible, personalize } from '../../../viewer/reader/personalize.js';
 
 /**
  * Mount the live preview pane into container.
@@ -116,6 +116,12 @@ export function mountPreview(container, store) {
         resolveTemplateAsset: state.resolveTemplateAsset,
       };
 
+      // Say so when the viewer would not show this slide in the normal way.
+      const notice = state.previewMode === 'audience'
+        ? (slide.audience?.hidden ? 'Backup slide: hidden from the audience sequence. Audience mode shows it after the last slide, unnumbered.' : null)
+        : (slide.reader?.hidden ? 'Hidden from reader mode: readers never see this slide. The preview shows it anyway.' : null);
+      if (notice) viewport.append(h('div', { class: 'slipr-preview-notice', role: 'note' }, [notice]));
+
       if (state.previewMode === 'audience') {
         const slideEl = renderSlide(slide, showContext, { mode: 'audience' });
         const scaler = h('div', { class: 'slipr-preview-scaler' }, [slideEl]);
@@ -134,7 +140,10 @@ export function mountPreview(container, store) {
           depth: /** @type {1|2|3} */ (state.previewDepth),
         });
         const visibleSlide = personalizedModel.slides.find((s) => s.slide.id === slide.id);
-        const blocksToRender = visibleSlide ? visibleSlide.blocks : (slide.reader?.blocks ?? []);
+        // A slide personalize() leaves out (reader-hidden): filter its blocks by the same rule.
+        const blocksToRender = visibleSlide
+          ? visibleSlide.blocks
+          : (slide.reader?.blocks ?? []).filter((/** @type {any} */ b) => blockVisible(b, personalizedModel.prefs));
 
         if (slide.reader?.summary) {
           const summaryEl = h('div', { class: 'slipr-reader-summary' }, [slide.reader.summary]);

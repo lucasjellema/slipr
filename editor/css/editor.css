@@ -1467,3 +1467,16 @@ body.is-screen #slipr-editor-banners {
 .slipr-embed-height .slipr-input {
   width: 6rem;
 }
+
+/* ---------- Preview notices (E-005) ---------- */
+
+.slipr-preview-notice {
+  align-self: stretch;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-left: 3px solid var(--slipr-editor-warning);
+  background: rgba(210, 153, 34, 0.1);
+  color: var(--slipr-editor-text);
+  border-radius: 0 4px 4px 0;
+}
