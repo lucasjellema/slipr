@@ -6,9 +6,9 @@
 /**
  * Register global keyboard shortcuts on the window.
  * @param {import('./store.js').EditorStore} store
- * @param {{ onSave?: () => void, onPresent?: () => void, onRead?: () => void }} [handlers]
+ * @param {{ onSave?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
-export function registerShortcuts(store, { onSave, onPresent, onRead } = {}) {
+export function registerShortcuts(store, { onSave, onPresent, onRead, onFindReplace } = {}) {
   window.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().includes('MAC');
     const mod = isMac ? e.metaKey : e.ctrlKey;

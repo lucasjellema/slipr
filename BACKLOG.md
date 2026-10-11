@@ -65,7 +65,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
 - [ ] **I-024** [editor] Keyboard-first editing shortcuts
-- [ ] **I-025** [editor] Find & replace across slides, blocks and notes
 - [ ] **I-026** [editor] Image handling: resize/compress to WebP, crop, focal point
 - [ ] **I-027** [editor] AI assist (Claude API): draft slides from an outline, tighten bullets, write alt text, **generate a reader layer from speaker notes**, suggest glossary terms
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
@@ -159,6 +158,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-014** [editor] Bug: `Ctrl+F` / `Ctrl+H` threw `ReferenceError: onFindReplace is not defined`, because `registerShortcuts()` did not take the handler that `main.js` passes. Found in the docs pass · done 2026-10-11 · claude
 - [x] **E-005** [editor] Live preview in both modes with profile/depth simulation (checked against the viewer: same `personalize()` rules, `showSlide`, diagnostics); notes for backup and reader-hidden slides · done 2026-10-11 · claude
 - [x] **I-036** [editor] Block editors for tabs (labels, Markdown, add / reorder / remove), embed (URL with hints, title, height) and slide-ref (slide picker, label); every block type now has an editor · done 2026-10-11 · claude
 - [x] **E-003** [editor] Slide list: add, duplicate, delete, reorder (buttons, Alt+↑/↓, drag and drop with a drop line and edge scrolling), hide from audience mode (◉ / ◌) · done 2026-10-11 · claude
@@ -166,6 +166,8 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [x] **E-009** [editor] Show settings: chapters (with summary), profiles, glossary and reading routes: edit, reorder, usage counts, deletes that explain their effect (glossary: keep the words as plain text) · done 2026-10-10 · claude
 - [x] **E-008** [editor] Reader tab: summary, block editors with profile (`for`) and depth, related slides, `showSlide`, Markdown toolbar (glossary, popup, slide link). Editors for tabs, embed and slide-ref blocks are I-036 · done 2026-10-10 · claude
 - [x] **I-035** [editor] Cards editor for `cards` slots: fields per card by type, length counters, move / remove / add up to `maxItems`, card images; plus quote and code editors · done 2026-10-10 · claude
+- [x] **I-025** [editor] Global search & replace across slides, blocks, notes and settings: modal dialog (Ctrl+F / Ctrl+H / toolbar button), match previews with clickable jump-to-slide, case/whole-word options, replace in current slide or across whole show, pure actions + 4 tests · done 2026-10-10 · claude
+
 - [x] **E-006** [editor] Images and hotspots: choose / drop / paste images into image slots and reader image blocks, alt-text dialog, dedup by content; hotspot editor (click to place, drag or arrow keys to move, title + Markdown). Also fixed the Reader tab writing invalid blocks (type change, callout `kind` → `variant`, `md` on non-text blocks) · done 2026-10-10 · claude
 - [x] **E-013** [editor] Bug: after changing a slide's layout the form kept the old layout's fields (no image field for `text-image`); buttons and undo inside the inspector tabs showed stale content. Forms now re-render for everything except the echo of the user's own typing, keeping focus · done 2026-10-10 · claude
 - [x] **E-012** [editor] Bug: the slide list did not scroll, so slides beyond the window could not be reached; the toolbar hid its buttons in narrow windows. Fixed, plus a slide navigator ("Go to slide" filter, keyboard navigation, PageUp/PageDown) · done 2026-10-10 · claude

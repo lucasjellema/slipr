@@ -7,7 +7,7 @@ Read the root `CLAUDE.md` first. This file adds editor-specific guidance.
 - State flows one way: **UI → `dispatch(action)` → `store` → subscribers → UI**. Panels never modify the show object directly.
 - Every change to show data is a pure function in `js/actions.js`. If you need a new kind of edit, add an action there first, with a unit test.
 - The slide form is generated from the template's slot definitions. To support a new slot type, add a field editor in `ui/field-editors.js` **and** renderer support in `shared/render.js` **and** the type in the schema and spec.
-- To support a new reader **block** type: block editor in `ui/block-editors.js` + rendering in `shared/blocks.js` + schema + `docs/show-format.md`.
+- To support a new reader **block** type: block editor in `ui/reader-form.js` (value helpers with tests in `block-values.js`) + `convertBlock()` in `actions.js` + rendering in `shared/blocks.js` + schema + `docs/show-format.md`.
 - The preview uses `shared/render.js` and `shared/blocks.js`, the same renderers as the viewer, and `viewer/reader/personalize.js` for the profile/depth simulation. Do not add editor-only rendering.
 
 ## Invariants
@@ -30,6 +30,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 7. Kill the tab while dirty and reopen. The draft restore is offered.
 8. "Present" opens the viewer at the current slide.
 8b. Reader tab: give a block a profile ("For"), add and reorder a related slide, untick "Show the slide…" (the reader preview drops the slide visual), and use the Markdown toolbar on a selected word. The preview with that profile shows or hides the block.
+8c. Find & replace (`Ctrl+F`, `Ctrl+H` or the 🔍 button): a word from a slide, a reader block and the notes is listed with its location; clicking a match selects that slide; **Replace in Current Slide** and **Replace All** change the text, and one `Ctrl+Z` undoes each.
 8a. Reader tab: add a block, switch it to *Image with Hotspots*, paste an image, click the image to add a hotspot (its title field gets focus with the default selected), drag a marker, nudge it with the arrow keys, delete one with `Delete`. The reader preview and `viewer/?…&mode=reader` show the hotspots.
 9. The browser console is free of errors.
 
@@ -40,4 +41,5 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 - A field editor must write the value **shape** the format requires: an `image` slot is `{ src, alt, … }`, `quote` / `code` are objects, `cards` is an array of objects (see `docs/show-format.md`). Writing a plain string turns a valid show into an invalid one (bug E-010). Slot types without an editor should be read-only, never a text input. The rules live in `js/slot-values.js` (and `js/card-values.js` for cards, quote and code); extend them (with a test) when you add a field editor. A cards editor writes the whole array through `setSlot`, reading the current value from the store at the moment of the edit.
 - A form must not skip re-rendering just because it has focus: that leaves stale fields after a layout change, a button press or undo (bug E-013). Skip only the echo of the user's own typing (`isTypingEcho()`), and re-render with `rerenderKeepingFocus()` from `dom.js`. Add new typing actions to the form's `TYPING_ACTIONS`, and dispatch typing with a `coalesceKey`: that key is how a form recognises its own typing echo (a dispatch without one always re-renders the form).
 - Reader blocks follow the same rule as slots: a block editor writes only the fields its type allows (`variant`, not `kind`, for callouts), and a type change goes through `setBlockType`. Block types without an editor are read-only.
+- Find & replace has two walkers in `actions.js`: `findMatches()` (search) and `replaceInSlide()` + `replaceAllText()` (replace). When the format gains a text field, add it to both, or search finds text that replace leaves alone (or the other way round).
 - Large images make the whole store slow if inlined. Keep only paths in the show, never data URLs.

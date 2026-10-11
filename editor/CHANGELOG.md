@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Find & replace shortcuts (E-014)
+- **Fixed** `Ctrl+F` / `Ctrl+H` throwing `ReferenceError: onFindReplace is not defined` instead of opening Find & Replace: `registerShortcuts()` now takes the `onFindReplace` handler that `main.js` passes.
+
 ### 2026-10-11: Live preview checked (E-005, done)
 - **Checked** the preview against the viewer: reader mode filters blocks with the viewer's own `personalize()` (profile and depth give the same blocks as the viewer), follows `showSlide`, and shows the slide's errors and warnings.
 - **Added** a note above the preview when the viewer would not show the slide the normal way: a backup slide in audience mode ("shown after the last slide, unnumbered"), or a slide hidden from reader mode.

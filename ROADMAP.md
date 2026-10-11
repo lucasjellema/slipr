@@ -92,14 +92,16 @@ Derive a Slipr template from the Conclusion PowerPoint template. ✅ First versi
 **Goal**: Make and change shows, both layers, without touching JSON.
 
 1. ✅ Shell, store, actions, undo/redo (done 2026-10-10). This also gives first versions of steps 3 and 5–7. [E-001]
-2. Open, save and new-from-template via the File System Access API. [E-002]
-3. Slide list: add, duplicate, delete, reorder, hide. [E-003]
-4. Slide tab: generated slot form + layout picker. [E-004]
-5. Reader tab: summary, block editors with profile/depth, related. [E-008]
-6. Show settings: chapters, glossary, profiles, paths. [E-009]
-7. Live preview in both modes, with a profile/depth simulation. [E-005]
-8. Images and hotspots: drop or paste, alt text, hotspot placement. [E-006]
-9. Present / Read buttons. [E-007]
+2. ✅ Open, save and new-from-template via the File System Access API. [E-002]
+3. ✅ Slide list: add, duplicate, delete, reorder (also by dragging), hide. [E-003]
+4. ✅ Slide tab: generated slot form + layout picker. [E-004, I-035]
+5. ✅ Reader tab: summary, block editors with profile/depth, related. [E-008, I-036]
+6. ✅ Show settings: chapters, glossary, profiles, paths. [E-009]
+7. ✅ Live preview in both modes, with a profile/depth simulation. [E-005] Checked against the viewer and marked done 2026-10-11.
+8. ✅ Images and hotspots: drop or paste, alt text, hotspot placement. [E-006]
+9. ✅ Present / Read buttons. [E-007]
+
+Also done along the way: find & replace (I-025) and the fixes E-010 to E-014.
 
 **Done when**: You can build the demo show from scratch in the editor.
 

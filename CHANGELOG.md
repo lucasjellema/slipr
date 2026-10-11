@@ -6,6 +6,10 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-11: Documentation pass (editor E-003 to E-009, I-025, I-036)
+- **Changed** the docs to match the code after E-003, E-004, E-005, E-008, E-009, I-025, I-035 and I-036: root README status (the editor saves to disk now), ROADMAP Phase 5 steps, the editor's README status, `ARCHITECTURE.md` (module tree with `ui/find-replace.js`, all test files, the real store state, the full action list, a find & replace section; drafts marked planned, no slide thumbnails), and `CLAUDE.md` (where block editors live, a find & replace smoke step, the two search/replace walkers).
+- **Fixed** E-014, found in this pass: `Ctrl+F` / `Ctrl+H` in the editor threw, because the shortcut handler was not passed on (see the editor changelog).
+
 ### 2026-10-10: `registerAsset()` in the show context (E-006)
 - **Added** `ctx.registerAsset(src, blob)` to `shared/load.js`: for a show loaded from a folder it makes a newly added file resolvable (a `blob:` URL); for URL shows it does nothing, because the server serves the new file.
 

@@ -2,7 +2,7 @@
 
 The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, configure the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); global find & replace (I-025); and the fixes E-010 to E-013. Also done: editors for cards, quotes and code (I-035). Not yet: a layout picker with previews (E-004), editors for tabs, embed and slide-ref blocks (I-036), and draft autosave (I-020).
+> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); the slide list with drag and drop and a hide toggle (E-003); the slide form with an editor for every slot type, including cards, quotes and code, and a layout picker with live previews (E-004, I-035); the Reader tab with an editor for every block type (E-008, I-036); the live preview (E-005); show settings (E-009); global find & replace (I-025); and the fixes E-010 to E-014. Not yet: draft autosave (I-020).
 >
 > **Quick Start:** Run `npm run serve` in the repository root, then open <http://localhost:8080/editor/>. Choose **Open show folder…** for a show on your disk, **New show…** to start one from a template, or open the demo by URL: <http://localhost:8080/editor/?show=../shows/demo/show.json>
 
@@ -15,7 +15,7 @@ The editor uses a responsive 3-column layout:
 ```
 ┌──────────────┬──────────────────────────┬──────────────────────────────┐
 │ Slides       │ Slide                    │ Preview                      │
-│ [Go to slide]│ Layout: [Title+bullets▾] │                              │
+│ [Go to slide]│ Layout: [Title + bullets]│                              │
 │ 1 ▣ Title    │ [Slide] [Reader]         │ (Audience | Reader▾ as Dev ▾)│
 │ 2 ▣ Why      │ Title  [____________]    │   ┌──────────────────────┐   │
 │ 3 ▣ Demo     │ Body   [- item       ]   │   │  rendered slide      │   │
@@ -23,7 +23,7 @@ The editor uses a responsive 3-column layout:
 │              │ Notes  [____________]    │   ⚠ 1 warning                │
 │ ⚙ Show       │                          │                              │
 └──────────────┴──────────────────────────┴──────────────────────────────┘
- [Open] [New] [Save]                              [Present ▶] [Read 📖]
+ [↶] [↷] [🔍 Find]  [Open] [New] [Save]            [Present ▶] [Read 📖]
 ```
 
 1. **Left pane: Slides** — ordered list of all slides in the show, with a "Go to slide" box.

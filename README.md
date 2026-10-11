@@ -11,12 +11,12 @@
 
 Each slide carries both layers: the concise **audience layer** (the slide itself) and the detailed **reader layer** (blocks of interactive content). See [docs/show-format.md](docs/show-format.md).
 
-> Status: **Phases 0–4 done, Phase 5 (editor) in progress**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes, on whole slides and on objects within them. The **PPTX converter** turns PowerPoint decks into Slipr shows. Two templates ship: a neutral `default` and **Conclusion** (the company house style, 17 layouts, for internal use until the brand team has reviewed it). The **editor** has its first version: you can edit a show in the browser, but it cannot save to disk yet. See [ROADMAP.md](ROADMAP.md).
+> Status: **Phases 0–4 done, Phase 5 (editor) in progress**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes, on whole slides and on objects within them. The **PPTX converter** turns PowerPoint decks into Slipr shows. Two templates ship: a neutral `default` and **Conclusion** (the company house style, 17 layouts, for internal use until the brand team has reviewed it). The **editor** (Chrome or Edge) opens, creates and saves show folders anywhere on disk. It edits slides with a form generated from the layout and a layout picker with live previews, as well as images and hotspots, the reader layer, show settings (chapters, profiles, glossary, routes), and find & replace, all with undo and a live preview. Present and Read open the viewer on the same show. Still to come: draft autosave. See [ROADMAP.md](ROADMAP.md).
 >
 > Try it: run `npm run serve` in this folder and open
 > - <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience; add `&mode=reader` for reader mode)
 > - <http://localhost:8080/viewer/?show=../shows/conclusion-demo/show.json> (every layout of the Conclusion template)
-> - <http://localhost:8080/editor/?show=../shows/demo/show.json> (editor, first version)
+> - <http://localhost:8080/editor/?show=../shows/demo/show.json> (editor; or open <http://localhost:8080/editor/> for a show folder on disk)
 
 ## Components
 
@@ -68,7 +68,7 @@ slipr/
 ├── editor/          editor web app
 ├── converter/       PPTX → Slipr converter
 ├── templates/       Slipr templates: default, conclusion (house style)
-├── shows/           shows: demo (every format feature), conclusion-demo, fixtures
+├── shows/           shows: demo (every format feature), conclusion-demo, impact-autonomy-agents, fixtures
 └── vendor/          third-party libraries, checked in (Reveal.js)
 ```
 
