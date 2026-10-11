@@ -117,6 +117,10 @@ body.slipr-editor-app {
   transition: background 0.15s, border-color 0.15s;
 }
 
+a.slipr-btn {
+  text-decoration: none;
+}
+
 .slipr-btn:hover:not(:disabled) {
   background: #2D333B;
   border-color: #444C56;

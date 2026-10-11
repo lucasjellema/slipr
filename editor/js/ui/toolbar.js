@@ -1,9 +1,10 @@
 // @ts-check
 /**
- * Editor top toolbar: title, dirty indicator, save, undo, redo, present, read.
+ * Editor top toolbar: title, dirty indicator, save, undo, redo, present, read, help.
  */
 
 import { h } from '../dom.js';
+import { HELP_PAGE, helpUrl } from '../help.js';
 
 /**
  * Mount the editor toolbar into a container.
@@ -110,6 +111,22 @@ export function mountToolbar(container, store, handlers = {}) {
           onclick: () => handlers.onRead?.(),
         },
         ['Read 📖']
+      ),
+      // A link, not a button: it opens in a new tab without a popup blocker,
+      // and the click points it at the section for the current tab (E-016).
+      h(
+        'a',
+        {
+          class: 'slipr-btn',
+          href: HELP_PAGE,
+          target: 'slipr-help',
+          rel: 'noopener',
+          title: 'User manual (F1)',
+          onclick: (/** @type {MouseEvent} */ e) => {
+            /** @type {HTMLAnchorElement} */ (e.currentTarget).href = helpUrl(store.state.activeTab);
+          },
+        },
+        ['? Help']
       ),
     ]);
 

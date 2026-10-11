@@ -47,6 +47,11 @@ export function renderStartScreen(container, { message, recent, canOpenFolders, 
         h('a', { href: '?show=../shows/demo/show.json' }, ['demo show']),
         ' from the Slipr folder.',
       ]),
+      h('p', { class: 'slipr-help' }, [
+        'New to the editor? Read the ',
+        h('a', { href: 'help.html', target: 'slipr-help', rel: 'noopener' }, ['user manual']),
+        '.',
+      ]),
     ])
   );
 }

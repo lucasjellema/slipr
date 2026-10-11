@@ -1,185 +1,45 @@
 # Slipr Editor
 
-The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, configure the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
+The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, write the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) in progress. Done: the 3-pane shell, store, undo/redo, slide and reader inspectors, live preview and keyboard shortcuts (E-001); opening, saving and creating show folders (E-002); Present and Read for shows anywhere on disk (E-007); images and hotspots (E-006); the slide list with drag and drop and a hide toggle (E-003); the slide form with an editor for every slot type, including cards, quotes and code, and a layout picker with live previews (E-004, I-035); the Reader tab with an editor for every block type (E-008, I-036); the live preview (E-005); show settings (E-009); global find & replace (I-025); and the fixes E-010 to E-014. Not yet: draft autosave (I-020).
->
-> **Quick Start:** Run `npm run serve` in the repository root, then open <http://localhost:8080/editor/>. Choose **Open show folder…** for a show on your disk, **New show…** to start one from a template, or open the demo by URL: <http://localhost:8080/editor/?show=../shows/demo/show.json>
+> **Status:** Phase 5 (Editor MVP) done (2026-10-11): every part of a show can be made and changed in the editor. Not yet: draft autosave (I-020). See [CHANGELOG.md](CHANGELOG.md) for what changed when.
 
----
+## User manual
 
-## Screen Layout
+The full, step-by-step guide is **[help.html](help.html)**, built into the editor:
 
-The editor uses a responsive 3-column layout:
+- click **? Help** in the toolbar,
+- press `F1` (it opens at the section for the tab you are in), or
+- open <http://localhost:8080/editor/help.html> while `npm run serve` runs.
 
-```
-┌──────────────┬──────────────────────────┬──────────────────────────────┐
-│ Slides       │ Slide                    │ Preview                      │
-│ [Go to slide]│ Layout: [Title + bullets]│                              │
-│ 1 ▣ Title    │ [Slide] [Reader]         │ (Audience | Reader▾ as Dev ▾)│
-│ 2 ▣ Why      │ Title  [____________]    │   ┌──────────────────────┐   │
-│ 3 ▣ Demo     │ Body   [- item       ]   │   │  rendered slide      │   │
-│ + Add slide  │        [- item       ]   │   └──────────────────────┘   │
-│              │ Notes  [____________]    │   ⚠ 1 warning                │
-│ ⚙ Show       │                          │                              │
-└──────────────┴──────────────────────────┴──────────────────────────────┘
- [↶] [↷] [🔍 Find]  [Open] [New] [Save]            [Present ▶] [Read 📖]
-```
+It covers every part of the editor, with a Markdown reference, all keyboard shortcuts and troubleshooting. This README is only an overview.
 
-1. **Left pane: Slides** — ordered list of all slides in the show, with a "Go to slide" box.
-2. **Center pane: Inspector** — tabs to edit the slide visual, interactive reader layer, and show settings.
-3. **Right pane: Live Preview** — instant rendering in Audience or Reader mode with profile/depth simulation.
-4. **Top toolbar** — show title, unsaved changes indicator, undo/redo, file operations, and launch buttons. In a narrow window it wraps onto two lines.
+## Quick start
 
-Notices (for example "Saved", or that a template was found by name) appear in a bar under the toolbar.
+1. Run `npm run serve` in the repository root.
+2. Open <http://localhost:8080/editor/> in **Chrome** or **Edge**.
+3. Choose **Open show folder…** for a show on your disk, **New show…** to start one from a template, or open the demo: <http://localhost:8080/editor/?show=../shows/demo/show.json>
 
----
+## What you can do
 
-## User Guide
+| Area | In short | Manual |
+|---|---|---|
+| Show folders | Open, create from a template and save show folders anywhere on disk; recent shows; clean `show.json` diffs | [Open, create and save](help.html#files) |
+| Slide list | Go to slide, add (in a chosen layout), duplicate, delete, reorder by dragging, hide from the audience | [The slide list](help.html#slides) |
+| Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code and cards; notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |
+| Images | Choose, drop or paste; copied into `images/` once; alt text | [Images](help.html#images) |
+| Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
+| Show settings | Metadata, presentation settings, chapters, profiles, glossary, reading routes | [Show settings](help.html#settings) |
+| Preview | Audience or reader view, as any profile at any depth, with the slide's errors and warnings | [Live preview](help.html#preview) |
+| Find and replace | Across slides, notes, reader blocks and settings; one undo step | [Find and replace](help.html#find) |
+| Present and Read | Save, then open the viewer at the selected slide | [Present and Read](help.html#present) |
 
-### 1. Opening, Creating and Saving Shows
+Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
 
-A show is a folder with `show.json` and an `images/` folder. It can live anywhere on your disk; it does not need to be inside the Slipr folder.
-
-* **Start screen:** Opening the editor without a show shows **Open show folder…**, **New show…**, your **recent shows**, and a link to the demo.
-* **Open a show folder:** Click **Open…** (or **Open show folder…**) and pick the folder that contains `show.json`. The editor reopens as `editor/?folder=<key>`, a link that works in this browser: bookmark it or reload it freely. After a browser restart, the browser may ask once more: click **Allow access**.
-* **New show:** Click **New…**, enter a title, choose a template (from `templates/index.json`), then pick an **empty** folder. The editor writes `show.json` (with one title slide) and an empty `images/` folder. New shows refer to their template as `/templates/<name>`.
-* **Templates for shows outside the Slipr folder:** If a show's template reference points outside its folder (as in `../../templates/default`), the template with that name from Slipr's `templates/` folder is used, and a notice says so.
-* **Save:** Press **Ctrl+S** or click **Save**. The editor writes `show.json` with 2-space indentation and a fixed key order (the same as the PowerPoint converter), so changes show up as small diffs in git. A hand-formatted `show.json` is reformatted once, on its first save.
-* **Shows opened by URL** (`?show=…`, like the demo): the first Save asks you to choose the show's folder on disk, and checks that it holds the same show.
-* **Unsaved changes:** a yellow dot (`●`) appears next to the show title, and the browser warns before you close the tab.
-
-### 2. Managing Slides (Left Pane)
-
-* **Select a slide:** Click any slide in the list to open it in the inspector and preview. The list scrolls, and keeps its place while you edit.
-* **Go to slide:** Type in the box above the list: a slide number (`12`), words from the title (`ai act`), a layout name or a chapter. Press `Enter` to jump to the first match, `Esc` to clear the box.
-* **Move through slides with the keyboard:** In the list, `↑` / `↓` move one slide, `PageUp` / `PageDown` five, `Home` / `End` to the first or last slide. Outside text fields, `PageUp` / `PageDown` go to the previous or next slide.
-* **Add a slide with a chosen layout:** Click **▾** next to **+ Add** and pick a layout from the grid (previewed with sample text).
-* **Add a slide:** Click the **+ Add** button at the top of the sidebar (or press `Ctrl+Enter`). The new slide is inserted immediately after the currently selected slide. It gets the same layout as the current slide; after a title or section slide it gets the template's plain content layout (`bullets` in the default template, `text` in the Conclusion template).
-* **Reorder slides:** Drag a slide to its new place (a line shows where it will land), click **▲** / **▼**, or press `Alt+↑` / `Alt+↓`.
-* **Hide a slide from the audience:** Click **◉** on the slide (it becomes **◌** and the title is struck through). It stays in reader mode, which suits backup slides. Click again to show it.
-* **Duplicate a slide:** Click the **⎘** button (or press `Ctrl+D`). The slide and all its reader blocks are duplicated with fresh unique IDs and inserted after the original.
-* **Delete a slide:** Click the **🗑** button. Deleting a slide automatically removes its ID from any curated paths (`paths`) and related slide lists (`related`) so references stay valid.
-* **Open Show Settings:** Click the **⚙ Show** button in the sidebar header to configure show-level settings.
-
-### 3. Editing the Slide (Center Pane: "Slide" Tab)
-
-* **Choose a layout:** Click the **Layout** button. A grid shows every layout of the template with **this slide's content** in it, and what switching would do ("Keeps all content", "Hides Text", "Needs Photo"). Click one, or use the arrow keys and `Enter`. The fields of the new layout appear at once.
-  * *Smart slot retention:* When you switch layouts, fields with matching names are preserved. Content for slots not in the new layout is safely preserved in the background (`_orphaned`), so switching back restores your text.
-* **Fill in slots:** The form automatically generates fields based on the selected layout's slot definitions:
-  * **Text & headings:** Single-line inputs for titles, subtitles, or captions.
-  * **Rich text & lists:** Multiline text areas supporting Markdown formatting (`**bold**`, `*italic*`, `` `code` ``) and bullet lists (`- item`).
-  * **Images:** A preview, the image path, its alt text and how it fits its frame (as the layout decides, fill the frame, or show the whole image). See *Adding images* below.
-  * **Quote:** The quote text and its source.
-  * **Code:** The language (e.g. `js`) and the code. `Tab` indents; press `Esc`, then `Tab`, to leave the field.
-  * **Cards** (layouts with repeated items, such as the Conclusion template's columns, numbered boxes, facts, image cards and people): one group of fields per card. A counter (`7 / 18`) shows how much room a field has and turns yellow when the text is too long. Move cards with **▲** / **▼**, remove one with **🗑**, and add one with **+ Add card**, up to the number the layout has room for. Image fields in cards work like any image field.
-* **Speaker notes:** Add private presenter notes in the **Speaker Notes** box. These appear in Reveal's presenter view (`S` key in audience mode).
-* **Chapter:** Assign the slide to a chapter to drive the agenda slide in audience mode and the table of contents in reader mode.
-* **Tags:** Comma-separated topics, used by reader search and "related" suggestions.
-* **Audience mode:** **Build step by step** shows bullets and cards one at a time (optionally with an effect such as *fade-up*); **Auto-animate** morphs matching fields between neighbouring auto-animate slides; choose the **transition** into this slide, or keep the show's default.
-* **Audience visibility:** Check **Hide from audience mode** to make a slide reader-only (useful for backup slides or in-depth reference material).
-
-#### Adding images
-
-Image fields (on slides and in reader image blocks) accept an image in three ways:
-
-* **Choose…** opens a file chooser.
-* **Drop** an image file onto the field.
-* **Paste** from the clipboard: press `Ctrl+V` while the image field has focus, or click **Paste**. `Ctrl+V` anywhere outside a text field also works: the image goes into the slide's first empty image field.
-
-The image is copied into the show's `images/` folder (as `images/<name>-<hash>.<ext>`; a pasted image is named after the slide). If the same image is already in the folder, it is reused instead of copied again. Then a dialog asks for **alt text**, a short description for people who cannot see the image; you can also fill it in later. PNG, JPEG, GIF, WebP, AVIF and SVG are supported; images over 3 MB get a notice. Undo restores the previous image; image files are never deleted automatically.
-
-Adding images needs the show's folder: a show opened by URL asks for its folder first.
-
-### 4. Creating the Reader Layer (Center Pane: "Reader" Tab)
-
-The Reader tab holds the detailed content for individuals reading the show interactively:
-
-* **Reader Summary:** A concise one-sentence overview displayed at the top of the reader page for this slide.
-* **Reader Blocks:**
-  * Click **+ Add Block** to append an interactive block, then choose its type. Changing the type converts the block and keeps its text where the new type has room for it.
-  * Block types:
-    * **Text:** Markdown article content with popovers (`^[inline popup]`), glossary links (`[[term]]`), and `#slide` references.
-    * **Collapsible Panel (Details):** Expandable section with a title and Markdown content.
-    * **Callout Box:** Highlighted callout with a kind (**Info**, **Tip**, **Warning**, **Quote**), an optional title and Markdown content.
-    * **Image with Hotspots:** An image (added like any image field), alt text, an optional caption, and hotspots. See below.
-    * **Tabs:** Alternatives side by side (for example code in several languages): a label and Markdown text per tab. Add tabs with **+ Add tab**, reorder with **▲**, remove with **🗑** (one tab always stays).
-    * **Embedded Page:** Another web page inside the reader view: its address (https, or a file in the show folder), a title and an optional height. The editor warns about addresses that will not work; many sites refuse to be embedded, so check the preview.
-    * **Link to Slide:** A card that links to another slide: pick the slide and, if you like, a label.
-* **Hotspots** (on an image block, once it has an image):
-  * **Place:** click on the image. A numbered marker appears there and its title field gets focus, so you can type the title right away. Below it, write the popup text in Markdown.
-  * **Move:** drag a marker. With a marker selected, the arrow keys nudge it (Shift: bigger steps).
-  * **Remove:** press `Delete` on a selected marker, or click its **🗑**.
-  * **Keyboard only:** **+ Add hotspot** places one in the middle of the image.
-* **Target Audience & Depth per Block:**
-  * **Detail Level:** Choose **Essential (1)**, **Standard (2)**, or **Deep dive (3)**. Readers select their preferred depth, and blocks adjust automatically.
-  * **For:** Click **For: everyone** to choose which reader profiles see the block (one checkbox per profile defined in Show Settings). With none checked, every reader sees it.
-  * Reorder blocks using **▲** / **▼**, or remove a block with **🗑**.
-* **Writing reader text:** Above every Markdown field, a small toolbar inserts a **glossary term** (`[[term]]`; with words selected, `[[term|those words]]`), a **popup** (`^[…]` around the selected text, or an empty one to type into) and a **link to another slide** (`[text](#slide-id)`).
-* **Related slides:** Under the blocks, add slides to offer readers as "see also"; reorder them with **▲** or remove them with **✕**.
-* **Show the slide:** Uncheck **Show the slide above its reader blocks** for a reader-only text page.
-* **Reader visibility:** Check **Hide this slide completely from reader mode** if a slide only makes sense during a live speech.
-
-### 5. Show Settings (Center Pane: "Show Settings" Tab)
-
-Click **⚙ Show** to access show-level configurations:
-
-* **Metadata:** Edit show title, subtitle, author, date, language (a code such as `en` or `nl`), a short description and tags.
-* **Audience settings:** Choose aspect ratio (**16:9** widescreen or **4:3**), the slide transition (none, fade, slide, convex, concave, zoom, or Reveal's default), slide numbers, and an agenda slide before each chapter.
-* **Chapters:** Add, rename, reorder (▲ / ▼) or delete chapters, and give each an optional summary. The agenda and the reader contents follow this order. Deleting a chapter says how many slides lose it.
-* **Profiles:** The kinds of readers (for example *Developer*, *Manager*), with an optional description. Readers pick one; choose per block who sees it with **For** in the Reader tab. Deleting a profile says how many blocks are tailored for it.
-* **Glossary:** Terms with a Markdown definition and an optional link. Reference them in any Markdown as `[[id]]` (the card shows the id and how often it is used). Deleting a term that is used lists where, and offers to keep those words as plain text.
-* **Reading routes:** Curated routes through the show (for example a 5-minute overview): a name, a description, and either all slides or a list you put together and reorder.
-
-New items get a name you can type over right away. Names, titles and terms can't be left empty.
-
-### 6. Live Preview (Right Pane)
-
-The preview pane updates instantly as you type (debounced at 150 ms):
-
-* **Audience Mode:** Shows the slide scaled responsively using CSS container queries (`cqw`), identical to how it renders on the big screen.
-* **Reader Mode:** Shows the slide visual plus its tailored reader layer (summary and interactive blocks, including hotspots).
-* **Profile & Depth Simulation:** When previewing Reader mode, use the toolbar dropdowns to simulate what different profiles (e.g. *Developer*, *Manager*) and detail depths (1, 2, or 3) will see.
-* **Validation Diagnostics:** Problems with the current slide appear under the preview: errors in red (the show cannot be shown until they are fixed, for example an image block without an image), warnings in yellow (for example missing required slots, text too long for the layout, missing alt text).
-
-### 7. History and Launching
-
-* **Undo / Redo:** Use **↶ Undo** (`Ctrl+Z`) and **↷ Redo** (`Ctrl+Y` or `Ctrl+Shift+Z`). Typing bursts within a 1-second pause are coalesced into a single undo step; so is dragging a hotspot.
-* **Present ▶ (F5):** Saves your changes, then opens audience mode in a new browser tab, starting at the selected slide.
-* **Read 📖:** Saves your changes, then opens reader mode in a new browser tab at the selected slide.
-* Both work for shows anywhere on disk: the viewer opens the same folder (`viewer/?folder=<key>`). A show opened by URL with unsaved changes first asks for its folder.
-
-### 8. Find and Replace
-
-Press **Ctrl+F** or **Ctrl+H** (or click **🔍 Find & Replace** in the toolbar) to open the Find & Replace modal dialog:
-* **Search across the whole show:** Matches are searched across audience slide slot values (text and cards), speaker notes, reader summaries and blocks (text, details, callouts, image captions and hotspot text), and show settings (metadata, chapters, glossary).
-* **Search options:** Toggle **Match case** (case-sensitive) and **Whole word**.
-* **Preview & navigation:** A live list shows matching snippets with `<mark>` highlights and location badges. Clicking any match closes the dialog and immediately navigates to that slide.
-* **Replace:** Click **Replace in Current Slide** to replace occurrences on the currently selected slide, or **Replace All** to replace occurrences throughout the entire show. All replacements are pure, immutable, and fully undoable with `Ctrl+Z`.
-
----
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|---|---|
-| `Ctrl+S` / `Cmd+S` | Save show |
-| `Ctrl+Z` / `Cmd+Z` | Undo last change |
-| `Ctrl+Y` / `Cmd+Y` or `Ctrl+Shift+Z` | Redo last undone change |
-| `Ctrl+F` / `Cmd+F` or `Ctrl+H` / `Cmd+H` | Open Find & Replace dialog |
-| `Ctrl+Enter` | Add a new slide after the current one |
-| `Ctrl+D` | Duplicate current slide |
-| `Alt+↑` | Move current slide up |
-| `Alt+↓` | Move current slide down |
-| `PageUp` / `PageDown` | Previous / next slide (outside text fields) |
-| `↑` `↓` `PageUp` `PageDown` `Home` `End` | Move through the slide list (when it has focus) |
-| `Enter` / `Esc` in "Go to slide" | Jump to the first match / clear the box |
-| `Ctrl+V` | Paste an image into the focused image field, or (outside text fields) into the slide's first empty image field |
-| Arrow keys / `Shift`+arrows, `Delete` | Nudge / remove the selected hotspot marker |
-| `F5` | Save, then launch the audience presentation from the current slide |
-
----
-
-## Browser Requirements
+## Browser requirements
 
 The editor runs in any modern browser using native ES modules, and opening a show by URL (`?show=…`) works everywhere. Opening, creating and saving show folders, adding images, and presenting shows from a folder use the File System Access API, so they need a Chromium-based browser: **Google Chrome** or **Microsoft Edge**.
+
+## For developers
+
+How the editor is built: [ARCHITECTURE.md](ARCHITECTURE.md). Rules, pitfalls and the smoke-test checklist for AI agents (and humans): [CLAUDE.md](CLAUDE.md). A user-visible change updates [help.html](help.html) and, if the overview above changes, this README.

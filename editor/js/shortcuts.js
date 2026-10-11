@@ -3,6 +3,8 @@
  * Global keyboard shortcuts for Slipr Editor.
  */
 
+import { openHelp } from './help.js';
+
 /**
  * Register global keyboard shortcuts on the window.
  * @param {import('./store.js').EditorStore} store
@@ -90,6 +92,13 @@ export function registerShortcuts(store, { onSave, onPresent, onRead, onFindRepl
       const next = Math.max(0, Math.min(slides.length - 1, idx + (e.key === 'PageUp' ? -1 : 1)));
       e.preventDefault();
       store.selectSlide(slides[next].id);
+      return;
+    }
+
+    // User manual, at the section for the current tab: F1
+    if (e.key === 'F1') {
+      e.preventDefault();
+      openHelp(store.state.activeTab);
       return;
     }
 

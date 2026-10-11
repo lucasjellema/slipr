@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: User manual (E-016)
+- **Added** `help.html`, the editor's user manual: getting started, key ideas, the screen, opening / creating / saving, the slide list, the Slide tab, images, the Reader tab, hotspots, a Markdown reference with the insert toolbar, show settings, preview and problems, find and replace, Present and Read, undo, keyboard shortcuts and troubleshooting. A static page (`css/help.css`, light and dark, phone width, printable) with a contents list.
+- **Added** ways to open it: **? Help** in the toolbar, a link on the start screen, and `F1`, which opens the section for the current tab (Slide, Reader or Show settings). `js/help.js` holds the address and the sections; `test/help.test.js` checks that those sections and every link inside the manual exist, and that it loads nothing from the network.
+- **Changed** `README.md` into a short overview (status, quick start, a table of what the editor does with links into the manual, browser requirements), so the detailed guide lives in one place.
+
 ### 2026-10-11: The last missing controls; Phase 5 done (E-015)
 - **Added** to the Slide tab: **Tags** (comma-separated), and an **Audience mode** group with **Build step by step** (off, one by one, or one by one with a Reveal effect such as `fade-up`), **Auto-animate**, the **transition into this slide** (or the show default), and **Hide from audience mode**. New action `setSlideAudience`.
 - **Added** a **Fit** choice to image fields: as the layout decides, fill the frame (`cover`), or show the whole image (`contain`).

@@ -24,10 +24,12 @@ The editor is a single-page app in vanilla JS. All state lives in one **store** 
 ```
 editor/
 ├── index.html            ✅ 3-column shell: toolbar, sidebar, inspector, preview
+├── help.html             ✅ user manual: static page, no scripts; sections have ids the editor links to (E-016)
 ├── css/
-│   └── editor.css        ✅
+│   ├── editor.css        ✅
+│   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
     ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006)
@@ -39,10 +41,11 @@ editor/
     ├── show-entities.js  ✅ DOM-free: unique ids, glossary references and unlinking, profile / chapter usage (E-009)
     ├── layout-choice.js  ✅ DOM-free: the slide in another layout, what a switch hides / brings back / still needs, sample content (E-004)
     ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
+    ├── help.js           ✅ DOM-free: manual address and the section per inspector tab; openHelp() (E-016)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025)
     ├── dom.js            ✅ h() element builder, addStylesheet()
-    ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+F / Ctrl+H, Ctrl+Enter, Ctrl+D, Alt+↑/↓, PageUp/PageDown, F5
+    ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+F / Ctrl+H, Ctrl+Enter, Ctrl+D, Alt+↑/↓, PageUp/PageDown, F5, F1
     ├── io/
     │   ├── fs-access.js  ✅ File System Access API: pick folder, permission, write show.json, create a new show, copy an image in (`writeImage`, `findImageBySuffix`)
     │   ├── images.js     ✅ DOM-free: supported image types, `images/<slug>-<hash8>.<ext>` names, content suffix (E-006)
@@ -50,7 +53,7 @@ editor/
     │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
-        ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read
+        ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read, ? Help (a link, so no popup blocker)
         ├── slide-list.js    ✅ items, selection, reorder (buttons, Alt+↑/↓, drag and drop), hide toggle, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012, E-003)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, Layout button (opens the layout picker), notes, chapter, hidden
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for every block type: text, details, callout, image, tabs, embed, slide-ref (I-036)
