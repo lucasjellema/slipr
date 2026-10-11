@@ -34,6 +34,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Preview | Audience or reader view, as any profile at any depth, with the slide's errors and warnings | [Live preview](help.html#preview) |
 | Find and replace | Across slides, notes, reader blocks and settings; one undo step | [Find and replace](help.html#find) |
 | Present and Read | Save, then open the viewer at the selected slide | [Present and Read](help.html#present) |
+| Export | One HTML file with show, template and viewer that presents offline (unsaved changes included) | [Export as one file](help.html#export) |
 
 Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
 

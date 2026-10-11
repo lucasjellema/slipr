@@ -89,7 +89,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-051** [templates] Auto-generated style-guide page: all layouts, blocks, colors and fonts of a template
 - [ ] **I-052** [templates] Generate `styleguide` JSON from `theme.css` (or vice versa)
 - [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder)
-- [ ] **I-085** [editor] **Export… button** in the editor: save the open show as one HTML file, with the same packer as `npm run export` (`shared/export/single-file.js`): show files through the folder handle, app files from the server; download or save with the File System Access API
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
@@ -156,6 +155,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **I-085** [editor] Export… button: the open show (unsaved changes included) as one offline HTML file, same packer as `npm run export`; save dialog or download · done 2026-10-11 · claude
 - [x] **I-054** [format] Single-file HTML export: `npm run export -- <show folder>` packs the show, its template and the viewer into one HTML file that presents offline in both modes (import map of `data:` modules, embedded files, inlined fonts and images; Mermaid only when needed). Spec: `docs/specs/I-054-single-file-export.md`. Next: an Export button in the editor (I-085) · done 2026-10-11 · claude
 - [x] **I-073** [format/viewer] **Mermaid diagram**: support for Mermaid diagrams in audience layout slot (`diagram`) and reader block (`diagram`), client-side rendering with vendored Mermaid 11.4.1 (D-002, lazy loaded, strict security), theme integration, SVG caching, search indexing, and demo show example (`s-pipeline`) · done 2026-10-11 · claude
 - [x] **E-016** [editor] User manual inside the editor: `editor/help.html` (every part of the editor, Markdown reference, shortcuts, troubleshooting; light and dark, phone width, offline), opened from **? Help** in the toolbar, the start screen, and `F1` at the section for the current tab · done 2026-10-11 · claude

@@ -1,6 +1,6 @@
 # I-054: Single-file HTML export
 
-Status: **done** (export command; editor button: I-085) · 2026-10-11 · Phase 6. Verified: both demos export and present in audience and reader mode with no network requests (served over http). Opening the file with `file://` was not tested in Claude's browser pane
+Status: **done** (export command, and the editor's Export… button, I-085) · 2026-10-11 · Phase 6. Verified: both demos export and present in audience and reader mode with no network requests (served over http). Opening the file with `file://` was not tested in Claude's browser pane
 
 ## Goal
 

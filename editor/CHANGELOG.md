@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Export… button (I-085)
+- **Added** **Export…** in the toolbar: save the open show as one HTML file that presents offline, with the same packer as `npm run export` (`shared/export/single-file.js`). The show is exported as it is in the editor, unsaved changes included (show.json comes from the editor's state; images and other show files from the show folder, or from the server for a show opened by URL; viewer and template from the Slipr server). The save dialog opens first, inside the click; without one the file is downloaded. New module `export.js`.
+- **Added** "Export as one file" to the manual (`help.html`).
+
 ### 2026-10-11: User manual (E-016)
 - **Added** `help.html`, the editor's user manual: getting started, key ideas, the screen, opening / creating / saving, the slide list, the Slide tab, images, the Reader tab, hotspots, a Markdown reference with the insert toolbar, show settings, preview and problems, find and replace, Present and Read, undo, keyboard shortcuts and troubleshooting. A static page (`css/help.css`, light and dark, phone width, printable) with a contents list.
 - **Added** ways to open it: **? Help** in the toolbar, a link on the start screen, and `F1`, which opens the section for the current tab (Slide, Reader or Show settings). `js/help.js` holds the address and the sections; `test/help.test.js` checks that those sections and every link inside the manual exist, and that it loads nothing from the network.

@@ -10,7 +10,7 @@ import { HELP_PAGE, helpUrl } from '../help.js';
  * Mount the editor toolbar into a container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
- * @param {{ onOpen?: () => void, onNew?: () => void, onSave?: () => void, onPresent?: () => void, onRead?: () => void }} [handlers]
+ * @param {{ onOpen?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
 export function mountToolbar(container, store, handlers = {}) {
   const root = h('header', { class: 'slipr-toolbar' });
@@ -90,6 +90,15 @@ export function mountToolbar(container, store, handlers = {}) {
           onclick: () => handlers.onSave?.(),
         },
         ['Save']
+      ),
+      h(
+        'button',
+        {
+          class: 'slipr-btn',
+          title: 'Export as one HTML file that presents offline (show, template and viewer in one file)',
+          onclick: () => handlers.onExport?.(),
+        },
+        ['Export…']
       ),
     ]);
 

@@ -12,6 +12,7 @@ import { addStylesheet, h, isTextEntry } from './dom.js';
 import { addImageToSlot, imageFileFrom, pasteTargetSlot } from './image-input.js';
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
 import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
+import { exportShow } from './export.js';
 import { mountToolbar } from './ui/toolbar.js';
 import { mountSlideList } from './ui/slide-list.js';
 import { mountSlideForm } from './ui/slide-form.js';
@@ -157,6 +158,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
       onOpen: () => run(() => openFolder(store)),
       onNew: () => run(() => newShow(store)),
       onSave: () => run(() => save(store)),
+      onExport: () => run(() => exportShow(store, showUrl)),
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
       onFindReplace: () => openFindReplaceDialog(store),

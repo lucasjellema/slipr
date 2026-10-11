@@ -33,6 +33,7 @@
         <li><a href="#preview">Live preview and problems</a></li>
         <li><a href="#find">Find and replace</a></li>
         <li><a href="#present">Present and Read</a></li>
+        <li><a href="#export">Export as one file</a></li>
         <li><a href="#undo">Undo, redo and saving</a></li>
         <li><a href="#shortcuts">Keyboard shortcuts</a></li>
         <li><a href="#trouble">Troubleshooting</a></li>
@@ -86,7 +87,7 @@
         <h2>The screen</h2>
         <figure class="diagram" aria-label="Editor screen layout">
 <pre>┌────────────────────────────────────────────────────────────────────────────┐
-│ Title *  Undo Redo  Find & Replace  Open… New… Save  Present  Read  ? Help │
+│ Title * Undo Redo Find&Replace Open… New… Save Export… Present Read ? Help │
 ├───────────────┬────────────────────────────┬───────────────────────────────┤
 │ Slides  Show  │ [Slide] [Reader]           │ Preview  Audience | Reader    │
 │ [Go to slide] │ Layout: [Title + bullets]  │ ┌──────────────────────┐      │
@@ -361,6 +362,18 @@
           <dt>Read</dt><dd>Saves, then opens reader mode in a new tab at the selected slide.</dd>
         </dl>
         <p>Both work for shows anywhere on disk: the viewer opens the same folder. If saving fails, or a show opened by address still needs its folder, the new tab closes again and the editor tells you why.</p>
+      </section>
+
+      <section id="export">
+        <h2>Export as one file</h2>
+        <p>Click <strong>Export…</strong> to save the show as <strong>one HTML file</strong> that holds the show, its template and the viewer. That file presents <strong>offline</strong>: double-click it to open it in a browser, without the Slipr server and without internet. Send it to someone, put it on a USB stick, or keep it as an archive copy.</p>
+        <ul>
+          <li>The export is the show <strong>as it is in the editor</strong>, unsaved changes included. Exporting does not save.</li>
+          <li>Choose where to save the file; the name is the show's id (for example <code>demo.html</code>). In a browser without a save dialog the file is downloaded.</li>
+          <li>The file opens in audience mode. For reader mode, add <code>?mode=reader</code> to its address. Readers' notes and bookmarks stay in their own browser.</li>
+          <li>Expect a few MB: fonts and images are inside, and shows with diagrams also carry the diagram library.</li>
+        </ul>
+        <p>The same export is available as a command: <code>npm run export -- shows/&lt;name&gt;</code>.</p>
       </section>
 
       <section id="undo">
