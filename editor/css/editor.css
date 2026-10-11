@@ -1399,3 +1399,32 @@ body.is-screen #slipr-editor-banners {
 .slipr-layout-note.is-restored {
   color: #3FB950;
 }
+
+/* ---------- Slide list: drag and drop, hidden slides (E-003) ---------- */
+
+.slipr-slide-item[draggable="true"] {
+  cursor: grab;
+}
+
+.slipr-slide-item.is-dragging {
+  opacity: 0.4;
+}
+
+/* Where the dragged slide will land: a line above or below the slide under the pointer. */
+.slipr-slide-item.is-drop-before {
+  box-shadow: 0 -3px 0 0 var(--slipr-editor-accent-hover);
+}
+
+.slipr-slide-item.is-drop-after {
+  box-shadow: 0 3px 0 0 var(--slipr-editor-accent-hover);
+}
+
+.slipr-slide-item.is-audience-hidden .slipr-slide-item-title {
+  color: var(--slipr-editor-muted);
+  text-decoration: line-through;
+  text-decoration-color: rgba(139, 148, 158, 0.6);
+}
+
+.slipr-hide-toggle.is-on {
+  color: var(--slipr-editor-warning);
+}

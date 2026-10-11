@@ -56,7 +56,8 @@ A show is a folder with `show.json` and an `images/` folder. It can live anywher
 * **Move through slides with the keyboard:** In the list, `↑` / `↓` move one slide, `PageUp` / `PageDown` five, `Home` / `End` to the first or last slide. Outside text fields, `PageUp` / `PageDown` go to the previous or next slide.
 * **Add a slide with a chosen layout:** Click **▾** next to **+ Add** and pick a layout from the grid (previewed with sample text).
 * **Add a slide:** Click the **+ Add** button at the top of the sidebar (or press `Ctrl+Enter`). The new slide is inserted immediately after the currently selected slide. It gets the same layout as the current slide; after a title or section slide it gets the template's plain content layout (`bullets` in the default template, `text` in the Conclusion template).
-* **Reorder slides:** Click the **▲** (move up) or **▼** (move down) buttons on a slide (or press `Alt+↑` / `Alt+↓`).
+* **Reorder slides:** Drag a slide to its new place (a line shows where it will land), click **▲** / **▼**, or press `Alt+↑` / `Alt+↓`.
+* **Hide a slide from the audience:** Click **◉** on the slide (it becomes **◌** and the title is struck through). It stays in reader mode, which suits backup slides. Click again to show it.
 * **Duplicate a slide:** Click the **⎘** button (or press `Ctrl+D`). The slide and all its reader blocks are duplicated with fresh unique IDs and inserted after the original.
 * **Delete a slide:** Click the **🗑** button. Deleting a slide automatically removes its ID from any curated paths (`paths`) and related slide lists (`related`) so references stay valid.
 * **Open Show Settings:** Click the **⚙ Show** button in the sidebar header to configure show-level settings.

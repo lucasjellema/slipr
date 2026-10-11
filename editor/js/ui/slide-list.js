@@ -8,7 +8,7 @@
 
 import { h } from '../dom.js';
 import { slideTitle } from '../../../shared/render.js';
-import { matchSlides, navigateIndex } from '../slide-filter.js';
+import { dropIndex, matchSlides, navigateIndex } from '../slide-filter.js';
 import { openLayoutPicker } from './layout-picker.js';
 
 /**
@@ -70,6 +70,7 @@ export function mountSlideList(container, store) {
     },
   });
 
+  wireDragAndDrop(list, store);
   root.append(header, h('div', { class: 'slipr-slide-filter-row' }, [filterInput]), list);
   container.append(root);
 
@@ -169,8 +170,9 @@ export function mountSlideList(container, store) {
       const item = h(
         'li',
         {
-          class: `slipr-slide-item ${isSelected ? 'is-selected' : ''}`,
+          class: `slipr-slide-item ${isSelected ? 'is-selected' : ''} ${isAudienceHidden ? 'is-audience-hidden' : ''}`,
           'data-slide-id': slide.id,
+          draggable: 'true',
           tabindex: isSelected ? '0' : '-1',
           'aria-current': isSelected ? 'true' : undefined,
           onclick: (/** @type {MouseEvent} */ e) => {
@@ -192,6 +194,19 @@ export function mountSlideList(container, store) {
             ]),
           ]),
           h('div', { class: 'slipr-slide-item-tools' }, [
+            h(
+              'button',
+              {
+                class: `slipr-item-btn slipr-hide-toggle ${isAudienceHidden ? 'is-on' : ''}`,
+                'aria-pressed': isAudienceHidden ? 'true' : 'false',
+                'aria-label': `Hide "${title}" from audience mode`,
+                title: isAudienceHidden
+                  ? 'Hidden from audience mode (still in reader mode). Click to show it again'
+                  : 'Hide from audience mode (for backup slides; reader mode still shows it)',
+                onclick: () => store.dispatch('setHidden', { slideId: slide.id, audienceHidden: !isAudienceHidden }),
+              },
+              [isAudienceHidden ? '◌' : '◉']
+            ),
             h(
               'button',
               {
@@ -267,4 +282,80 @@ export function mountSlideList(container, store) {
 
   renderHeader();
   renderList();
+}
+
+/**
+ * Reorder slides by dragging them in the list (E-003). A line shows where the
+ * slide will land (above or below the slide under the pointer); near the top or
+ * bottom edge the list scrolls. The keyboard alternative is Alt+↑ / Alt+↓.
+ * @param {HTMLElement} list
+ * @param {import('../store.js').EditorStore} store
+ */
+function wireDragAndDrop(list, store) {
+  const TYPE = 'application/x-slipr-slide';
+  /** @type {string | null} */
+  let dragId = null;
+  /** @type {{ el: HTMLElement, after: boolean } | null} */
+  let marker = null;
+
+  const clearMarker = () => {
+    marker?.el.classList.remove('is-drop-before', 'is-drop-after');
+    marker = null;
+  };
+  const indexOf = (/** @type {string} */ id) => (store.state.show?.slides ?? []).findIndex((/** @type {any} */ s) => s.id === id);
+
+  list.addEventListener('dragstart', (e) => {
+    const item = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-slide-item');
+    if (!(item instanceof HTMLElement) || !e.dataTransfer) return;
+    dragId = item.dataset.slideId ?? null;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData(TYPE, dragId ?? '');
+    item.classList.add('is-dragging');
+  });
+
+  list.addEventListener('dragover', (e) => {
+    if (!dragId) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+    // Scroll when near the top or bottom edge.
+    const box = list.getBoundingClientRect();
+    if (e.clientY < box.top + 40) list.scrollTop -= 12;
+    else if (e.clientY > box.bottom - 40) list.scrollTop += 12;
+
+    const item = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-slide-item');
+    if (!(item instanceof HTMLElement) || item.dataset.slideId === dragId) {
+      clearMarker();
+      return;
+    }
+    const r = item.getBoundingClientRect();
+    const after = e.clientY > r.top + r.height / 2;
+    if (marker?.el === item && marker.after === after) return;
+    clearMarker();
+    item.classList.add(after ? 'is-drop-after' : 'is-drop-before');
+    marker = { el: item, after };
+  });
+
+  list.addEventListener('dragleave', (e) => {
+    if (!list.contains(/** @type {Node | null} */ (e.relatedTarget))) clearMarker();
+  });
+
+  list.addEventListener('drop', (e) => {
+    if (!dragId) return;
+    e.preventDefault();
+    const target = marker;
+    clearMarker();
+    if (!target) return;
+    const from = indexOf(dragId);
+    const to = indexOf(target.el.dataset.slideId ?? '');
+    if (from === -1 || to === -1) return;
+    const slideId = dragId;
+    store.dispatch('moveSlide', { slideId, toIndex: dropIndex(from, to, target.after) });
+    store.selectSlide(slideId);
+  });
+
+  list.addEventListener('dragend', () => {
+    list.querySelector('.is-dragging')?.classList.remove('is-dragging');
+    clearMarker();
+    dragId = null;
+  });
 }

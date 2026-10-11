@@ -61,3 +61,17 @@ export function navigateIndex(key, current, count, page = 5) {
     default: return null;
   }
 }
+
+/**
+ * The `toIndex` for moveSlide when a slide is dropped before or after another
+ * (E-003). moveSlide takes the final position after removal, so dropping
+ * further down the list is one less than the target's index.
+ * @param {number} from    Index of the dragged slide.
+ * @param {number} target  Index of the slide it is dropped on.
+ * @param {boolean} after  Dropped on the lower half (after the target).
+ * @returns {number}
+ */
+export function dropIndex(from, target, after) {
+  const position = after ? target + 1 : target;   // insertion point in the current list
+  return from < position ? position - 1 : position;
+}

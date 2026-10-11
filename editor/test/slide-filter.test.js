@@ -45,3 +45,40 @@ describe('slide navigator: keys', () => {
     assert.equal(navigateIndex('ArrowDown', 0, 0), null);
   });
 });
+
+describe('slide list: drag and drop (E-003)', async () => {
+  const { dropIndex } = await import('../js/slide-filter.js');
+  const { readJson } = await import('../../shared/test/helpers.js');
+  const actions = await import('../js/actions.js');
+  const demo = readJson('shows/demo/show.json');
+  const ids = (show) => show.slides.map((s) => s.id);
+
+  /** Drop slide `from` before/after slide `target` and return the new order. */
+  const drop = (from, target, after) => ids(actions.moveSlide(demo, { slideId: demo.slides[from].id, toIndex: dropIndex(from, target, after) }));
+
+  test('dropping down the list lands exactly before / after the target', () => {
+    const order = drop(1, 4, false);
+    assert.equal(order.indexOf(demo.slides[1].id), order.indexOf(demo.slides[4].id) - 1);
+    const order2 = drop(1, 4, true);
+    assert.equal(order2.indexOf(demo.slides[1].id), order2.indexOf(demo.slides[4].id) + 1);
+  });
+
+  test('dropping up the list lands exactly before / after the target', () => {
+    const order = drop(6, 2, false);
+    assert.equal(order.indexOf(demo.slides[6].id), order.indexOf(demo.slides[2].id) - 1);
+    const order2 = drop(6, 2, true);
+    assert.equal(order2.indexOf(demo.slides[6].id), order2.indexOf(demo.slides[2].id) + 1);
+  });
+
+  test('dropping onto its own place or a neighbouring gap changes nothing', () => {
+    assert.deepEqual(drop(3, 3, false), ids(demo));
+    assert.deepEqual(drop(3, 3, true), ids(demo));
+    assert.deepEqual(drop(3, 2, true), ids(demo));
+    assert.deepEqual(drop(3, 4, false), ids(demo));
+  });
+
+  test('to the very start and the very end', () => {
+    assert.equal(drop(5, 0, false)[0], demo.slides[5].id);
+    assert.equal(drop(0, demo.slides.length - 1, true).at(-1), demo.slides[0].id);
+  });
+});

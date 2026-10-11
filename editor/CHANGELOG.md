@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Slide list: drag and drop, hide toggle (E-003, done)
+- **Added** drag and drop in the slide list: a line shows where the slide will land (above or below the slide under the pointer), the list scrolls near its top and bottom edges, and the moved slide is selected. One drop is one undo step. The keyboard alternative stays `Alt+↑` / `Alt+↓`.
+- **Added** a hide toggle (◉ / ◌) on every slide in the list: hide it from audience mode (a backup slide; reader mode still shows it) or show it again. Hidden slides are struck through.
+- **Added** `dropIndex()` in `slide-filter.js` (the `moveSlide` index for "before / after this slide"), with tests.
+
 ### 2026-10-10: Layout picker with previews (E-004, done)
 - **Added** the layout picker (`ui/layout-picker.js`): the Slide tab's layout dropdown is now a button with the layout's name (and description) that opens a grid of every template layout, rendered by the shared renderer with **this slide's content**. Each layout says what switching does: "Keeps all content", "Hides Text (kept; switch back to restore)", "Brings back Photo", "Needs Agenda items". Arrow keys move through the grid (by row and column), Home / End, Enter chooses, Esc closes; the current layout is focused first.
 - **Added** "▾" next to "+ Add" in the slide list: add a slide with a layout chosen from the same grid, previewed with sample text; the new slide is selected.

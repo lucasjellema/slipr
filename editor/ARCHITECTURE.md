@@ -49,7 +49,7 @@ editor/
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
-        ├── slide-list.js    ✅ items, selection, reorder, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012)
+        ├── slide-list.js    ✅ items, selection, reorder (buttons, Alt+↑/↓, drag and drop), hide toggle, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012, E-003)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
         ├── markdown-toolbar.js ✅ toolbar above Markdown fields: glossary term, popup, slide link (E-008)
