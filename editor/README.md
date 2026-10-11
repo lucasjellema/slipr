@@ -26,9 +26,10 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 |---|---|---|
 | Show folders | Open, create from a template and save show folders anywhere on disk; recent shows; clean `show.json` diffs | [Open, create and save](help.html#files) |
 | Slide list | Go to slide, add (in a chosen layout), duplicate, delete, reorder by dragging, hide from the audience | [The slide list](help.html#slides) |
-| Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code and cards; notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |
+| Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code, cards and diagrams (Mermaid); notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |
 | Images | Choose, drop or paste; copied into `images/` once; alt text | [Images](help.html#images) |
-| Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
+| Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links, diagrams) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
+| Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |
 | Show settings | Metadata, presentation settings, chapters, profiles, glossary, reading routes | [Show settings](help.html#settings) |
 | Preview | Audience or reader view, as any profile at any depth, with the slide's errors and warnings | [Live preview](help.html#preview) |
 | Find and replace | Across slides, notes, reader blocks and settings; one undo step | [Find and replace](help.html#find) |

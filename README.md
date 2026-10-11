@@ -2,9 +2,9 @@
 
 **Slipr** (short for *SlidePresenter*) is personal presentation software. You write a show once and it serves two very different experiences:
 
-- **Audience mode** is for presenting to a room on the big screen, like a regular slideshow. It is concise and high level, with animations, visualizations, overview and agenda slides, speaker notes and a presenter view.
+- **Audience mode** is for presenting to a room on the big screen, like a regular slideshow. It is concise and high level, with animations, visualizations (including client-side Mermaid diagrams), overview and agenda slides, speaker notes and a presenter view.
 - **Reader mode** is for one person exploring the same show at their own pace, interactively and in much more depth. It offers:
-  - hover and tap popups, collapsible panels, tabs, and hotspots on images
+  - hover and tap popups, collapsible panels, tabs, hotspots on images, and Mermaid diagrams
   - content tailored to the reader's profile and preferred level of detail
   - personalised navigation: paths, progress, bookmarks and "go deeper" links
   - full-text search, and the reader's own highlights and notes
@@ -45,10 +45,10 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 | **Show** | A presentation. It is a folder with a `show.json` file and an `images/` folder. |
 | **Slide** | One entry in the show's `slides` array. It names a *layout* and fills that layout's *slots*. |
 | **Template** | A reusable look and feel: a style guide (colors, fonts, illustrations) plus a set of base slide *layouts*. Each show links to one template. |
-| **Layout** | A base slide format in a template, such as *title*, *section*, *bullets*, *image-full* or *two-column*. |
-| **Slot** | A named place in a layout that a slide fills with content, such as `title`, `body` or `image`. |
+| **Layout** | A base slide format in a template, such as *title*, *section*, *bullets*, *image-full*, *two-column* or *diagram*. |
+| **Slot** | A named place in a layout that a slide fills with content, such as `title`, `body`, `image`, `quote`, `diagram` or `cards`. |
 | **Cards** | A slot that holds a small set of repeated items with the same fields, such as four columns with a heading and text, or key figures with an icon. |
-| **Reader block** | A piece of reader-layer content attached to a slide: text, collapsible panel, callout, tabs, image with hotspots, embed. |
+| **Reader block** | A piece of reader-layer content attached to a slide: text, collapsible panel, callout, tabs, diagram (Mermaid), image with hotspots, embed, slide link. |
 | **Chapter** | A group of slides. Chapters drive the agenda in audience mode and the table of contents in reader mode. |
 | **Glossary** | Terms with definitions. In reader mode they appear as popups wherever the term is referenced. |
 | **Profile** | A type of reader (e.g. *Developer*, *Manager*). Blocks can be targeted at profiles. |

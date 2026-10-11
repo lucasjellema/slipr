@@ -27,6 +27,7 @@
         <li><a href="#images">Images</a></li>
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
+        <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
         <li><a href="#preview">Live preview and problems</a></li>
@@ -61,7 +62,7 @@
           <dt>Audience mode</dt>
           <dd>The slideshow for a room: linear, concise and high level, with builds, transitions, an agenda and speaker notes. This is the <strong>slide itself</strong>, edited in the <a href="#slide-tab">Slide tab</a>.</dd>
           <dt>Reader mode</dt>
-          <dd>For one person reading at their own pace: the slides plus a detailed <strong>reader layer</strong> of text, panels, tabs, callouts, images with hotspots and embedded pages, tailored to the reader's profile and chosen depth. Edited in the <a href="#reader-tab">Reader tab</a>.</dd>
+          <dd>For one person reading at their own pace: the slides plus a detailed <strong>reader layer</strong> of text, panels, tabs, callouts, diagrams (Mermaid), images with hotspots and embedded pages, tailored to the reader's profile and chosen depth. Edited in the <a href="#reader-tab">Reader tab</a>.</dd>
         </dl>
         <p class="tip"><strong>Tip:</strong> keep the slide short and put the depth in the reader layer. A slide with three words and a picture can carry pages of explanation for readers.</p>
         <table>
@@ -69,9 +70,9 @@
           <tbody>
             <tr><td><strong>Show</strong></td><td>A presentation: a folder with <code>show.json</code> and an <code>images/</code> folder. It can live anywhere on your disk.</td></tr>
             <tr><td><strong>Template</strong></td><td>The look and feel: colours, fonts, illustrations and a set of layouts. Every show uses one template. Slides contain no styling; change the template and the whole show changes with it.</td></tr>
-            <tr><td><strong>Layout</strong></td><td>A slide format in the template, such as <em>Title</em>, <em>Section</em>, <em>Title + bullets</em>, <em>Two columns</em> or <em>Full image</em>.</td></tr>
-            <tr><td><strong>Slot</strong></td><td>A place in a layout that you fill: a title, a body text, an image, a quote, a set of cards. The Slide tab shows one field per slot.</td></tr>
-            <tr><td><strong>Reader block</strong></td><td>One piece of the reader layer of a slide: text, a collapsible panel, a callout, tabs, an image with hotspots, an embedded page or a link to another slide.</td></tr>
+            <tr><td><strong>Layout</strong></td><td>A slide format in the template, such as <em>Title</em>, <em>Section</em>, <em>Title + bullets</em>, <em>Two columns</em>, <em>Full image</em> or <em>Diagram</em>.</td></tr>
+            <tr><td><strong>Slot</strong></td><td>A place in a layout that you fill: a title, a body text, an image, a quote, a diagram, a set of cards. The Slide tab shows one field per slot.</td></tr>
+            <tr><td><strong>Reader block</strong></td><td>One piece of the reader layer of a slide: text, a collapsible panel, a callout, tabs, a diagram (Mermaid), an image with hotspots, an embedded page or a link to another slide.</td></tr>
             <tr><td><strong>Chapter</strong></td><td>A group of slides. Chapters drive the agenda in audience mode and the contents in reader mode.</td></tr>
             <tr><td><strong>Profile</strong></td><td>A kind of reader, such as <em>Developer</em> or <em>Manager</em>. Reader blocks can be meant for some profiles only.</td></tr>
             <tr><td><strong>Depth</strong></td><td>How detailed a reader block is: 1 Essential, 2 Standard, 3 Deep dive. Readers choose how deep they want to go.</td></tr>
@@ -163,8 +164,9 @@
           <dt>Quote</dt><dd>The quote and who said it.</dd>
           <dt>Code</dt><dd>The language (for example <code>js</code>) and the code. <kbd>Tab</kbd> indents; press <kbd>Esc</kbd> and then <kbd>Tab</kbd> to leave the field.</dd>
           <dt>Cards</dt><dd>Layouts with repeated items (columns, numbered boxes, key figures, image cards, people) get one group of fields per card. A counter such as <code>7 / 18</code> shows how much room a field has and turns yellow when the text is too long. Move cards with <strong>▲</strong> / <strong>▼</strong>, remove one with <strong>🗑</strong>, and add one with <strong>+ Add card</strong>, up to the number the layout has room for.</dd>
+          <dt>Diagram</dt><dd>A Mermaid diagram definition (plain text) with an optional caption. Rendered directly in the browser as an interactive SVG on slides using the <strong>Diagram</strong> layout. See <a href="#diagrams">Diagrams (Mermaid)</a>.</dd>
         </dl>
-        <p>A field marked <em>No editor for this slot type yet</em> (charts and diagrams) can only be changed in <code>show.json</code> for now.</p>
+        <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
 
         <h3>Notes and options</h3>
         <dl>
@@ -209,6 +211,7 @@
             <tr><td><strong>Image with Hotspots</strong></td><td>An image with numbered markers that open popups</td><td>Image, alt text, optional caption, <a href="#hotspots">hotspots</a></td></tr>
             <tr><td><strong>Embedded Page</strong></td><td>Another web page inside the reader view</td><td>Address (https, or a file in the show folder), a title, an optional height</td></tr>
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
+            <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
@@ -237,6 +240,53 @@
           <li><strong>Without a mouse:</strong> <strong>+ Add hotspot</strong> places one in the middle of the image; then move it with the arrow keys.</li>
         </ul>
         <p>A hotspot stays at the same spot on the image at every screen size.</p>
+      </section>
+
+      <section id="diagrams">
+        <h2>Diagrams (Mermaid)</h2>
+        <p>Slipr renders <strong>Mermaid diagrams</strong> natively in both audience and reader mode. Diagrams are written as plain text and rendered directly in the browser into lightweight, scalable SVGs using vendored Mermaid.</p>
+
+        <h3>Where diagrams can be used</h3>
+        <ul>
+          <li><strong>On a slide (Audience mode):</strong> select the <strong>Diagram</strong> layout. It provides a <code>diagram</code> slot for Mermaid code and an optional caption, plus a slide title.</li>
+          <li><strong>In the reader layer (Reader mode):</strong> use a <strong>Diagram</strong> block (<code>"type": "diagram"</code>) with Mermaid code and an optional caption.</li>
+        </ul>
+
+        <h3>Supported diagram types</h3>
+        <p>All standard Mermaid diagram formats work out of the box, including:</p>
+        <ul>
+          <li><strong>Flowcharts:</strong> <code>flowchart LR</code> (left to right) or <code>flowchart TD</code> (top down) with rectangular nodes, round nodes, decision diamonds, database cylinders and subgraphs.</li>
+          <li><strong>Sequence diagrams:</strong> <code>sequenceDiagram</code> with actors, participants, sync/async arrows and autonumbering.</li>
+          <li><strong>State diagrams:</strong> <code>stateDiagram-v2</code> for state machines and workflows.</li>
+          <li><strong>Class diagrams:</strong> <code>classDiagram</code> for object and data structures.</li>
+          <li><strong>Entity Relationship diagrams:</strong> <code>erDiagram</code> for database entities and relationships.</li>
+          <li><strong>Git graphs, Gantt charts, Mindmaps</strong> and <strong>Pie charts</strong>.</li>
+        </ul>
+
+        <h3>Example: Flowchart</h3>
+        <div class="diagram"><pre><code>flowchart LR
+    A[Authoring] --&gt; S[(Show folder)]
+    S --&gt; V[Audience Mode]
+    S --&gt; R[Reader Mode]</code></pre></div>
+
+        <h3>Example: Sequence diagram</h3>
+        <div class="diagram"><pre><code>sequenceDiagram
+    autonumber
+    Author-&gt;&gt;Editor: Edit slides &amp; blocks
+    Editor-&gt;&gt;Show: Save show.json
+    Audience-&gt;&gt;Viewer: Open presentation</code></pre></div>
+
+        <h3>Key features</h3>
+        <dl>
+          <dt>Offline and private</dt>
+          <dd>Mermaid is vendored inside Slipr (zero external CDN requests, zero tracking, works completely offline on trains, flights and conference Wi-Fi).</dd>
+          <dt>Theme matching</dt>
+          <dd>Diagram typography, backgrounds and borders match the active Slipr template tokens automatically.</dd>
+          <dt>Searchable</dt>
+          <dd>All labels, node names and notes inside diagrams are indexed by reader search (<kbd>/</kbd>) and editor Find &amp; Replace (<kbd>Ctrl+F</kbd> / <kbd>Ctrl+H</kbd>).</dd>
+          <dt>Clear syntax errors</dt>
+          <dd>If your Mermaid definition has a typo, Slipr highlights the error with a friendly badge and the exact line number rather than breaking the slide.</dd>
+        </dl>
       </section>
 
       <section id="markdown">
@@ -366,6 +416,8 @@
           <dd>The layout has a limit for that field; a warning says so. Shorten it, choose a layout with more room, or move the details to the reader layer.</dd>
           <dt>An embedded page stays empty</dt>
           <dd>The site does not allow being embedded. Use a link in a text block instead.</dd>
+          <dt>A diagram shows a red "Diagram syntax error" box</dt>
+          <dd>There is a typo or unsupported syntax in the Mermaid code. The error box explains what line and token Mermaid could not understand. Check the syntax or test it in the Mermaid Live Editor.</dd>
         </dl>
       </section>
 

@@ -42,7 +42,7 @@ Profile, path and depth in the URL let you send a tailored link, for example "th
 Built on Reveal.js. The aim is a polished, linear presentation.
 
 - **Animations**: bullets that build one by one (several fragment styles), slide transitions, and *auto-animate*, where matching elements morph smoothly from one slide to the next.
-- **Visualizations**: charts that build up on screen *(planned)*. Images and dynamic Mermaid SVG diagrams work today (flowcharts, sequence diagrams, etc.).
+- **Visualizations**: charts that build up on screen *(planned)*. Images and dynamic Mermaid SVG diagrams work today (flowcharts, sequence diagrams, architectures, etc.), rendered client-side with vendored Mermaid and scaled to fit the presentation canvas.
 - **High-level overviews**: with `settings.agenda: true`, an agenda slide is generated at the start of every chapter (after the title slide for the first chapter). A thin bar along the bottom shows chapter progress. `O` gives an overview of all slides.
 - **Presenter view** (`S`): notes, timer, clock, and next-slide preview in a separate window on your laptop screen. The browser must allow popups for `localhost`.
 - **Backup slides** (`audience.hidden`): placed after the last slide, not counted in the slide number, and marked with a dashed outline in the overview.
@@ -113,7 +113,7 @@ On screens of 1400 px and wider, "My notes" docks beside the article. On smaller
 - *(planned)* **Tag filter**: show only slides about a topic.
 
 ### Search (`/`)
-Full-text search across slides, reader blocks, glossary and presenter notes (when shown), as you type. It is case- and accent-insensitive and matches word beginnings ("temp" finds "template"). Results show where the match is with a marked snippet. ↑/↓ and Enter work, and opening a result jumps there with the words highlighted. Matches in content hidden by your current tailoring are counted, with a one-click "show everything".
+Full-text search across slides, reader blocks (including text and labels inside Mermaid diagrams), glossary and presenter notes (when shown), as you type. It is case- and accent-insensitive and matches word beginnings ("temp" finds "template"). Results show where the match is with a marked snippet. ↑/↓ and Enter work, and opening a result jumps there with the words highlighted. Matches in content hidden by your current tailoring are counted, with a one-click "show everything".
 
 ### Annotations
 - Select text in the article, or in the text on a slide (titles, bullets), to **highlight** it or **add a note**.
