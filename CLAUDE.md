@@ -26,7 +26,7 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 - **Rendering lives in `shared/`.** Slide visuals go in `render.js` and reader blocks in `blocks.js`. Do not write a second renderer inside the viewer or editor.
 - **Reader data stays in the reader's browser.** No analytics, no network calls with personal data.
 - **Accessibility is not optional in reader mode.** Every hover interaction must also work with tap and keyboard.
-- **Slides contain no styling.** Visual decisions belong in the template (`theme.css`, layouts).
+- **Slides contain no styling.** Visual decisions belong in the template (`theme.css`, layouts). One accepted exception: extra images placed freely on a slide (D-013).
 
 ## Workflow for every change
 
