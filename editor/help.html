@@ -30,6 +30,7 @@
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
+        <li><a href="#glossary">Glossary</a></li>
         <li><a href="#preview">Live preview and problems</a></li>
         <li><a href="#find">Find and replace</a></li>
         <li><a href="#present">Present and Read</a></li>
@@ -78,7 +79,7 @@
             <tr><td><strong>Profile</strong></td><td>A kind of reader, such as <em>Developer</em> or <em>Manager</em>. Reader blocks can be meant for some profiles only.</td></tr>
             <tr><td><strong>Depth</strong></td><td>How detailed a reader block is: 1 Essential, 2 Standard, 3 Deep dive. Readers choose how deep they want to go.</td></tr>
             <tr><td><strong>Reading route</strong></td><td>A curated path through the show, for example a five-minute overview.</td></tr>
-            <tr><td><strong>Glossary</strong></td><td>Terms with definitions. In reader mode a referenced term opens a popup with its definition.</td></tr>
+            <tr><td><strong>Glossary</strong></td><td>Terms with definitions. In reader mode a referenced term opens a popup with its definition. See <a href="#glossary">Glossary</a>.</td></tr>
           </tbody>
         </table>
       </section>
@@ -310,7 +311,7 @@
         <h3>The insert toolbar</h3>
         <p>Above every reader Markdown field, a small toolbar inserts the special parts for you:</p>
         <ul>
-          <li><strong>Glossary term</strong>: pick a term; with words selected it becomes <code>[[term|those words]]</code>.</li>
+          <li><strong>Glossary term</strong>: pick a term; with words selected it becomes <code>[[term|those words]]</code>. See <a href="#glossary">Glossary</a>.</li>
           <li><strong>Popup</strong>: wraps the selected text in <code>^[…]</code>, or inserts an empty one to type into.</li>
           <li><strong>Slide link</strong>: pick a slide; the selected words become the link text.</li>
         </ul>
@@ -324,10 +325,63 @@
           <dt>Audience presentation settings</dt><dd>Aspect ratio (16:9 or 4:3), the slide transition (none, fade, slide, convex, concave, zoom, or Reveal's default), slide numbers, and an agenda slide before each chapter.</dd>
           <dt>Chapters</dt><dd>Add, rename, reorder (▲ / ▼) and delete chapters, each with an optional summary. The agenda and the reader contents follow this order. Deleting a chapter tells you how many slides lose it.</dd>
           <dt>Profiles</dt><dd>The kinds of readers, with an optional description that readers see when they choose. Deleting a profile tells you how many blocks were meant for it; a block meant only for that profile becomes visible to everyone.</dd>
-          <dt>Glossary</dt><dd>Terms with a Markdown definition and an optional link. Each term shows its id (what you type between <code>[[ ]]</code>) and how often it is used. Deleting a term in use lists where, and lets you keep those words as plain text.</dd>
+          <dt>Glossary</dt><dd>Terms with a Markdown definition and an optional link. See <a href="#glossary">Glossary</a> for how to add, use and delete them.</dd>
           <dt>Reading routes</dt><dd>Curated routes for readers, such as a five-minute overview: a name, a description, and either all slides or a list of slides you put together and reorder.</dd>
         </dl>
         <p>A new item gets a placeholder name, selected so you can type over it. Names, titles and terms can't be left empty. An item's id is set when you create it and never changes, so references keep working when you rename it.</p>
+      </section>
+
+      <section id="glossary">
+        <h2>Glossary</h2>
+        <p>The glossary explains the words your readers may not know. You write a term and its definition once; wherever you refer to the term, a reader can tap or hover it, or press <kbd>Enter</kbd> on it, to see the definition in a popup. In audience mode the same words are ordinary text, so the slides stay clean.</p>
+
+        <h3>Add and change terms</h3>
+        <ol>
+          <li>Click <strong>⚙ Show</strong> at the top of the slide list and go to <strong>Glossary</strong>. The number after it tells you how many terms the show has.</li>
+          <li>Click <strong>+ Add term</strong>. A term called <em>New term</em> appears with its name selected: type the word or phrase.</li>
+          <li>Write the <strong>Definition</strong> in Markdown. Keep it to a sentence or two: it appears in a small popup.</li>
+          <li>Optionally add a <strong>Link</strong> to a page with more information. Readers see it as <em>Learn more ↗</em> under the definition; only addresses starting with <code>https://</code> or <code>http://</code> are shown.</li>
+        </ol>
+        <p>Changes are saved with the show and undone with <kbd>Ctrl</kbd>+<kbd>Z</kbd>, like everything else. A term can't be left without a name.</p>
+
+        <h3>The term's id</h3>
+        <p>Each term card shows an <strong>id</strong>: the short name text uses to refer to the term, such as <code>reveal-js</code>. The id is set when you add the term and <strong>never changes</strong>, so references keep working when you rename the term. Because every new term starts as <em>New term</em>, new ids look like <code>new-term</code>, <code>new-term-2</code>, and so on. That's fine: the insert toolbar picks the right id for you, and readers never see it.</p>
+
+        <h3>Use a term in your text</h3>
+        <ul>
+          <li><strong>With the toolbar:</strong> above reader text, tab text, hotspot text and glossary definitions, open <strong>[[ ]] Term…</strong> and pick the term. It is inserted at the cursor as <code>[[id]]</code>, which shows the term's name.</li>
+          <li><strong>With your own words:</strong> select words first, then pick the term. They become <code>[[id|your words]]</code>: the reader sees your words, and the popup still explains the term. Use this for plurals or other word forms, such as <code>[[agent|agents]]</code>.</li>
+          <li><strong>By hand:</strong> type <code>[[id]]</code> or <code>[[id|words]]</code> in any Markdown field, including slide text and speaker notes.</li>
+        </ul>
+        <p>Renaming a term updates every <code>[[id]]</code> reference automatically, because they show the term's current name. References with your own words keep those words.</p>
+        <p>Definitions may refer to other terms; inside a popup those show as plain text.</p>
+
+        <h3>See where a term is used</h3>
+        <p>Each term card says how often it is used (<em>used 4×</em>). To find the places, open <a href="#find">Find and replace</a> and search for the id, for example <code>[[reveal-js</code>.</p>
+
+        <h3>Delete a term</h3>
+        <p>Click the term's <strong>🗑</strong>. A term that is not used is removed at once. For a term in use the editor lists where it is used and asks what to do with those places:</p>
+        <dl>
+          <dt>Delete, keep the words as plain text</dt>
+          <dd>The references become ordinary text with the words readers saw. Usually what you want.</dd>
+          <dt>Delete, leave the references</dt>
+          <dd>The <code>[[id]]</code> references stay in the text, for example because you will add the term again. Until then readers see the id instead of a name, without a popup, and each reference gives a warning.</dd>
+        </dl>
+
+        <h3>What readers get</h3>
+        <ul>
+          <li>Terms in reader text are marked; tapping, hovering or pressing <kbd>Enter</kbd> opens the popup with the name, the definition and the optional link.</li>
+          <li>Reader search also finds glossary terms and their definitions.</li>
+          <li>To try a popup yourself, click <strong>Read</strong> in the toolbar: it opens reader mode at the selected slide.</li>
+        </ul>
+
+        <h3>Problems</h3>
+        <dl>
+          <dt>Warning: unknown glossary term "[[…]]"</dt>
+          <dd>The text refers to an id that is not in the glossary: a typo, or a deleted term. Correct the id, add the term, or remove the brackets.</dd>
+          <dt>The popup has no "Learn more" link</dt>
+          <dd>The link must start with <code>https://</code> or <code>http://</code>.</dd>
+        </dl>
       </section>
 
       <section id="preview">

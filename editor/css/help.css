@@ -111,6 +111,7 @@ dt { font-weight: 600; margin-top: 0.75rem; }
 dd { margin: 0.1rem 0 0 1.25rem; }
 
 code, kbd, pre { font-family: var(--slipr-font-mono); font-size: 0.875em; }
+.content pre { max-width: 100%; overflow-x: auto; }
 code {
   background: var(--slipr-help-surface);
   border: 1px solid var(--slipr-help-border);
@@ -166,7 +167,7 @@ th { background: var(--slipr-help-surface); }
 .sev-warning { color: var(--slipr-help-warning); }
 
 @media (max-width: 52rem) {
-  .page { grid-template-columns: 1fr; gap: 1rem; padding: 1rem; }
+  .page { grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1rem; }
   .toc { position: static; max-height: none; border-bottom: 1px solid var(--slipr-help-border); padding-bottom: 1rem; }
   .top { padding: 0.75rem 1rem; }
   table { display: block; overflow-x: auto; }

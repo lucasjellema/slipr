@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Glossary chapter in the user manual
+- **Added** a *Glossary* section to `help.html`: adding and changing terms, the term's id (fixed at creation, so new terms get `new-term`, `new-term-2`…), using terms with the insert toolbar or by hand (`[[id]]`, `[[id|words]]`), finding where a term is used, the two ways to delete a used term, what readers get, and the warnings. Show settings, Key ideas and the Markdown section link to it.
+- **Fixed** the manual scrolling sideways on phones: the narrow layout's column could not shrink below its widest code block.
+
 ### 2026-10-11: Export… button (I-085)
 - **Added** **Export…** in the toolbar: save the open show as one HTML file that presents offline, with the same packer as `npm run export` (`shared/export/single-file.js`). The show is exported as it is in the editor, unsaved changes included (show.json comes from the editor's state; images and other show files from the show folder, or from the server for a show opened by URL; viewer and template from the Slipr server). The save dialog opens first, inside the click; without one the file is downloaded. New module `export.js`.
 - **Added** "Export as one file" to the manual (`help.html`).
