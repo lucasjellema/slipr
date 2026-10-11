@@ -6,7 +6,7 @@
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { slideTitle } from '../../../shared/render.js';
-import { chapterUsage, glossaryReferences, profileUsage, uniqueId } from '../show-entities.js';
+import { chapterUsage, glossaryReferences, isIsoDate, isLanguageTag, parseTags, profileUsage, uniqueId } from '../show-entities.js';
 import { openConfirmDialog } from './dialogs.js';
 import { markdownToolbar } from './markdown-toolbar.js';
 
@@ -54,7 +54,7 @@ export function mountShowSettings(container, store) {
           class: 'slipr-input',
           value: meta.subtitle ?? '',
           oninput: (e) => {
-            store.dispatch('setMeta', { subtitle: /** @type {HTMLInputElement} */ (e.target).value }, {
+            store.dispatch('setMeta', { subtitle: /** @type {HTMLInputElement} */ (e.target).value || undefined }, {
               coalesceKey: 'meta-subtitle',
             });
           },
@@ -67,7 +67,7 @@ export function mountShowSettings(container, store) {
           class: 'slipr-input',
           value: meta.author ?? '',
           oninput: (e) => {
-            store.dispatch('setMeta', { author: /** @type {HTMLInputElement} */ (e.target).value }, {
+            store.dispatch('setMeta', { author: /** @type {HTMLInputElement} */ (e.target).value || undefined }, {
               coalesceKey: 'meta-author',
             });
           },
@@ -76,13 +76,55 @@ export function mountShowSettings(container, store) {
       h('div', { class: 'slipr-form-group' }, [
         h('label', { class: 'slipr-label' }, ['Date']),
         h('input', {
-          type: 'text',
+          type: 'date',
           class: 'slipr-input',
           value: meta.date ?? '',
           oninput: (e) => {
-            store.dispatch('setMeta', { date: /** @type {HTMLInputElement} */ (e.target).value }, {
-              coalesceKey: 'meta-date',
-            });
+            const input = /** @type {HTMLInputElement} */ (e.target);
+            const ok = input.value === '' || isIsoDate(input.value);
+            input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+            if (ok) store.dispatch('setMeta', { date: input.value || undefined }, { coalesceKey: 'meta-date' });
+          },
+        }),
+      ]),
+      h('div', { class: 'slipr-form-group' }, [
+        h('label', { class: 'slipr-label', for: 'slipr-meta-language' }, ['Language']),
+        h('input', {
+          type: 'text',
+          id: 'slipr-meta-language',
+          class: 'slipr-input',
+          placeholder: 'en, nl, nl-NL…',
+          value: meta.language ?? '',
+          oninput: (e) => {
+            const input = /** @type {HTMLInputElement} */ (e.target);
+            const value = input.value.trim();
+            const ok = value === '' || isLanguageTag(value);
+            input.setAttribute('aria-invalid', ok ? 'false' : 'true');
+            if (ok) store.dispatch('setMeta', { language: value || undefined }, { coalesceKey: 'meta-language' });
+          },
+        }),
+        h('span', { class: 'slipr-help' }, ['The language of the show (a language code). Used for hyphenation, screen readers and spelling.']),
+      ]),
+      h('div', { class: 'slipr-form-group' }, [
+        h('label', { class: 'slipr-label', for: 'slipr-meta-description' }, ['Description']),
+        h('textarea', {
+          id: 'slipr-meta-description',
+          class: 'slipr-textarea slipr-textarea-sm',
+          placeholder: 'One or two sentences about the show (reader welcome, link previews)',
+          oninput: (e) => store.dispatch('setMeta', { description: /** @type {HTMLTextAreaElement} */ (e.target).value || undefined }, { coalesceKey: 'meta-description' }),
+        }, [meta.description ?? '']),
+      ]),
+      h('div', { class: 'slipr-form-group' }, [
+        h('label', { class: 'slipr-label', for: 'slipr-meta-tags' }, ['Tags']),
+        h('input', {
+          type: 'text',
+          id: 'slipr-meta-tags',
+          class: 'slipr-input',
+          placeholder: 'Comma-separated',
+          value: (meta.tags ?? []).join(', '),
+          oninput: (e) => {
+            const tags = parseTags(/** @type {HTMLInputElement} */ (e.target).value);
+            store.dispatch('setMeta', { tags: tags.length ? tags : undefined }, { coalesceKey: 'meta-tags' });
           },
         }),
       ]),
@@ -114,15 +156,34 @@ export function mountShowSettings(container, store) {
           {
             class: 'slipr-select',
             onchange: (e) => {
-              store.dispatch('setSettings', { transition: /** @type {HTMLSelectElement} */ (e.target).value });
+              store.dispatch('setSettings', { transition: /** @type {HTMLSelectElement} */ (e.target).value || undefined });
             },
           },
           [
-            h('option', { value: 'fade', selected: settings.transition === 'fade' ? true : undefined }, ['Fade']),
-            h('option', { value: 'slide', selected: settings.transition === 'slide' ? true : undefined }, ['Slide']),
-            h('option', { value: 'none', selected: settings.transition === 'none' ? true : undefined }, ['None']),
+            h('option', { value: '', selected: settings.transition ? undefined : true }, ['Reveal default']),
+            ...['none', 'fade', 'slide', 'convex', 'concave', 'zoom'].map((t) => h('option', { value: t, selected: settings.transition === t ? true : undefined }, [t.charAt(0).toUpperCase() + t.slice(1)])),
           ]
         ),
+      ]),
+      h('div', { class: 'slipr-form-checkbox' }, [
+        h('label', {}, [
+          h('input', {
+            type: 'checkbox',
+            checked: Boolean(settings.slideNumbers),
+            onchange: (e) => store.dispatch('setSettings', { slideNumbers: /** @type {HTMLInputElement} */ (e.target).checked || undefined }),
+          }),
+          ' Show slide numbers',
+        ]),
+      ]),
+      h('div', { class: 'slipr-form-checkbox' }, [
+        h('label', {}, [
+          h('input', {
+            type: 'checkbox',
+            checked: Boolean(settings.agenda),
+            onchange: (e) => store.dispatch('setSettings', { agenda: /** @type {HTMLInputElement} */ (e.target).checked || undefined }),
+          }),
+          ' Agenda slide before each chapter (generated from the chapters)',
+        ]),
       ]),
     ]);
 

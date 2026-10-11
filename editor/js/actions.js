@@ -369,6 +369,29 @@ export function setTags(show, { slideId, tags }) {
   return { ...show, slides };
 }
 
+/**
+ * Set audience-mode options of a slide (E-015): `fragments`, `autoAnimate`,
+ * `transition`, `background`. A key patched to undefined or false is removed,
+ * and an empty `audience` object too. `hidden` has its own action (setHidden).
+ * @param {any} show
+ * @param {{ slideId: string, patch: Record<string, any> }} payload
+ * @returns {any}
+ */
+export function setSlideAudience(show, { slideId, patch }) {
+  if (!Array.isArray(show.slides)) return show;
+  const slides = show.slides.map((s) => {
+    if (s.id !== slideId) return s;
+    const audience = { ...(s.audience ?? {}), ...patch };
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === undefined || value === false || value === '') delete audience[key];
+    }
+    const updated = { ...s, audience };
+    if (Object.keys(audience).length === 0) delete updated.audience;
+    return updated;
+  });
+  return { ...show, slides };
+}
+
 // ---------------------------------------------------------------------------
 // Reader layer actions
 // ---------------------------------------------------------------------------
@@ -717,13 +740,8 @@ export function setShowSlide(show, { slideId, showSlide }) {
  * @returns {any}
  */
 export function setMeta(show, patch) {
-  return {
-    ...show,
-    meta: {
-      ...(show.meta ?? {}),
-      ...patch,
-    },
-  };
+  // A key patched to undefined is removed (an emptied optional field).
+  return { ...show, meta: mergeDefined(show.meta ?? {}, patch) };
 }
 
 /**
@@ -733,13 +751,8 @@ export function setMeta(show, patch) {
  * @returns {any}
  */
 export function setSettings(show, patch) {
-  return {
-    ...show,
-    settings: {
-      ...(show.settings ?? {}),
-      ...patch,
-    },
-  };
+  // A key patched to undefined is removed (back to the default).
+  return { ...show, settings: mergeDefined(show.settings ?? {}, patch) };
 }
 
 /**
@@ -1551,6 +1564,7 @@ export const actions = {
   setHidden,
   setChapter,
   setTags,
+  setSlideAudience,
   setSummary,
   addBlock,
   updateBlock,

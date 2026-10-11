@@ -69,12 +69,14 @@ A show is a folder with `show.json` and an `images/` folder. It can live anywher
 * **Fill in slots:** The form automatically generates fields based on the selected layout's slot definitions:
   * **Text & headings:** Single-line inputs for titles, subtitles, or captions.
   * **Rich text & lists:** Multiline text areas supporting Markdown formatting (`**bold**`, `*italic*`, `` `code` ``) and bullet lists (`- item`).
-  * **Images:** A preview, the image path and its alt text. See *Adding images* below.
+  * **Images:** A preview, the image path, its alt text and how it fits its frame (as the layout decides, fill the frame, or show the whole image). See *Adding images* below.
   * **Quote:** The quote text and its source.
   * **Code:** The language (e.g. `js`) and the code. `Tab` indents; press `Esc`, then `Tab`, to leave the field.
   * **Cards** (layouts with repeated items, such as the Conclusion template's columns, numbered boxes, facts, image cards and people): one group of fields per card. A counter (`7 / 18`) shows how much room a field has and turns yellow when the text is too long. Move cards with **▲** / **▼**, remove one with **🗑**, and add one with **+ Add card**, up to the number the layout has room for. Image fields in cards work like any image field.
 * **Speaker notes:** Add private presenter notes in the **Speaker Notes** box. These appear in Reveal's presenter view (`S` key in audience mode).
 * **Chapter:** Assign the slide to a chapter to drive the agenda slide in audience mode and the table of contents in reader mode.
+* **Tags:** Comma-separated topics, used by reader search and "related" suggestions.
+* **Audience mode:** **Build step by step** shows bullets and cards one at a time (optionally with an effect such as *fade-up*); **Auto-animate** morphs matching fields between neighbouring auto-animate slides; choose the **transition** into this slide, or keep the show's default.
 * **Audience visibility:** Check **Hide from audience mode** to make a slide reader-only (useful for backup slides or in-depth reference material).
 
 #### Adding images
@@ -122,8 +124,8 @@ The Reader tab holds the detailed content for individuals reading the show inter
 
 Click **⚙ Show** to access show-level configurations:
 
-* **Metadata:** Edit show title, subtitle, author, and date.
-* **Audience settings:** Choose aspect ratio (**16:9** widescreen or **4:3**) and slide transitions (**fade**, **slide**, or **none**).
+* **Metadata:** Edit show title, subtitle, author, date, language (a code such as `en` or `nl`), a short description and tags.
+* **Audience settings:** Choose aspect ratio (**16:9** widescreen or **4:3**), the slide transition (none, fade, slide, convex, concave, zoom, or Reveal's default), slide numbers, and an agenda slide before each chapter.
 * **Chapters:** Add, rename, reorder (▲ / ▼) or delete chapters, and give each an optional summary. The agenda and the reader contents follow this order. Deleting a chapter says how many slides lose it.
 * **Profiles:** The kinds of readers (for example *Developer*, *Manager*), with an optional description. Readers pick one; choose per block who sees it with **For** in the Reader tab. Deleting a profile says how many blocks are tailored for it.
 * **Glossary:** Terms with a Markdown definition and an optional link. Reference them in any Markdown as `[[id]]` (the card shows the id and how often it is used). Deleting a term that is used lists where, and offers to keep those words as plain text.

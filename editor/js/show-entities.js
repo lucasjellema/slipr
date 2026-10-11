@@ -181,3 +181,28 @@ export function profileUsage(show, profileId) {
 export function chapterUsage(show, chapterId) {
   return (show.slides ?? []).filter((/** @type {any} */ s) => s.chapter === chapterId).length;
 }
+
+/**
+ * Tags from what was typed: comma-separated, trimmed, empty and duplicate tags dropped (E-015).
+ * @param {string} text
+ * @returns {string[]}
+ */
+export function parseTags(text) {
+  return [...new Set(String(text ?? '').split(',').map((t) => t.trim()).filter(Boolean))];
+}
+
+/**
+ * A BCP-47 language tag as the format accepts it (`en`, `nl-NL`).
+ * @param {string} text
+ */
+export function isLanguageTag(text) {
+  return /^[a-zA-Z]{2,3}(-[a-zA-Z0-9]{2,8})*$/.test(text);
+}
+
+/**
+ * An ISO date `YYYY-MM-DD` as the format accepts it.
+ * @param {string} text
+ */
+export function isIsoDate(text) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(text);
+}

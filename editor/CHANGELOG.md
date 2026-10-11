@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: The last missing controls; Phase 5 done (E-015)
+- **Added** to the Slide tab: **Tags** (comma-separated), and an **Audience mode** group with **Build step by step** (off, one by one, or one by one with a Reveal effect such as `fade-up`), **Auto-animate**, the **transition into this slide** (or the show default), and **Hide from audience mode**. New action `setSlideAudience`.
+- **Added** a **Fit** choice to image fields: as the layout decides, fill the frame (`cover`), or show the whole image (`contain`).
+- **Added** to Show Settings: **Language** (checked as a language code), **Description**, **Tags**, **Show slide numbers**, **Agenda slide before each chapter**, and all six transitions plus "Reveal default". The date field is a date picker.
+- **Fixed** emptied metadata and settings being stored as `""`, which made the show invalid for `date` and `language`: `setMeta` and `setSettings` now remove keys set to `undefined`, and empty optional fields are removed.
+- **Checked** Phase 5's "done when": every field used by `shows/demo/show.json` now has an editor control.
+
 ### 2026-10-11: Find & replace shortcuts (E-014)
 - **Fixed** `Ctrl+F` / `Ctrl+H` throwing `ReferenceError: onFindReplace is not defined` instead of opening Find & Replace: `registerShortcuts()` now takes the `onFindReplace` handler that `main.js` passes.
 

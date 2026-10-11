@@ -77,7 +77,7 @@ editor/
 
 ### Actions (`actions.js`)
 Pure and unit-testable in Node:
-- slides: `addSlide`, `duplicateSlide`, `deleteSlide`, `moveSlide`, `setLayout`, `setSlot`, `setNotes`, `setHidden`, `setChapter`, `setTags`
+- slides: `addSlide`, `duplicateSlide`, `deleteSlide`, `moveSlide`, `setLayout`, `setSlot`, `setNotes`, `setHidden`, `setSlideAudience`, `setChapter`, `setTags`
 - reader layer: `setSummary`, `addBlock`, `updateBlock`, `moveBlock`, `deleteBlock`, `setBlockType`, `setBlockAudience` (for/depth), `addHotspot`, `updateHotspot`, `deleteHotspot`, `setRelated`, `setShowSlide`
 - show: `setMeta`, `setSettings`, `upsertChapter`, `deleteChapter`, `upsertGlossaryTerm`, `deleteGlossaryTerm` (optionally `unlink`), `upsertProfile`, `deleteProfile`, `upsertPath`, `deletePath`, `moveShowItem`
 - find & replace: `replaceAllText`, `replaceSlideText` (plus the pure query `findMatches()`, which is not an action)

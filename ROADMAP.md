@@ -87,7 +87,7 @@ Each phase is broken into backlog items (IDs in brackets) in [BACKLOG.md](BACKLO
 
 Derive a Slipr template from the Conclusion PowerPoint template. ✅ First version (12 layouts) and the card layouts with the new `cards` slot type (I-043b), 17 layouts in total. Left: a generator for business-unit variants (I-043c), review by Lucas and the brand team (I-043d), and the Facts icons (I-058). Spec: [docs/specs/I-043-conclusion-template.md](docs/specs/I-043-conclusion-template.md).
 
-## Phase 5: Editor MVP (≈ 3–4 sessions) · in progress
+## Phase 5: Editor MVP (≈ 3–4 sessions) ✅ done 2026-10-11
 
 **Goal**: Make and change shows, both layers, without touching JSON.
 
@@ -101,9 +101,9 @@ Derive a Slipr template from the Conclusion PowerPoint template. ✅ First versi
 8. ✅ Images and hotspots: drop or paste, alt text, hotspot placement. [E-006]
 9. ✅ Present / Read buttons. [E-007]
 
-Also done along the way: find & replace (I-025) and the fixes E-010 to E-014.
+Also done along the way: find & replace (I-025), the fixes E-010 to E-014, and the last missing controls (E-015).
 
-**Done when**: You can build the demo show from scratch in the editor.
+**Done when**: You can build the demo show from scratch in the editor. ✅ Checked 2026-10-11: every field used by `shows/demo/show.json` has an editor control.
 
 ## Phase 6: Polish & publish
 

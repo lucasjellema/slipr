@@ -158,6 +158,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **E-015** [editor] The last controls needed to build the demo from scratch: slide tags, audience options (step-by-step builds, auto-animate, transition), image fit, show language / description / tags, slide numbers, agenda; empty metadata no longer stored as `""` · done 2026-10-11 · claude
 - [x] **E-014** [editor] Bug: `Ctrl+F` / `Ctrl+H` threw `ReferenceError: onFindReplace is not defined`, because `registerShortcuts()` did not take the handler that `main.js` passes. Found in the docs pass · done 2026-10-11 · claude
 - [x] **E-005** [editor] Live preview in both modes with profile/depth simulation (checked against the viewer: same `personalize()` rules, `showSlide`, diagnostics); notes for backup and reader-hidden slides · done 2026-10-11 · claude
 - [x] **I-036** [editor] Block editors for tabs (labels, Markdown, add / reorder / remove), embed (URL with hints, title, height) and slide-ref (slide picker, label); every block type now has an editor · done 2026-10-11 · claude

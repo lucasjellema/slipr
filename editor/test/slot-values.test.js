@@ -117,3 +117,9 @@ describe('slot values: edited shows stay valid (E-010)', () => {
     assert.deepEqual(typeErrors, []);
   });
 });
+
+test('imageValue: fit can be set and cleared (E-015)', () => {
+  const img = { src: 'images/a.png', alt: 'A' };
+  assert.deepEqual(imageValue(img, { fit: 'contain' }), { src: 'images/a.png', alt: 'A', fit: 'contain' });
+  assert.deepEqual(imageValue({ ...img, fit: 'cover' }, { fit: undefined }), img);
+});

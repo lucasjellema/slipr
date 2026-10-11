@@ -65,7 +65,7 @@ export function listValue(previous, text) {
 /**
  * Value to store for an `image` slot: `{ src, alt, … }`, keeping other fields
  * such as `fit` and `focus`. An empty `src` removes the slot; an empty `alt`
- * is left out (the validator warns about it).
+ * is left out (the validator warns about it); a field changed to undefined is removed.
  * @param {any} previous
  * @param {{ src?: string, alt?: string }} change
  * @returns {Record<string, any> | undefined}
@@ -77,6 +77,8 @@ export function imageValue(previous, change) {
   const next = { ...base, ...change };
   if (!next.src) return undefined;
   if (!next.alt) delete next.alt;
+  // A field changed to undefined (e.g. fit back to the template default) is removed.
+  for (const [key, value] of Object.entries(change)) if (value === undefined) delete next[key];
   return next;
 }
 

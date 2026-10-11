@@ -75,3 +75,34 @@ test('upserts remove optional fields patched to undefined (emptied summary or de
   assert.ok(!('description' in show.paths[0]));
   assert.deepEqual(validateShow(show, { template }).errors, []);
 });
+
+describe('metadata, tags and audience options (E-015)', async () => {
+  const { parseTags, isLanguageTag, isIsoDate } = await import('../js/show-entities.js');
+
+  test('tags, language and date input', () => {
+    assert.deepEqual(parseTags(' ai, agents ,, ai , governance'), ['ai', 'agents', 'governance']);
+    assert.deepEqual(parseTags(''), []);
+    assert.ok(isLanguageTag('nl') && isLanguageTag('nl-NL') && !isLanguageTag('dutch!') && !isLanguageTag(''));
+    assert.ok(isIsoDate('2026-10-11') && !isIsoDate('11-10-2026') && !isIsoDate(''));
+  });
+
+  test('setMeta and setSettings remove keys set to undefined', () => {
+    let show = actions.setMeta(demo, { language: undefined, description: undefined });
+    assert.ok(!('language' in show.meta) && !('description' in show.meta));
+    assert.equal(show.meta.title, demo.meta.title);
+    show = actions.setSettings(show, { slideNumbers: undefined });
+    assert.ok(!('slideNumbers' in show.settings));
+    assert.deepEqual(validateShow(show, { template }).errors, []);
+  });
+
+  test('setSlideAudience sets and clears fragments, autoAnimate and transition', () => {
+    const id = demo.slides[0].id;
+    let show = actions.setSlideAudience(demo, { slideId: id, patch: { fragments: 'fade-up', autoAnimate: true, transition: 'zoom' } });
+    assert.deepEqual(show.slides[0].audience, { fragments: 'fade-up', autoAnimate: true, transition: 'zoom' });
+    assert.deepEqual(validateShow(show, { template }).errors, []);
+    show = actions.setSlideAudience(show, { slideId: id, patch: { fragments: false, autoAnimate: false, transition: undefined } });
+    assert.ok(!('audience' in show.slides[0]), 'an empty audience object is removed');
+    const hidden = actions.setHidden(demo, { slideId: id, audienceHidden: true });
+    assert.equal(actions.setSlideAudience(hidden, { slideId: id, patch: { autoAnimate: false } }).slides[0].audience.hidden, true, 'hidden is kept');
+  });
+});

@@ -11,9 +11,10 @@ import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
 import { openLayoutPicker } from './layout-picker.js';
 import { layoutName } from '../layout-choice.js';
+import { parseTags } from '../show-entities.js';
 
 /** Actions the slide form dispatches while the user types. */
-const TYPING_ACTIONS = new Set(['setSlot', 'setNotes']);
+const TYPING_ACTIONS = new Set(['setSlot', 'setNotes', 'setTags']);
 
 /**
  * Mount the slide form into a container.
@@ -132,7 +133,69 @@ export function mountSlideForm(container, store) {
       h('label', {}, [hiddenCheckbox, ' Hide from audience mode']),
     ]);
 
-    root.append(layoutRow, slotsContainer, notesRow, chapterRow, visibilityRow);
+    // 5. Tags and audience-mode options (E-015)
+    const tagsRow = h('div', { class: 'slipr-form-group' }, [
+      h('label', { class: 'slipr-label', for: 'slipr-slide-tags' }, ['Tags']),
+      h('input', {
+        type: 'text',
+        id: 'slipr-slide-tags',
+        class: 'slipr-input',
+        placeholder: 'Comma-separated, e.g. architecture, format',
+        value: (slide.tags ?? []).join(', '),
+        oninput: (e) => {
+          const tags = parseTags(/** @type {HTMLInputElement} */ (e.target).value);
+          store.dispatch('setTags', { slideId: slide.id, tags }, { coalesceKey: `tags-${slide.id}` });
+        },
+      }),
+      h('span', { class: 'slipr-help' }, ['Topics for reader search and "related" suggestions.']),
+    ]);
+
+    const audience = slide.audience ?? {};
+    /** @param {Record<string, any>} patch */
+    const setAudience = (patch) => store.dispatch('setSlideAudience', { slideId: slide.id, patch });
+    const fragmentsValue = audience.fragments === true ? 'true' : typeof audience.fragments === 'string' ? audience.fragments : '';
+    const audienceRow = h('fieldset', { class: 'slipr-fieldset slipr-audience-options' }, [
+      h('legend', {}, ['Audience mode']),
+      h('div', { class: 'slipr-form-group' }, [
+        h('label', { class: 'slipr-label', for: 'slipr-fragments' }, ['Build step by step']),
+        h('select', {
+          id: 'slipr-fragments',
+          class: 'slipr-select',
+          onchange: (e) => {
+            const v = /** @type {HTMLSelectElement} */ (e.target).value;
+            setAudience({ fragments: v === '' ? undefined : v === 'true' ? true : v });
+          },
+        }, [
+          h('option', { value: '', selected: fragmentsValue === '' ? true : undefined }, ['Off: everything at once']),
+          h('option', { value: 'true', selected: fragmentsValue === 'true' ? true : undefined }, ['On: bullets and cards one by one']),
+          ...['fade-in', 'fade-up', 'fade-down', 'fade-left', 'fade-right', 'fade-in-then-semi-out', 'semi-fade-out', 'grow', 'shrink'].map((style) => h('option', { value: style, selected: fragmentsValue === style ? true : undefined }, [`On, with effect: ${style}`])),
+        ]),
+      ]),
+      h('div', { class: 'slipr-form-checkbox' }, [
+        h('label', {}, [
+          h('input', {
+            type: 'checkbox',
+            checked: Boolean(audience.autoAnimate),
+            onchange: (e) => setAudience({ autoAnimate: /** @type {HTMLInputElement} */ (e.target).checked || undefined }),
+          }),
+          ' Auto-animate: morph matching fields from and to neighbouring auto-animate slides',
+        ]),
+      ]),
+      h('div', { class: 'slipr-form-group' }, [
+        h('label', { class: 'slipr-label', for: 'slipr-slide-transition' }, ['Transition into this slide']),
+        h('select', {
+          id: 'slipr-slide-transition',
+          class: 'slipr-select',
+          onchange: (e) => setAudience({ transition: /** @type {HTMLSelectElement} */ (e.target).value || undefined }),
+        }, [
+          h('option', { value: '', selected: audience.transition ? undefined : true }, [`Show default (${state.show?.settings?.transition ?? 'Reveal default'})`]),
+          ...['none', 'fade', 'slide', 'convex', 'concave', 'zoom'].map((t) => h('option', { value: t, selected: audience.transition === t ? true : undefined }, [t])),
+        ]),
+      ]),
+      visibilityRow,
+    ]);
+
+    root.append(layoutRow, slotsContainer, notesRow, chapterRow, tagsRow, audienceRow);
   }
 
   store.subscribe((event) => {
@@ -228,6 +291,22 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
         value: image?.alt ?? '',
         oninput: (e) => write(imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value })),
       }),
+      // How the image fills its frame (E-015). Without a choice the layout decides.
+      h('select', {
+        class: 'slipr-select slipr-select-sm slipr-input-alt',
+        'aria-label': `${labelText}: fit`,
+        disabled: image?.src ? undefined : true,
+        onchange: (e) => {
+          const fit = /** @type {HTMLSelectElement} */ (e.target).value || undefined;
+          const next = imageValue(current, { fit });
+          current = next;
+          store.dispatch('setSlot', { slideId, slot: slotName, value: next });
+        },
+      }, [
+        h('option', { value: '', selected: image?.fit ? undefined : true }, ['Fit: as the layout decides']),
+        h('option', { value: 'cover', selected: image?.fit === 'cover' ? true : undefined }, ['Fill the frame (may crop)']),
+        h('option', { value: 'contain', selected: image?.fit === 'contain' ? true : undefined }, ['Show the whole image']),
+      ]),
     ];
   } else if (kind === 'quote') {
     inputs = quoteEditor({ label: labelText, read: () => current, write });
