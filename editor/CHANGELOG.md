@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Show grid chapter in the user manual
+- **Changed** the manual's *Show grid* section into a full chapter: when to use it, opening and closing (`Esc` first clears the selection), what the cards, groups, *continued* and badges mean, selecting, rearranging slides and chapters, batch changes in the selection bar, that the chapter order follows the slides (agenda, contents, Show settings), keys, and a worked example (a backup chapter).
+
 ### 2026-10-11: Export chapter in the user manual
 - **Changed** the manual's *Export as one file* section into a full chapter: when to use it, exporting step by step (fix errors first; unsaved changes included; shows opened by address only from inside the Slipr folder), opening an exported file in audience and reader mode, what the file contains and what not, changing an exported show, and the export messages.
 

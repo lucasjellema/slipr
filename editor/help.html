@@ -148,24 +148,72 @@
 
       <section id="grid">
         <h2>Show grid</h2>
-        <p>The show grid shows <strong>all slides at once</strong>, as thumbnails, to rearrange and tidy up a show. Open it with <strong>▦ Grid</strong> in the toolbar or <strong>▦</strong> above the slide list; <strong>Back to editor</strong> or <kbd>Esc</kbd> closes it. <strong>S</strong>, <strong>M</strong> and <strong>L</strong> change the thumbnail size.</p>
-        <p>Slides appear in the order of the show, grouped into <strong>chapters</strong> the way readers see them: consecutive slides of the same chapter form one group. If a chapter comes back later in the show, its second group is marked <em>continued</em>. Each card shows the slide number and title, and badges for backup slides (<strong>◌ backup</strong>), slides hidden from reader mode, and errors (<strong>✖</strong>) or warnings (<strong>⚠</strong>).</p>
+        <p>The show grid shows <strong>all slides at once</strong>, as thumbnails grouped by chapter. Where the slide list is for working on one slide, the grid is for the <strong>structure</strong> of the show: rearranging, regrouping into chapters, and tidying up many slides at once.</p>
+
+        <h3>When to use it</h3>
+        <ul>
+          <li>Reordering a long show, or moving a whole chapter.</li>
+          <li>Putting slides into chapters, or splitting a chapter.</li>
+          <li>Hiding, duplicating or deleting several slides in one go, for example turning the last five slides into backup slides.</li>
+          <li>Spotting problems: every slide with an error or warning is marked.</li>
+        </ul>
+
+        <h3>Open and close</h3>
+        <p>Click <strong>▦ Grid</strong> in the toolbar or <strong>▦</strong> above the slide list. The slide you were on is selected. <strong>Back to editor</strong> closes the grid; so does <kbd>Esc</kbd> when nothing is selected (with a selection, the first <kbd>Esc</kbd> clears it). Double-click a slide, or press <kbd>Enter</kbd>, to close the grid and open that slide in the editor.</p>
+        <p><strong>S</strong>, <strong>M</strong> and <strong>L</strong> at the top change the size of the thumbnails.</p>
+
+        <h3>What you see</h3>
+        <ul>
+          <li>Slides in show order, each with its number, title and a thumbnail drawn by the same renderer as the preview.</li>
+          <li>Slides are grouped into <strong>chapters</strong> the way readers see them: consecutive slides of the same chapter form one group, with the chapter's title and slide count above it. Slides without a chapter are grouped under <em>No chapter</em>.</li>
+          <li>A group marked <em>continued</em> is a chapter that comes back later in the show, after slides of another chapter. Readers then see that chapter twice in the contents. Usually that's a mistake: drag the stray slides next to the rest of their chapter.</li>
+          <li>Badges on a slide: <strong>◌ backup</strong> (hidden from audience mode), <strong>no reader</strong> (hidden from reader mode), <strong>✖</strong> errors and <strong>⚠</strong> warnings. Open the slide to see the problem under the preview.</li>
+          <li>Chapters that have no slides yet are listed under <em>Chapters without slides</em>.</li>
+        </ul>
+
+        <h3>Select slides</h3>
+        <p>Click a slide to select it. <kbd>Ctrl</kbd>-click adds or removes one, <kbd>Shift</kbd>-click selects everything from the last clicked slide, <kbd>Ctrl</kbd>+<kbd>A</kbd> selects all. While slides are selected, a <strong>selection bar</strong> offers what you can do with them.</p>
+
+        <h3>Rearrange</h3>
         <table>
           <thead><tr><th>To…</th><th>Do this</th></tr></thead>
           <tbody>
-            <tr><td>Select slides</td><td>Click a slide. <kbd>Ctrl</kbd>-click adds or removes one, <kbd>Shift</kbd>-click selects a range, <kbd>Ctrl</kbd>+<kbd>A</kbd> selects all, <kbd>Esc</kbd> clears the selection.</td></tr>
-            <tr><td>Open a slide in the editor</td><td>Double-click it, or press <kbd>Enter</kbd>. The grid closes.</td></tr>
-            <tr><td>Move slides</td><td>Drag them: a bar shows where they will land. Dropped among another chapter's slides, they join that chapter; dropped on a chapter's title, they go to its start. Or press <kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>Alt</kbd>+<kbd>→</kbd> (also <strong>◀</strong> <strong>▶</strong> in the selection bar).</td></tr>
-            <tr><td>Duplicate, hide, delete</td><td>Use the selection bar, or <kbd>Ctrl</kbd>+<kbd>D</kbd> and <kbd>Delete</kbd>. Deleting asks first. A show always keeps at least one slide.</td></tr>
-            <tr><td>Put slides in a chapter</td><td><strong>Chapter…</strong> in the selection bar: an existing chapter, <em>(No chapter)</em>, or <em>New chapter from selection</em>.</td></tr>
-            <tr><td>Make a new chapter</td><td><strong>+ Chapter</strong>: with slides selected, they become the new chapter, gathered where the first of them is; without a selection you get an empty chapter, listed under <em>Chapters without slides</em> (drop slides on it to fill it). Type its name right away.</td></tr>
-            <tr><td>Rename a chapter</td><td>Type in its title field.</td></tr>
-            <tr><td>Move a chapter</td><td>Drag its title bar (by <strong>⠿</strong>) onto another chapter or between slides, or use <strong>▲</strong> / <strong>▼</strong>. All its slides move along, and the agenda follows the new order.</td></tr>
-            <tr><td>Delete a chapter</td><td><strong>🗑</strong> on its title bar. Its slides stay, without a chapter.</td></tr>
-            <tr><td>Add a slide</td><td><strong>+ Add slide…</strong> adds one after the selection (or at the end) in a layout you choose.</td></tr>
+            <tr><td>Move slides</td><td>Drag the selected slides: a bar shows where they will land. Or press <kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>Alt</kbd>+<kbd>→</kbd> (also <kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>Alt</kbd>+<kbd>↓</kbd>), or use <strong>◀</strong> <strong>▶</strong> in the selection bar.</td></tr>
+            <tr><td>Move slides into a chapter</td><td>Drop them among that chapter's slides, or on the chapter's title to put them at its start, or on a chip under <em>Chapters without slides</em>. They join that chapter.</td></tr>
+            <tr><td>Set the chapter of slides</td><td><strong>Chapter…</strong> in the selection bar: an existing chapter, <em>(No chapter)</em>, or <em>New chapter from selection…</em>. The slides stay where they are.</td></tr>
+            <tr><td>Make a new chapter</td><td><strong>+ Chapter</strong>. With slides selected, they become the new chapter, gathered where the first of them is. Without a selection you get an empty chapter under <em>Chapters without slides</em>; drop slides on it. Either way, type the chapter's name right away.</td></tr>
+            <tr><td>Rename a chapter</td><td>Type in its title field above its slides.</td></tr>
+            <tr><td>Move a chapter</td><td>Drag its title bar by <strong>⠿</strong> onto another chapter or between slides, or use <strong>▲</strong> / <strong>▼</strong>. All its slides move along.</td></tr>
+            <tr><td>Delete a chapter</td><td><strong>🗑</strong> on its title bar, then confirm. Its slides stay, without a chapter.</td></tr>
           </tbody>
         </table>
-        <p>Keyboard: the arrow keys move through the slides (and select), <kbd>Shift</kbd>+arrows extend the selection, <kbd>Ctrl</kbd>+arrows move without selecting, <kbd>Space</kbd> adds or removes the focused slide. Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+        <p class="note">The order of the chapters always follows the slides: when you move slides or chapters, the agenda in audience mode, the contents in reader mode and the chapter list in <a href="#settings">Show settings</a> follow the new order automatically.</p>
+
+        <h3>Change many slides at once</h3>
+        <table>
+          <thead><tr><th>Selection bar</th><th>Keys</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Duplicate</strong></td><td><kbd>Ctrl</kbd>+<kbd>D</kbd></td><td>A copy of each selected slide, right after its original.</td></tr>
+            <tr><td><strong>Hide from audience</strong> / <strong>Show to audience</strong></td><td></td><td>Turns the slides into backup slides, or back. Reader mode still shows them.</td></tr>
+            <tr><td><strong>Delete</strong></td><td><kbd>Delete</kbd></td><td>Asks first. A show always keeps at least one slide.</td></tr>
+            <tr><td><strong>+ Add slide…</strong> (top bar)</td><td></td><td>A new slide after the selection (or at the end), in a layout you choose.</td></tr>
+          </tbody>
+        </table>
+        <p>Every change, however many slides it touches, is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</p>
+
+        <h3>Keyboard</h3>
+        <ul>
+          <li>Arrow keys move through the slides and select the one you land on; <kbd>↑</kbd> / <kbd>↓</kbd> go to the slide above or below on screen.</li>
+          <li><kbd>Shift</kbd>+arrows extend the selection; <kbd>Ctrl</kbd>+arrows move without selecting, and <kbd>Space</kbd> then adds or removes the focused slide.</li>
+          <li><kbd>Enter</kbd> opens the focused slide in the editor; <kbd>Esc</kbd> clears the selection, or closes the grid.</li>
+        </ul>
+
+        <h3>Example: turn the last slides into a backup chapter</h3>
+        <ol>
+          <li>Open the grid and click the first slide that should become backup material; <kbd>Shift</kbd>-click the last slide.</li>
+          <li>Click <strong>+ Chapter</strong> and type <em>Backup</em>.</li>
+          <li>Click <strong>Hide from audience</strong>. The slides get the <strong>◌ backup</strong> badge. In the presentation they come after the last slide, without numbers, for questions afterwards; readers find them in the <em>Backup</em> chapter.</li>
+        </ol>
       </section>
 
       <section id="slide-tab">
