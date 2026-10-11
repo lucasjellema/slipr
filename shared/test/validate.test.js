@@ -222,6 +222,53 @@ describe('warnings', () => {
   });
 });
 
+describe('extra images (overlays, format 0.2, I-083)', () => {
+  const overlay = (extra = {}) => ({ image: { src: 'images/two-modes.svg', alt: 'Two modes' }, x: 0.7, y: 0.1, w: 0.2, h: 0.2, ...extra });
+  const withOverlay = (extra, version = '0.2') => validateVariant((s) => {
+    s.slipr = version;
+    s.slides[1].overlays = [overlay(extra)];
+  });
+
+  test('a 0.2 show with an overlay inside the canvas is valid without warnings', () => {
+    const result = withOverlay({ fragment: 'fade-up' });
+    assert.deepEqual(result.errors, []);
+    assert.deepEqual(result.warnings, []);
+  });
+
+  test('both 0.1 and 0.2 shows without overlays are valid', () => {
+    const noOverlays = (s) => { for (const slide of s.slides) delete slide.overlays; };
+    for (const version of ['0.1', '0.2']) assert.equal(validateVariant((s) => { noOverlays(s); s.slipr = version; }).ok, true, version);
+    assert.ok(codes(validateVariant((s) => { s.slipr = '0.3'; }).errors).includes('enum'));
+  });
+
+  test('overlays in a 0.1 show are an error', () => {
+    assert.ok(codes(withOverlay({}, '0.1').errors).includes('format-version'));
+  });
+
+  test('outside the canvas, without size, or without alt text: warnings', () => {
+    assert.ok(codes(withOverlay({ x: 0.9 }).warnings).includes('outside-canvas'));
+    assert.deepEqual(withOverlay({ x: 0.802 }).warnings, [], 'within the tolerance');
+    assert.ok(codes(withOverlay({ w: 0 }).warnings).includes('empty-overlay'));
+    assert.ok(codes(withOverlay({ image: { src: 'images/two-modes.svg' } }).warnings).includes('missing-alt'));
+  });
+
+  test('positions must be fractions, and the image is required', () => {
+    assert.ok(codes(withOverlay({ x: 1.5 }).errors).includes('maximum'));
+    assert.ok(codes(withOverlay({ y: -0.1 }).errors).includes('minimum'));
+    assert.equal(withOverlay({ image: undefined }).ok, false);
+    assert.equal(withOverlay({ fragment: 'spin' }).ok, false);
+  });
+
+  test('overlay images count as images: collected, and checked for their file', () => {
+    const show = clone(demo);
+    show.slipr = '0.2';
+    show.slides[1].overlays = [overlay({ image: { src: 'images/extra.png', alt: 'Extra' } })];
+    assert.ok(collectImagePaths(show).includes('images/extra.png'));
+    const { warnings } = validateShow(show, { template, imageExists: (src) => src !== 'images/extra.png' });
+    assert.ok(warnings.some((w) => w.code === 'missing-file' && w.path === 'slides[1].overlays[0].image'));
+  });
+});
+
 describe('robustness', () => {
   for (const input of [null, undefined, 42, 'show', [], {}, { slides: 'nope' }, { slides: [null, 3, {}] }]) {
     test(`never throws on ${JSON.stringify(input)}`, () => {
@@ -234,7 +281,7 @@ describe('robustness', () => {
 
 describe('helpers', () => {
   test('collectImagePaths lists unique image sources', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['images/architecture.svg', 'images/caged-agent.jpg', 'images/two-modes.svg']);
+    assert.deepEqual(collectImagePaths(demo).sort(), ['images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {

@@ -78,6 +78,17 @@ def test_blank_slide_text_box_and_picture_without_alt(converted):
     assert any("no title" in n for n in entry.notes)
 
 
+def test_picture_without_a_slot_becomes_an_extra_image(converted):
+    s = slide(converted, 6)
+    # 7.5 x 5.5 in, 2 x 1.5 in on python-pptx's 13.333 x 7.5 in (16:9) slide
+    assert s["overlays"] == [{"image": {"src": "images/slide06-2.png", "alt": "Company logo"}, "x": 0.5625, "y": 0.7333, "w": 0.15, "h": 0.2}]
+    assert list(s).index("overlays") == list(s).index("content") + 1
+    assert "reader" not in s, "nothing moved to the reader layer"
+    assert converted.report.slides[5].placed == ["picture 2"]
+    assert converted.show["slipr"] == "0.2", "extra images need format 0.2"
+    assert "Placed as an extra image: picture 2" in converted.report.to_markdown()
+
+
 def test_unsupported_table_is_reported_and_flagged_in_notes(converted):
     s = slide(converted, 7)
     assert s["layout"] == "bullets"  # template pptxMapping: "Title Only" → bullets
@@ -92,7 +103,7 @@ def test_hidden_slide_becomes_backup(converted):
 
 
 def test_assets(converted):
-    assert [a.path for a in converted.assets] == ["images/slide05-1.png", "images/slide06-1.png"]
+    assert [a.path for a in converted.assets] == ["images/slide05-1.png", "images/slide06-1.png", "images/slide06-2.png"]
     assert all(a.data.startswith(b"\x89PNG") for a in converted.assets)
 
 

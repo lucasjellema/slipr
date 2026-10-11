@@ -1,4 +1,4 @@
-# Show format: version 0.1 (draft)
+# Show format: version 0.2 (draft)
 
 A **show** is a folder:
 
@@ -124,7 +124,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `$schema` | string | no | Path to `shared/schema/show.schema.json`, for autocomplete in editors outside this repo's VS Code workspace |
-| `slipr` | string | yes | Format version of this file, currently `"0.1"` |
+| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides; a show without them may stay 0.1. The editor and the converter write 0.2 only when a show has extra images |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
 | `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json` (see *Template references* below). `version`: semver range |
@@ -144,9 +144,33 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | `chapter` | string | no | ID of a chapter |
 | `tags` | string[] | no | Topics, used for reader filtering, search facets and "related" suggestions |
 | `content` | object | yes | **Audience layer.** Slot name → slot value (see slot types). Unknown slots produce a warning |
+| `overlays` | array | no | **Extra images** placed freely on the slide, in front of the layout (format 0.2, D-013). See *Extra images* below |
 | `notes` | string | no | Speaker notes (Markdown). Presenter view only, unless the reader opts to see them |
 | `audience` | object | no | Audience-mode options: `hidden` (backup slide), `fragments` (bool or `"fade-up"` etc.), `autoAnimate` (bool: Reveal auto-animate to the next slide), `transition`, `background` |
 | `reader` | object | no | **Reader layer** (see below) |
+
+### Extra images (`slide.overlays`, format 0.2)
+
+Besides the layout's own image slots, a slide can carry extra images that the author places and sizes freely: a logo, an arrow, a screenshot next to the bullets. This is the one accepted exception to "slides contain no styling" (D-013); everything else stays template-driven.
+
+```json
+"overlays": [
+  { "image": { "src": "images/logo.svg", "alt": "Slipr logo" }, "x": 0.78, "y": 0.06, "w": 0.16, "h": 0.12 },
+  { "image": { "src": "images/arrow.png", "alt": "Arrow to the second bullet" }, "x": 0.52, "y": 0.48, "w": 0.1, "h": 0.08, "fragment": "fade-left" }
+]
+```
+
+| Field | Type | Meaning |
+|---|---|---|
+| `image` | image value | `{ src, alt, fit?, focus? }`, as in an image slot. `fit` defaults to `contain` (never distorted); `cover` fills the box and may crop |
+| `x`, `y` | number 0–1 | Top-left corner, as a fraction of the canvas width (`x`) and height (`y`) |
+| `w`, `h` | number 0–1 | Width as a fraction of the canvas width, height as a fraction of the canvas height |
+| `fragment` | `true` or effect | Appear one by one in audience mode, optionally with an effect (the values of `audience.fragments`) |
+
+- Later overlays are in front of earlier ones; all are in front of the layout's content.
+- Overlays with `fragment` appear after the slide's own fragments (bullets, cards), in array order.
+- They scale with the slide. In reader mode a slide with overlays keeps its picture layout on narrow screens instead of reflowing (see `docs/template-format.md`).
+- A 0.1 show with overlays is an error. An overlay that sticks out of the canvas (more than 0.5 %) is a warning.
 
 ### Reader layer (`slide.reader`)
 
@@ -219,10 +243,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays` in a 0.1 show.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images), an extra image that sticks out of the slide, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
+- `0.2` (2026-10-11): adds `slide.overlays` (I-083). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it gets its first extra image.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

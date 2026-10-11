@@ -5,6 +5,7 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+import { buildOverlaySection } from './overlay-list.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
 import { addImageToSlot, imageFileFrom } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
@@ -14,7 +15,7 @@ import { layoutName } from '../layout-choice.js';
 import { parseTags } from '../show-entities.js';
 
 /** Actions the slide form dispatches while the user types. */
-const TYPING_ACTIONS = new Set(['setSlot', 'setNotes', 'setTags']);
+const TYPING_ACTIONS = new Set(['setSlot', 'setNotes', 'setTags', 'updateOverlay']);
 
 /**
  * Mount the slide form into a container.
@@ -195,7 +196,7 @@ export function mountSlideForm(container, store) {
       visibilityRow,
     ]);
 
-    root.append(layoutRow, slotsContainer, notesRow, chapterRow, tagsRow, audienceRow);
+    root.append(layoutRow, slotsContainer, buildOverlaySection(slide, store), notesRow, chapterRow, tagsRow, audienceRow);
   }
 
   store.subscribe((event) => {

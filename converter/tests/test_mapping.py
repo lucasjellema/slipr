@@ -50,6 +50,33 @@ def test_leftovers_go_to_the_reader_layer(template):
     assert len(mapped.moved) == 2
 
 
+def test_pictures_without_a_slot_become_extra_images_when_the_slide_size_is_known(template):
+    # 12192000 x 6858000 EMU = a 16:9 slide; the second picture sits at the bottom right
+    a = ImageRef(blob=b"a", ext="png", sha1="a", alt="Main", top=0, left=0, width=6096000, height=3429000)
+    b = ImageRef(blob=b"b", ext="png", sha1="b", alt="Logo", top=6000000, left=10972800, width=1219200, height=685800)
+    mapped = map_slide(sm(title="Photo", images=[a, b]), "s-04", template,
+                       images=["images/a.png", "images/b.png"], slide_size=(12192000, 6858000))
+    assert mapped.slide["content"]["image"]["src"] == "images/a.png"
+    assert mapped.slide["overlays"] == [{"image": {"src": "images/b.png", "alt": "Logo"}, "x": 0.9, "y": 0.8749, "w": 0.1, "h": 0.1}]
+    assert mapped.placed == ["picture 2"] and mapped.moved == []
+    assert "reader" not in mapped.slide
+
+
+def test_extra_images_stay_on_the_slide(template):
+    # A picture that sticks out past the right and bottom edges is kept inside.
+    a = ImageRef(blob=b"a", ext="png", sha1="a", alt="Main", width=100, height=100)
+    b = ImageRef(blob=b"b", ext="png", sha1="b", alt="Off", top=900, left=950, width=200, height=300)
+    mapped = map_slide(sm(title="T", images=[a, b]), "s-04", template, images=["images/a.png", "images/b.png"], slide_size=(1000, 1000))
+    assert mapped.slide["overlays"][0] | {"image": None} == {"image": None, "x": 0.8, "y": 0.7, "w": 0.2, "h": 0.3}
+
+
+def test_without_a_slide_size_extra_pictures_go_to_the_reader_layer(template):
+    mapped = map_slide(sm(title="Photo", images=[IMG, IMG]), "s-04", template, images=["images/a.png", "images/b.png"])
+    assert "overlays" not in mapped.slide
+    assert mapped.slide["reader"]["blocks"][0]["type"] == "image"
+    assert mapped.moved == ["picture 2"]
+
+
 def test_more_bodies_than_slots_merge_into_the_last(template):
     mapped = map_slide(sm(title="T", bodies=[body("- a"), body("- b"), body("- c")]), "s-05", template, images=[])
     assert mapped.layout == "two-column"

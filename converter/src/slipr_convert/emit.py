@@ -64,11 +64,13 @@ def build_show(
             chapter=chapter_ids.get(sm.section) if sm.section else None,
             include_notes=include_notes,
             notes_to_reader=notes_to_reader,
+            slide_size=(deck.slide_width, deck.slide_height),
         )
         slides.append(mapped.slide)
         entry = report.slide(sm.index + 1, sid, sm.title or "")
         entry.layout, entry.reason = mapped.layout, mapped.reason
         entry.moved, entry.skipped, entry.notes = mapped.moved, mapped.skipped, mapped.remarks
+        entry.placed = mapped.placed
         if sm.hidden:
             entry.notes.append("hidden in PowerPoint → backup slide (audience.hidden)")
 
@@ -83,7 +85,8 @@ def build_show(
     if schema_ref:
         show["$schema"] = schema_ref
     show.update({
-        "slipr": "0.1",
+        # Format 0.2 only when it is needed: extra images (I-083).
+        "slipr": "0.2" if any(s.get("overlays") for s in slides) else "0.1",
         "id": show_id,
         "meta": meta,
         "template": {"ref": template_ref, "version": version_range(template.get("version", "1.0.0"))},

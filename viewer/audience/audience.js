@@ -125,6 +125,13 @@ function buildSection(slide, ctx) {
       if (style) li.classList.add(style);
     }
   }
+  // Extra images (I-083) build one by one after the slide's own fragments, in their order.
+  (Array.isArray(slide.overlays) ? slide.overlays : []).forEach((/** @type {any} */ overlay, /** @type {number} */ i) => {
+    if (!overlay?.fragment) return;
+    const img = rendered.querySelector(`.slipr-overlay[data-overlay="${i}"]`);
+    img?.classList.add('fragment');
+    if (typeof overlay.fragment === 'string') img?.classList.add(overlay.fragment);
+  });
   section.append(rendered);
 
   if (slide.notes) {

@@ -6,6 +6,12 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-11: Show format 0.2: extra images on a slide (I-083, D-013)
+- **Added** `slide.overlays` (show format **0.2**): extra images placed freely on a slide, `{ image, x, y, w, h, fragment? }` with position and size as fractions of the canvas, in front of the layout. 0.1 stays valid (enum in the schema); a 0.1 show with overlays is an error; an overlay outside the canvas is a warning, and overlay images get the usual alt-text and file checks. Spec: `docs/specs/I-083-extra-images.md`; `docs/show-format.md` and `docs/template-format.md` updated; D-013 refined.
+- **Added** to `shared/render.js`: the `.slipr-overlays` layer (inline positioning, so every template supports it), and the mode class `slipr-mode-reader-fixed` for reader-mode slides with extra images, so they stay a picture on narrow screens. `collectImagePaths()` includes overlay images (file checks, single-file export).
+- **Changed** the demo show to format 0.2: "A show is just data" has an extra image (`images/json-badge.svg`) that appears with `fade-left`.
+- Editor, viewer and converter: see their changelogs.
+
 ### 2026-10-11: Documentation pass (handover)
 - **Changed** the root README status (Phases 0–5 done; the show grid, Export… and the editor theme), the editor README status, and the backlog's *Now* section (Phase 6, with handover notes: open questions for Lucas, what still needs checking in a real browser, and working habits).
 

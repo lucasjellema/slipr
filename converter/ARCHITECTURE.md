@@ -92,7 +92,7 @@ Layout choice (template-agnostic: it only looks at slot *types*):
    The cheapest layout wins, with ties going to template order.
 
 Slot filling: title → `title`, subtitle → `subtitle` / `caption` / `byline`. Text blocks fill the list/richtext slots in order, and extra blocks are merged into the last one. Short one-line leftovers can fill remaining text slots (e.g. a caption). Pictures fill image slots.
-**Everything else goes to the reader layer** (`converted-text-N` / `converted-image-N` blocks), so readers still see it, and it is listed in the report. Unsupported elements get a marker line in the speaker notes and an entry in the report.
+**Pictures without a slot become extra images** (`slide.overlays`, D-013): `_overlay_value()` turns the picture's position and size into fractions of the slide (`DeckModel.slide_width` / `slide_height`, passed as `slide_size`), kept inside it, and the report lists them under `placed`. **Everything else goes to the reader layer** (`converted-text-N` blocks, and `converted-image-N` when a picture's size is unknown), so readers still see it, and it is listed in the report. `emit.py` writes `"slipr": "0.2"` only when a slide has extra images. Unsupported elements get a marker line in the speaker notes and an entry in the report.
 
 ### 5. `emit.py`: output
 - Slide ids are `s-01`, `s-02`, …, with zero-padding sized to the deck.

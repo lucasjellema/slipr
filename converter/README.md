@@ -60,12 +60,13 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Speaker notes | `notes` (and optionally a reader block) | ✅ |
 | Bullet build animations | `audience.fragments: true` | ✅ |
 | Presentation title / author / date, slide size | `meta`, `settings.aspectRatio` (16:9 or 4:3) | ✅ |
-| Content that doesn't fit the chosen layout | **reader layer** text/image blocks, so it is never lost | ✅ |
+| Pictures that don't fit the chosen layout | **extra images** on the slide (`overlays`, show format 0.2) at their PowerPoint position and size | ✅ |
+| Text that doesn't fit the chosen layout | **reader layer** text blocks, so it is never lost | ✅ |
 | Tables | *(next)* `table` block/slot (I-040). Now: reported, plus a warning in the slide notes | ❌ |
 | Charts | *(next)* `chart` slot with the **chart's real data** (I-046). Now: reported | ❌ |
 | SmartArt, diagrams, OLE objects, video | *(later)* image fallback via LibreOffice (I-041). Now: reported | ❌ |
 | Logos and decorations from the master | ignored on purpose: the template provides them | n/a |
-| Colours, fonts, positions | ignored on purpose, because the template decides | n/a |
+| Colours, fonts, positions | ignored on purpose, because the template decides (except the place of extra pictures, D-013) | n/a |
 
 ## How layouts are chosen
 
@@ -74,7 +75,7 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 2. **Title-only slides:** the first one becomes `title`, later ones `section`.
 3. **Best fit:** otherwise, the layout whose slots match the slide's text blocks and pictures with the least left over.
 
-Whatever doesn't fit, such as a third text block or a second picture, goes to the slide's reader layer and is listed in the report.
+Text that doesn't fit, such as a third text block, goes to the slide's reader layer. A picture that doesn't fit, such as a second picture or a logo, becomes an **extra image** on the slide at the same place as in PowerPoint (the show is then format 0.2). Both are listed in the report.
 
 ## The conversion report
 

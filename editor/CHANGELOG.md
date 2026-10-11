@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Extra images on a slide (I-083)
+- **Added** an "Extra images" section in the Slide tab (`ui/overlay-list.js`): add an image (choose, drop or paste, with the alt-text dialog), and per image its picture, alt text, "appears on the next click" (with an effect), bring forward / send backward, select on the preview, and remove. A new image is placed in the middle at 30 % of the slide width with its own aspect ratio (`createImageBitmap`; SVG from its `viewBox`).
+- **Added** move and resize on the audience preview (`ui/overlay-editor.js`): click to select, drag to move, drag a corner to resize keeping the aspect ratio (Shift: free); arrow keys move (Shift: 5 %), Alt+arrows resize, Delete removes, Esc deselects. A drag is one undo step, and so is a burst of key presses.
+- **Added** actions `addOverlay`, `updateOverlay`, `deleteOverlay`, `moveOverlay` (boxes kept inside the canvas, rounded to 4 decimals; the first extra image makes the show format 0.2), helpers `overlayBox`, `newOverlayBox`, `resizedOverlayBox`, and `addOverlayImage` / `addImageToOverlay` in `image-input.js`. The serializer orders overlay keys. Tests in `editor/test/overlays.test.js`.
+
 ### 2026-10-11: Light and dark theme (I-082)
 - **Added** a light theme and a theme switch at the end of the toolbar: ☀ Light, ☾ Dark, ◐ System (follows `prefers-color-scheme`, also when it changes). The choice is kept per browser in `localStorage` (`slipr-editor-theme`), and an inline script in `index.html` applies it before the first paint (no flash). The manual (`help.html`) follows the same choice instead of only the system setting. New module `theme.js`.
 - **Changed** the dark theme to a lighter "dimmed" palette (dark grey `#22272E` instead of near-black `#0E1116`).

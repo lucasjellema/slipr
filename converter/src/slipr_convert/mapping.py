@@ -91,7 +91,7 @@ def choose_layout(sm: SlideModel, template: dict, mapping: dict | None = None) -
     if entry.layout in layouts:
         # A plain name mapping yields to best fit when it would push pictures
         # out. A mapping with placeholder roles is the template author's
-        # explicit choice and always wins (extra pictures go to the reader layer).
+        # explicit choice and always wins (extra pictures become extra images).
         if sm.images and not entry.roles and not capacity(layouts[entry.layout]).image_slots and any_image_layout:
             pass
         else:
@@ -112,7 +112,7 @@ def choose_layout(sm: SlideModel, template: dict, mapping: dict | None = None) -
         n_slots = len(cap.body_slots)
         cost = 0
         cost += 3 * n_body if n_slots == 0 else max(0, n_body - n_slots)  # moved away / merged
-        cost += 5 * max(0, n_img - len(cap.image_slots))  # pictures moved to the reader layer
+        cost += 5 * max(0, n_img - len(cap.image_slots))  # pictures without a slot (extra images)
         cost += max(0, n_slots - n_body) + max(0, len(cap.image_slots) - n_img)  # empty slots
         cost += 2 if (sm.title and not cap.title) else 0
         if best_cost is None or cost < best_cost:
@@ -126,6 +126,7 @@ class MappedSlide:
     layout: str
     reason: str
     moved: list[str] = field(default_factory=list)
+    placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083)
     skipped: list[str] = field(default_factory=list)
     remarks: list[str] = field(default_factory=list)
 
@@ -140,8 +141,11 @@ def map_slide(
     chapter: str | None = None,
     include_notes: bool = True,
     notes_to_reader: bool = False,
+    slide_size: tuple[int, int] | None = None,
 ) -> MappedSlide:
-    """`images`: the asset path for each of `sm.images`, in the same order."""
+    """`images`: the asset path for each of `sm.images`, in the same order.
+    `slide_size`: the deck's slide width and height (EMU); with it, pictures that
+    fit no image slot become extra images at their PowerPoint position (D-013)."""
     entry = lookup_entry(sm.layout_name, template, mapping)
     # An explicit role for this layout wins over the template-wide ignore list
     # (idx numbers mean different things per layout, e.g. 91 = logo or a text box).
@@ -208,12 +212,17 @@ def map_slide(
         blocks.append({"id": f"converted-text-{n}", "type": "text", "md": body.markdown})
         result.moved.append(f"text block {n} (“{_preview(body.markdown)}”)")
 
-    # Pictures → image slots; extra pictures become reader image blocks
+    # Pictures → image slots; extra pictures become extra images at their
+    # PowerPoint position (D-013), or reader image blocks when that is unknown.
     free_images = list(cap.image_slots)
+    overlays: list[dict] = []
     for n, (ref, path) in enumerate(zip(sm.images, image_paths), 1):
         value = _image_value(ref, path, result, n)
         if free_images:
             content[free_images.pop(0)] = value
+        elif (overlay := _overlay_value(ref, value, slide_size)) is not None:
+            overlays.append(overlay)
+            result.placed.append(f"picture {n}")
         else:
             blocks.append({"id": f"converted-image-{n}", "type": "image", "image": value})
             result.moved.append(f"picture {n}")
@@ -221,6 +230,8 @@ def map_slide(
     if not had_title:
         result.remarks.append("no title found on this slide")
     result.slide["content"] = content
+    if overlays:
+        result.slide["overlays"] = overlays
     if chapter:
         result.slide["chapter"] = chapter
 
@@ -379,6 +390,23 @@ def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
         result.remarks.append(f"picture {n} has no alt text (add a description in PowerPoint or in show.json)")
     # No "fit": the template decides how its image slots crop (cover or contain).
     return {"src": path, "alt": ref.alt}
+
+
+def _overlay_value(ref: ImageRef, image: dict, slide_size: tuple[int, int] | None) -> dict | None:
+    """An extra image at the picture's place on the slide (fractions of the
+    slide, kept inside it), or None when the slide or picture size is unknown."""
+    if not slide_size or slide_size[0] <= 0 or slide_size[1] <= 0 or ref.width <= 0 or ref.height <= 0:
+        return None
+    sw, sh = slide_size
+
+    def frac(v: float) -> float:
+        return round(v, 4)
+
+    w = min(1.0, max(0.02, ref.width / sw))
+    h = min(1.0, max(0.02, ref.height / sh))
+    x = min(1.0 - w, max(0.0, ref.left / sw))
+    y = min(1.0 - h, max(0.0, ref.top / sh))
+    return {"image": image, "x": frac(x), "y": frac(y), "w": frac(w), "h": frac(h)}
 
 
 def markdown_to_plain(md: str) -> str:

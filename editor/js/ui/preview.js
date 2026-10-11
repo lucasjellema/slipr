@@ -10,6 +10,7 @@ import { renderSlide } from '../../../shared/render.js';
 import { renderBlocks } from '../../../shared/blocks.js';
 import { renderDiagrams } from '../../../shared/diagram.js';
 import { blockVisible, personalize } from '../../../viewer/reader/personalize.js';
+import { mountOverlayEditor, onOverlaySelection } from './overlay-editor.js';
 
 /**
  * Mount the live preview pane into container.
@@ -28,6 +29,8 @@ export function mountPreview(container, store) {
   }
 
   function render() {
+    // An extra image's box had keyboard focus: give it back after the re-render (I-083).
+    const overlayFocused = Boolean(document.activeElement?.closest?.('.slipr-overlay-box') && root.contains(document.activeElement));
     root.innerHTML = '';
     const state = store.state;
     const slide = state.show?.slides?.find((s) => s.id === state.selectedSlideId);
@@ -127,6 +130,7 @@ export function mountPreview(container, store) {
         const slideEl = renderSlide(slide, showContext, { mode: 'audience' });
         const scaler = h('div', { class: 'slipr-preview-scaler' }, [slideEl]);
         viewport.append(scaler);
+        mountOverlayEditor(slideEl, slide, store, { focus: overlayFocused });
       } else {
         // Reader mode preview: slide visual + tailored reader layer
         const readerContainer = h('div', { class: 'slipr-reader-preview-content' });
@@ -188,6 +192,8 @@ export function mountPreview(container, store) {
     root.append(header, viewport, diagnostics);
     renderDiagrams(viewport);
   }
+
+  onOverlaySelection(scheduleRender);
 
   store.subscribe(({ changedKeys }) => {
     if (

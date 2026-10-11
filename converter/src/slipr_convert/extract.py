@@ -42,6 +42,8 @@ def extract_deck(prs) -> DeckModel:
         aspect_ratio="4:3" if abs(ratio - 4 / 3) < 0.05 else "16:9",
         sections=section_names,
         slides=slides,
+        slide_width=int(prs.slide_width or 0),
+        slide_height=int(prs.slide_height or 0),
     )
 
 

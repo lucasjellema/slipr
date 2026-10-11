@@ -112,6 +112,7 @@ Pick from the *Next* section of the backlog. Likely candidates: PDF export, hous
 1. ✅ Single-file HTML export: `npm run export -- <show folder>`, one file that presents offline, and an **Export…** button in the editor (done 2026-10-11). [I-054, I-085]
 2. ✅ Show grid: all slides as thumbnails grouped by chapter, to rearrange slides and chapters (done 2026-10-11). [I-081]
 3. ✅ Light and dark theme for the editor, with a lighter dark theme (done 2026-10-11). [I-082]
+4. ✅ Extra images placed freely on a slide: show format 0.2, renderer, editor (move and resize on the preview), converter (done 2026-10-11). [I-083, D-013]
 
 ---
 

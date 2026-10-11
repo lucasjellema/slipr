@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Pictures without a slot become extra images (I-083)
+- **Changed** a picture that fits no image slot is placed as an extra image (`slide.overlays`, D-013) at its PowerPoint position and size (fractions of the slide, kept inside it), instead of a reader image block. Without a known slide or picture size it still goes to the reader layer. The report lists it as "Placed as an extra image", and counts them; the CLI summary too.
+- **Changed** a converted show is format 0.2 when it has extra images, else still 0.1.
+- **Added** `DeckModel.slide_width` / `slide_height`, and a second picture on the sample deck's blank slide. 36 tests.
+
 ### 2026-10-10: Card roles (I-043b)
 - **Added** card roles in `mapping._apply_roles`: `cards[i].field` fills that field of card *i* (plain text for `text` fields, Markdown for `richtext` / `list`, the picture for `image`). `cards[i]` fills the whole card: a picture goes to the first free image field, and text is split on paragraphs over the free non-image fields in order, the last field taking the rest. Cards that stay empty are dropped.
 - **Changed** images no longer get a `fit` value: the template decides how a photo is cropped.

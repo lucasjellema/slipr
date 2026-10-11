@@ -1714,7 +1714,175 @@ export function createChapterFromSlides(show, { chapterId, title, slideIds }) {
   return moveSlides({ ...show, chapters: placed }, { slideIds, beforeSlideId: beforeSlide?.id ?? null, chapter: chapterId });
 }
 
+// ---------------------------------------------------------------------------
+// Extra images on a slide (I-083, D-013): `slide.overlays`, show format 0.2.
+
+/** Smallest size of an extra image, as a fraction of the canvas. */
+export const OVERLAY_MIN_SIZE = 0.02;
+
+/** @param {number} n */
+const round4 = (n) => Math.round(n * 10000) / 10000;
+
+/**
+ * An overlay's box kept inside the canvas: size between OVERLAY_MIN_SIZE and 1,
+ * position so the box fits, all rounded to 4 decimals.
+ * @param {{ x?: number, y?: number, w?: number, h?: number }} box
+ * @returns {{ x: number, y: number, w: number, h: number }}
+ */
+export function overlayBox({ x, y, w, h }) {
+  const num = (/** @type {unknown} */ v, /** @type {number} */ d) => (typeof v === 'number' && Number.isFinite(v) ? v : d);
+  const W = round4(Math.min(1, Math.max(OVERLAY_MIN_SIZE, num(w, 0.3))));
+  const H = round4(Math.min(1, Math.max(OVERLAY_MIN_SIZE, num(h, 0.3))));
+  return {
+    x: round4(Math.min(1 - W, Math.max(0, num(x, (1 - W) / 2)))),
+    y: round4(Math.min(1 - H, Math.max(0, num(y, (1 - H) / 2)))),
+    w: W,
+    h: H,
+  };
+}
+
+/**
+ * Where a new extra image goes: centred, 30 % of the canvas wide (less if it
+ * would be taller than 80 %), with the image's own aspect ratio.
+ * @param {number} imageAspect  Image width / height.
+ * @param {number} canvasAspect Canvas width / height (16/9 or 4/3).
+ * @returns {{ x: number, y: number, w: number, h: number }}
+ */
+export function newOverlayBox(imageAspect, canvasAspect) {
+  const ia = imageAspect > 0 && Number.isFinite(imageAspect) ? imageAspect : 1;
+  let w = 0.3;
+  let h = (w * canvasAspect) / ia;
+  if (h > 0.8) {
+    h = 0.8;
+    w = (h * ia) / canvasAspect;
+  }
+  return overlayBox({ w, h });
+}
+
+/**
+ * A box resized by dragging one corner; the opposite corner stays put.
+ * @param {{ x: number, y: number, w: number, h: number }} start
+ * @param {string} corner  'nw' | 'ne' | 'sw' | 'se'
+ * @param {number} dx @param {number} dy  Pointer movement, fractions of the canvas.
+ * @param {boolean} keepAspect
+ * @returns {{ x: number, y: number, w: number, h: number }}
+ */
+export function resizedOverlayBox(start, corner, dx, dy, keepAspect) {
+  const west = corner.includes('w');
+  const north = corner.includes('n');
+  let w = Math.max(OVERLAY_MIN_SIZE, start.w + (west ? -dx : dx));
+  let h = Math.max(OVERLAY_MIN_SIZE, start.h + (north ? -dy : dy));
+  if (keepAspect) {
+    const ratio = start.h / start.w;
+    // Follow the larger relative change, so the box tracks the pointer.
+    if (w / start.w >= h / start.h) h = w * ratio;
+    else w = h / ratio;
+    // Keep it inside the canvas, still with the same ratio.
+    const maxW = west ? start.x + start.w : 1 - start.x;
+    const maxH = north ? start.y + start.h : 1 - start.y;
+    const scale = Math.min(1, maxW / w, maxH / h);
+    w *= scale;
+    h *= scale;
+  }
+  const x = west ? start.x + start.w - w : start.x;
+  const y = north ? start.y + start.h - h : start.y;
+  return overlayBox({ x, y, w, h });
+}
+
+/**
+ * @param {any} show @param {string} slideId
+ * @param {(overlays: any[]) => any[]} fn
+ * @returns {any}
+ */
+function mapOverlays(show, slideId, fn) {
+  if (!Array.isArray(show.slides)) return show;
+  let changed = false;
+  const slides = show.slides.map((/** @type {any} */ s) => {
+    if (s.id !== slideId) return s;
+    const current = Array.isArray(s.overlays) ? s.overlays : [];
+    const next = fn(current);
+    if (next === current) return s;
+    changed = true;
+    const { overlays: _old, ...rest } = s;
+    if (!next.length) return rest;
+    // Keep the schema's key order: overlays right after content.
+    /** @type {Record<string, any>} */
+    const out = {};
+    for (const [k, v] of Object.entries(rest)) {
+      out[k] = v;
+      if (k === 'content') out.overlays = next;
+    }
+    if (!('overlays' in out)) out.overlays = next;
+    return out;
+  });
+  if (!changed) return show;
+  // Extra images need show format 0.2; a show stays 0.2 once it is.
+  return { ...show, slipr: show.slipr === '0.1' || !show.slipr ? '0.2' : show.slipr, slides };
+}
+
+/**
+ * Add an extra image to a slide, in front of the others.
+ * @param {any} show
+ * @param {{ slideId: string, overlay: { image: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
+ * @returns {any}
+ */
+export function addOverlay(show, { slideId, overlay }) {
+  if (!overlay?.image?.src) return show;
+  const { image, fragment, ...box } = overlay;
+  const item = { image, ...overlayBox(box), ...(fragment ? { fragment } : {}) };
+  return mapOverlays(show, slideId, (list) => [...list, item]);
+}
+
+/**
+ * Change an extra image: its box (kept inside the canvas), image or
+ * `fragment` (undefined or false removes it).
+ * @param {any} show
+ * @param {{ slideId: string, index: number, patch: { image?: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
+ * @returns {any}
+ */
+export function updateOverlay(show, { slideId, index, patch }) {
+  return mapOverlays(show, slideId, (list) => {
+    const current = list[index];
+    if (!current) return list;
+    const merged = { ...current, ...patch };
+    const next = { image: merged.image, ...overlayBox(merged) };
+    if (merged.fragment) next.fragment = merged.fragment;
+    if (JSON.stringify(next) === JSON.stringify(current)) return list;
+    return list.map((o, i) => (i === index ? next : o));
+  });
+}
+
+/**
+ * Remove an extra image (the file stays in images/).
+ * @param {any} show
+ * @param {{ slideId: string, index: number }} payload
+ * @returns {any}
+ */
+export function deleteOverlay(show, { slideId, index }) {
+  return mapOverlays(show, slideId, (list) => (list[index] ? list.filter((_, i) => i !== index) : list));
+}
+
+/**
+ * Change the stacking order: a higher index is further in front.
+ * @param {any} show
+ * @param {{ slideId: string, index: number, toIndex: number }} payload
+ * @returns {any}
+ */
+export function moveOverlay(show, { slideId, index, toIndex }) {
+  return mapOverlays(show, slideId, (list) => {
+    if (!list[index] || toIndex < 0 || toIndex >= list.length || toIndex === index) return list;
+    const next = [...list];
+    const [item] = next.splice(index, 1);
+    next.splice(toIndex, 0, item);
+    return next;
+  });
+}
+
 export const actions = {
+  addOverlay,
+  updateOverlay,
+  deleteOverlay,
+  moveOverlay,
   setBlockType,
   addHotspot,
   updateHotspot,

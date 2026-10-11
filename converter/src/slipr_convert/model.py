@@ -65,6 +65,8 @@ class DeckModel:
     aspect_ratio: str  # '16:9' or '4:3'
     sections: list[str]  # section names in order (empty when the deck has none)
     slides: list[SlideModel]
+    slide_width: int = 0  # EMU; 0 when unknown (positions of extra images need it)
+    slide_height: int = 0
 
 
 @dataclass

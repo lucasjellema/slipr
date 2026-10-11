@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://slipr.local/schema/show.schema.json",
   "title": "Slipr show",
-  "description": "A Slipr show (show.json), format version 0.1. Spec: docs/show-format.md",
+  "description": "A Slipr show (show.json), format version 0.2 (0.1 is still valid). Spec: docs/show-format.md",
   "type": "object",
   "required": ["slipr", "id", "meta", "template", "slides"],
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "const": "0.1", "description": "Show format version." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -160,6 +160,11 @@
           "propertyNames": { "$ref": "#/$defs/id" },
           "additionalProperties": { "$ref": "#/$defs/slotValue" }
         },
+        "overlays": {
+          "type": "array",
+          "description": "Extra images placed freely on the slide, in front of the layout (format 0.2, D-013). Later ones are in front.",
+          "items": { "$ref": "#/$defs/overlay" }
+        },
         "notes": { "$ref": "#/$defs/markdown" },
         "audience": { "$ref": "#/$defs/audience" },
         "reader": { "$ref": "#/$defs/reader" },
@@ -192,6 +197,26 @@
           "anyOf": [
             { "type": "string" },
             { "$ref": "#/$defs/image" }
+          ]
+        }
+      }
+    },
+    "overlay": {
+      "type": "object",
+      "required": ["image", "x", "y", "w", "h"],
+      "additionalProperties": false,
+      "description": "An extra image on a slide. Position and size are fractions of the slide canvas.",
+      "properties": {
+        "image": { "$ref": "#/$defs/image" },
+        "x": { "type": "number", "minimum": 0, "maximum": 1, "description": "Left edge, fraction of the canvas width." },
+        "y": { "type": "number", "minimum": 0, "maximum": 1, "description": "Top edge, fraction of the canvas height." },
+        "w": { "type": "number", "minimum": 0, "maximum": 1, "description": "Width, fraction of the canvas width." },
+        "h": { "type": "number", "minimum": 0, "maximum": 1, "description": "Height, fraction of the canvas height." },
+        "fragment": {
+          "description": "Appear one by one in audience mode; true or a Reveal fragment style.",
+          "anyOf": [
+            { "type": "boolean" },
+            { "enum": ["fade-in", "fade-up", "fade-down", "fade-left", "fade-right", "fade-in-then-semi-out", "semi-fade-out", "grow", "shrink"] }
           ]
         }
       }

@@ -1800,3 +1800,93 @@ body.is-screen #slipr-editor-banners {
 .slipr-panel-actions .slipr-btn {
   white-space: nowrap;
 }
+
+/* ---------- Extra images on a slide (I-083) ---------- */
+
+/* Boxes over the audience preview's extra images: select, drag, resize. */
+.slipr-overlay-handles {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.slipr-overlay-box {
+  position: absolute;
+  pointer-events: auto;
+  cursor: move;
+  touch-action: none;
+  outline: 1px dashed color-mix(in srgb, var(--slipr-editor-accent) 70%, transparent);
+  outline-offset: 0;
+}
+
+.slipr-overlay-box:hover {
+  outline: 2px solid var(--slipr-editor-accent);
+}
+
+.slipr-overlay-box.is-selected,
+.slipr-overlay-box:focus-visible {
+  outline: 2px solid var(--slipr-editor-warning);
+  background: color-mix(in srgb, var(--slipr-editor-warning) 10%, transparent);
+}
+
+.slipr-overlay-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--slipr-editor-on-color);
+  border-radius: 2px;
+  background: var(--slipr-editor-warning);
+  box-shadow: 0 1px 3px var(--slipr-editor-shadow);
+}
+
+.slipr-overlay-handle.is-nw { left: -7px; top: -7px; cursor: nwse-resize; }
+.slipr-overlay-handle.is-ne { right: -7px; top: -7px; cursor: nesw-resize; }
+.slipr-overlay-handle.is-sw { left: -7px; bottom: -7px; cursor: nesw-resize; }
+.slipr-overlay-handle.is-se { right: -7px; bottom: -7px; cursor: nwse-resize; }
+
+/* The Slide tab's "Extra images" section. */
+.slipr-overlays-form > .slipr-help {
+  margin: 0 0 8px;
+}
+
+.slipr-overlay-list {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slipr-overlay-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  background: var(--slipr-editor-surface);
+}
+
+.slipr-overlay-row-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.slipr-overlay-row-title {
+  font-weight: 600;
+  color: var(--slipr-editor-text-strong);
+}
+
+.slipr-overlay-row-tools {
+  margin-left: auto;
+  display: flex;
+  gap: 2px;
+}
+
+.slipr-overlay-row .slipr-label {
+  margin: 0;
+}

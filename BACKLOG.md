@@ -17,13 +17,14 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
+
 Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-11, for the next session)**
 - **Waiting for Lucas:**
   - **E-017** (under *Ideas → Editor*): when deleting slides empties a reading route, should the route be removed or turned into "all slides"?
-  - **I-086** (glossary terms clickable in slides) and **I-083 / I-084** (extra images, picture styles) are specified with his decisions (D-013, D-014) and ready to start once he chooses them.
-  - I-083, I-084 and I-086 (the optional glossary `aliases`) all change a format. They need a spec in `docs/specs/`, a schema and version bump, and a migration check before code.
+  - **I-086** (glossary terms clickable in slides) and **I-084** (picture styles) are specified with his decisions (D-014) and ready to start once he chooses them. I-083 (extra images) is done.
+  - I-084 and I-086 (the optional glossary `aliases`) change a format. They need a spec in `docs/specs/`, a schema and version bump, and a migration check before code.
 - **Not verified in Claude's browser pane, so Lucas checks these in a real browser:**
   - an exported file opened by double-click (`file://`);
   - a real mouse drag in the show grid and the slide list (tested with synthetic events);
@@ -95,7 +96,6 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
 - [ ] **E-017** [editor] Bug: deleting slides can leave a reading route with no slides, which the schema rejects (`paths[].slides` needs at least one). Seen while building the show grid's multi-delete. Ask what to do (remove the empty route, or keep it as "all slides"), then fix in `deleteSlide` with a test
-- [ ] **I-083** [format/editor/viewer/converter] **Extra images on a slide**: besides the layout's own image slots, add more images to a slide and place them freely: drag to position, drag the corner handles to resize (keeping the aspect ratio unless Shift is held), with alt text like any image (choose, drop or paste, E-006). **Decided by Lucas, D-013** (an accepted exception to "slides contain no styling"): free placement on any slide; positions and sizes as fractions of the slide canvas (like hotspots); images sit **in front of** the layout's content; in reader mode they **scale with the slide**; they can **appear one by one** (fragments); the PPTX converter **uses them** for pictures that fit no placeholder (instead of reader-layer leftovers). Work: show-format change (for example `slide.overlays: [{ image, x, y, w, h, fragment? }]`; schema, spec, version bump), `shared/render.js` (an absolutely positioned layer over the canvas), editor drag / resize on the preview with keyboard alternatives (arrow keys move, Shift+arrows resize), validation (inside the canvas, alt text), viewer fragments, converter mapping
 - [ ] **I-084** [format/editor/templates/converter] **Picture styles**: give a picture a drop shadow, soft edges or transparency, for image slots, card images, reader image blocks and the extra images of I-083. **Decided by Lucas, D-014** (option c): the template defines named picture styles (for example `shadow`, `soft`, `faded`; a CSS class in `theme.css` each, listed with a label in `template.json`) and a picture may name one; on top of that a picture may have a free opacity (0–100 %). Work: template format (the list of picture styles; schema, spec, version bump) and styles for the default and Conclusion templates; show format (`style`, `opacity` on the image value; schema, spec, version bump); rendering in `shared/render.js` and `shared/blocks.js`; validation (unknown style: warning, picture unstyled); a style picker with a live preview and an opacity slider in the editor's image field; the PPTX converter mapping PowerPoint's picture effects (outer shadow, soft edges) to the closest template style and transparency to opacity. Check print/PDF
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
 
@@ -178,6 +178,7 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 
 ## Done
 
+- [x] **I-083** [format/editor/viewer/converter] Extra images on a slide (D-013, show format 0.2): `slide.overlays` with position and size as fractions of the canvas, in front of the layout, optionally one by one; reader mode keeps such a slide a picture on narrow screens; editor: "Extra images" in the Slide tab (choose / drop / paste, alt text, order, appear one by one) and move / resize on the audience preview (drag, corners with aspect lock, arrow keys, Alt+arrows, Delete); the converter places pictures that fit no slot as extra images. Spec: `docs/specs/I-083-extra-images.md` · done 2026-10-11 · claude
 - [x] **I-082** [editor] Light / dark theme switch (Light, Dark, System) in the toolbar, remembered per browser, applied before the first paint; a lighter dark theme; all colours as tokens; the manual follows the choice; WCAG AA contrast checked by a test · done 2026-10-11 · claude
 - [x] **I-081** [editor] Show grid: all slides as thumbnails in chapter runs; multi-select, drag slides and chapters, duplicate / hide / assign chapter / new chapter / delete as one undo step each, rename / move / delete chapters, empty chapters as drop targets, keyboard alternatives, badges · done 2026-10-11 · claude
 - [x] **I-085** [editor] Export… button: the open show (unsaved changes included) as one offline HTML file, same packer as `npm run export`; save dialog or download · done 2026-10-11 · claude

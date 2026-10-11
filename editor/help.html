@@ -35,6 +35,7 @@
         <li><a href="#grid">Show grid</a></li>
         <li><a href="#slide-tab">Slide tab</a></li>
         <li><a href="#images">Images</a></li>
+        <li><a href="#extra-images">Extra images</a></li>
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
@@ -276,6 +277,50 @@
         <p>The editor copies the image into the show's <code>images/</code> folder, named after the file (a pasted image after the slide) plus a short code. The same image added twice is stored once. Then it asks for <strong>alt text</strong>: a short description for people who cannot see the image, read aloud by screen readers and shown when the image cannot load. Leave it empty only for pure decoration. You can always change it later in the field.</p>
         <p>Supported: PNG, JPEG, GIF, WebP, AVIF and SVG. Images over 3&nbsp;MB get a warning, because they make the show slow to open: use a smaller or compressed version when you can.</p>
         <p class="note">Undo puts the previous image back. The editor never deletes image files; unused files simply stay in <code>images/</code>.</p>
+      </section>
+
+      <section id="extra-images">
+        <h2>Extra images</h2>
+        <p>A layout has its own places for pictures. When you need one more (a logo, an arrow pointing at a bullet, a screenshot next to the text), add it as an <strong>extra image</strong>: you put it anywhere on the slide and choose its size. Extra images sit in front of the layout's content and scale with the slide.</p>
+        <p class="tip"><strong>Tip:</strong> the template still decides the look of everything else. Use extra images for what the layout cannot do, not to rebuild a slide by hand.</p>
+
+        <h3>Add one</h3>
+        <ol>
+          <li>Select the slide. In the <strong>Slide</strong> tab, find <strong>Extra images</strong> (under the layout's fields).</li>
+          <li>Drop an image on <strong>Add an extra image</strong>, paste one (<kbd>Ctrl</kbd>+<kbd>V</kbd> while it has focus, or <strong>Paste</strong>), or click <strong>Choose…</strong>.</li>
+          <li>Write the <strong>alt text</strong> in the dialog, as for any <a href="#images">image</a>.</li>
+        </ol>
+        <p>The image appears in the middle of the slide, 30 % of the slide wide, with its own proportions. It is selected on the preview, ready to move.</p>
+
+        <h3>Move and resize it on the preview</h3>
+        <p>Extra images are placed on the preview in <strong>Audience</strong> mode. Each has a thin dashed outline; the selected one has a yellow outline and four corner handles.</p>
+        <table>
+          <thead><tr><th>To…</th><th>Mouse</th><th>Keyboard (the image selected)</th></tr></thead>
+          <tbody>
+            <tr><td>Select</td><td>Click it. Click elsewhere on the slide to deselect.</td><td><kbd>Tab</kbd> to it; <kbd>Esc</kbd> deselects</td></tr>
+            <tr><td>Move</td><td>Drag it</td><td>Arrow keys (1 % per press; <kbd>Shift</kbd>: 5 %)</td></tr>
+            <tr><td>Resize, same proportions</td><td>Drag a corner handle</td><td><kbd>Alt</kbd>+<kbd>→</kbd> or <kbd>↑</kbd> larger, <kbd>Alt</kbd>+<kbd>←</kbd> or <kbd>↓</kbd> smaller</td></tr>
+            <tr><td>Resize freely</td><td>Hold <kbd>Shift</kbd> while dragging a corner</td><td></td></tr>
+            <tr><td>Remove</td><td>🗑 in the Slide tab</td><td><kbd>Delete</kbd></td></tr>
+          </tbody>
+        </table>
+        <p>An image always stays on the slide: you can't drag it past the edge. One drag, or a series of key presses, is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>. The Slide tab shows each image's place and size (for example <em>at 74%, 30% · 16% × 28%</em>), and <strong>⌖</strong> selects it on the preview.</p>
+
+        <h3>Settings per image</h3>
+        <dl>
+          <dt>Picture</dt><dd>Drop, paste or choose another picture to replace it; its place and size stay.</dd>
+          <dt>Alt text</dt><dd>What the image shows, for people who can't see it. Leave it empty only for decoration.</dd>
+          <dt>In audience mode</dt><dd><em>Visible from the start</em>, or <em>Appears on the next click</em>, optionally with an effect such as <em>fade-left</em>. Images that appear on a click come after the slide's own steps (bullets, cards), in the order of the list.</dd>
+          <dt>▲ / ▼</dt><dd>Bring forward or send backward, when images overlap. The last image in the list is in front.</dd>
+        </dl>
+
+        <h3>In reader mode and elsewhere</h3>
+        <ul>
+          <li>Readers see the slide with its extra images in place. On a phone, where slides normally turn into flowing text, a slide with extra images stays a picture, so nothing lands on top of the text.</li>
+          <li>Extra images are included in <a href="#export">Export as one file</a>, and show in the <a href="#grid">show grid</a>'s thumbnails.</li>
+          <li>A show with extra images is saved in show format 0.2. That happens by itself; older versions of Slipr cannot open it.</li>
+          <li>Converting a PowerPoint deck: pictures that fit none of the layout's image places become extra images at the same place as in PowerPoint.</li>
+        </ul>
       </section>
 
       <section id="reader-tab">
@@ -585,6 +630,7 @@
             <tr><td>Arrow keys, <kbd>Shift</kbd>+arrows, <kbd>Delete</kbd></td><td>Nudge or remove the selected hotspot</td></tr>
             <tr><td><kbd>F5</kbd></td><td>Save and present from the current slide</td></tr>
             <tr><td><kbd>F1</kbd></td><td>This manual, at the section for the current tab</td></tr>
+            <tr><td>On a selected extra image</td><td>See <a href="#extra-images">Extra images</a>: arrows, <kbd>Shift</kbd>+arrows, <kbd>Alt</kbd>+arrows, <kbd>Delete</kbd>, <kbd>Esc</kbd></td></tr>
             <tr><td>In the show grid</td><td>See <a href="#grid">Show grid</a>: arrows, <kbd>Shift</kbd>/<kbd>Ctrl</kbd>+arrows, <kbd>Space</kbd>, <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd>, <kbd>Ctrl</kbd>+<kbd>D</kbd>, <kbd>Delete</kbd>, <kbd>Enter</kbd>, <kbd>Esc</kbd></td></tr>
           </tbody>
         </table>

@@ -29,6 +29,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Show grid | All slides as thumbnails, grouped by chapter: select several, drag to move or regroup, duplicate, hide, delete; add, rename, move and delete chapters | [Show grid](help.html#grid) |
 | Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code, cards and diagrams (Mermaid); notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |
 | Images | Choose, drop or paste; copied into `images/` once; alt text | [Images](help.html#images) |
+| Extra images | Put more pictures on a slide, anywhere: move and resize them on the preview, let them appear one by one | [Extra images](help.html#extra-images) |
 | Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links, diagrams) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
 | Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |
 | Show settings | Metadata, presentation settings, chapters, profiles, glossary, reading routes | [Show settings](help.html#settings) |

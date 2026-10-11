@@ -6,8 +6,15 @@
  *
  * Output structure (see docs/template-format.md):
  *   <div class="slipr-slide slipr-mode-…" data-layout data-aspect data-slide-id>
- *     <div class="slipr-canvas"> …filled layout fragment… </div>
+ *     <div class="slipr-canvas">
+ *       …filled layout fragment…
+ *       <div class="slipr-overlays"> <img class="slipr-overlay"> … </div>   (extra images, D-013)
+ *     </div>
  *   </div>
+ *
+ * A reader-mode slide with extra images gets the mode class
+ * `slipr-mode-reader-fixed` instead of `slipr-mode-reader`, so the templates'
+ * narrow-screen reflow rules leave it a picture (I-083).
  *
  * Text goes in via textContent; Markdown via shared/markdown.js (escaped);
  * nothing else from the show reaches innerHTML.
@@ -32,8 +39,9 @@ export function renderSlide(slide, ctx, options = {}) {
   const mode = options.mode ?? 'audience';
   const mdOptions = { mode, glossary: ctx.show.glossary ?? {}, slideHref: options.slideHref };
 
+  const overlays = Array.isArray(slide.overlays) ? slide.overlays : [];
   const root = doc.createElement('div');
-  root.className = `slipr-slide slipr-mode-${mode}`;
+  root.className = `slipr-slide slipr-mode-${mode}${mode === 'reader' && overlays.length ? '-fixed' : ''}`;
   root.dataset.layout = slide.layout;
   root.dataset.aspect = ctx.show.settings?.aspectRatio ?? '16:9';
   root.dataset.slideId = slide.id;
@@ -67,7 +75,53 @@ export function renderSlide(slide, ctx, options = {}) {
     }
     fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode, def });
   }
+  if (overlays.length) canvas.append(renderOverlays(overlays, ctx, doc, mode));
   return root;
+}
+
+/**
+ * The layer of extra images (D-013, I-083): absolutely positioned in front of
+ * the layout, as fractions of the canvas. Positioning is inline so every
+ * template supports it; values are clamped numbers, never raw strings.
+ * @param {any[]} overlays
+ * @param {import('./load.js').ShowContext} ctx
+ * @param {Document} doc
+ * @param {string} mode
+ * @returns {HTMLElement}
+ */
+function renderOverlays(overlays, ctx, doc, mode) {
+  const layer = doc.createElement('div');
+  layer.className = 'slipr-overlays';
+  Object.assign(layer.style, { position: 'absolute', inset: '0', zIndex: '10', pointerEvents: 'none' });
+  overlays.forEach((overlay, i) => {
+    const src = overlay?.image?.src;
+    if (typeof src !== 'string' || !src) return;
+    const img = doc.createElement('img');
+    img.className = 'slipr-overlay';
+    img.dataset.overlay = String(i);
+    img.src = ctx.resolveAsset(src);
+    img.alt = overlay.image.alt ?? '';
+    img.decoding = 'async';
+    if (mode === 'reader') img.loading = 'lazy';
+    Object.assign(img.style, {
+      position: 'absolute',
+      left: percent(overlay.x),
+      top: percent(overlay.y),
+      width: percent(overlay.w),
+      height: percent(overlay.h),
+      objectFit: overlay.image.fit === 'cover' ? 'cover' : 'contain',
+      margin: '0',
+    });
+    if (typeof overlay.image.focus === 'string') img.style.objectPosition = overlay.image.focus;
+    layer.append(img);
+  });
+  return layer;
+}
+
+/** A fraction 0–1 as a CSS percentage, clamped. @param {unknown} n */
+function percent(n) {
+  const v = typeof n === 'number' && Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 0;
+  return `${Math.round(v * 100000) / 1000}%`;
 }
 
 /**

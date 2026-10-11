@@ -29,10 +29,10 @@ editor/
 │   ├── editor.css        ✅
 │   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
-    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006)
+    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083)
     ├── export.js         ✅ Export…: the open show as one offline HTML file via shared/export/single-file.js; files from the editor state, the show folder and the server (I-085)
     ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
@@ -46,7 +46,7 @@ editor/
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
-    ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025)
+    ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025); extra images: overlayBox, newOverlayBox, resizedOverlayBox (I-083)
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+F / Ctrl+H, Ctrl+Enter, Ctrl+D, Alt+↑/↓, PageUp/PageDown, F5, F1
     ├── io/
@@ -65,6 +65,8 @@ editor/
         ├── image-field.js   ✅ image preview + choose / drop / paste, used by image slots and image blocks (E-006)
         ├── show-settings.js ✅ "Settings" tab: meta, settings; chapters, profiles, glossary and reading routes with usage, reorder and explained deletes (E-009)
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
+        ├── overlay-editor.js ✅ extra images on the audience preview: select, drag, corner resize, keyboard (I-083)
+        ├── overlay-list.js  ✅ the Slide tab's "Extra images" section (I-083)
         ├── block-editors.js    (idea) the block editors moved out of reader-form.js, which has grown large
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
         ├── layout-picker.js ✅ grid of template layouts, each rendering the current slide (or sample text for a new slide), with the effect of switching (E-004)
@@ -101,7 +103,10 @@ Changing a block's type goes through `setBlockType` / `convertBlock()` in `actio
 Like the slide form, block editors are chosen by block `type`, so a new block type means a new editor (in `reader-form.js`, with DOM-free value helpers in `block-values.js`) plus support in `shared/blocks.js`. Every block editor carries the common controls: profiles (`for`) and depth. Markdown fields get a small toolbar (`markdown-toolbar.js`) for inserting `[[glossary]]` references (picked from the glossary), `^[popups]` and slide links; the insert is dispatched as the field's own `input` event. The "For" picker keeps its open state per block across re-renders.
 
 ### Preview (`preview.js`)
-In **audience** mode it renders the selected slide with `shared/render.js` into a fixed 1920×1080 container that is CSS-scaled to fit the pane. In **reader** mode it renders the slide visual plus its blocks via `shared/blocks.js`, after filtering with the viewer's `personalize.js` for the profile and depth chosen in the preview toolbar. Re-renders debounced at 150 ms. A note above the slide says when the viewer would not show it the normal way: a backup slide (`audience.hidden`) in audience mode, or a reader-hidden slide in reader mode; the blocks of a reader-hidden slide are still filtered with `blockVisible()`. It also shows `validate.js` errors and warnings for that slide. The slide list shows titles, not thumbnails. The layout picker (`layout-picker.js`) renders its previews with the same `shared/render.js`.
+In **audience** mode it renders the selected slide with `shared/render.js` into a container as wide as the pane (at most 900 px); the template sizes everything in `cqw`. On top of it, `overlay-editor.js` draws a box per extra image. In **reader** mode it renders the slide visual plus its blocks via `shared/blocks.js`, after filtering with the viewer's `personalize.js` for the profile and depth chosen in the preview toolbar. Re-renders debounced at 150 ms. A note above the slide says when the viewer would not show it the normal way: a backup slide (`audience.hidden`) in audience mode, or a reader-hidden slide in reader mode; the blocks of a reader-hidden slide are still filtered with `blockVisible()`. It also shows `validate.js` errors and warnings for that slide. The slide list shows titles, not thumbnails. The layout picker (`layout-picker.js`) renders its previews with the same `shared/render.js`.
+
+### Extra images (`overlay-list.js`, `overlay-editor.js`, I-083)
+`slide.overlays` (D-013) are edited in two places: the Slide tab lists them (picture, alt text, appearing one by one, stacking order, remove, add), and the audience preview moves and resizes them. Both dispatch `addOverlay` / `updateOverlay` / `deleteOverlay` / `moveOverlay`; `overlayBox()` keeps every box inside the canvas, and the first extra image sets the show to format 0.2. The preview re-renders after every change, so `overlay-editor.js` keeps the selection in module state and is mounted again on each render; it gives keyboard focus back to the selected box after the slide is attached (a microtask). A drag moves the box locally and dispatches once on release; key presses dispatch at once with a `coalesceKey`, so a burst is one undo step, and read the overlay from the store (several presses can come before a re-render). `showOverlaySelected()` lets the Slide tab select an image and redraw the preview; calling it during a drag would replace the box under the pointer.
 
 ### Persistence (`io/`, `files.js`)
 - **Open**: `showDirectoryPicker()` → check for `show.json` → remember the handle in IndexedDB (`shared/folder-handles.js`) → reload as `?folder=<key>`. On load, `loadShowFromFolder()` reads the show and its images through the handle and resolves the template by name (D-012). Reloading keeps working; if the browser dropped the permission, an access screen asks for it with one click.

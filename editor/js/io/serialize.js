@@ -56,6 +56,7 @@ const slide = {
   keys: keysOf(defs.slide),
   fields: {
     content: { values: slotValue },
+    overlays: { items: { keys: keysOf(defs.overlay), fields: { image } } },
     _orphaned: { values: slotValue },
     audience: { keys: keysOf(defs.audience) },
     reader: { keys: keysOf(defs.reader), fields: { blocks: { items: block } } },

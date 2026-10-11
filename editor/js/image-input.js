@@ -11,6 +11,7 @@ import { ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
+import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
 
@@ -173,5 +174,83 @@ export async function addImageToCard(store, { slideId, slot, index, field, file 
       const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
       store.dispatch('setSlot', { slideId, slot, value: cardsValue(withCardField(cardsOf(current), index, field, image)) });
     },
+  });
+}
+
+/**
+ * Width / height of an image file, or 1 when it cannot be read (for example an
+ * SVG without a size). Raster images via createImageBitmap (no rendering
+ * needed); SVG from its viewBox or width/height. Never waits more than 2 s.
+ * @param {Blob} file
+ * @returns {Promise<number>}
+ */
+async function imageAspect(file) {
+  const read = async () => {
+    if (file.type === 'image/svg+xml') return svgAspect(await file.text());
+    const bitmap = await createImageBitmap(file);
+    const ratio = bitmap.width && bitmap.height ? bitmap.width / bitmap.height : 1;
+    bitmap.close();
+    return ratio;
+  };
+  try {
+    return await Promise.race([read(), new Promise((resolve) => setTimeout(() => resolve(1), 2000))]);
+  } catch {
+    return 1;
+  }
+}
+
+/**
+ * Width / height of an SVG from its viewBox, else its width and height; 1 if unknown.
+ * @param {string} text
+ * @returns {number}
+ */
+export function svgAspect(text) {
+  const tag = /<svg\b[^>]*>/i.exec(text)?.[0] ?? '';
+  const box = /viewBox\s*=\s*["']\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(tag);
+  if (box && Number(box[1]) > 0 && Number(box[2]) > 0) return Number(box[1]) / Number(box[2]);
+  const w = /\swidth\s*=\s*["']\s*([\d.]+)/i.exec(tag);
+  const h = /\sheight\s*=\s*["']\s*([\d.]+)/i.exec(tag);
+  return w && h && Number(w[1]) > 0 && Number(h[1]) > 0 ? Number(w[1]) / Number(h[1]) : 1;
+}
+
+/**
+ * Add an image to a slide as an extra image (I-083): copied into the show
+ * folder like any image, placed in the middle with its own aspect ratio, in
+ * front of the other extra images; then the alt-text dialog opens.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, file: File }} target
+ * @returns {Promise<number>} The index of the new extra image.
+ */
+export async function addOverlayImage(store, { slideId, file }) {
+  const slideOf = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  const index = slideOf()?.overlays?.length ?? 0;
+  const aspect = await imageAspect(file);
+  const canvasAspect = store.state.show?.settings?.aspectRatio === '4:3' ? 4 / 3 : 16 / 9;
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slideOf()?.content?.title ?? '') || slideId}-extra-${index + 1}`,
+    read: (s) => s?.overlays?.[index]?.image,
+    write: (image) => {
+      if (slideOf()?.overlays?.[index]) store.dispatch('updateOverlay', { slideId, index, patch: { image } });
+      else store.dispatch('addOverlay', { slideId, overlay: { image, ...newOverlayBox(aspect, canvasAspect) } });
+    },
+  });
+  return index;
+}
+
+/**
+ * Replace the image of an extra image; its place and size stay.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, index: number, file: File }} target
+ */
+export async function addImageToOverlay(store, { slideId, index, file }) {
+  const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-extra-${index + 1}`,
+    read: (s) => s?.overlays?.[index]?.image,
+    write: (image) => store.dispatch('updateOverlay', { slideId, index, patch: { image } }),
   });
 }

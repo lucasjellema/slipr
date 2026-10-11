@@ -125,6 +125,9 @@ def build_sample_deck() -> bytes:
     box = s6.shapes.add_textbox(Inches(1), Inches(6), Inches(6), Inches(1))
     box.text_frame.text = "Free text box"
     s6.shapes.add_picture(io.BytesIO(png((30, 30, 200))), Inches(1), Inches(1), Inches(4), Inches(3))
+    # …and a second picture that fits no image slot: an extra image at its place (I-083)
+    logo = s6.shapes.add_picture(io.BytesIO(png((30, 160, 60))), Inches(7.5), Inches(5.5), Inches(2), Inches(1.5))
+    set_alt(logo, "Company logo")
 
     # 7. A table (not converted)
     s7 = prs.slides.add_slide(layout(prs, "Title Only"))

@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Extra images on a slide (I-083)
+- **Added** in audience mode, extra images with `fragment` get Reveal's `fragment` class (and the effect), so they appear one by one after the slide's own fragments. Rendering itself is in `shared/render.js`.
+- **Changed** in reader mode, a slide with extra images keeps its picture layout on narrow screens (mode class `slipr-mode-reader-fixed`): the templates' reflow rules do not apply to it.
+
 ### 2026-10-11: Runs from a single-file export (I-054)
 - **Added** a bundle mode: when the page is a single-file export (`globalThis.SLIPR_BUNDLE`), `js/main.js` loads the bundled show through the bundle's `fetch`, and show and template assets resolve to object URLs.
 - **Changed** `addStylesheet` (`js/dom.js`) to map a virtual bundle URL to its object URL, and `audience/audience.js` to name Reveal's `reset.css` and `reveal.css` directly (so the exporter finds them).

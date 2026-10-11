@@ -68,6 +68,7 @@ export function validateShow(show, options = {}) {
     }
     if (layouts) checkSlots(slide, at, layouts, errors, warnings);
     checkImages(slide, at, options.imageExists, warnings);
+    checkOverlays(slide, at, show.slipr, errors, warnings);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -204,6 +205,9 @@ export function collectImagePaths(show) {
     for (const block of arrayOf(slide?.reader?.blocks)) {
       if (block?.type === 'image' && isImage(block.image)) found.push(block.image.src);
     }
+    for (const overlay of arrayOf(slide?.overlays)) {
+      if (isImage(overlay?.image)) found.push(overlay.image.src);
+    }
   }
   return [...new Set(found)];
 }
@@ -331,6 +335,9 @@ function checkImages(slide, at, imageExists, warnings) {
   arrayOf(slide.reader?.blocks).forEach((block, j) => {
     if (block?.type === 'image' && isImage(block.image)) images.push([block.image, `${at}.reader.blocks[${j}].image`]);
   });
+  arrayOf(slide.overlays).forEach((overlay, j) => {
+    if (isImage(overlay?.image)) images.push([overlay.image, `${at}.overlays[${j}].image`]);
+  });
   for (const [image, path] of images) {
     if (!image.alt || !String(image.alt).trim()) {
       warnings.push({ path, code: 'missing-alt', message: `image "${image.src}" has no alt text` });
@@ -339,6 +346,30 @@ function checkImages(slide, at, imageExists, warnings) {
       warnings.push({ path, code: 'missing-file', message: `image file "${image.src}" not found` });
     }
   }
+}
+
+/** How far an overlay may stick out of the canvas before it is reported (rounding, nudging). */
+const OVERLAY_TOLERANCE = 0.005;
+
+/**
+ * Extra images (D-013, I-083): only in format 0.2, and inside the canvas.
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ */
+function checkOverlays(slide, at, version, errors, warnings) {
+  const overlays = arrayOf(slide.overlays);
+  if (!overlays.length) return;
+  if (version === '0.1') {
+    errors.push({ path: `${at}.overlays`, code: 'format-version', message: 'extra images (overlays) need show format 0.2: set "slipr" to "0.2"' });
+  }
+  overlays.forEach((o, j) => {
+    if (!isObject(o) || ![o.x, o.y, o.w, o.h].every((n) => typeof n === 'number')) return;
+    if (o.w <= 0 || o.h <= 0) {
+      warnings.push({ path: `${at}.overlays[${j}]`, code: 'empty-overlay', message: 'extra image has no size' });
+    } else if (o.x + o.w > 1 + OVERLAY_TOLERANCE || o.y + o.h > 1 + OVERLAY_TOLERANCE) {
+      warnings.push({ path: `${at}.overlays[${j}]`, code: 'outside-canvas', message: 'extra image sticks out of the slide' });
+    }
+  });
 }
 
 /**

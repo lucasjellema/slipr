@@ -1,6 +1,6 @@
 {
   "$schema": "../../shared/schema/show.schema.json",
-  "slipr": "0.1",
+  "slipr": "0.2",
   "id": "demo",
   "meta": {
     "title": "Introducing Slipr",
@@ -198,6 +198,9 @@
         "title": "A show is just data",
         "body": "- `show.json` + `images/`\n- Linked to a template\n- Slides name a **layout** and fill its **slots**\n- No styling in the show, ever"
       },
+      "overlays": [
+        { "image": { "src": "images/json-badge.svg", "alt": "A JSON file: curly braces on a document" }, "x": 0.74, "y": 0.3, "w": 0.16, "h": 0.2844, "fragment": "fade-left" }
+      ],
       "audience": { "autoAnimate": true },
       "reader": {
         "summary": "Shows are plain JSON; the template owns the looks.",

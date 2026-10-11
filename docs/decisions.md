@@ -96,6 +96,7 @@ Status · Date
 - They can appear **one by one** in audience mode (fragments).
 - The PPTX converter **uses them** for pictures that fit no placeholder, instead of moving those to the reader layer.
 **Consequences**: A show-format change (a new slide field, schema + spec + version bump, a migration is not needed because the field is optional). `shared/render.js` gets an absolutely positioned layer over the canvas; the editor gets drag and resize on the preview with keyboard alternatives; validation checks that images stay inside the canvas and have alt text. Free placement can clash with a template's design, so it is the author's responsibility; templates keep full control of everything else.
+**Refined** · 2026-10-11 (Lucas, while specifying I-083): on narrow screens in reader mode a slide with extra images **keeps its picture layout** instead of reflowing (it gets the mode class `slipr-mode-reader-fixed`). The field is `slide.overlays` in show format **0.2**; 0.1 stays valid, and a show becomes 0.2 when it gets its first extra image. Spec: `docs/specs/I-083-extra-images.md`.
 
 ## D-014: Picture styles are template presets, plus a free opacity
 **Accepted** · 2026-10-11 (Lucas; backlog I-084)
