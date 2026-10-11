@@ -112,12 +112,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
   - Reader mode: page navigation, zoom, and the PDF's text included in Slipr search (`search-index.js`, V-015). Either the browser's built-in viewer in an iframe (`#page=n`), or vendored **PDF.js** for consistent rendering. Decide in a spike.
   - Audience mode: show a chosen page as a slide, with fragments stepping through pages.
   - Local files work offline · todo · —
-- [ ] **I-073** [format/viewer] **Mermaid diagram**: implements the planned `diagram` slot (already in the schema) plus a `diagram` block. Supersedes the Mermaid part of I-007.
-  - Vendored **Mermaid**, about 3 MB, so lazy-loading is essential. `securityLevel: 'strict'`, and theme variables taken from the template tokens.
-  - Reader mode: pan and zoom for large diagrams, and clickable nodes that open a Slipr popover or jump to a slide (`#slide-id`).
-  - Audience mode: build the diagram up step by step with fragments (stretch goal).
-  - Rendered SVG is cached per diagram source.
-  - Editor: a live preview while typing the Mermaid source · todo · —
 - [ ] **I-074** [format/viewer] **Cytoscape graph visualization**: a `graph` slot and block, with nodes and edges inline in show.json or in a `data/*.json` file. Each node has an `id`, `label` and optional `md` / `slide` / `tags`. Also a layout (`cose`, `breadthfirst`, `concentric`, …) and styles mapped from template tokens.
   - Vendored **Cytoscape.js**.
   - Reader mode: pan and zoom, click a node → popover with its Markdown or a jump to its slide, highlight neighbours, filter by tag.
@@ -162,6 +156,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **I-073** [format/viewer] **Mermaid diagram**: support for Mermaid diagrams in audience layout slot (`diagram`) and reader block (`diagram`), client-side rendering with vendored Mermaid 11.4.1 (D-002, lazy loaded, strict security), theme integration, SVG caching, search indexing, and demo show example (`s-pipeline`) · done 2026-10-11 · claude
 - [x] **E-016** [editor] User manual inside the editor: `editor/help.html` (every part of the editor, Markdown reference, shortcuts, troubleshooting; light and dark, phone width, offline), opened from **? Help** in the toolbar, the start screen, and `F1` at the section for the current tab · done 2026-10-11 · claude
 - [x] **E-015** [editor] The last controls needed to build the demo from scratch: slide tags, audience options (step-by-step builds, auto-animate, transition), image fit, show language / description / tags, slide numbers, agenda; empty metadata no longer stored as `""` · done 2026-10-11 · claude
 - [x] **E-014** [editor] Bug: `Ctrl+F` / `Ctrl+H` threw `ReferenceError: onFindReplace is not defined`, because `registerShortcuts()` did not take the handler that `main.js` passes. Found in the docs pass · done 2026-10-11 · claude

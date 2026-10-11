@@ -47,7 +47,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     docs.push({
@@ -63,7 +63,7 @@ export function buildSearchIndex(show) {
         ...(block.tabs ?? []).map((/** @type {any} */ t) => t.label),
         ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.title),
         block.image?.alt].filter(Boolean).join(' · ');
-      const body = [block.md, ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
+      const body = [block.md, block.mermaid, ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
         .filter(Boolean).map(text).join('\n');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,

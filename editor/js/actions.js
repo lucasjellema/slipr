@@ -1137,6 +1137,18 @@ export function findMatches(show, { query, matchCase = false, matchWholeWord = f
                 }
               }
             });
+          } else if (val && typeof val === 'object') {
+            for (const [k, v] of Object.entries(val)) {
+              if (typeof v === 'string') {
+                total += scanString(v, regex, {
+                  slideId: slide.id,
+                  slideIndex: sNum,
+                  slideTitle: sTitle,
+                  location: `Slot: ${slot} (${k})`,
+                  field: `content.${slot}.${k}`,
+                }, matches);
+              }
+            }
           }
         }
       }
@@ -1167,7 +1179,7 @@ export function findMatches(show, { query, matchCase = false, matchWholeWord = f
         if (Array.isArray(slide.reader.blocks)) {
           slide.reader.blocks.forEach((block, bIdx) => {
             const bType = block.type || 'block';
-            for (const f of ['md', 'title', 'caption', 'label']) {
+            for (const f of ['md', 'title', 'caption', 'label', 'mermaid']) {
               if (typeof block[f] === 'string') {
                 total += scanString(block[f], regex, {
                   slideId: slide.id,
@@ -1302,6 +1314,23 @@ function replaceInSlide(slide, regex, replacement) {
           contentChanged = true;
           nextContent[slot] = nextArr;
         }
+      } else if (val && typeof val === 'object') {
+        let objChanged = false;
+        const nextObj = { ...val };
+        for (const [k, v] of Object.entries(val)) {
+          if (typeof v === 'string') {
+            const res = replaceInString(v, regex, replacement);
+            if (res.replaced > 0) {
+              count += res.replaced;
+              objChanged = true;
+              nextObj[k] = res.text;
+            }
+          }
+        }
+        if (objChanged) {
+          contentChanged = true;
+          nextContent[slot] = nextObj;
+        }
       }
     }
     if (contentChanged) {
@@ -1338,7 +1367,7 @@ function replaceInSlide(slide, regex, replacement) {
         let blockChanged = false;
         let nextBlock = { ...block };
 
-        for (const f of ['md', 'title', 'caption', 'label']) {
+        for (const f of ['md', 'title', 'caption', 'label', 'mermaid']) {
           if (typeof nextBlock[f] === 'string') {
             const res = replaceInString(nextBlock[f], regex, replacement);
             if (res.replaced > 0) {

@@ -115,6 +115,14 @@ export function renderBlock(block, slideId, ctx) {
       return `<div ${attrs}>${badges}<a href="${escape(href)}" data-slide-link="${escape(block.slide)}">${escape(label)}</a></div>`;
     }
 
+    case 'diagram': {
+      const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
+      return `<div ${attrs}>${badges}<figure class="slipr-figure slipr-figure--diagram">`
+        + `<div class="slipr-diagram" data-mermaid="${escape(block.mermaid)}">`
+        + `<pre class="mermaid">${escape(block.mermaid)}</pre>`
+        + `</div>${caption}</figure></div>`;
+    }
+
     default:
       return ''; // unknown block types are reported by validation, not rendered
   }

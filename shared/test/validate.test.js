@@ -192,7 +192,7 @@ describe('warnings', () => {
     ['unknown profile in for', 'unknown-profile', (s) => { s.slides[1].reader.blocks[3].for = ['cfo']; }],
     ['unknown slide in path', 'unknown-slide', (s) => { s.paths[0].slides.push('s-missing'); }],
     ['unknown slide in related', 'unknown-slide', (s) => { s.slides[2].reader.related.push('s-missing'); }],
-    ['unknown slide in slide-ref', 'unknown-slide', (s) => { s.slides[9].reader.blocks[1].slide = 's-missing'; }],
+    ['unknown slide in slide-ref', 'unknown-slide', (s) => { s.slides.find((sl) => sl.id === 's-roadmap').reader.blocks[1].slide = 's-missing'; }],
     ['unknown chapter', 'unknown-chapter', (s) => { s.slides[0].chapter = 'nope'; }],
     ['unknown slot', 'unknown-slot', (s) => { s.slides[0].content.tagline = 'x'; }],
     ['missing required slot', 'missing-slot', (s) => { delete s.slides[1].content.title; }],

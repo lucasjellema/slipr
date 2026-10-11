@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Mermaid diagrams (I-073)
+- **Added** `shared/diagram.js`: client-side Mermaid rendering with lazy-loaded vendored Mermaid 11.4.1 (D-002), `securityLevel: 'strict'`, template font/theme variables, and SVG caching per diagram source text.
+- **Added** audience layout `diagram` (`templates/default/layouts/diagram.html`) and responsive styling for `.slipr-diagram`, `.slipr-figure--diagram`, and `.slipr-block--diagram` in default and conclusion themes.
+- **Added** support for `diagram` slot type (`{ "mermaid": "...", "caption": "..." }`) and reader block type (`diagram`).
+- **Added** diagram text indexing in `viewer/reader/search-index.js` and global search & replace support in `editor/js/actions.js`.
+- **Added** demo slide `s-pipeline` in `shows/demo/show.json` demonstrating flowchart audience slide and sequence diagram reader block.
+
 ### 2026-10-10: Shows from a folder (E-007, D-012)
 - **Added** `?folder=<key>`: the viewer opens a show folder remembered in this browser (by the editor, or by the new **Open a show folder…** on the help page). Images become `blob:` URLs; `R` / `A` keep the parameter. When the browser has dropped read access, an access page asks for it with one click; an unknown key explains that folder links work only in the browser where the folder was opened.
 

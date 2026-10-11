@@ -85,6 +85,19 @@ describe('block types', () => {
     assert.match(renderBlock({ id: 'r', type: 'slide-ref', slide: 's-ai' }, 's', ctx), />AI help, kept in its cage<\/a>/);
   });
 
+  test('diagram: renders mermaid pre block and caption', () => {
+    const html = renderBlock({
+      id: 'd1',
+      type: 'diagram',
+      mermaid: 'graph TD\n  A --> B',
+      caption: 'Flow overview',
+    }, 's-arch', ctx);
+    assert.match(html, /class="slipr-block slipr-block--diagram"/);
+    assert.match(html, /<div class="slipr-diagram" data-mermaid="graph TD/);
+    assert.match(html, /<pre class="mermaid">graph TD\n  A --&gt; B<\/pre>/);
+    assert.match(html, /<figcaption class="slipr-caption">Flow overview<\/figcaption>/);
+  });
+
   test('unknown types render nothing', () => {
     assert.equal(renderBlock({ id: 'x', type: 'carousel' }, 's', ctx), '');
   });

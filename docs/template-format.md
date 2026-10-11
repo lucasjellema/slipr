@@ -120,6 +120,7 @@ Renderer rules:
 | `code` | `<pre>` | `<code class="language-…">` |
 | `quote` | `<blockquote>` | text plus `<cite>` |
 | `cards` | any container | One clone of the slot's `<template>` blueprint per card (see below) |
+| `diagram` | any container | Rendered SVG diagram from Mermaid source |
 
 - An element whose optional slot is **empty** gets the attribute `data-empty` so CSS can hide it or reflow around it.
 - Relative URLs inside a fragment (logos, illustrations) are resolved against the layout file.

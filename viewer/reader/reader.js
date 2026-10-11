@@ -12,6 +12,7 @@
  */
 import { renderSlide, slideTitle } from '../../shared/render.js';
 import { renderBlocks, blockDomId } from '../../shared/blocks.js';
+import { renderDiagrams } from '../../shared/diagram.js';
 import { markdown } from '../../shared/markdown.js';
 import { addStylesheet, h } from '../js/dom.js';
 import { audienceUrl, parseReaderHash } from '../js/mode-switch.js';
@@ -131,6 +132,7 @@ export async function startReader(app, ctx) {
         h('p', { class: 'reader-made-with' }, ['Made with Slipr']),
       ]),
     );
+    renderDiagrams(main);
     const fresh = buildContents(model, marks);
     contents.nav.replaceWith(fresh.nav);
     if (contents.nav.classList.contains('is-open')) fresh.nav.classList.add('is-open');

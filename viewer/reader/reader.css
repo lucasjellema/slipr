@@ -657,3 +657,40 @@ body.slipr-reader {
 }
 .reader-pin-object:hover, .reader-pin-object:focus-visible { background: var(--slipr-color-primary); color: var(--slipr-color-on-primary); outline: none; }
 .reader-toast .reader-link-button { color: var(--slipr-color-accent); }
+
+/* Diagrams */
+.slipr-diagram {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slipr-diagram svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.slipr-diagram-error {
+  border: 1px solid #d97706;
+  background: #fffbeb;
+  color: #92400e;
+  padding: 1rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+.slipr-diagram-error-badge {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: #b45309;
+}
+.slipr-diagram-error-text {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  font-family: var(--slipr-font-code, monospace);
+  font-size: 0.8rem;
+}
+

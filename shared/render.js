@@ -140,7 +140,23 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       break;
     }
 
-    default: // chart, diagram: planned slot types
+    case 'diagram': {
+      el.classList.add('slipr-diagram');
+      el.dataset.mermaid = value.mermaid;
+      const pre = doc.createElement('pre');
+      pre.className = 'mermaid';
+      pre.textContent = value.mermaid;
+      el.replaceChildren(pre);
+      if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
+        const figcaption = doc.createElement('figcaption');
+        figcaption.className = 'slipr-caption';
+        figcaption.textContent = value.caption;
+        el.parentElement?.append(figcaption);
+      }
+      break;
+    }
+
+    default: // chart: planned slot type
       el.innerHTML = `<p class="slipr-placeholder">[${escape(type)}: not supported yet]</p>`;
   }
 }

@@ -173,8 +173,9 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `image` | `image` (as slot value), `hotspots?: [{ x, y, title, md }]` (x/y as fraction 0–1) | Image with clickable hotspots that open popups |
 | `embed` | `url`, `title`, `height?` | Sandboxed iframe (live demo, video) |
 | `slide-ref` | `slide`, `label?` | Link card to another slide |
+| `diagram` | `mermaid`, `caption?` | Rendered SVG diagram from Mermaid source |
 
-*Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization), `diagram` (Mermaid).
+*Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
 
 ## Markdown subset
 
@@ -202,7 +203,7 @@ The template defines which slots a layout has and the type of each slot.
 | `quote` | object | `{ "text": "...", "source": "..." }` |
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
-| `diagram` | object | *(planned)* `{ "mermaid": "graph LR; A-->B" }` |
+| `diagram` | object | `{ "mermaid": "flowchart LR; A-->B", "caption": "..." }` rendered as an SVG diagram |
 
 ## Template references
 

@@ -8,6 +8,7 @@ import { h } from '../dom.js';
 import { issuesForSlide } from '../store.js';
 import { renderSlide } from '../../../shared/render.js';
 import { renderBlocks } from '../../../shared/blocks.js';
+import { renderDiagrams } from '../../../shared/diagram.js';
 import { blockVisible, personalize } from '../../../viewer/reader/personalize.js';
 
 /**
@@ -185,6 +186,7 @@ export function mountPreview(container, store) {
     }
 
     root.append(header, viewport, diagnostics);
+    renderDiagrams(viewport);
   }
 
   store.subscribe(({ changedKeys }) => {

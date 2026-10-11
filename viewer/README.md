@@ -42,7 +42,7 @@ Profile, path and depth in the URL let you send a tailored link, for example "th
 Built on Reveal.js. The aim is a polished, linear presentation.
 
 - **Animations**: bullets that build one by one (several fragment styles), slide transitions, and *auto-animate*, where matching elements morph smoothly from one slide to the next.
-- **Visualizations**: charts and diagrams that build up on screen *(planned slot types)*. Images and SVG diagrams work today.
+- **Visualizations**: charts that build up on screen *(planned)*. Images and dynamic Mermaid SVG diagrams work today (flowcharts, sequence diagrams, etc.).
 - **High-level overviews**: with `settings.agenda: true`, an agenda slide is generated at the start of every chapter (after the title slide for the first chapter). A thin bar along the bottom shows chapter progress. `O` gives an overview of all slides.
 - **Presenter view** (`S`): notes, timer, clock, and next-slide preview in a separate window on your laptop screen. The browser must allow popups for `localhost`.
 - **Backup slides** (`audience.hidden`): placed after the last slide, not counted in the slide number, and marked with a dashed outline in the overview.
@@ -95,6 +95,7 @@ On screens of 1400 px and wider, "My notes" docks beside the article. On smaller
 - **Collapsible panels** for background and side topics.
 - **Tabs** for alternatives, such as code in several languages or *before / after*.
 - **Callouts** for tips, warnings and quotes.
+- **Mermaid diagrams**: flowcharts, sequence diagrams and workflows rendered client-side as responsive SVGs.
 - **Embedded live demos and videos.**
 - *(planned)* **The slide itself** can be enlarged, or stepped through build by build.
 

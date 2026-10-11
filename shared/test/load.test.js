@@ -28,8 +28,9 @@ test('loads the demo show, its template and all layouts', async () => {
   const ctx = await loadShow('shows/demo/show.json', { baseUrl: base, fetch: fsFetch() });
   assert.equal(ctx.show.id, 'demo');
   assert.equal(ctx.template.id, 'default');
-  assert.deepEqual([...ctx.layouts.keys()].sort(), ['bullets', 'image-full', 'section', 'title', 'two-column']);
+  assert.deepEqual([...ctx.layouts.keys()].sort(), ['bullets', 'diagram', 'image-full', 'section', 'title', 'two-column']);
   assert.match(ctx.layouts.get('bullets').html, /data-slot="body"/);
+  assert.match(ctx.layouts.get('diagram').html, /data-slot="diagram"/);
   assert.ok(ctx.layouts.get('bullets').base.href.endsWith('/templates/default/layouts/bullets.html'));
   assert.deepEqual(ctx.validation.errors, []);
   assert.deepEqual(ctx.validation.warnings, []);
