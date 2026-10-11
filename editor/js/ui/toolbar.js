@@ -10,7 +10,7 @@ import { HELP_PAGE, helpUrl } from '../help.js';
  * Mount the editor toolbar into a container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
- * @param {{ onOpen?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
+ * @param {{ onOpen?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onGrid?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
 export function mountToolbar(container, store, handlers = {}) {
   const root = h('header', { class: 'slipr-toolbar' });
@@ -103,6 +103,15 @@ export function mountToolbar(container, store, handlers = {}) {
     ]);
 
     const runGroup = h('div', { class: 'slipr-toolbar-group' }, [
+      h(
+        'button',
+        {
+          class: 'slipr-btn',
+          title: 'Show grid: all slides and chapters at a glance, to reorder, group and tidy up',
+          onclick: () => handlers.onGrid?.(),
+        },
+        ['▦ Grid']
+      ),
       h(
         'button',
         {

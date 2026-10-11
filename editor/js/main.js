@@ -13,6 +13,7 @@ import { addImageToSlot, imageFileFrom, pasteTargetSlot } from './image-input.js
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
 import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
 import { exportShow } from './export.js';
+import { mountShowGrid } from './ui/show-grid.js';
 import { mountToolbar } from './ui/toolbar.js';
 import { mountSlideList } from './ui/slide-list.js';
 import { mountSlideForm } from './ui/slide-form.js';
@@ -151,7 +152,11 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   /** @param {'audience' | 'reader'} mode */
   const present = (mode) => run(() => openViewer(store, mode, showUrl));
 
-  // 3. Toolbar
+  // 3. Show grid (I-081): a full-width view over the three panes, opened from the toolbar or slide list
+  const mainEl = /** @type {HTMLElement} */ (document.querySelector('.slipr-editor-main'));
+  const grid = mountShowGrid(mainEl, store);
+
+  // 3b. Toolbar
   const toolbarEl = document.getElementById('slipr-editor-toolbar');
   if (toolbarEl) {
     mountToolbar(toolbarEl, store, {
@@ -159,6 +164,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
       onNew: () => run(() => newShow(store)),
       onSave: () => run(() => save(store)),
       onExport: () => run(() => exportShow(store, showUrl)),
+      onGrid: () => grid.toggle(),
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
       onFindReplace: () => openFindReplaceDialog(store),
@@ -168,7 +174,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   // 4. Left sidebar (slide list)
   const sidebarEl = document.getElementById('slipr-editor-sidebar');
   if (sidebarEl) {
-    mountSlideList(sidebarEl, store);
+    mountSlideList(sidebarEl, store, { onGrid: () => grid.open() });
   }
 
   // 5. Center inspector (tabs: Slide, Reader, Settings)

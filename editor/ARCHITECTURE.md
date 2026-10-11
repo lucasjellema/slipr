@@ -43,6 +43,7 @@ editor/
     ├── layout-choice.js  ✅ DOM-free: the slide in another layout, what a switch hides / brings back / still needs, sample content (E-004)
     ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
     ├── help.js           ✅ DOM-free: manual address and the section per inspector tab; openHelp() (E-016)
+    ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025)
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -55,6 +56,7 @@ editor/
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
         ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read, ? Help (a link, so no popup blocker)
+        ├── show-grid.js     ✅ the show grid: all slides as thumbnails in chapter runs; select, drag, batch operations, chapter moves (I-081)
         ├── slide-list.js    ✅ items, selection, reorder (buttons, Alt+↑/↓, drag and drop), hide toggle, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012, E-003)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, Layout button (opens the layout picker), notes, chapter, hidden
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for every block type: text, details, callout, image, tabs, embed, slide-ref (I-036)
@@ -81,6 +83,7 @@ editor/
 
 ### Actions (`actions.js`)
 Pure and unit-testable in Node:
+- several slides or a chapter at once (show grid, one undo step each): `moveSlides`, `duplicateSlides`, `deleteSlides`, `setSlidesHidden`, `setSlidesChapter`, `moveChapter`, `createChapterFromSlides`; they keep `show.chapters` in the order of the slides (`syncChapterOrder`), because the agenda lists chapters in that order
 - slides: `addSlide`, `duplicateSlide`, `deleteSlide`, `moveSlide`, `setLayout`, `setSlot`, `setNotes`, `setHidden`, `setSlideAudience`, `setChapter`, `setTags`
 - reader layer: `setSummary`, `addBlock`, `updateBlock`, `moveBlock`, `deleteBlock`, `setBlockType`, `setBlockAudience` (for/depth), `addHotspot`, `updateHotspot`, `deleteHotspot`, `setRelated`, `setShowSlide`
 - show: `setMeta`, `setSettings`, `upsertChapter`, `deleteChapter`, `upsertGlossaryTerm`, `deleteGlossaryTerm` (optionally `unlink`), `upsertProfile`, `deleteProfile`, `upsertPath`, `deletePath`, `moveShowItem`

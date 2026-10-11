@@ -15,8 +15,9 @@ import { openLayoutPicker } from './layout-picker.js';
  * Mount the slide list sidebar into container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
+ * @param {{ onGrid?: () => void }} [handlers]  onGrid: open the show grid (I-081).
  */
-export function mountSlideList(container, store) {
+export function mountSlideList(container, store, handlers = {}) {
   const root = h('div', { class: 'slipr-slide-list-panel' });
   const header = h('div', { class: 'slipr-panel-header' });
   let query = '';
@@ -114,6 +115,16 @@ export function mountSlideList(container, store) {
             onclick: () => openLayoutPicker({ store, mode: 'add', slideId: store.state.selectedSlideId }),
           },
           ['▾']
+        ),
+        h(
+          'button',
+          {
+            class: 'slipr-btn slipr-btn-sm',
+            title: 'Show grid: all slides and chapters at a glance',
+            'aria-label': 'Open the show grid',
+            onclick: () => handlers.onGrid?.(),
+          },
+          ['▦']
         ),
         h(
           'button',

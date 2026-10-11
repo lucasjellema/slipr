@@ -1578,6 +1578,142 @@ export function replaceSlideText(show, { slideId, find, replaceWith = '', matchC
 }
 
 /** Action registry lookup */
+// ---------------------------------------------------------------------------
+// Show grid (I-081): operations on several slides or a whole chapter at once.
+// Each is one action, so it is one undo step.
+// ---------------------------------------------------------------------------
+
+/**
+ * Put `show.chapters` in the order in which their slides first appear. Chapters
+ * without slides keep their places; the others are re-sorted among the places
+ * they occupy. The agenda lists chapters in this order, so it follows the slides.
+ * @param {any} show
+ * @returns {any}
+ */
+export function syncChapterOrder(show) {
+  if (!Array.isArray(show.chapters) || !Array.isArray(show.slides)) return show;
+  const first = new Map();
+  show.slides.forEach((/** @type {any} */ s, /** @type {number} */ i) => {
+    if (s.chapter && !first.has(s.chapter)) first.set(s.chapter, i);
+  });
+  const used = show.chapters.filter((/** @type {any} */ c) => first.has(c.id));
+  const sorted = [...used].sort((a, b) => first.get(a.id) - first.get(b.id));
+  let k = 0;
+  const chapters = show.chapters.map((/** @type {any} */ c) => (first.has(c.id) ? sorted[k++] : c));
+  return chapters.every((c, i) => c === show.chapters[i]) ? show : { ...show, chapters };
+}
+
+/**
+ * Move slides as one block, in their current order, to just before another
+ * slide (or to the end). Optionally give the moved slides a chapter
+ * (`null` removes it; `undefined` leaves it).
+ * @param {any} show
+ * @param {{ slideIds: string[], beforeSlideId?: string | null, chapter?: string | null }} payload
+ * @returns {any}
+ */
+export function moveSlides(show, { slideIds, beforeSlideId = null, chapter }) {
+  if (!Array.isArray(show.slides)) return show;
+  const ids = new Set(slideIds);
+  let moving = show.slides.filter((/** @type {any} */ s) => ids.has(s.id));
+  if (!moving.length) return show;
+  const rest = show.slides.filter((/** @type {any} */ s) => !ids.has(s.id));
+  // Dropping onto one of the moved slides: insert before the next slide that stays.
+  let target = beforeSlideId;
+  if (target && ids.has(target)) {
+    const after = show.slides.slice(show.slides.findIndex((/** @type {any} */ s) => s.id === target));
+    target = after.find((/** @type {any} */ s) => !ids.has(s.id))?.id ?? null;
+  }
+  const at = target ? rest.findIndex((/** @type {any} */ s) => s.id === target) : -1;
+  const insert = at === -1 ? rest.length : at;
+  if (chapter !== undefined) {
+    moving = moving.map((/** @type {any} */ s) => {
+      const next = { ...s };
+      if (chapter) next.chapter = chapter;
+      else delete next.chapter;
+      return next;
+    });
+  }
+  const slides = [...rest.slice(0, insert), ...moving, ...rest.slice(insert)];
+  const unchanged = slides.every((s, i) => s === show.slides[i]);
+  return unchanged ? show : syncChapterOrder({ ...show, slides });
+}
+
+/**
+ * Duplicate slides; each copy goes right after its original.
+ * @param {any} show
+ * @param {{ slideIds: string[] }} payload
+ * @returns {any}
+ */
+export function duplicateSlides(show, { slideIds }) {
+  return slideIds.reduce((acc, slideId) => duplicateSlide(acc, { slideId }), show);
+}
+
+/**
+ * Delete slides (with the same reference clean-up as deleteSlide). A show
+ * keeps at least one slide: deleting them all does nothing.
+ * @param {any} show
+ * @param {{ slideIds: string[] }} payload
+ * @returns {any}
+ */
+export function deleteSlides(show, { slideIds }) {
+  const ids = new Set(slideIds);
+  if (!Array.isArray(show.slides) || show.slides.every((/** @type {any} */ s) => ids.has(s.id))) return show;
+  return syncChapterOrder(slideIds.reduce((acc, slideId) => deleteSlide(acc, { slideId }), show));
+}
+
+/**
+ * Hide slides from audience mode, or show them again.
+ * @param {any} show
+ * @param {{ slideIds: string[], audienceHidden: boolean }} payload
+ * @returns {any}
+ */
+export function setSlidesHidden(show, { slideIds, audienceHidden }) {
+  return slideIds.reduce((acc, slideId) => setHidden(acc, { slideId, audienceHidden }), show);
+}
+
+/**
+ * Give slides a chapter (`null`: none), without moving them.
+ * @param {any} show
+ * @param {{ slideIds: string[], chapter: string | null }} payload
+ * @returns {any}
+ */
+export function setSlidesChapter(show, { slideIds, chapter }) {
+  return syncChapterOrder(slideIds.reduce((acc, slideId) => setChapter(acc, { slideId, chapter }), show));
+}
+
+/**
+ * Move all slides of a chapter, as one block, to just before another slide
+ * (or to the end); the chapter order follows.
+ * @param {any} show
+ * @param {{ chapterId: string, beforeSlideId?: string | null }} payload
+ * @returns {any}
+ */
+export function moveChapter(show, { chapterId, beforeSlideId = null }) {
+  const slideIds = (show.slides ?? []).filter((/** @type {any} */ s) => s.chapter === chapterId).map((/** @type {any} */ s) => s.id);
+  return slideIds.length ? moveSlides(show, { slideIds, beforeSlideId }) : show;
+}
+
+/**
+ * Make a new chapter of some slides: they get the chapter and are gathered
+ * where the first of them is.
+ * @param {any} show
+ * @param {{ chapterId: string, title: string, slideIds: string[] }} payload
+ * @returns {any}
+ */
+export function createChapterFromSlides(show, { chapterId, title, slideIds }) {
+  const ids = new Set(slideIds);
+  const slides = Array.isArray(show.slides) ? show.slides : [];
+  const firstIndex = slides.findIndex((/** @type {any} */ s) => ids.has(s.id));
+  if (firstIndex === -1) return show;
+  const beforeSlide = slides.slice(firstIndex).find((/** @type {any} */ s) => !ids.has(s.id)) ?? null;
+  // Insert the chapter entry before the chapter that follows it in the slides (else at the end).
+  const chapters = (Array.isArray(show.chapters) ? show.chapters : []).filter((/** @type {any} */ c) => c.id !== chapterId);
+  const nextChapterIndex = beforeSlide?.chapter ? chapters.findIndex((/** @type {any} */ c) => c.id === beforeSlide.chapter) : -1;
+  const entry = { id: chapterId, title };
+  const placed = nextChapterIndex === -1 ? [...chapters, entry] : [...chapters.slice(0, nextChapterIndex), entry, ...chapters.slice(nextChapterIndex)];
+  return moveSlides({ ...show, chapters: placed }, { slideIds, beforeSlideId: beforeSlide?.id ?? null, chapter: chapterId });
+}
+
 export const actions = {
   setBlockType,
   addHotspot,
@@ -1585,6 +1721,13 @@ export const actions = {
   deleteHotspot,
   addSlide,
   duplicateSlide,
+  moveSlides,
+  duplicateSlides,
+  deleteSlides,
+  setSlidesHidden,
+  setSlidesChapter,
+  moveChapter,
+  createChapterFromSlides,
   deleteSlide,
   moveSlide,
   setLayout,

@@ -1484,3 +1484,249 @@ body.is-screen #slipr-editor-banners {
   color: var(--slipr-editor-text);
   border-radius: 0 4px 4px 0;
 }
+
+/* ---------- Show grid (I-081) ---------- */
+
+.slipr-editor-main {
+  position: relative;
+}
+
+.slipr-grid-view {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  background: var(--slipr-editor-bg);
+}
+
+.slipr-grid-view[hidden] {
+  display: none;
+}
+
+.slipr-grid-header,
+.slipr-grid-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--slipr-editor-border);
+}
+
+.slipr-grid-header {
+  justify-content: space-between;
+  background: var(--slipr-editor-surface);
+}
+
+.slipr-grid-title {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.slipr-grid-actions,
+.slipr-grid-sizes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.slipr-grid-selection {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+.slipr-grid-selection .slipr-help {
+  margin: 0;
+}
+
+.slipr-grid-count {
+  font-weight: 600;
+  color: var(--slipr-editor-accent-hover);
+}
+
+.slipr-grid-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px 16px 40px;
+}
+
+.slipr-grid-run {
+  margin-bottom: 18px;
+}
+
+.slipr-grid-run-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+.slipr-grid-run-header[draggable="true"] {
+  cursor: grab;
+}
+
+.slipr-grid-run-header.is-drop-into,
+.slipr-grid-chip.is-drop-into {
+  outline: 2px dashed var(--slipr-editor-accent-hover);
+  outline-offset: 2px;
+}
+
+.slipr-grid-handle {
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-grid-run-input {
+  width: auto;
+  min-width: 12rem;
+  max-width: 28rem;
+  font-weight: 600;
+}
+
+.slipr-grid-run-title.is-none {
+  font-weight: 600;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-grid-cards {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--slipr-grid-card, 210px), 1fr));
+  gap: 12px;
+}
+
+.slipr-grid-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: var(--slipr-editor-surface-raised);
+  cursor: pointer;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 180px;
+}
+
+.slipr-grid-card:hover {
+  border-color: #444C56;
+}
+
+.slipr-grid-card.is-selected {
+  border-color: var(--slipr-editor-accent);
+  background: rgba(47, 129, 247, 0.12);
+}
+
+.slipr-grid-card:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent-hover);
+  outline-offset: 2px;
+}
+
+.slipr-grid-card.is-backup .slipr-grid-thumb {
+  opacity: 0.55;
+}
+
+/* Where dragged slides will land: a bar on the left or right of the card under the pointer. */
+.slipr-grid-card.is-drop-before {
+  box-shadow: -5px 0 0 0 var(--slipr-editor-accent-hover);
+}
+
+.slipr-grid-card.is-drop-after {
+  box-shadow: 5px 0 0 0 var(--slipr-editor-accent-hover);
+}
+
+.slipr-grid-view.is-dragging .slipr-grid-card.is-selected {
+  opacity: 0.5;
+}
+
+/* The rendered slide sizes itself (container queries); the thumb only sets the width. */
+.slipr-grid-thumb {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #FFFFFF;
+  pointer-events: none;
+}
+
+.slipr-grid-caption {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  min-width: 0;
+  font-size: 12px;
+}
+
+.slipr-grid-number {
+  color: var(--slipr-editor-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.slipr-grid-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slipr-grid-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.slipr-grid-badge {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(139, 148, 158, 0.18);
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-grid-badge.is-error {
+  color: var(--slipr-editor-danger);
+  background: rgba(248, 81, 73, 0.12);
+}
+
+.slipr-grid-badge.is-warning {
+  color: var(--slipr-editor-warning);
+  background: rgba(210, 153, 34, 0.12);
+}
+
+.slipr-grid-empty {
+  margin-top: 8px;
+}
+
+.slipr-grid-empty-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.slipr-grid-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px dashed var(--slipr-editor-border);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.slipr-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.slipr-grid-selection .slipr-select {
+  width: auto;
+}
