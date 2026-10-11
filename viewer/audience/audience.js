@@ -15,7 +15,6 @@ import { buildAgendaSlide, createChapterBar } from './agenda.js';
 import { readerUrl } from '../js/mode-switch.js';
 import { renderDiagrams } from '../../shared/diagram.js';
 
-const VENDOR = new URL('../../vendor/reveal.js-6.0.2/dist/', import.meta.url);
 const COLOR = /^(#[0-9a-f]{3,8}|(rgb|hsl|oklch|color)\(.*\)|[a-z]+)$/i;
 
 /**
@@ -25,8 +24,9 @@ const COLOR = /^(#[0-9a-f]{3,8}|(rgb|hsl|oklch|color)\(.*\)|[a-z]+)$/i;
  */
 export async function startAudience(app, ctx) {
   await Promise.all([
-    addStylesheet(new URL('reset.css', VENDOR).href),
-    addStylesheet(new URL('reveal.css', VENDOR).href),
+    // Literal paths, so the single-file exporter (I-054) finds these stylesheets.
+    addStylesheet(new URL('../../vendor/reveal.js-6.0.2/dist/reset.css', import.meta.url).href),
+    addStylesheet(new URL('../../vendor/reveal.js-6.0.2/dist/reveal.css', import.meta.url).href),
     addStylesheet(new URL('audience.css', import.meta.url).href),
   ]);
   await document.fonts.ready;

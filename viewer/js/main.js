@@ -22,6 +22,20 @@ main().catch((err) => {
 });
 
 async function main() {
+  // A single-file export (I-054): the show, its template and the viewer are all in this file.
+  const bundle = /** @type {any} */ (globalThis).SLIPR_BUNDLE;
+  if (bundle) {
+    await present(async () => {
+      const ctx = await loadShow(bundle.showUrl, { fetch: bundle.fetch, checkImages: false });
+      const { resolveAsset, resolveTemplateAsset } = ctx;
+      return {
+        ...ctx,
+        resolveAsset: (src) => bundle.url(resolveAsset(src)),
+        resolveTemplateAsset: (path) => bundle.url(resolveTemplateAsset(path)),
+      };
+    });
+    return;
+  }
   if (folderParam) {
     await openFolderShow(folderParam);
     return;

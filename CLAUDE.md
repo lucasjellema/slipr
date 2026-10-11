@@ -61,6 +61,7 @@ The demo show `shows/demo/` exercises every format feature. Use it as the refere
 | Run JS tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
 | Run converter tests | `pytest` in `converter/` with its venv active (or `converter/.venv/Scripts/python -m pytest`) |
 | Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` |
+| Export a show as one HTML file | `npm run export -- shows/<name> [out.html]` (default `exports/<name>.html`, git-ignored; I-054) |
 
 Two toolchains: the web side uses npm and Node (dev tooling only), and the converter is **Python** (D-006, see `converter/CLAUDE.md`).
 

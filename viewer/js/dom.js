@@ -31,7 +31,8 @@ export function addStylesheet(href) {
   return new Promise((resolve) => {
     const link = document.createElement('link');
     link.rel = 'stylesheet';
-    link.href = href;
+    // In a single-file export (I-054) stylesheets live in the file, not on a server.
+    link.href = /** @type {any} */ (globalThis).SLIPR_BUNDLE?.url(href) ?? href;
     link.onload = () => resolve(link);
     link.onerror = () => {
       console.warn(`Slipr: stylesheet failed to load: ${href}`);

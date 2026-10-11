@@ -36,6 +36,7 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 2. **Edit a show:** Open <http://localhost:8080/editor/> and choose **Open show folder…** (a show anywhere on your disk) or **New show…** (from a template), or open the demo at <http://localhost:8080/editor/?show=../shows/demo/show.json>. Select slides in the left pane, edit layout slots and reader blocks in the center inspector, and inspect live updates in the right preview pane. The editor's user manual ([editor/help.html](editor/help.html), also under **? Help** or `F1` in the editor) explains everything in detail, including keyboard shortcuts.
 3. **Present to an audience:** Click **Present ▶** in the editor toolbar, press `F5`, or open <http://localhost:8080/viewer/?show=../shows/demo/show.json>.
 4. **Explore in reader mode:** Click **Read 📖** in the editor or add `&mode=reader` to the viewer URL.
+5. **Share it as one file:** `npm run export -- shows/demo` writes `exports/demo.html`: the show, its template and the viewer in one HTML file that presents offline (double-click it; no server, no internet). Add `?mode=reader` to its address for reader mode.
 
 ## Key concepts
 

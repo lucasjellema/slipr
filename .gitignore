@@ -42,3 +42,6 @@ converter/out/
 # Source PowerPoint files (company templates, real decks) stay out of git
 /*.pptx
 /*.potx
+
+# Single-file HTML exports (I-054): generated, may contain brand material
+/exports/

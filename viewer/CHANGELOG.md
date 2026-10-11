@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Runs from a single-file export (I-054)
+- **Added** a bundle mode: when the page is a single-file export (`globalThis.SLIPR_BUNDLE`), `js/main.js` loads the bundled show through the bundle's `fetch`, and show and template assets resolve to object URLs.
+- **Changed** `addStylesheet` (`js/dom.js`) to map a virtual bundle URL to its object URL, and `audience/audience.js` to name Reveal's `reset.css` and `reveal.css` directly (so the exporter finds them).
+
 ### 2026-10-11: Mermaid diagrams (I-073)
 - **Added** `shared/diagram.js`: client-side Mermaid rendering with lazy-loaded vendored Mermaid 11.4.1 (D-002), `securityLevel: 'strict'`, template font/theme variables, and SVG caching per diagram source text.
 - **Added** audience layout `diagram` (`templates/default/layouts/diagram.html`) and responsive styling for `.slipr-diagram`, `.slipr-figure--diagram`, and `.slipr-block--diagram` in default and conclusion themes.
