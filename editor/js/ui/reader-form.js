@@ -10,6 +10,7 @@ import { imageValue } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
 import { hotspotEditor } from './hotspot-editor.js';
 import { markdownToolbar } from './markdown-toolbar.js';
+import { addTab, embedHeight, embedUrlProblem, moveTab, removeTab, setTab, tabsArray } from '../block-values.js';
 import { slideTitle } from '../../../shared/render.js';
 
 /** Actions the reader form dispatches while the user types. */
@@ -243,8 +244,14 @@ export function mountReaderForm(container, store) {
         bodyEl.append(kindSelect, calloutTitle, markdownToolbar(/** @type {HTMLTextAreaElement} */ (mdArea), { show: state.show, slideId: slide.id }), mdArea);
       } else if (block.type === 'image') {
         bodyEl.append(imageBlockEditor(store, slide.id, block));
+      } else if (block.type === 'tabs') {
+        bodyEl.append(tabsEditor(store, slide.id, block));
+      } else if (block.type === 'embed') {
+        bodyEl.append(embedEditor(store, slide.id, block));
+      } else if (block.type === 'slide-ref') {
+        bodyEl.append(slideRefEditor(store, slide, block));
       } else if (block.type !== 'text') {
-        // tabs, embed, slide-ref: no editor yet. Read-only, so their shape is never broken.
+        // An unknown block type: read-only, so its shape is never broken.
         bodyEl.append(
           h('div', { class: 'slipr-readonly' }, [describeBlock(block)]),
           h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
@@ -468,5 +475,158 @@ function relatedEditor(store, slide, show) {
     h('span', { class: 'slipr-help' }, ['Offered to readers as "see also" below this slide.']),
     related.length ? h('ol', { class: 'slipr-related-list' }, items) : null,
     picker,
+  ]);
+}
+
+/**
+ * Tabs block (I-036): one group per tab with its label and Markdown text;
+ * add, reorder and remove tabs (the last one stays).
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function tabsEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.tabs;
+  /** @param {any[]} tabs @param {string} [coalesceKey] */
+  const write = (tabs, coalesceKey) =>
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch: { tabs } }, coalesceKey ? { coalesceKey } : undefined);
+  const tabs = tabsArray(block.tabs);
+
+  const groups = tabs.map((tab, i) => {
+    const md = /** @type {HTMLTextAreaElement} */ (h('textarea', {
+      class: 'slipr-textarea slipr-textarea-sm',
+      placeholder: 'Tab content (Markdown)',
+      'aria-label': `Tab ${i + 1}: content`,
+      oninput: (/** @type {Event} */ e) => write(setTab(read(), i, { md: /** @type {HTMLTextAreaElement} */ (e.target).value }), `block-tab-md-${block.id}-${i}`),
+    }, [tab.md]));
+    return h('div', { class: 'slipr-tab-editor' }, [
+      h('div', { class: 'slipr-entity-row' }, [
+        h('input', {
+          type: 'text',
+          class: 'slipr-input slipr-input-sm',
+          value: tab.label,
+          'aria-label': `Tab ${i + 1}: label`,
+          oninput: (/** @type {Event} */ e) => {
+            const input = /** @type {HTMLInputElement} */ (e.target);
+            const empty = input.value.trim() === '';
+            input.setAttribute('aria-invalid', empty ? 'true' : 'false');
+            if (!empty) write(setTab(read(), i, { label: input.value }), `block-tab-label-${block.id}-${i}`);
+          },
+        }),
+        h('div', { class: 'slipr-entity-tools' }, [
+          h('button', {
+            type: 'button', class: 'slipr-item-btn', title: 'Move tab left', 'aria-label': `Move tab "${tab.label}" earlier`,
+            disabled: i === 0 ? true : undefined, onclick: () => write(moveTab(read(), i, i - 1)),
+          }, ['▲']),
+          h('button', {
+            type: 'button', class: 'slipr-item-btn slipr-item-btn-danger', title: 'Remove tab', 'aria-label': `Remove tab "${tab.label}"`,
+            disabled: tabs.length <= 1 ? true : undefined, onclick: () => write(removeTab(read(), i)),
+          }, ['🗑']),
+        ]),
+      ]),
+      markdownToolbar(md, { show: store.state.show, slideId }),
+      md,
+    ]);
+  });
+
+  return h('div', { class: 'slipr-tabs-editor' }, [
+    ...groups,
+    h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', onclick: () => write(addTab(read())) }, ['+ Add tab']),
+  ]);
+}
+
+/**
+ * Embedded page (I-036): URL (with a hint when it will not work), title and height.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function embedEditor(store, slideId, block) {
+  /** @param {Record<string, any>} patch @param {string} field */
+  const update = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, { coalesceKey: `block-${field}-${block.id}` });
+  const problem = embedUrlProblem(block.url ?? '');
+  const hint = h('span', { class: `slipr-help ${problem ? `is-${problem.level}` : ''}`, 'aria-live': 'polite' }, [
+    problem?.message ?? 'Many sites refuse to be shown inside another page; reader mode then shows an empty frame. Check it in the preview.',
+  ]);
+  return h('div', { class: 'slipr-embed-editor' }, [
+    h('input', {
+      type: 'url',
+      class: 'slipr-input slipr-input-sm',
+      placeholder: 'https://… or a file in the show folder',
+      'aria-label': 'Embedded page: address',
+      value: block.url ?? '',
+      oninput: (/** @type {Event} */ e) => {
+        const url = /** @type {HTMLInputElement} */ (e.target).value;
+        const p = embedUrlProblem(url);
+        hint.textContent = p?.message ?? '';
+        hint.className = `slipr-help ${p ? `is-${p.level}` : ''}`;
+        update({ url }, 'url');
+      },
+    }),
+    hint,
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm slipr-input-alt',
+      placeholder: 'Title (for screen readers and the frame)',
+      'aria-label': 'Embedded page: title',
+      value: block.title ?? '',
+      oninput: (/** @type {Event} */ e) => {
+        const input = /** @type {HTMLInputElement} */ (e.target);
+        const empty = input.value.trim() === '';
+        input.setAttribute('aria-invalid', empty ? 'true' : 'false');
+        if (!empty) update({ title: input.value }, 'title');
+      },
+    }),
+    h('label', { class: 'slipr-embed-height' }, [
+      'Height ',
+      h('input', {
+        type: 'number',
+        class: 'slipr-input slipr-input-sm',
+        min: '100',
+        step: '50',
+        placeholder: '400',
+        value: block.height ?? '',
+        'aria-label': 'Embedded page: height in pixels',
+        oninput: (/** @type {Event} */ e) => update({ height: embedHeight(/** @type {HTMLInputElement} */ (e.target).value) }, 'height'),
+      }),
+      ' px',
+    ]),
+  ]);
+}
+
+/**
+ * Link to another slide (I-036): which slide, and an optional label.
+ * @param {import('../store.js').EditorStore} store
+ * @param {any} slide  The slide that holds the block.
+ * @param {any} block
+ */
+function slideRefEditor(store, slide, block) {
+  const slides = Array.isArray(store.state.show?.slides) ? store.state.show.slides : [];
+  const known = slides.some((/** @type {any} */ s) => s.id === block.slide);
+  const options = slides
+    .map((/** @type {any} */ s, /** @type {number} */ i) => ({ s, i }))
+    .filter(({ s }) => s.id !== slide.id)
+    .map(({ s, i }) => h('option', { value: s.id, selected: s.id === block.slide ? true : undefined }, [`${i + 1}. ${slideTitle(s) || s.id}`]));
+  const target = slides.find((/** @type {any} */ s) => s.id === block.slide);
+  return h('div', { class: 'slipr-slide-ref-editor' }, [
+    h('select', {
+      class: 'slipr-select slipr-select-sm',
+      'aria-label': 'Link to slide',
+      onchange: (/** @type {Event} */ e) => store.dispatch('updateBlock', { slideId: slide.id, blockId: block.id, patch: { slide: /** @type {HTMLSelectElement} */ (e.target).value } }),
+    }, [
+      known ? null : h('option', { value: '', selected: true, disabled: true }, [block.slide ? `${block.slide} (no such slide)` : 'Choose a slide…']),
+      ...options,
+    ]),
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm slipr-input-alt',
+      placeholder: target ? `Label (optional; default: "${slideTitle(target) || target.id}")` : 'Label (optional)',
+      'aria-label': 'Link to slide: label',
+      value: block.label ?? '',
+      oninput: (/** @type {Event} */ e) => store.dispatch('updateBlock', {
+        slideId: slide.id, blockId: block.id, patch: { label: /** @type {HTMLInputElement} */ (e.target).value || undefined },
+      }, { coalesceKey: `block-label-${block.id}` }),
+    }),
   ]);
 }

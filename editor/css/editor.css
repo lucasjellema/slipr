@@ -1428,3 +1428,42 @@ body.is-screen #slipr-editor-banners {
 .slipr-hide-toggle.is-on {
   color: var(--slipr-editor-warning);
 }
+
+/* ---------- Tabs, embed and slide-ref block editors (I-036) ---------- */
+
+.slipr-tabs-editor,
+.slipr-embed-editor,
+.slipr-slide-ref-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-tab-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+}
+
+.slipr-help.is-error {
+  color: var(--slipr-editor-danger);
+}
+
+.slipr-help.is-warning {
+  color: var(--slipr-editor-warning);
+}
+
+.slipr-embed-height {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-embed-height .slipr-input {
+  width: 6rem;
+}

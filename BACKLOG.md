@@ -73,7 +73,6 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
-- [ ] **I-036** [editor] Block editors for `tabs` (add, rename, reorder tabs), `embed` (URL, title, height) and `slide-ref` (slide picker, label). They are read-only in the Reader tab since E-006
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -161,6 +160,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Done
 
+- [x] **I-036** [editor] Block editors for tabs (labels, Markdown, add / reorder / remove), embed (URL with hints, title, height) and slide-ref (slide picker, label); every block type now has an editor · done 2026-10-11 · claude
 - [x] **E-003** [editor] Slide list: add, duplicate, delete, reorder (buttons, Alt+↑/↓, drag and drop with a drop line and edge scrolling), hide from audience mode (◉ / ◌) · done 2026-10-11 · claude
 - [x] **E-004** [editor] Slide tab: generated slot form with a field editor for every slot type, and a layout picker with live previews of the slide in each layout (what is hidden, brought back, needed); "▾" to add a slide in a chosen layout · done 2026-10-10 · claude
 - [x] **E-009** [editor] Show settings: chapters (with summary), profiles, glossary and reading routes: edit, reorder, usage counts, deletes that explain their effect (glossary: keep the words as plain text) · done 2026-10-10 · claude

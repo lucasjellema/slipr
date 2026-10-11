@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Editors for tabs, embed and slide-ref blocks (I-036)
+- **Added** a tabs editor: one group per tab with a label and Markdown text (with the insert toolbar); add, reorder and remove tabs (a tabs block keeps at least one, and a label is never stored empty).
+- **Added** an embedded-page editor: the address (with a hint when it will not work: empty, a blocked scheme such as `javascript:`, or plain `http:`), a required title, and an optional height (at least 100 px; empty uses the default).
+- **Added** a slide-link editor: pick the slide from the show (not the slide itself) and an optional label; an unknown target is shown so it can be replaced.
+- **Added** `block-values.js` (DOM-free tab, embed URL and height helpers; tests in `editor/test/block-values.test.js`). Every reader block type now has an editor; only unknown types stay read-only.
+
 ### 2026-10-11: Slide list: drag and drop, hide toggle (E-003, done)
 - **Added** drag and drop in the slide list: a line shows where the slide will land (above or below the slide under the pointer), the list scrolls near its top and bottom edges, and the moved slide is selected. One drop is one undo step. The keyboard alternative stays `Alt+↑` / `Alt+↓`.
 - **Added** a hide toggle (◉ / ◌) on every slide in the list: hide it from audience mode (a backup slide; reader mode still shows it) or show it again. Hidden slides are struck through.

@@ -37,6 +37,7 @@ editor/
     ├── markdown-insert.js ✅ DOM-free: insert glossary references, popups and slide links into Markdown text (E-008)
     ├── show-entities.js  ✅ DOM-free: unique ids, glossary references and unlinking, profile / chapter usage (E-009)
     ├── layout-choice.js  ✅ DOM-free: the slide in another layout, what a switch hides / brings back / still needs, sample content (E-004)
+    ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup
     ├── dom.js            ✅ h() element builder, addStylesheet()
@@ -51,7 +52,7 @@ editor/
         ├── toolbar.js       ✅ title, dirty dot, save, undo, redo, present, read
         ├── slide-list.js    ✅ items, selection, reorder (buttons, Alt+↑/↓, drag and drop), hide toggle, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012, E-003)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, layout select, notes, chapter, hidden
-        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for text, details, callout and image (tabs, embed, slide-ref read-only)
+        ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for every block type: text, details, callout, image, tabs, embed, slide-ref (I-036)
         ├── markdown-toolbar.js ✅ toolbar above Markdown fields: glossary term, popup, slide link (E-008)
         ├── image-field.js   ✅ image preview + choose / drop / paste, used by image slots and image blocks (E-006)
         ├── show-settings.js ✅ "Settings" tab: meta, settings; chapters, profiles, glossary and reading routes with usage, reorder and explained deletes (E-009)

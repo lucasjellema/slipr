@@ -101,7 +101,9 @@ The Reader tab holds the detailed content for individuals reading the show inter
     * **Collapsible Panel (Details):** Expandable section with a title and Markdown content.
     * **Callout Box:** Highlighted callout with a kind (**Info**, **Tip**, **Warning**, **Quote**), an optional title and Markdown content.
     * **Image with Hotspots:** An image (added like any image field), alt text, an optional caption, and hotspots. See below.
-    * **Tabs**, **Embedded Page** and **Link to Slide:** Shown read-only for now, with a summary. Edit them in `show.json`.
+    * **Tabs:** Alternatives side by side (for example code in several languages): a label and Markdown text per tab. Add tabs with **+ Add tab**, reorder with **▲**, remove with **🗑** (one tab always stays).
+    * **Embedded Page:** Another web page inside the reader view: its address (https, or a file in the show folder), a title and an optional height. The editor warns about addresses that will not work; many sites refuse to be embedded, so check the preview.
+    * **Link to Slide:** A card that links to another slide: pick the slide and, if you like, a label.
 * **Hotspots** (on an image block, once it has an image):
   * **Place:** click on the image. A numbered marker appears there and its title field gets focus, so you can type the title right away. Below it, write the popup text in Markdown.
   * **Move:** drag a marker. With a marker selected, the arrow keys nudge it (Shift: bigger steps).
