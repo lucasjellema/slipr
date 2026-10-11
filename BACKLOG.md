@@ -15,7 +15,30 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ---
 
-## Now: Phase 5 (Editor MVP)
+## Now: Phase 6 (Polish & publish)
+
+Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+
+**Handover notes (state on 2026-10-11, for the next session)**
+- **Waiting for Lucas:**
+  - **E-017** (under *Ideas → Editor*): when deleting slides empties a reading route, should the route be removed or turned into "all slides"?
+  - **I-086** (glossary terms clickable in slides) and **I-083 / I-084** (extra images, picture styles) are specified with his decisions (D-013, D-014) and ready to start once he chooses them.
+  - I-083, I-084 and I-086 (the optional glossary `aliases`) all change a format. They need a spec in `docs/specs/`, a schema and version bump, and a migration check before code.
+- **Not verified in Claude's browser pane, so Lucas checks these in a real browser:**
+  - an exported file opened by double-click (`file://`);
+  - a real mouse drag in the show grid and the slide list (tested with synthetic events);
+  - the real save dialog of Export…;
+  - the editor theme following an OS light/dark switch while open (the pane cannot fire that event; on-load behaviour is verified).
+- **How to verify in the pane:** see the notes at the top of `editor/CLAUDE.md`'s smoke-test checklist:
+  - stub `window.open` and `showSaveFilePicker`;
+  - use OPFS folders for the folder picker;
+  - dispatch paste and drop events with a canvas-made PNG.
+- **Working habits that avoided trouble:**
+  - In a Python edit script, compute the new text completely before opening the file for writing. An exception after `open(…, 'w')` leaves an empty file.
+  - Put long scripts in the scratchpad, not in shell heredocs.
+  - When another session has uncommitted edits in a file you also changed, stage only your hunk. Write the blob as HEAD plus your edit with `git hash-object -w`, then `git update-index --cacheinfo`. Run the tests on the staged snapshot (`git checkout-index` into a scratch folder).
+  - Never `git add -A`.
+- **Editor colours:** use tokens only. `editor/test/theme-contrast.test.js` fails on a hard-coded colour or low contrast (see `editor/CLAUDE.md`).
 
 
 ## Pending verification & chores from earlier phases

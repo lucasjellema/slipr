@@ -6,6 +6,9 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-11: Documentation pass (handover)
+- **Changed** the root README status (Phases 0–5 done; the show grid, Export… and the editor theme), the editor README status, and the backlog's *Now* section (Phase 6, with handover notes: open questions for Lucas, what still needs checking in a real browser, and working habits).
+
 ### 2026-10-11: Single-file HTML export (I-054)
 - **Added** `shared/export/single-file.js` and `npm run export -- <show folder> [out.html]` (`tools/export-show.js`): one HTML file with the show, its template and the viewer, which presents offline in both modes (no server, no network requests). ES modules travel as `data:` URLs in an import map, with relative imports and `import.meta.url` rewritten to virtual addresses; show and template files are embedded and served by a small runtime; CSS `url()`s and layout URLs are inlined. Mermaid is included only for shows with diagrams. Exports go to `exports/` (git-ignored). Spec: `docs/specs/I-054-single-file-export.md`.
 - **Changed** the viewer slightly for it: `main.js` loads a bundled show, `addStylesheet` maps virtual URLs, and `audience.js` names Reveal's stylesheets directly.
