@@ -444,14 +444,56 @@
 
       <section id="export">
         <h2>Export as one file</h2>
-        <p>Click <strong>Export…</strong> to save the show as <strong>one HTML file</strong> that holds the show, its template and the viewer. That file presents <strong>offline</strong>: double-click it to open it in a browser, without the Slipr server and without internet. Send it to someone, put it on a USB stick, or keep it as an archive copy.</p>
+        <p><strong>Export…</strong> saves the show as <strong>one HTML file</strong> that holds everything needed to present and read it: the show, its images, its template with fonts and illustrations, and the Slipr viewer. Whoever gets the file can open it with a double-click: no Slipr, no server, no internet, nothing to install.</p>
+
+        <h3>When to use it</h3>
         <ul>
-          <li>The export is the show <strong>as it is in the editor</strong>, unsaved changes included. Exporting does not save.</li>
-          <li>Choose where to save the file; the name is the show's id (for example <code>demo.html</code>). In a browser without a save dialog the file is downloaded.</li>
-          <li>The file opens in audience mode. For reader mode, add <code>?mode=reader</code> to its address. Readers' notes and bookmarks stay in their own browser.</li>
-          <li>Expect a few MB: fonts and images are inside, and shows with diagrams also carry the diagram library.</li>
+          <li><strong>Presenting on another computer</strong>, or where the Wi-Fi can't be trusted: copy the file to a USB stick or the laptop.</li>
+          <li><strong>Sending a show</strong> to someone to read in their own time: attach the file, or put it on a shared drive. They get the full reader mode.</li>
+          <li><strong>Keeping a copy</strong> of a show as it was on a given day.</li>
         </ul>
-        <p>The same export is available as a command: <code>npm run export -- shows/&lt;name&gt;</code>.</p>
+
+        <h3>Export a show</h3>
+        <ol>
+          <li>Fix any <span class="sev sev-error">errors</span> under the preview first: the exported file shows the same error page as the viewer would.</li>
+          <li>Click <strong>Export…</strong> in the toolbar.</li>
+          <li>Choose where to save the file. Its name is the show's id, for example <code>demo.html</code>; you can change it. In a browser without a save dialog the file goes to your downloads.</li>
+          <li>Wait a moment while the editor packs the show. A message under the toolbar says where the file went and how big it is.</li>
+        </ol>
+        <p>The export is the show <strong>as it is in the editor</strong>, with unsaved changes included. Exporting does not save the show itself; press <kbd>Ctrl</kbd>+<kbd>S</kbd> for that.</p>
+        <p class="note">A show opened by its address (<code>?show=…</code>) can only be exported when it is inside the Slipr folder, like the demo. For a show elsewhere, open its folder with <strong>Open…</strong> first.</p>
+
+        <h3>Open an exported file</h3>
+        <ul>
+          <li>Double-click it, or drag it into a browser window. Chrome and Edge are tested; other current browsers should work.</li>
+          <li>It opens in <strong>audience mode</strong>, ready to present: arrow keys to move, <kbd>O</kbd> for an overview of all slides.</li>
+          <li>For <strong>reader mode</strong>, press <kbd>R</kbd> (and <kbd>A</kbd> to go back), or add <code>?mode=reader</code> to the end of the file's address. Readers can choose their profile and depth as usual.</li>
+          <li>Search, glossary popups, hotspots, tabs, diagrams and the reader's own highlights, notes and bookmarks all work offline. Those notes stay in the reader's browser on that computer.</li>
+        </ul>
+
+        <h3>What is in the file, and what is not</h3>
+        <table>
+          <thead><tr><th>Included</th><th>Not included</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>All slides and reader blocks, speaker notes, chapters, profiles, glossary and reading routes; the images the show uses; the template's fonts and illustrations; the viewer, and the diagram library when the show has diagrams</td>
+              <td>Embedded <code>https:</code> sites (they still need an internet connection) and links to other web pages; images or files the show refers to that are missing from its folder (a message names them)</td>
+            </tr>
+          </tbody>
+        </table>
+        <p>Expect a few MB: the fonts and images are inside. Large photos make the file large; see <a href="#images">Images</a> for keeping them small.</p>
+
+        <h3>Changing an exported show</h3>
+        <p>An exported file is a copy: it can't be opened in the editor. Change the show itself, then export again; give the new file a new name or replace the old one.</p>
+
+        <h3>Messages</h3>
+        <dl>
+          <dt>Export: show: images/… not found; left out</dt>
+          <dd>The show refers to a file that is not in its folder. Add the image again, or remove the reference, and export again.</dd>
+          <dt>Export: template: … not found</dt>
+          <dd>Part of the template is missing from Slipr's <code>templates/</code> folder. The file still opens, but may look different.</dd>
+        </dl>
+        <p>More in <a href="#trouble">Troubleshooting</a>. The same export is available as a command for the Slipr folder: <code>npm run export -- shows/&lt;name&gt;</code>.</p>
       </section>
 
       <section id="undo">

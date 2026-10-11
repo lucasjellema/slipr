@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Export chapter in the user manual
+- **Changed** the manual's *Export as one file* section into a full chapter: when to use it, exporting step by step (fix errors first; unsaved changes included; shows opened by address only from inside the Slipr folder), opening an exported file in audience and reader mode, what the file contains and what not, changing an exported show, and the export messages.
+
 ### 2026-10-11: Show grid (I-081)
 - **Added** the show grid (`ui/show-grid.js`): a full-width view of all slides as thumbnails, in show order and grouped into chapter runs as reader mode groups them (a chapter that returns later is marked *continued*), with badges for backup and reader-hidden slides and for errors and warnings. Opened with **▦ Grid** (toolbar) or **▦** (slide list header). Select with click, Ctrl/Cmd-click, Shift-click or the keyboard; drag slides (they join the chapter they are dropped in) and chapters (all their slides move); a selection bar to duplicate, hide or show, assign a chapter, make a new chapter, move (◀ ▶, Alt+←/→) and delete; rename, move (▲ ▼) and delete chapters; empty chapters as drop targets; **+ Add slide…** with the layout picker. Up and down arrows go by what is on screen (rows restart per chapter). Thumbnails are cached per slide object and draw Mermaid diagrams.
 - **Added** batch actions, each one undo step: `moveSlides`, `duplicateSlides`, `deleteSlides` (never all slides), `setSlidesHidden`, `setSlidesChapter`, `moveChapter`, `createChapterFromSlides`, and `syncChapterOrder` (chapters in the order of their first slide, so the agenda follows), with `show-grid-model.js` (runs, empty chapters, range selection, grid keys). Tests in `editor/test/show-grid.test.js`.
