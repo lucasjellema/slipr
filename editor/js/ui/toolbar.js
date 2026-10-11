@@ -4,6 +4,7 @@
  */
 
 import { h } from '../dom.js';
+import { THEME_CHOICES, setThemeChoice, themeChoice } from '../theme.js';
 import { HELP_PAGE, helpUrl } from '../help.js';
 
 /**
@@ -146,6 +147,7 @@ export function mountToolbar(container, store, handlers = {}) {
         },
         ['? Help']
       ),
+      themeSelect(),
     ]);
 
     root.append(brand, historyGroup, fileGroup, runGroup);
@@ -163,4 +165,19 @@ export function mountToolbar(container, store, handlers = {}) {
   });
 
   render();
+}
+
+/** Labels of the theme choices (I-082). */
+const THEME_LABELS = { system: '◐ System', light: '☀ Light', dark: '☾ Dark' };
+
+/** The Light / Dark / System switch (I-082). */
+function themeSelect() {
+  const current = themeChoice();
+  const select = /** @type {HTMLSelectElement} */ (h('select', {
+    class: 'slipr-select slipr-select-sm slipr-theme-select',
+    'aria-label': 'Theme',
+    title: 'Theme: light, dark, or follow the system setting',
+    onchange: () => setThemeChoice(/** @type {any} */ (select.value)),
+  }, THEME_CHOICES.map((c) => h('option', { value: c, selected: c === current ? true : undefined }, [THEME_LABELS[c]]))));
+  return select;
 }

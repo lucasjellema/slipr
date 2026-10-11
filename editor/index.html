@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slipr Editor</title>
+  <script>
+    // Theme before the first paint (I-082): the editor's choice (System, Light, Dark); see js/theme.js.
+    (() => {
+      let choice = 'system';
+      try { choice = localStorage.getItem('slipr-editor-theme') || 'system'; } catch {}
+      const light = choice === 'light' || (choice !== 'dark' && matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    })();
+  </script>
   <link rel="stylesheet" href="css/editor.css">
 </head>
 <body class="slipr-editor-app">

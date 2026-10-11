@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Light and dark theme (I-082)
+- **Added** a light theme and a theme switch at the end of the toolbar: ☀ Light, ☾ Dark, ◐ System (follows `prefers-color-scheme`, also when it changes). The choice is kept per browser in `localStorage` (`slipr-editor-theme`), and an inline script in `index.html` applies it before the first paint (no flash). The manual (`help.html`) follows the same choice instead of only the system setting. New module `theme.js`.
+- **Changed** the dark theme to a lighter "dimmed" palette (dark grey `#22272E` instead of near-black `#0E1116`).
+- **Changed** every colour in `editor.css` to go through `--slipr-editor-*` tokens (new: `border-strong`, `hover`, `selected`, `text-strong`, `link`, `indicator`, `on-color`, `danger-strong`, `success-text`, `accent-2`, `preview-bg`, `shadow` and hover variants); tints are `color-mix()` of tokens. Only the white behind slide thumbnails and template fallbacks stay literal.
+- **Added** `editor/test/theme-contrast.test.js`: reads both themes (editor and manual) from the CSS and checks WCAG AA (4.5:1 text, 3:1 indicators) for every text/background pair used, that both themes define the same tokens, and that no colour is hard-coded outside the token blocks. It caught two dark-theme problems that are fixed: white on the Save button's hover green, and blue selection borders on dark panels (now the `indicator` token).
+- **Fixed** the slide list header squeezing its buttons in a narrow sidebar (it wraps now), and the Present button turning brown on hover.
+
 ### 2026-10-11: Show grid chapter in the user manual
 - **Changed** the manual's *Show grid* section into a full chapter: when to use it, opening and closing (`Esc` first clears the selection), what the cards, groups, *continued* and badges mean, selecting, rearranging slides and chapters, batch changes in the selection bar, that the chapter order follows the slides (agenda, contents, Show settings), keys, and a worked example (a backup chapter).
 

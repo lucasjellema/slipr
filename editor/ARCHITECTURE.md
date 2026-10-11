@@ -44,6 +44,7 @@ editor/
     ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
     ├── help.js           ✅ DOM-free: manual address and the section per inspector tab; openHelp() (E-016)
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
+    ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
     ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025)
     ├── dom.js            ✅ h() element builder, addStylesheet()

@@ -38,7 +38,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Present and Read | Save, then open the viewer at the selected slide | [Present and Read](help.html#present) |
 | Export | One HTML file with show, template and viewer that presents offline (unsaved changes included) | [Export as one file](help.html#export) |
 
-Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
+The editor has a **light and a dark theme**: choose ☀ Light, ☾ Dark or ◐ System (follows your computer) at the end of the toolbar; the choice is remembered in your browser. Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
 
 ## Browser requirements
 

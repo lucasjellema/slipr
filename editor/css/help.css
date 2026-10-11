@@ -1,4 +1,5 @@
-/* Slipr Editor: user manual (help.html). Light and dark follow the system setting. */
+/* Slipr Editor: user manual (help.html). Light and dark follow the editor's theme choice (I-082):
+   help.html sets data-theme before the first paint (System follows the OS setting). */
 
 :root {
   --slipr-help-bg: #FFFFFF;
@@ -13,22 +14,21 @@
   --slipr-help-warning: #9A6700;
   --slipr-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --slipr-font-mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --slipr-help-bg: #0E1116;
-    --slipr-help-surface: #161B22;
-    --slipr-help-border: #30363D;
-    --slipr-help-text: #E6EDF3;
-    --slipr-help-muted: #8B949E;
-    --slipr-help-accent: #58A6FF;
-    --slipr-help-note: #0C2D4A;
-    --slipr-help-tip: #0F2E1A;
-    --slipr-help-error: #FF7B72;
-    --slipr-help-warning: #D29922;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --slipr-help-bg: #22272E;
+  --slipr-help-surface: #2D333B;
+  --slipr-help-border: #444C56;
+  --slipr-help-text: #CDD9E5;
+  --slipr-help-muted: #ADBAC7;
+  --slipr-help-accent: #6CB6FF;
+  --slipr-help-note: #1F3450;
+  --slipr-help-tip: #1F3A26;
+  --slipr-help-error: #FF938A;
+  --slipr-help-warning: #DAAA3F;
 }
 
 * { box-sizing: border-box; }

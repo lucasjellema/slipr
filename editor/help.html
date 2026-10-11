@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Slipr Editor Help</title>
+  <script>
+    // Theme before the first paint (I-082): the editor's choice (System, Light, Dark); see js/theme.js.
+    (() => {
+      let choice = 'system';
+      try { choice = localStorage.getItem('slipr-editor-theme') || 'system'; } catch {}
+      const light = choice === 'light' || (choice !== 'dark' && matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    })();
+  </script>
   <link rel="stylesheet" href="css/help.css">
 </head>
 <body>
@@ -100,11 +109,13 @@
 └───────────────┴────────────────────────────┴───────────────────────────────┘</pre>
         </figure>
         <ol>
-          <li><strong>Toolbar</strong> (top): the show's title with a dot (<code>●</code>) when there are unsaved changes, undo and redo, find and replace, open, new and save, Present and Read, and this help. In a narrow window it wraps onto two lines.</li>
+          <li><strong>Toolbar</strong> (top): the show's title with a dot (<code>●</code>) when there are unsaved changes, undo and redo, find and replace, open, new, save and export, the show grid, Present and Read, this help, and the theme. In a narrow window it wraps onto two lines.</li>
           <li><strong>Slide list</strong> (left): every slide in order, with a <em>Go to slide</em> box, and <strong>⚙ Show</strong> for the show settings.</li>
           <li><strong>Inspector</strong> (middle): the <strong>Slide</strong> tab for the audience layer and the <strong>Reader</strong> tab for the reader layer of the selected slide, or the show settings.</li>
           <li><strong>Preview</strong> (right): the selected slide as the audience or a reader will see it, and any problems with it.</li>
         </ol>
+        <h3>Light or dark</h3>
+        <p>The theme menu at the end of the toolbar switches the editor between <strong>☀ Light</strong>, <strong>☾ Dark</strong> and <strong>◐ System</strong>, which follows your computer's light or dark setting. The choice is remembered in this browser, and this manual follows it too. It only changes the editor: slides always show in their template's own colours.</p>
         <p>Messages such as <em>Saved</em> appear in a bar under the toolbar.</p>
       </section>
 

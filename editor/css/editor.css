@@ -2,21 +2,75 @@
  * Slipr Editor: styles for the editor application shell.
  */
 
+/*
+ * Themes (I-082). The dark theme is the default; :root[data-theme="light"] switches
+ * every token. The editor sets data-theme before the first paint (index.html) from
+ * the reader's choice: Light, Dark or System (follows prefers-color-scheme).
+ * All colours go through these tokens; tints are color-mix() of them, so they adapt.
+ * Contrast (WCAG AA) is checked by editor/test/theme-contrast.test.js.
+ */
 :root {
-  --slipr-editor-bg: #0E1116;
-  --slipr-editor-surface: #161B22;
-  --slipr-editor-surface-raised: #21262D;
-  --slipr-editor-border: #30363D;
-  --slipr-editor-text: #E6EDF3;
-  --slipr-editor-muted: #8B949E;
-  --slipr-editor-accent: #2F81F7;
-  --slipr-editor-accent-hover: #58A6FF;
-  --slipr-editor-danger: #F85149;
-  --slipr-editor-danger-hover: #FF7B72;
-  --slipr-editor-warning: #D29922;
-  --slipr-editor-success: #238636;
+  color-scheme: dark;
+  --slipr-editor-bg: #22272E;
+  --slipr-editor-surface: #2D333B;
+  --slipr-editor-surface-raised: #373E47;
+  --slipr-editor-border: #444C56;
+  --slipr-editor-border-strong: #636E7B;
+  --slipr-editor-hover: #3D444D;
+  --slipr-editor-selected: #2B3A4F;
+  --slipr-editor-text: #CDD9E5;
+  --slipr-editor-text-strong: #F0F6FC;
+  --slipr-editor-muted: #ADBAC7;
+  --slipr-editor-accent: #316DCA;
+  --slipr-editor-accent-hover: #6CB6FF;
+  --slipr-editor-indicator: #539BF5;
+  --slipr-editor-link: #6CB6FF;
+  --slipr-editor-on-color: #FFFFFF;
+  --slipr-editor-danger: #FF938A;
+  --slipr-editor-danger-hover: #FFB8B0;
+  --slipr-editor-danger-strong: #C93C37;
+  --slipr-editor-danger-strong-hover: #B6302B;
+  --slipr-editor-warning: #DAAA3F;
+  --slipr-editor-success: #347D39;
+  --slipr-editor-success-hover: #2B6A30;
+  --slipr-editor-success-text: #6BC46D;
+  --slipr-editor-accent-2: #8256D0;
+  --slipr-editor-accent-2-hover: #6B44B8;
+  --slipr-editor-preview-bg: #1C2128;
+  --slipr-editor-shadow: rgb(0 0 0 / 0.45);
   --slipr-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --slipr-font-mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --slipr-editor-bg: #E9ECEF;
+  --slipr-editor-surface: #FFFFFF;
+  --slipr-editor-surface-raised: #F6F8FA;
+  --slipr-editor-border: #D0D7DE;
+  --slipr-editor-border-strong: #8C959F;
+  --slipr-editor-hover: #EAEEF2;
+  --slipr-editor-selected: #DDF4FF;
+  --slipr-editor-text: #1F2328;
+  --slipr-editor-text-strong: #1F2328;
+  --slipr-editor-muted: #59636E;
+  --slipr-editor-accent: #0969DA;
+  --slipr-editor-accent-hover: #0550AE;
+  --slipr-editor-indicator: #0969DA;
+  --slipr-editor-link: #0550AE;
+  --slipr-editor-on-color: #FFFFFF;
+  --slipr-editor-danger: #CF222E;
+  --slipr-editor-danger-hover: #A40E26;
+  --slipr-editor-danger-strong: #CF222E;
+  --slipr-editor-danger-strong-hover: #A40E26;
+  --slipr-editor-warning: #7D4E00;
+  --slipr-editor-success: #1F883D;
+  --slipr-editor-success-hover: #1A7F37;
+  --slipr-editor-success-text: #116329;
+  --slipr-editor-accent-2: #8250DF;
+  --slipr-editor-accent-2-hover: #6639BA;
+  --slipr-editor-preview-bg: #D8DEE4;
+  --slipr-editor-shadow: rgb(31 35 40 / 0.18);
 }
 
 * {
@@ -63,7 +117,7 @@ body.slipr-editor-app {
   font-weight: 700;
   font-size: 16px;
   letter-spacing: -0.02em;
-  color: #FFFFFF;
+  color: var(--slipr-editor-text-strong);
 }
 
 .slipr-toolbar-badge {
@@ -122,8 +176,8 @@ a.slipr-btn {
 }
 
 .slipr-btn:hover:not(:disabled) {
-  background: #2D333B;
-  border-color: #444C56;
+  background: var(--slipr-editor-hover);
+  border-color: var(--slipr-editor-border-strong);
 }
 
 .slipr-btn:disabled {
@@ -133,18 +187,18 @@ a.slipr-btn {
 
 .slipr-btn.is-active {
   background: var(--slipr-editor-accent);
-  color: #FFFFFF;
-  border-color: var(--slipr-editor-accent);
+  color: var(--slipr-editor-on-color);
+  border-color: var(--slipr-editor-indicator);
 }
 
 .slipr-btn-primary {
   background: var(--slipr-editor-success);
-  border-color: rgba(240, 246, 252, 0.1);
-  color: #FFFFFF;
+  border-color: color-mix(in srgb, var(--slipr-editor-text) 10%, transparent);
+  color: var(--slipr-editor-on-color);
 }
 
 .slipr-btn-primary:hover:not(:disabled) {
-  background: #2EA043;
+  background: var(--slipr-editor-success-hover);
 }
 
 .slipr-btn-primary.is-dirty {
@@ -152,13 +206,13 @@ a.slipr-btn {
 }
 
 .slipr-btn-accent {
-  background: #8957E5;
-  border-color: rgba(240, 246, 252, 0.1);
-  color: #FFFFFF;
+  background: var(--slipr-editor-accent-2);
+  border-color: color-mix(in srgb, var(--slipr-editor-text) 10%, transparent);
+  color: var(--slipr-editor-on-color);
 }
 
 .slipr-btn-accent:hover:not(:disabled) {
-  background: #9E6A03;
+  background: var(--slipr-editor-accent-2-hover);
 }
 
 .slipr-btn-sm {
@@ -183,8 +237,8 @@ a.slipr-btn {
 .slipr-textarea:focus,
 .slipr-select:focus {
   outline: none;
-  border-color: var(--slipr-editor-accent);
-  box-shadow: 0 0 0 2px rgba(47, 129, 247, 0.2);
+  border-color: var(--slipr-editor-indicator);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--slipr-editor-accent) 30%, transparent);
 }
 
 .slipr-input-alt {
@@ -299,13 +353,13 @@ a.slipr-btn {
 }
 
 .slipr-slide-item:hover {
-  background: #2D333B;
-  border-color: #444C56;
+  background: var(--slipr-editor-hover);
+  border-color: var(--slipr-editor-border-strong);
 }
 
 .slipr-slide-item.is-selected {
-  background: #1C2128;
-  border-color: var(--slipr-editor-accent);
+  background: var(--slipr-editor-selected);
+  border-color: var(--slipr-editor-indicator);
 }
 
 .slipr-slide-item:focus-visible {
@@ -355,13 +409,13 @@ a.slipr-btn {
 }
 
 .slipr-item-badge--chapter {
-  background: rgba(47, 129, 247, 0.15);
-  color: #79C0FF;
+  background: color-mix(in srgb, var(--slipr-editor-accent) 18%, transparent);
+  color: var(--slipr-editor-link);
 }
 
 .slipr-item-badge--dim {
-  background: rgba(139, 148, 158, 0.15);
-  color: #8B949E;
+  background: color-mix(in srgb, var(--slipr-editor-muted) 18%, transparent);
+  color: var(--slipr-editor-muted);
 }
 
 .slipr-slide-item-tools {
@@ -386,8 +440,8 @@ a.slipr-btn {
 }
 
 .slipr-item-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  color: #FFFFFF;
+  background: var(--slipr-editor-hover);
+  color: var(--slipr-editor-text-strong);
 }
 
 .slipr-item-btn:disabled {
@@ -433,8 +487,8 @@ a.slipr-btn {
 }
 
 .slipr-tab-btn.is-active {
-  color: #FFFFFF;
-  border-bottom-color: var(--slipr-editor-accent);
+  color: var(--slipr-editor-text-strong);
+  border-bottom-color: var(--slipr-editor-indicator);
 }
 
 .slipr-inspector-content {
@@ -553,7 +607,7 @@ a.slipr-btn {
 /* Right Column (Live Preview) */
 
 .slipr-editor-preview {
-  background: #0B0E14;
+  background: var(--slipr-editor-preview-bg);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -596,7 +650,7 @@ a.slipr-btn {
 .slipr-preview-scaler {
   width: 100%;
   max-width: 900px;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 12px 36px var(--slipr-editor-shadow);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -608,7 +662,7 @@ a.slipr-btn {
   color: var(--slipr-color-text, #1E2329);
   padding: 24px;
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 8px 24px var(--slipr-editor-shadow);
 }
 
 .slipr-reader-summary {
@@ -747,7 +801,7 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-recent-item:hover,
 .slipr-recent-item:focus-visible {
-  border-color: var(--slipr-editor-accent);
+  border-color: var(--slipr-editor-indicator);
 }
 
 .slipr-recent-folder {
@@ -780,7 +834,7 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-banner--success {
-  color: #3FB950;
+  color: var(--slipr-editor-success-text);
 }
 
 /* ---------- Image fields (E-006) ---------- */
@@ -798,8 +852,8 @@ body.is-screen #slipr-editor-banners {
 .slipr-image-zone:focus-visible,
 .slipr-image-zone.is-dragover {
   outline: none;
-  border-color: var(--slipr-editor-accent);
-  background: rgba(47, 129, 247, 0.08);
+  border-color: var(--slipr-editor-indicator);
+  background: color-mix(in srgb, var(--slipr-editor-accent) 10%, transparent);
 }
 
 .slipr-image-thumb,
@@ -896,13 +950,13 @@ body.is-screen #slipr-editor-banners {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid #FFFFFF;
+  border: 2px solid var(--slipr-editor-on-color);
   background: var(--slipr-editor-accent);
-  color: #FFFFFF;
+  color: var(--slipr-editor-on-color);
   font: 600 12px/1 var(--slipr-font-sans);
   cursor: grab;
   touch-action: none;
-  box-shadow: 0 1px 4px rgb(0 0 0 / 0.5);
+  box-shadow: 0 1px 4px var(--slipr-editor-shadow);
 }
 
 .slipr-hs-marker:active {
@@ -943,7 +997,7 @@ body.is-screen #slipr-editor-banners {
   display: grid;
   place-items: center;
   background: var(--slipr-editor-accent);
-  color: #FFFFFF;
+  color: var(--slipr-editor-on-color);
   font-size: 11px;
   font-weight: 600;
 }
@@ -1034,7 +1088,7 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-find-match-item:hover {
   background: var(--slipr-editor-surface-raised);
-  border-color: var(--slipr-editor-accent);
+  border-color: var(--slipr-editor-indicator);
 }
 
 .slipr-find-match-location {
@@ -1052,8 +1106,8 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-find-match-snippet mark {
-  background: rgba(242, 169, 0, 0.4);
-  color: #FFFFFF;
+  background: color-mix(in srgb, var(--slipr-editor-warning) 35%, transparent);
+  color: var(--slipr-editor-text-strong);
   padding: 0 2px;
   border-radius: 2px;
   font-weight: 600;
@@ -1163,8 +1217,8 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-for-summary.is-tailored {
-  color: #79C0FF;
-  border-color: rgba(47, 129, 247, 0.5);
+  color: var(--slipr-editor-link);
+  border-color: color-mix(in srgb, var(--slipr-editor-accent) 55%, transparent);
 }
 
 .slipr-block-header {
@@ -1185,7 +1239,7 @@ body.is-screen #slipr-editor-banners {
   top: 100%;
   left: 0;
   min-width: 13rem;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 0.4);
+  box-shadow: 0 4px 12px var(--slipr-editor-shadow);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -1275,13 +1329,13 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-btn-danger {
-  background: var(--slipr-editor-danger);
-  border-color: var(--slipr-editor-danger);
-  color: #FFFFFF;
+  background: var(--slipr-editor-danger-strong);
+  border-color: var(--slipr-editor-danger-strong);
+  color: var(--slipr-editor-on-color);
 }
 
 .slipr-btn-danger:hover:not(:disabled) {
-  background: var(--slipr-editor-danger-hover);
+  background: var(--slipr-editor-danger-strong-hover);
 }
 
 .slipr-dialog-list {
@@ -1312,7 +1366,7 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-layout-button:hover,
 .slipr-layout-button:focus-visible {
-  border-color: var(--slipr-editor-accent);
+  border-color: var(--slipr-editor-indicator);
 }
 
 .slipr-layout-button-action {
@@ -1350,7 +1404,7 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-layout-card:hover {
-  border-color: #444C56;
+  border-color: var(--slipr-editor-border-strong);
 }
 
 .slipr-layout-card:focus-visible {
@@ -1359,7 +1413,7 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-layout-card.is-current {
-  border-color: var(--slipr-editor-accent);
+  border-color: var(--slipr-editor-indicator);
 }
 
 /* The rendered slide sizes itself (container queries); the thumb only sets the width. */
@@ -1401,7 +1455,7 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-layout-note.is-restored {
-  color: #3FB950;
+  color: var(--slipr-editor-success-text);
 }
 
 /* ---------- Slide list: drag and drop, hidden slides (E-003) ---------- */
@@ -1426,7 +1480,7 @@ body.is-screen #slipr-editor-banners {
 .slipr-slide-item.is-audience-hidden .slipr-slide-item-title {
   color: var(--slipr-editor-muted);
   text-decoration: line-through;
-  text-decoration-color: rgba(139, 148, 158, 0.6);
+  text-decoration-color: color-mix(in srgb, var(--slipr-editor-muted) 60%, transparent);
 }
 
 .slipr-hide-toggle.is-on {
@@ -1480,7 +1534,7 @@ body.is-screen #slipr-editor-banners {
   padding: 6px 10px;
   font-size: 12px;
   border-left: 3px solid var(--slipr-editor-warning);
-  background: rgba(210, 153, 34, 0.1);
+  background: color-mix(in srgb, var(--slipr-editor-warning) 12%, transparent);
   color: var(--slipr-editor-text);
   border-radius: 0 4px 4px 0;
 }
@@ -1614,12 +1668,12 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-grid-card:hover {
-  border-color: #444C56;
+  border-color: var(--slipr-editor-border-strong);
 }
 
 .slipr-grid-card.is-selected {
-  border-color: var(--slipr-editor-accent);
-  background: rgba(47, 129, 247, 0.12);
+  border-color: var(--slipr-editor-indicator);
+  background: var(--slipr-editor-selected);
 }
 
 .slipr-grid-card:focus-visible {
@@ -1683,18 +1737,18 @@ body.is-screen #slipr-editor-banners {
   font-size: 10px;
   padding: 1px 5px;
   border-radius: 3px;
-  background: rgba(139, 148, 158, 0.18);
+  background: color-mix(in srgb, var(--slipr-editor-muted) 18%, transparent);
   color: var(--slipr-editor-muted);
 }
 
 .slipr-grid-badge.is-error {
   color: var(--slipr-editor-danger);
-  background: rgba(248, 81, 73, 0.12);
+  background: color-mix(in srgb, var(--slipr-editor-danger) 14%, transparent);
 }
 
 .slipr-grid-badge.is-warning {
   color: var(--slipr-editor-warning);
-  background: rgba(210, 153, 34, 0.12);
+  background: color-mix(in srgb, var(--slipr-editor-warning) 14%, transparent);
 }
 
 .slipr-grid-empty {
@@ -1729,4 +1783,20 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-grid-selection .slipr-select {
   width: auto;
+}
+
+/* ---------- Theme switch (I-082) ---------- */
+
+.slipr-theme-select {
+  width: auto;
+}
+
+/* The slide list header wraps instead of squeezing its buttons in a narrow sidebar. */
+.slipr-panel-header {
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slipr-panel-actions .slipr-btn {
+  white-space: nowrap;
 }

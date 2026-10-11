@@ -14,6 +14,7 @@ import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.
 import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
 import { exportShow } from './export.js';
 import { mountShowGrid } from './ui/show-grid.js';
+import { watchTheme } from './theme.js';
 import { mountToolbar } from './ui/toolbar.js';
 import { mountSlideList } from './ui/slide-list.js';
 import { mountSlideForm } from './ui/slide-form.js';
@@ -29,6 +30,7 @@ import { registerShortcuts } from './shortcuts.js';
  * `?show=<url>` a show by URL, and no parameter shows the start screen.
  */
 export async function bootstrap() {
+  watchTheme();   // I-082: follow the system (choice System) and other tabs
   const params = new URLSearchParams(window.location.search);
   const folderKey = params.get('folder');
   const showUrl = params.get('show');
