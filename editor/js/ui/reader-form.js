@@ -5,6 +5,7 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+import { pictureStyleControls } from './picture-style.js';
 import { addImageToBlock } from '../image-input.js';
 import { imageValue } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
@@ -347,6 +348,17 @@ function imageBlockEditor(store, slideId, block) {
         const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
           ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.image;
         update({ image: imageValue(current, { alt: /** @type {HTMLInputElement} */ (e.target).value }) }, 'alt');
+      },
+    }),
+    pictureStyleControls({
+      label: 'Reader image',
+      image: block.image,
+      styles: store.state.template?.pictureStyles ?? [],
+      resolveAsset: store.state.resolveAsset,
+      onChange: (patch) => {
+        const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+          ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.image;
+        if (current?.src) store.dispatch('updateBlock', { slideId, blockId: block.id, patch: { image: imageValue(current, patch) } });
       },
     }),
     h('input', {

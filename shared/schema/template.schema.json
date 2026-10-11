@@ -2,13 +2,13 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://slipr.local/schema/template.schema.json",
   "title": "Slipr template",
-  "description": "A Slipr template manifest (template.json), format version 0.1. Spec: docs/template-format.md",
+  "description": "A Slipr template manifest (template.json), format version 0.3 (0.1 and 0.2 are still valid). Spec: docs/template-format.md",
   "type": "object",
   "required": ["slipr", "id", "name", "version", "theme", "layouts"],
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string" },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Template format version. 0.2 adds placeholder roles to pptxMapping and pptxIgnore." },
+    "slipr": { "enum": ["0.1", "0.2", "0.3"], "description": "Template format version. 0.2 adds placeholder roles to pptxMapping and pptxIgnore; 0.3 adds pictureStyles." },
     "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
     "name": { "type": "string", "minLength": 1 },
     "version": {
@@ -46,9 +46,25 @@
       "type": "array",
       "description": "(0.2) PowerPoint placeholder idx values that are never content in this template (footer, slide number, theme bar, overlays, logo).",
       "items": { "type": "integer", "minimum": 0 }
+    },
+    "pictureStyles": {
+      "type": "array",
+      "description": "(0.3) Named picture styles a picture may use (D-014). Each is the CSS class slipr-picture-<id> in theme.css.",
+      "items": { "$ref": "#/$defs/pictureStyle" }
     }
   },
   "$defs": {
+    "pictureStyle": {
+      "type": "object",
+      "required": ["id", "label"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "The class slipr-picture-<id> in theme.css." },
+        "label": { "type": "string", "minLength": 1, "description": "Shown by the editor." },
+        "description": { "type": "string" },
+        "pptxEffect": { "enum": ["shadow", "softEdges", "roundedCorners", "border"], "description": "The PowerPoint picture effect this style stands for (converter)." }
+      }
+    },
     "id": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]*$" },
     "pptxLayoutMapping": {
       "type": "object",

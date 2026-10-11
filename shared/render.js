@@ -20,6 +20,7 @@
  * nothing else from the show reaches innerHTML.
  */
 import { markdown, markdownInline, markdownListItems, escape } from './markdown.js';
+import { applyPictureStyle } from './picture.js';
 
 /**
  * @typedef {object} RenderOptions
@@ -96,24 +97,35 @@ function renderOverlays(overlays, ctx, doc, mode) {
   overlays.forEach((overlay, i) => {
     const src = overlay?.image?.src;
     if (typeof src !== 'string' || !src) return;
-    const img = doc.createElement('img');
-    img.className = 'slipr-overlay';
-    img.dataset.overlay = String(i);
-    img.src = ctx.resolveAsset(src);
-    img.alt = overlay.image.alt ?? '';
-    img.decoding = 'async';
-    if (mode === 'reader') img.loading = 'lazy';
-    Object.assign(img.style, {
+    // The box (position, fragment) and the picture (style, opacity) are separate
+    // elements: a picture's inline opacity would otherwise beat Reveal's
+    // fragment opacity, and the image would show before its click.
+    const box = doc.createElement('div');
+    box.className = 'slipr-overlay';
+    box.dataset.overlay = String(i);
+    Object.assign(box.style, {
       position: 'absolute',
       left: percent(overlay.x),
       top: percent(overlay.y),
       width: percent(overlay.w),
       height: percent(overlay.h),
+    });
+    const img = doc.createElement('img');
+    img.src = ctx.resolveAsset(src);
+    img.alt = overlay.image.alt ?? '';
+    img.decoding = 'async';
+    if (mode === 'reader') img.loading = 'lazy';
+    Object.assign(img.style, {
+      display: 'block',
+      width: '100%',
+      height: '100%',
       objectFit: overlay.image.fit === 'cover' ? 'cover' : 'contain',
       margin: '0',
     });
     if (typeof overlay.image.focus === 'string') img.style.objectPosition = overlay.image.focus;
-    layer.append(img);
+    applyPictureStyle(img, overlay.image);
+    box.append(img);
+    layer.append(box);
   });
   return layer;
 }
@@ -177,6 +189,7 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
         img.style.objectFit = value.fit;
       }
       if (value.focus) img.style.objectPosition = value.focus;
+      applyPictureStyle(img, value);   // picture style class and opacity (D-014)
       break;
     }
 

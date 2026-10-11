@@ -17,6 +17,7 @@ from pathlib import Path
 import pytest
 from lxml import etree
 from pptx import Presentation
+from pptx.dml.color import RGBColor
 from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.util import Inches
 
@@ -48,6 +49,36 @@ def set_alt(shape, text: str) -> None:
     for el in shape._element.iter(f"{{{P}}}cNvPr"):
         el.set("descr", text)
         return
+
+
+A = "http://schemas.openxmlformats.org/drawingml/2006/main"
+
+
+def add_picture_effect(pic, effect: str) -> None:
+    """Give a picture a PowerPoint effect, as PowerPoint writes it (I-084):
+    'shadow', 'softEdges', 'roundedCorners' or 'border'."""
+    sp_pr = pic._element.spPr
+    if effect in ("shadow", "softEdges"):
+        lst = sp_pr.find(f"{{{A}}}effectLst")
+        if lst is None:
+            lst = etree.SubElement(sp_pr, f"{{{A}}}effectLst")
+        if effect == "shadow":
+            shadow = etree.SubElement(lst, f"{{{A}}}outerShdw", blurRad="76200", dist="38100", dir="5400000")
+            color = etree.SubElement(shadow, f"{{{A}}}srgbClr", val="000000")
+            etree.SubElement(color, f"{{{A}}}alpha", val="40000")
+        else:
+            etree.SubElement(lst, f"{{{A}}}softEdge", rad="63500")
+    elif effect == "roundedCorners":
+        sp_pr.find(f"{{{A}}}prstGeom").set("prst", "roundRect")
+    elif effect == "border":
+        pic.line.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+        pic.line.width = Inches(0.05)
+
+
+def set_transparency(pic, percent: int) -> None:
+    """PowerPoint's picture transparency: <a:alphaModFix amt> on the image."""
+    blip = pic._element.find(f".//{{{A}}}blip")
+    etree.SubElement(blip, f"{{{A}}}alphaModFix", amt=str((100 - percent) * 1000))
 
 
 def add_build_animation(slide) -> None:
@@ -118,6 +149,8 @@ def build_sample_deck() -> bytes:
     s5.shapes.title.text = "Our office"
     pic = placeholder(s5, PP_PLACEHOLDER.PICTURE).insert_picture(io.BytesIO(png((200, 30, 30))))
     set_alt(pic, "The office building at sunrise")
+    add_picture_effect(pic, "shadow")      # → picture style "shadow" (I-084)
+    set_transparency(pic, 30)              # → opacity 0.7
     placeholder(s5, PP_PLACEHOLDER.BODY).text = "Amsterdam, 2026"
 
     # 6. Blank slide with a text box and a picture without alt text

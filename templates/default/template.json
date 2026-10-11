@@ -1,9 +1,9 @@
 {
   "$schema": "../../shared/schema/template.schema.json",
-  "slipr": "0.1",
+  "slipr": "0.3",
   "id": "default",
   "name": "Slipr Default",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Clean, neutral template used for samples and tests. Uses system fonts, so it needs no font files.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -22,6 +22,12 @@
       "code": "ui-monospace (Cascadia Code, Consolas, Menlo)"
     }
   },
+  "pictureStyles": [
+    { "id": "shadow", "label": "Shadow", "description": "A soft drop shadow", "pptxEffect": "shadow" },
+    { "id": "soft", "label": "Soft edges", "description": "The edges fade into the background", "pptxEffect": "softEdges" },
+    { "id": "rounded", "label": "Rounded corners", "pptxEffect": "roundedCorners" },
+    { "id": "frame", "label": "Frame", "description": "A white border with a small shadow, like a print", "pptxEffect": "border" }
+  ],
   "layouts": [
     {
       "id": "title",

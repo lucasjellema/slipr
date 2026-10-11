@@ -46,7 +46,7 @@ describe('valid inputs', () => {
 describe('template format 0.2', () => {
   test('placeholder roles in pptxMapping are accepted and checked', () => {
     const t = clone(template);
-    t.slipr = '0.2';
+    t.slipr = '0.3'; // 0.3 includes 0.2's placeholder roles
     t.pptxIgnore = [15, 16, 85];
     t.pptxMapping['Text'] = { layout: 'bullets', placeholders: { 0: 'title', 13: 'body', 35: null } };
     assert.deepEqual(validateTemplate(t), { ok: true, errors: [], warnings: [] });
@@ -69,7 +69,7 @@ describe('cards slots', () => {
   /** The default template plus one cards layout. */
   function cardsTemplate() {
     const t = clone(template);
-    t.slipr = '0.2';
+    t.slipr = '0.3'; // 0.3 includes 0.2's placeholder roles
     t.layouts.push({
       id: 'cards', name: 'Cards', file: 'layouts/bullets.html',
       slots: [
@@ -236,7 +236,11 @@ describe('extra images (overlays, format 0.2, I-083)', () => {
   });
 
   test('both 0.1 and 0.2 shows without overlays are valid', () => {
-    const noOverlays = (s) => { for (const slide of s.slides) delete slide.overlays; };
+    // Without the 0.2 features: overlays, picture styles and opacity.
+    const noOverlays = (s) => {
+      for (const slide of s.slides) delete slide.overlays;
+      for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
+    };
     for (const version of ['0.1', '0.2']) assert.equal(validateVariant((s) => { noOverlays(s); s.slipr = version; }).ok, true, version);
     assert.ok(codes(validateVariant((s) => { s.slipr = '0.3'; }).errors).includes('enum'));
   });
@@ -266,6 +270,60 @@ describe('extra images (overlays, format 0.2, I-083)', () => {
     assert.ok(collectImagePaths(show).includes('images/extra.png'));
     const { warnings } = validateShow(show, { template, imageExists: (src) => src !== 'images/extra.png' });
     assert.ok(warnings.some((w) => w.code === 'missing-file' && w.path === 'slides[1].overlays[0].image'));
+  });
+});
+
+describe('picture styles and opacity (D-014, I-084)', () => {
+  const imageSlide = (s) => s.slides.find((x) => x.id === 's-architecture');
+
+  test('the default template offers four picture styles, in format 0.3', () => {
+    assert.equal(template.slipr, '0.3');
+    assert.deepEqual(template.pictureStyles.map((p) => p.id), ['shadow', 'soft', 'rounded', 'frame']);
+    const css = readFileSync(resolve(repoRoot, 'templates/default/theme.css'), 'utf8');
+    for (const { id } of template.pictureStyles) assert.match(css, new RegExp(`\\.slipr-picture-${id}\\s*\\{`), `theme.css defines .slipr-picture-${id}`);
+  });
+
+  test('picture styles need template format 0.3, with unique ids', () => {
+    const t = clone(template);
+    t.slipr = '0.2';
+    assert.ok(codes(validateTemplate(t).errors).includes('format-version'));
+    const u = clone(template);
+    u.pictureStyles.push({ id: 'shadow', label: 'Again' });
+    assert.ok(codes(validateTemplate(u).errors).includes('duplicate-id'));
+    const v = clone(template);
+    v.pictureStyles[0].pptxEffect = 'glow';
+    assert.equal(validateTemplate(v).ok, false);
+  });
+
+  test('a style and an opacity on slot, block and overlay images are valid in 0.2', () => {
+    const result = validateVariant((s) => {
+      const slide = imageSlide(s);
+      slide.content.image = { ...slide.content.image, style: 'shadow', opacity: 0.6 };
+      slide.reader.blocks.find((b) => b.type === 'image').image.style = 'frame';
+    });
+    assert.deepEqual(result.errors, []);
+    assert.deepEqual(result.warnings, []);
+  });
+
+  test('in a 0.1 show they are an error', () => {
+    const result = validateVariant((s) => {
+      s.slipr = '0.1';
+      for (const slide of s.slides) delete slide.overlays;
+      imageSlide(s).content.image.opacity = 0.5;
+    });
+    assert.ok(codes(result.errors).includes('format-version'));
+  });
+
+  test('an unknown style is a warning; opacity must be 0-1', () => {
+    assert.ok(codes(validateVariant((s) => { imageSlide(s).content.image.style = 'sparkle'; }).warnings).includes('unknown-picture-style'));
+    assert.ok(codes(validateVariant((s) => { imageSlide(s).content.image.opacity = 1.5; }).errors).includes('maximum'));
+    assert.equal(validateVariant((s) => { imageSlide(s).content.image.style = 'Not An Id'; }).ok, false);
+  });
+
+  test('without a template, styles are not checked', () => {
+    const show = clone(demo);
+    imageSlide(show).content.image.style = 'sparkle';
+    assert.deepEqual(validateShow(show).warnings, []);
   });
 });
 

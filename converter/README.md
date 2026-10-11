@@ -59,6 +59,7 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Pictures (placeholders and free pictures) | copied to `images/` (identical pictures only once), `image` slot. Alt text comes from the picture's description; an automatic file-name description counts as missing | ✅ |
 | Speaker notes | `notes` (and optionally a reader block) | ✅ |
 | Bullet build animations | `audience.fragments: true` | ✅ |
+| Picture shadow, soft edges, rounded corners, outline; transparency | the template's matching **picture style** (`pptxEffect`); `opacity` | ✅ |
 | Presentation title / author / date, slide size | `meta`, `settings.aspectRatio` (16:9 or 4:3) | ✅ |
 | Pictures that don't fit the chosen layout | **extra images** on the slide (`overlays`, show format 0.2) at their PowerPoint position and size | ✅ |
 | Text that doesn't fit the chosen layout | **reader layer** text blocks, so it is never lost | ✅ |

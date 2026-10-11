@@ -36,6 +36,7 @@
         <li><a href="#slide-tab">Slide tab</a></li>
         <li><a href="#images">Images</a></li>
         <li><a href="#extra-images">Extra images</a></li>
+        <li><a href="#picture-styles">Picture styles</a></li>
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
@@ -320,6 +321,38 @@
           <li>Extra images are included in <a href="#export">Export as one file</a>, and show in the <a href="#grid">show grid</a>'s thumbnails.</li>
           <li>A show with extra images is saved in show format 0.2. That happens by itself; older versions of Slipr cannot open it.</li>
           <li>Converting a PowerPoint deck: pictures that fit none of the layout's image places become extra images at the same place as in PowerPoint.</li>
+        </ul>
+      </section>
+
+      <section id="picture-styles">
+        <h2>Picture styles</h2>
+        <p>Any picture (in an image field, a card, a reader image block or an extra image) can get a <strong>picture style</strong> and an <strong>opacity</strong>. The styles come from the template, so they match its look; you only choose one.</p>
+        <table>
+          <thead><tr><th>Style</th><th>What it does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>None</strong></td><td>The picture as it is.</td></tr>
+            <tr><td><strong>Shadow</strong></td><td>A soft drop shadow under the picture.</td></tr>
+            <tr><td><strong>Soft edges</strong></td><td>The edges fade into the background.</td></tr>
+            <tr><td><strong>Rounded corners</strong></td><td>Rounded corners.</td></tr>
+            <tr><td><strong>Frame</strong></td><td>A white border with a small shadow, like a print. (Conclusion: with a thin magenta line.)</td></tr>
+          </tbody>
+        </table>
+        <p>These are the styles of the shipped templates; another template can offer other ones.</p>
+
+        <h3>Choose a style</h3>
+        <p>Once a field has a picture, a row of small previews appears under it: <strong>None</strong> and one per style, each showing <em>this</em> picture in that style. Click one. The selected style has a blue outline, and the preview on the right changes at once.</p>
+
+        <h3>Opacity</h3>
+        <p>Drag the <strong>Opacity</strong> slider (or use the arrow keys on it) to make the picture partly transparent, in steps of 5 %. The value is stored when you let go; 100 % means fully visible. Use it for a picture behind text, or to tone down a decoration.</p>
+
+        <h3>Good to know</h3>
+        <ul>
+          <li>Both are one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>.</li>
+          <li>With <em>Show the whole image</em> the shadow follows the picture; rounded corners and a frame follow the picture's box.</li>
+          <li>A frame adds a border inside the picture's box, so hotspots on a framed reader image can be a few pixels off. Check them in the preview.</li>
+          <li>If a show names a style its template doesn't have (for example after switching templates), the picture is shown without it and the field says so, with a <strong>Remove it</strong> button.</li>
+          <li>A show that uses a style or an opacity is saved in show format 0.2. That happens by itself.</li>
+          <li>Converting a PowerPoint deck: a picture's shadow, soft edges, rounded corners or outline becomes the matching style, and its transparency the opacity.</li>
         </ul>
       </section>
 

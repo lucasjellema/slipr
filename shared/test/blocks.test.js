@@ -61,11 +61,20 @@ describe('block types', () => {
 
   test('image: resolved src, lazy loading, positioned hotspots with hidden content', () => {
     const html = renderBlock(block('s-architecture', 'diagram'), 's-architecture', ctx);
-    assert.match(html, /<img src="http:\/\/host\/shows\/demo\/images\/architecture\.svg" alt="Slipr architecture diagram with clickable components" loading="lazy"/);
+    assert.match(html, /<img src="http:\/\/host\/shows\/demo\/images\/architecture\.svg" alt="Slipr architecture diagram with clickable components" class="slipr-picture-frame" loading="lazy"/);
     assert.equal((html.match(/class="slipr-hotspot"/g) ?? []).length, 6);
     assert.match(html, /style="left:28\.75%;top:36\.7%" data-hotspot="0" aria-label="Converter">1<\/button>/);
     assert.match(html, /<span class="slipr-hotspot-content" data-hotspot="0" hidden><span class="slipr-popover-title">Converter<\/span>/);
     assert.match(html, /<figcaption>Click the markers/);
+  });
+
+  test('image: picture style class and opacity (D-014)', () => {
+    const b = structuredClone(block('s-architecture', 'diagram'));
+    b.image = { ...b.image, style: 'frame', opacity: 0.4 };
+    assert.match(renderBlock(b, 's-architecture', ctx), /alt="[^"]*" class="slipr-picture-frame" style="opacity:0\.4" loading="lazy"/);
+    b.image = { ...b.image, style: '"><script>', opacity: 1 };
+    const html = renderBlock(b, 's-architecture', ctx);
+    assert.doesNotMatch(html, /<script>|slipr-picture-|opacity/, 'a malformed style and full opacity add nothing');
   });
 
   test('embed: sandboxed lazy iframe, relative URL resolved', () => {

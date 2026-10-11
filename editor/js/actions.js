@@ -248,6 +248,7 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
  */
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
+  show = withPictureFormat(show, value);
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
     const content = { ...(s.content ?? {}) };
@@ -259,6 +260,30 @@ export function setSlot(show, { slideId, slot, value }) {
     return { ...s, content };
   });
   return { ...show, slides };
+}
+
+/**
+ * Does a value hold a picture with a style or opacity (D-014, I-084)? It
+ * looks into arrays and objects, so a cards value counts too.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
+export function usesPictureStyle(value) {
+  if (Array.isArray(value)) return value.some(usesPictureStyle);
+  if (value === null || typeof value !== 'object') return false;
+  const v = /** @type {Record<string, unknown>} */ (value);
+  if (typeof v.src === 'string' && (v.style !== undefined || v.opacity !== undefined)) return true;
+  return Object.values(v).some((x) => x !== null && typeof x === 'object' && usesPictureStyle(x));
+}
+
+/**
+ * A picture style or opacity needs show format 0.2: raise a 0.1 show when a
+ * value brings one in. A show stays 0.2 once it is.
+ * @param {any} show @param {unknown} value
+ * @returns {any}
+ */
+function withPictureFormat(show, value) {
+  return (show.slipr === '0.1' || !show.slipr) && usesPictureStyle(value) ? { ...show, slipr: '0.2' } : show;
 }
 
 /**
@@ -458,6 +483,7 @@ export function addBlock(show, { slideId, block, afterBlockId = null }) {
  */
 export function updateBlock(show, { slideId, blockId, patch }) {
   if (!Array.isArray(show.slides)) return show;
+  show = withPictureFormat(show, patch?.image);
   const slides = show.slides.map((s) => {
     if (s.id !== slideId || !Array.isArray(s.reader?.blocks)) return s;
     const blocks = s.reader.blocks.map((b) => {

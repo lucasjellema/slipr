@@ -9,6 +9,8 @@ import { h } from '../dom.js';
 import { addImageToOverlay, addOverlayImage } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
 import { selectOverlay, showOverlaySelected } from './overlay-editor.js';
+import { pictureStyleControls } from './picture-style.js';
+import { imageValue } from '../slot-values.js';
 
 const EFFECTS = ['fade-in', 'fade-up', 'fade-down', 'fade-left', 'fade-right', 'fade-in-then-semi-out', 'semi-fade-out', 'grow', 'shrink'];
 
@@ -76,6 +78,13 @@ export function buildOverlaySection(slide, store) {
           const alt = /** @type {HTMLInputElement} */ (e.target).value;
           store.dispatch('updateOverlay', { slideId, index: i, patch: { image: { ...o.image, alt } } }, { coalesceKey: `overlay-alt-${slideId}-${i}` });
         },
+      }),
+      pictureStyleControls({
+        label: `Extra image ${i + 1}`,
+        image: o.image,
+        styles: store.state.template?.pictureStyles ?? [],
+        resolveAsset,
+        onChange: (patch) => store.dispatch('updateOverlay', { slideId, index: i, patch: { image: imageValue(o.image, patch) } }),
       }),
       h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
       h('select', {

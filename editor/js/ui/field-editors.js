@@ -6,6 +6,7 @@
  * slide-form.js; card fields reuse the same kinds of inputs.
  */
 import { h } from '../dom.js';
+import { pictureStyleControls } from './picture-style.js';
 import { addCard, cardsArray, cardsValue, codeValue, lengthHint, moveCard, quoteValue, removeCard, withCardField } from '../card-values.js';
 import { imageValue, listValue, textareaText } from '../slot-values.js';
 import { addImageToCard } from '../image-input.js';
@@ -170,6 +171,16 @@ export function cardsEditor({ store, slideId, slotName, slotDef, label }) {
               const currentImage = read()[index]?.[field.name];
               if (!currentImage?.src) return;
               setField(imageValue(currentImage, { alt: /** @type {HTMLInputElement} */ (e.target).value }));
+            },
+          }),
+          pictureStyleControls({
+            label: `Card ${index + 1}: ${fieldLabel}`,
+            image,
+            styles: store.state.template?.pictureStyles ?? [],
+            resolveAsset: store.state.resolveAsset,
+            onChange: (patch) => {
+              const currentImage = read()[index]?.[field.name];
+              if (currentImage?.src) setField(imageValue(currentImage, patch));
             },
           }),
           field.help ? h('span', { class: 'slipr-help' }, [field.help]) : null,

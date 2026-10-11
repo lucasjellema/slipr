@@ -67,7 +67,7 @@ export function validateShow(show, options = {}) {
       warnings.push({ path: `${at}.chapter`, code: 'unknown-chapter', message: `unknown chapter "${slide.chapter}"` });
     }
     if (layouts) checkSlots(slide, at, layouts, errors, warnings);
-    checkImages(slide, at, options.imageExists, warnings);
+    checkImages(slide, at, options.imageExists, errors, warnings, options.template, show.slipr);
     checkOverlays(slide, at, show.slipr, errors, warnings);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
@@ -143,6 +143,13 @@ export function validateTemplate(template) {
   if (!isObject(template)) return result(errors, warnings);
 
   const layoutIds = collectIds(template.layouts, 'layouts', errors);
+  // Picture styles (D-014, I-084): template format 0.3, unique ids.
+  if (template.pictureStyles !== undefined) {
+    if (template.slipr === '0.1' || template.slipr === '0.2') {
+      errors.push({ path: 'pictureStyles', code: 'format-version', message: 'picture styles need template format 0.3: set "slipr" to "0.3"' });
+    }
+    collectIds(template.pictureStyles, 'pictureStyles', errors);
+  }
   arrayOf(template.layouts).forEach((layout, i) => {
     if (!isObject(layout)) return;
     const names = new Set();
@@ -315,11 +322,23 @@ function checkCards(cards, slot, path, errors, warnings) {
 }
 
 /**
+ * The ids of a template's picture styles, or null without a template (then
+ * styles are not checked).
+ * @param {any} template
+ * @returns {Set<string> | null}
+ */
+export function pictureStyleIds(template) {
+  if (!isObject(template)) return null;
+  return new Set(arrayOf(template.pictureStyles).filter(isObject).map((s) => s.id));
+}
+
+/**
  * @param {any} slide @param {string} at
  * @param {((src: string) => boolean) | undefined} imageExists
- * @param {Issue[]} warnings
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {any} template @param {unknown} version
  */
-function checkImages(slide, at, imageExists, warnings) {
+function checkImages(slide, at, imageExists, errors, warnings, template, version) {
   /** @type {[any, string][]} */
   const images = [];
   for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
@@ -338,7 +357,15 @@ function checkImages(slide, at, imageExists, warnings) {
   arrayOf(slide.overlays).forEach((overlay, j) => {
     if (isImage(overlay?.image)) images.push([overlay.image, `${at}.overlays[${j}].image`]);
   });
+  const styles = pictureStyleIds(template);
   for (const [image, path] of images) {
+    // Picture style and opacity (D-014, I-084): show format 0.2; unknown styles render unstyled.
+    if ((image.style !== undefined || image.opacity !== undefined) && version === '0.1') {
+      errors.push({ path, code: 'format-version', message: 'a picture style or opacity needs show format 0.2: set "slipr" to "0.2"' });
+    }
+    if (styles && typeof image.style === 'string' && !styles.has(image.style)) {
+      warnings.push({ path, code: 'unknown-picture-style', message: `the template has no picture style "${image.style}"; the picture is shown without it` });
+    }
     if (!image.alt || !String(image.alt).trim()) {
       warnings.push({ path, code: 'missing-alt', message: `image "${image.src}" has no alt text` });
     }

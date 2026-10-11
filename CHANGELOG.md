@@ -6,6 +6,12 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-11: Picture styles and opacity (I-084, D-014)
+- **Added** template format **0.3**: `pictureStyles` (id, label, description, `pptxEffect`), each a class `slipr-picture-<id>` in `theme.css`. Both templates are 0.3 and offer `shadow`, `soft`, `rounded` and `frame` (default 1.0.0 → 1.1.0, Conclusion 0.1.0 → 0.1.1 so `^0.1` shows stay in range; the Conclusion styles are on-brand and subject to I-043d).
+- **Added** to show format 0.2: `style` and `opacity` (0–1) on every image value (image slots, card images, reader image blocks, extra images). Validation: either in a 0.1 show is an error; a style the template lacks is a warning and renders unstyled.
+- **Added** `shared/picture.js`, used by `render.js` and `blocks.js`. **Changed** an extra image is now a positioned box with the image inside, so its opacity does not defeat Reveal's fragment (it showed before its click).
+- **Changed** the demo show: the JSON badge has a shadow at 90 %, the reader's architecture image a frame. Spec: `docs/specs/I-084-picture-styles.md`; template and show format docs; D-014 refined.
+
 ### 2026-10-11: Show format 0.2: extra images on a slide (I-083, D-013)
 - **Added** `slide.overlays` (show format **0.2**): extra images placed freely on a slide, `{ image, x, y, w, h, fragment? }` with position and size as fractions of the canvas, in front of the layout. 0.1 stays valid (enum in the schema); a 0.1 show with overlays is an error; an overlay outside the canvas is a warning, and overlay images get the usual alt-text and file checks. Spec: `docs/specs/I-083-extra-images.md`; `docs/show-format.md` and `docs/template-format.md` updated; D-013 refined.
 - **Added** to `shared/render.js`: the `.slipr-overlays` layer (inline positioning, so every template supports it), and the mode class `slipr-mode-reader-fixed` for reader-mode slides with extra images, so they stay a picture on narrow screens. `collectImagePaths()` includes overlay images (file checks, single-file export).

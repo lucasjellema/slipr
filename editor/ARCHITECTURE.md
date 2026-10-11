@@ -29,7 +29,7 @@ editor/
 │   ├── editor.css        ✅
 │   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
     ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083)
@@ -67,6 +67,7 @@ editor/
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
         ├── overlay-editor.js ✅ extra images on the audience preview: select, drag, corner resize, keyboard (I-083)
         ├── overlay-list.js  ✅ the Slide tab's "Extra images" section (I-083)
+        ├── picture-style.js ✅ picture style picker (live previews with the template's classes) and opacity slider, for every image field (I-084)
         ├── block-editors.js    (idea) the block editors moved out of reader-form.js, which has grown large
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
         ├── layout-picker.js ✅ grid of template layouts, each rendering the current slide (or sample text for a new slide), with the effect of switching (E-004)
@@ -107,6 +108,9 @@ In **audience** mode it renders the selected slide with `shared/render.js` into 
 
 ### Extra images (`overlay-list.js`, `overlay-editor.js`, I-083)
 `slide.overlays` (D-013) are edited in two places: the Slide tab lists them (picture, alt text, appearing one by one, stacking order, remove, add), and the audience preview moves and resizes them. Both dispatch `addOverlay` / `updateOverlay` / `deleteOverlay` / `moveOverlay`; `overlayBox()` keeps every box inside the canvas, and the first extra image sets the show to format 0.2. The preview re-renders after every change, so `overlay-editor.js` keeps the selection in module state and is mounted again on each render; it gives keyboard focus back to the selected box after the slide is attached (a microtask). A drag moves the box locally and dispatches once on release; key presses dispatch at once with a `coalesceKey`, so a burst is one undo step, and read the overlay from the store (several presses can come before a re-render). `showOverlaySelected()` lets the Slide tab select an image and redraw the preview; calling it during a drag would replace the box under the pointer.
+
+### Picture styles (`picture-style.js`, I-084)
+`pictureStyleControls()` is added by each image field's owner (slot form, cards editor, reader image block, extra image row), which passes the template's `pictureStyles` and an `onChange(patch)` that writes `{ style, opacity }` through the usual action (`setSlot`, `updateBlock`, `updateOverlay`), using `imageValue()` so `undefined` removes a key. The previews rely on the template's `theme.css` being loaded in the editor page with unscoped `.slipr-picture-<id>` classes. The opacity slider dispatches on `change`, not `input`: forms re-render after every dispatch, and a re-render in the middle of a drag would replace the slider. `setSlot` / `updateBlock` raise a 0.1 show to 0.2 when a value brings in a style or opacity (`usesPictureStyle()`).
 
 ### Persistence (`io/`, `files.js`)
 - **Open**: `showDirectoryPicker()` → check for `show.json` → remember the handle in IndexedDB (`shared/folder-handles.js`) → reload as `?folder=<key>`. On load, `loadShowFromFolder()` reads the show and its images through the handle and resolves the template by name (D-012). Reloading keeps working; if the browser dropped the permission, an access screen asks for it with one click.

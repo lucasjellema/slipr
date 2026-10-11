@@ -37,6 +37,8 @@ class ImageRef:
     width: int = 0
     height: int = 0
     idx: int | None = None  # placeholder idx when the picture fills a placeholder
+    effects: list[str] = field(default_factory=list)  # PowerPoint picture effects (reader.PICTURE_EFFECTS), I-084
+    opacity: float | None = None  # from the picture's transparency; None when opaque
 
 
 @dataclass

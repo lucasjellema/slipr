@@ -102,7 +102,7 @@ The renderer wraps each fragment in a fixed structure:
 </div>
 ```
 
-**Extra images** (`slide.overlays`, D-013, I-083) are drawn by the renderer in a layer appended to `.slipr-canvas`: `.slipr-overlays` > `img.slipr-overlay[data-overlay="i"]`, positioned **inline** (absolute, in percentages of the canvas, `z-index: 10`, in front of the layout). Templates need no CSS for them and must not position them; they may style `.slipr-overlay` otherwise (for example in print). Keep `.slipr-canvas` `position: relative` (it is the containing block).
+**Extra images** (`slide.overlays`, D-013, I-083) are drawn by the renderer in a layer appended to `.slipr-canvas`: `.slipr-overlays` > `div.slipr-overlay[data-overlay="i"] > img`, positioned **inline** (absolute, in percentages of the canvas, `z-index: 10`, in front of the layout). Templates need no CSS for them and must not position them; they may style `.slipr-overlay` otherwise (for example in print). Keep `.slipr-canvas` `position: relative` (it is the containing block).
 
 Templates size everything inside the slide in **container query units** (`cqw` = 1 % of the slide width). The same CSS then works on the 1920×1080 Reveal.js canvas, in reader mode's slide frame, and in editor thumbnails. Reader mode can reflow a layout on narrow screens with `@container (max-width: …)` rules on `.slipr-mode-reader` descendants (see `templates/default/theme.css`).
 
@@ -190,6 +190,37 @@ The reader app's own `reader.css` handles only the structure (columns, TOC, marg
 
 Layouts can adapt to reader mode with `.slipr-mode-reader` selectors. In particular they define how the layout reflows on narrow screens instead of being scaled down. Slides with extra images are rendered with `slipr-mode-reader-fixed` and keep their picture layout (see above).
 
+## Picture styles (`pictureStyles`, since 0.3)
+
+Named looks for pictures that a show may choose per picture (D-014): a shadow, soft edges, rounded corners, a frame. The template decides what they look like; a show only names one.
+
+```json
+"pictureStyles": [
+  { "id": "shadow",  "label": "Shadow", "description": "A soft drop shadow", "pptxEffect": "shadow" },
+  { "id": "soft",    "label": "Soft edges", "pptxEffect": "softEdges" },
+  { "id": "rounded", "label": "Rounded corners", "pptxEffect": "roundedCorners" },
+  { "id": "frame",   "label": "Frame", "pptxEffect": "border" }
+]
+```
+
+| Field | Meaning |
+|---|---|
+| `id` | kebab-case, unique. The renderer adds the class **`slipr-picture-<id>`** to the picture's `<img>` |
+| `label`, `description` | Shown in the editor's style picker |
+| `pptxEffect` | Optional: the PowerPoint picture effect this style stands for (`shadow`, `softEdges`, `roundedCorners`, `border`), so the converter can map pictures to it |
+
+Each style is a class in `theme.css`:
+
+```css
+.slipr-picture-shadow { filter: drop-shadow(0 0.35em 0.6em rgb(0 0 0 / 0.28)); }
+```
+
+- Write the classes **unscoped** (not under `.slipr-slide`): the same class styles a slide image, a reader image block and the editor's style preview, which is outside any slide.
+- Use `em` for sizes, so the effect scales with the slide's type. Keep to effects on the picture itself (filter, mask, radius, border, shadow); never change its size or position.
+- `filter: drop-shadow()` follows the visible picture, also with `fit: contain`; `box-shadow`, `border-radius` and borders follow the image box.
+- A border (a frame) sits inside the image box, so hotspots on a framed reader image can be a few pixels off.
+- A show that names a style the template lacks gets a validation warning; the class has no CSS, so the picture is simply unstyled.
+
 ## `pptxMapping`
 
 This maps PowerPoint slide-layout names to Slipr layout IDs and is used by the converter. Unmapped PowerPoint layouts fall back to the converter's heuristics (see `converter/ARCHITECTURE.md`).
@@ -219,3 +250,4 @@ Roles matter for corporate templates, where structural elements are often "body"
 |---|---|
 | 0.1 | Initial format |
 | 0.2 | `pptxMapping` values may be objects with placeholder roles; new `pptxIgnore`. New slot type `cards` with `fields`, and card roles (`cards[i]`, `cards[i].field`). 0.1 templates remain valid unchanged |
+| 0.3 | `pictureStyles` (D-014, I-084). 0.1 and 0.2 templates remain valid unchanged; `pictureStyles` in a 0.1 or 0.2 template is an error. Both shipped templates are 0.3 |

@@ -127,6 +127,7 @@ class MappedSlide:
     reason: str
     moved: list[str] = field(default_factory=list)
     placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083)
+    picture_styles: list[dict] = field(default_factory=list)  # the template's pictureStyles (I-084)
     skipped: list[str] = field(default_factory=list)
     remarks: list[str] = field(default_factory=list)
 
@@ -160,7 +161,8 @@ def map_slide(
     layout_id, reason = choose_layout(sm, template, mapping)
     layout = next(l for l in template["layouts"] if l["id"] == layout_id)
     slot_types = {s["name"]: s["type"] for s in layout.get("slots", [])}
-    result = MappedSlide(slide={"id": slide_id, "layout": layout_id}, layout=layout_id, reason=reason)
+    result = MappedSlide(slide={"id": slide_id, "layout": layout_id}, layout=layout_id, reason=reason,
+                         picture_styles=[s for s in template.get("pictureStyles", []) or [] if isinstance(s, dict)])
     if numbering:
         result.remarks.append(f"{len(numbering)} numbering text box(es) left out (the layout numbers its own items)")
     content: dict = {}
@@ -389,7 +391,19 @@ def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
     if not ref.alt:
         result.remarks.append(f"picture {n} has no alt text (add a description in PowerPoint or in show.json)")
     # No "fit": the template decides how its image slots crop (cover or contain).
-    return {"src": path, "alt": ref.alt}
+    value = {"src": path, "alt": ref.alt}
+    # PowerPoint picture effects → the first template picture style that stands
+    # for one of them (D-014, I-084); transparency → opacity.
+    for effect in ref.effects:
+        style = next((s["id"] for s in result.picture_styles if s.get("pptxEffect") == effect), None)
+        if style:
+            value["style"] = style
+            break
+    if ref.effects and "style" not in value:
+        result.remarks.append(f"picture {n}: the template has no picture style for {', '.join(ref.effects)}")
+    if ref.opacity is not None:
+        value["opacity"] = ref.opacity
+    return value
 
 
 def _overlay_value(ref: ImageRef, image: dict, slide_size: tuple[int, int] | None) -> dict | None:

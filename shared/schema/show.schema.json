@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays; a 0.1 show without them is still valid." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays and picture style / opacity; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -229,7 +229,9 @@
         "src": { "type": "string", "minLength": 1, "description": "Relative to show.json, e.g. images/x.png." },
         "alt": { "type": "string" },
         "fit": { "enum": ["contain", "cover"] },
-        "focus": { "type": "string", "description": "CSS object-position, e.g. center or 30% 50%." }
+        "focus": { "type": "string", "description": "CSS object-position, e.g. center or 30% 50%." },
+        "style": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "(0.2) Id of one of the template's picture styles (D-014)." },
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1, "description": "(0.2) Opacity of the picture, 0-1; absent means 1." }
       }
     },
     "code": {

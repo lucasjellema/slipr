@@ -52,10 +52,13 @@ After the layout is filled, the renderer appends one layer to the canvas:
 
 ```html
 <div class="slipr-overlays" style="position:absolute; inset:0; z-index:10; pointer-events:none">
-  <img class="slipr-overlay" data-overlay="0" src="…" alt="…"
-       style="position:absolute; left:78%; top:6%; width:16%; height:12%; object-fit:contain">
+  <div class="slipr-overlay" data-overlay="0" style="position:absolute; left:78%; top:6%; width:16%; height:12%">
+    <img src="…" alt="…" style="display:block; width:100%; height:100%; object-fit:contain">
+  </div>
 </div>
 ```
+
+The box carries the position and, in audience mode, Reveal's `fragment` class; the `<img>` inside carries the picture style and opacity (I-084). One element for both would break fragments: a picture's inline `opacity` beats Reveal's fragment rule, so it would show before its click.
 
 Positioning is inline (the values come from the show and are clamped to numbers), so every template supports overlays without any CSS of its own. Templates may still style `.slipr-overlay` (for example a print rule), but never position it.
 

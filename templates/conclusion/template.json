@@ -1,9 +1,9 @@
 {
   "$schema": "../../shared/schema/template.schema.json",
-  "slipr": "0.2",
+  "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -27,6 +27,12 @@
       "quote": "Source Serif 4 (italic, optical size 48)"
     }
   },
+  "pictureStyles": [
+    { "id": "shadow", "label": "Shadow", "description": "A soft, neutral drop shadow", "pptxEffect": "shadow" },
+    { "id": "soft", "label": "Soft edges", "description": "The edges fade into the background", "pptxEffect": "softEdges" },
+    { "id": "rounded", "label": "Rounded corners", "pptxEffect": "roundedCorners" },
+    { "id": "frame", "label": "Frame", "description": "A white border with a thin magenta line, like a print", "pptxEffect": "border" }
+  ],
   "layouts": [
     {
       "id": "title-wave",

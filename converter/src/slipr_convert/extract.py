@@ -90,9 +90,11 @@ def _extract_shape(shape, model: SlideModel) -> None:
     image = _image_of(shape)
     if image is not None:
         blob, ext, sha1 = image
+        effects, opacity = reader.picture_effects(shape)
         model.images.append(ImageRef(
             blob=blob, ext=ext, sha1=sha1, alt=reader.alt_text(shape),
             top=top, left=left, width=int(shape.width or 0), height=int(shape.height or 0), idx=idx,
+            effects=effects, opacity=opacity,
         ))
         return
 

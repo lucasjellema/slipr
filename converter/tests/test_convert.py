@@ -20,7 +20,7 @@ def test_meta_settings_and_chapters(converted):
     assert show["meta"]["author"] == "Test Author"
     assert len(show["meta"]["date"]) == 10
     assert show["settings"]["aspectRatio"] == "16:9"
-    assert show["template"] == {"ref": "../../templates/default", "version": "^1.0"}
+    assert show["template"] == {"ref": "../../templates/default", "version": "^1.1"}
     assert show["chapters"] == [{"id": "intro", "title": "Intro"}, {"id": "main-part", "title": "Main part"}]
     assert [s["id"] for s in show["slides"]] == [f"s-0{n}" for n in range(1, 9)]
     assert slide(converted, 1)["chapter"] == "intro"
@@ -64,7 +64,8 @@ def test_two_content(converted):
 def test_picture_with_caption(converted):
     s = slide(converted, 5)
     assert s["layout"] == "image-full"
-    assert s["content"]["image"] == {"src": "images/slide05-1.png", "alt": "The office building at sunrise"}
+    # The picture's shadow becomes the template's "shadow" style, its 30 % transparency opacity 0.7 (I-084).
+    assert s["content"]["image"] == {"src": "images/slide05-1.png", "alt": "The office building at sunrise", "style": "shadow", "opacity": 0.7}
     assert s["content"]["caption"] == "Amsterdam, 2026"
 
 
@@ -121,3 +122,41 @@ def test_notes_options(sample_deck, template):
     assert "notes" not in without.show["slides"][1]
     to_reader = convert(sample_deck, template, template_ref="t", notes_to_reader=True)
     assert to_reader.show["slides"][1]["reader"]["blocks"] == [{"id": "notes", "type": "text", "md": "Mention the new team."}]
+
+
+def test_picture_effects_map_to_template_styles(template):
+    """Soft edges, rounded corners and a border map to the template's styles;
+    with several effects the first in reader.PICTURE_EFFECTS wins (I-084)."""
+    import io
+
+    from pptx import Presentation
+    from pptx.util import Inches
+
+    from slipr_convert import reader
+    from slipr_convert.convert import convert
+    from .conftest import add_picture_effect, png
+
+    prs = Presentation()
+    blank = next(l for l in prs.slide_layouts if l.name == "Blank")
+    pics = []
+    for effects in (["softEdges"], ["roundedCorners"], ["border"], ["border", "shadow"], []):
+        s = prs.slides.add_slide(blank)
+        pic = s.shapes.add_picture(io.BytesIO(png((90, 90, 90))), Inches(1), Inches(1), Inches(4), Inches(3))
+        for e in effects:
+            add_picture_effect(pic, e)
+        pics.append(pic)
+    assert [reader.picture_effects(p)[0] for p in pics] == [["softEdges"], ["roundedCorners"], ["border"], ["shadow", "border"], []]
+
+    out = io.BytesIO()
+    prs.save(out)
+    result = convert(out.getvalue(), template, template_ref="../../templates/default", show_id="fx", source_name="fx.pptx")
+    styles = [s["content"]["image"].get("style") for s in result.show["slides"]]
+    assert styles == ["soft", "rounded", "frame", "shadow", None]
+    assert result.show["slipr"] == "0.2"
+
+    # A template without picture styles: no style, and the report says why.
+    plain = {k: v for k, v in template.items() if k != "pictureStyles"}
+    result = convert(out.getvalue(), plain, template_ref="../../templates/default", show_id="fx", source_name="fx.pptx")
+    assert all("style" not in s["content"]["image"] for s in result.show["slides"])
+    assert result.show["slipr"] == "0.1"
+    assert any("no picture style for softEdges" in n for n in result.report.slides[0].notes)

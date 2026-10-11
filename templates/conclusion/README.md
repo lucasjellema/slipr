@@ -26,6 +26,10 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 
 The last five are **card layouts**: their `cards` slot holds one object per card (see `docs/template-format.md`). The icons on `facts` are content in Slipr (a field per card), so each figure can have a fitting icon: use magenta brand icons on a transparent background. In PowerPoint they are fixed in the layout, so converted Facts slides have no icons until you add them. The demo show uses a neutral placeholder icon. The social-media icons on the PowerPoint Introduction slide are not carried over.
 
+## Picture styles
+
+`template.json` lists four picture styles (template format 0.3, D-014), defined at the end of `theme.css`: **shadow** (a soft neutral drop shadow), **soft** (edges that fade out), **rounded** (rounded corners) and **frame** (a white border with a thin magenta line, like a print). Authors choose one per picture in the editor, plus an opacity. They are a first proposal and part of the brand review (I-043d).
+
 ## Writing body text
 
 The `body` slot supports the template's text styles through Slipr Markdown:

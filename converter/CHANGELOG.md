@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Picture effects → picture styles (I-084)
+- **Added** `reader.picture_effects()`: a picture's outer shadow, soft edges, rounded-rectangle geometry and visible outline, and its transparency (`a:alphaModFix`). `ImageRef` gets `effects` and `opacity`.
+- **Added** the mapping: the first template picture style whose `pptxEffect` matches one of the effects (in the order shadow, soft edges, rounded corners, border) becomes the picture's `style`; the transparency becomes `opacity`. Without a matching style the report says so. A show that uses either is format 0.2.
+- **Added** test helpers `add_picture_effect()` and `set_transparency()`; the sample deck's photo has a shadow and 30 % transparency. 37 tests.
+
 ### 2026-10-11: Pictures without a slot become extra images (I-083)
 - **Changed** a picture that fits no image slot is placed as an extra image (`slide.overlays`, D-013) at its PowerPoint position and size (fractions of the slide, kept inside it), instead of a reader image block. Without a known slide or picture size it still goes to the reader layer. The report lists it as "Placed as an extra image", and counts them; the CLI summary too.
 - **Changed** a converted show is format 0.2 when it has extra images, else still 0.1.

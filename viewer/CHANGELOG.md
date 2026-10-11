@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-11: Picture styles (I-084)
+- **Changed** an extra image's fragment class now goes on its box (`div.slipr-overlay`), not the `<img>`: the picture carries its style and opacity, and an inline opacity would otherwise show the image before its click. Picture styles themselves are rendered by `shared/` and styled by the template.
+
 ### 2026-10-11: Extra images on a slide (I-083)
 - **Added** in audience mode, extra images with `fragment` get Reveal's `fragment` class (and the effect), so they appear one by one after the slide's own fragments. Rendering itself is in `shared/render.js`.
 - **Changed** in reader mode, a slide with extra images keeps its picture layout on narrow screens (mode class `slipr-mode-reader-fixed`): the templates' reflow rules do not apply to it.

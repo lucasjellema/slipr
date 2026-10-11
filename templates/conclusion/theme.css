@@ -418,3 +418,30 @@
   .slipr-mode-reader .cnc-person-photo { width: 50%; }
   .slipr-mode-reader .cnc-person-name { padding-top: 0.6rem; }
 }
+
+/* ---------- Picture styles (template format 0.3, D-014, I-084) ----------
+ * One class per entry in template.json's pictureStyles: slipr-picture-<id>.
+ * Not scoped under .slipr-slide, so the same class styles a slide image, a
+ * reader image block and the editor's style preview. On-brand versions of
+ * the four styles; subject to the brand review (I-043d).
+ */
+.slipr-picture-shadow {
+  filter: drop-shadow(0 0.3em 0.5em rgb(0 0 0 / 0.25));
+}
+.slipr-picture-soft {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+}
+.slipr-picture-rounded {
+  border-radius: 0.6em;
+}
+.slipr-picture-frame {
+  box-sizing: border-box;
+  border: 0.35em solid var(--cnc-white, #FFFFFF);
+  background: var(--cnc-white, #FFFFFF);
+  outline: 0.08em solid var(--cnc-magenta, #BC448C);
+  outline-offset: -0.08em;
+  box-shadow: 0 0.12em 0.45em rgb(0 0 0 / 0.2);
+}

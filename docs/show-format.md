@@ -124,7 +124,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `$schema` | string | no | Path to `shared/schema/show.schema.json`, for autocomplete in editors outside this repo's VS Code workspace |
-| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides; a show without them may stay 0.1. The editor and the converter write 0.2 only when a show has extra images |
+| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides and `style` / `opacity` on pictures; a show without them may stay 0.1. The editor and the converter write 0.2 only when a show uses them |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
 | `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json` (see *Template references* below). `version`: semver range |
@@ -222,7 +222,7 @@ The template defines which slots a layout has and the type of each slot.
 | `text` | string | Plain text, single line |
 | `richtext` | string | Markdown subset, including paragraphs and bullet lists |
 | `list` | string | Markdown bullet list, or an array of strings |
-| `image` | object | `{ "src": "images/x.png", "alt": "...", "fit": "contain" \| "cover", "focus": "center" }`. `src` is relative to `show.json` |
+| `image` | object | `{ "src": "images/x.png", "alt": "...", "fit": "contain" \| "cover", "focus": "center", "style": "shadow", "opacity": 0.8 }`. `src` is relative to `show.json`. `style` (0.2): one of the template's picture styles (D-014); `opacity` (0.2): 0–1, absent = 1. The same image value is used in card image fields, reader image blocks and extra images |
 | `code` | object | `{ "language": "js", "code": "..." }` |
 | `quote` | object | `{ "text": "...", "source": "..." }` |
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
@@ -243,11 +243,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays` in a 0.1 show.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images), an extra image that sticks out of the slide, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity` in a 0.1 show.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (I-083). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it gets its first extra image.
+- `0.2` (2026-10-11): adds `slide.overlays` (I-083), and `style` and `opacity` on image values (I-084). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

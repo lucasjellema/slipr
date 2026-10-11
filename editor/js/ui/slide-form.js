@@ -6,6 +6,7 @@
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { buildOverlaySection } from './overlay-list.js';
+import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
 import { addImageToSlot, imageFileFrom } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
@@ -308,6 +309,18 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
         h('option', { value: 'cover', selected: image?.fit === 'cover' ? true : undefined }, ['Fill the frame (may crop)']),
         h('option', { value: 'contain', selected: image?.fit === 'contain' ? true : undefined }, ['Show the whole image']),
       ]),
+      // Picture style and opacity (D-014, I-084).
+      pictureStyleControls({
+        label: labelText,
+        image,
+        styles: store.state.template?.pictureStyles ?? [],
+        resolveAsset: store.state.resolveAsset,
+        onChange: (patch) => {
+          const next = imageValue(current, patch);
+          current = next;
+          store.dispatch('setSlot', { slideId, slot: slotName, value: next });
+        },
+      }),
     ];
   } else if (kind === 'quote') {
     inputs = quoteEditor({ label: labelText, read: () => current, write });

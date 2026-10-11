@@ -85,8 +85,8 @@ def build_show(
     if schema_ref:
         show["$schema"] = schema_ref
     show.update({
-        # Format 0.2 only when it is needed: extra images (I-083).
-        "slipr": "0.2" if any(s.get("overlays") for s in slides) else "0.1",
+        # Format 0.2 only when it is needed: extra images (I-083), picture style or opacity (I-084).
+        "slipr": "0.2" if any(_needs_format_02(s) for s in slides) else "0.1",
         "id": show_id,
         "meta": meta,
         "template": {"ref": template_ref, "version": version_range(template.get("version", "1.0.0"))},
@@ -98,6 +98,19 @@ def build_show(
 
     report.warnings.extend(validate_show(show))
     return ConversionResult(show=show, assets=assets, report=report)
+
+
+def _needs_format_02(value) -> bool:
+    """Does a slide use show format 0.2: extra images, or a picture with a style or opacity?"""
+    if isinstance(value, dict):
+        if value.get("overlays"):
+            return True
+        if isinstance(value.get("src"), str) and ("style" in value or "opacity" in value):
+            return True
+        return any(_needs_format_02(v) for v in value.values())
+    if isinstance(value, list):
+        return any(_needs_format_02(v) for v in value)
+    return False
 
 
 def write_show(result: ConversionResult, out_dir: Path, *, force: bool = False) -> None:

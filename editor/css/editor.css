@@ -1890,3 +1890,104 @@ body.is-screen #slipr-editor-banners {
 .slipr-overlay-row .slipr-label {
   margin: 0;
 }
+
+/* ---------- Picture style and opacity (I-084) ---------- */
+
+.slipr-picture-style {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.slipr-picture-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.slipr-picture-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 76px;
+  padding: 4px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  background: var(--slipr-editor-surface);
+  color: var(--slipr-editor-text);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.slipr-picture-option:hover {
+  border-color: var(--slipr-editor-border-strong);
+}
+
+.slipr-picture-option.is-selected {
+  border-color: var(--slipr-editor-indicator);
+  background: var(--slipr-editor-selected);
+  color: var(--slipr-editor-text-strong);
+}
+
+.slipr-picture-option:focus-visible {
+  outline: 2px solid var(--slipr-editor-indicator);
+  outline-offset: 1px;
+}
+
+/* A light stage behind the preview, so shadows and frames show as on a slide. */
+.slipr-picture-option-frame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 44px;
+  padding: 5px;
+  border-radius: 3px;
+  background: var(--slipr-editor-preview-bg);
+  font-size: 8px;
+}
+
+.slipr-picture-option-frame img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.slipr-picture-opacity-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slipr-picture-opacity-row .slipr-label {
+  margin: 0;
+}
+
+.slipr-picture-opacity {
+  flex: 1;
+  accent-color: var(--slipr-editor-accent);
+}
+
+.slipr-picture-opacity-value {
+  min-width: 3.5em;
+  text-align: right;
+  color: var(--slipr-editor-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.slipr-picture-unknown {
+  margin: 0;
+}
+
+.slipr-link-btn {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--slipr-editor-link);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

@@ -11,6 +11,7 @@
  * annotation anchors can find it.
  */
 import { markdown, escape } from './markdown.js';
+import { pictureAttributes } from './picture.js';
 import { slideTitle } from './render.js';
 
 /**
@@ -93,7 +94,7 @@ export function renderBlock(block, slideId, ctx) {
       }).join('');
       const caption = block.caption ? `<figcaption>${escape(block.caption)}</figcaption>` : '';
       return `<div ${attrs}>${badges}<figure><div class="slipr-hotspot-frame">`
-        + `<img src="${escape(ctx.resolveAsset(image.src ?? ''))}" alt="${escape(image.alt ?? '')}" loading="lazy" decoding="async">`
+        + `<img src="${escape(ctx.resolveAsset(image.src ?? ''))}" alt="${escape(image.alt ?? '')}"${pictureAttributes(image)} loading="lazy" decoding="async">`
         + `${spots}</div>${caption}</figure></div>`;
     }
 

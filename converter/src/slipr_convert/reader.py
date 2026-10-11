@@ -77,6 +77,46 @@ def alt_text(shape) -> str:
     return ""
 
 
+# Picture effects the converter can map to template picture styles (I-084),
+# in order of precedence when a picture has several.
+PICTURE_EFFECTS = ("shadow", "softEdges", "roundedCorners", "border")
+
+
+def picture_effects(shape) -> tuple[list[str], float | None]:
+    """A picture's effects (a subset of PICTURE_EFFECTS, in that order) and its
+    opacity from the picture's transparency (None when opaque).
+
+    Read from the picture's own shape properties: an outer shadow and soft
+    edges in `a:effectLst`, a rounded-rectangle geometry, a visible outline
+    (`a:ln` with a fill), and `a:alphaModFix` on the image. Effects that come
+    only from a theme style reference are not seen.
+    """
+    el = shape._element  # noqa: SLF001
+    sp_pr = el.find("p:spPr", NS)
+    found: set[str] = set()
+    if sp_pr is not None:
+        if sp_pr.find("a:effectLst/a:outerShdw", NS) is not None:
+            found.add("shadow")
+        soft = sp_pr.find("a:effectLst/a:softEdge", NS)
+        if soft is not None and int(soft.get("rad") or 0) > 0:
+            found.add("softEdges")
+        geom = sp_pr.find("a:prstGeom", NS)
+        if geom is not None and geom.get("prst") in {"roundRect", "round2SameRect", "round1Rect", "snipRoundRect"}:
+            found.add("roundedCorners")
+        line = sp_pr.find("a:ln", NS)
+        if line is not None and line.find("a:noFill", NS) is None and (
+            line.find("a:solidFill", NS) is not None or line.find("a:gradFill", NS) is not None
+        ):
+            found.add("border")
+    opacity = None
+    alpha = el.find(".//a:blip/a:alphaModFix", NS)
+    if alpha is not None:
+        amt = int(alpha.get("amt") or 100000)
+        if amt < 100000:
+            opacity = round(max(0, amt) / 100000, 2)
+    return [e for e in PICTURE_EFFECTS if e in found], opacity
+
+
 def has_build_animations(slide) -> bool:
     """True when the slide has build steps (e.g. bullets appearing one by one)."""
     timing = slide._element.find(f"{{{NS['p']}}}timing")  # noqa: SLF001

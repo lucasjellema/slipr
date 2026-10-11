@@ -275,3 +275,28 @@
   .slipr-mode-reader .slipr-logo { display: none; }
   .slipr-mode-reader .slipr-image { max-height: 60vh; }
 }
+
+/* ---------- Picture styles (template format 0.3, D-014, I-084) ----------
+ * One class per entry in template.json's pictureStyles: slipr-picture-<id>.
+ * Not scoped under .slipr-slide, so the same class styles a slide image, a
+ * reader image block and the editor's style preview. Effects on the picture
+ * only (never layout); sizes in em, so they scale with the slide's type.
+ */
+.slipr-picture-shadow {
+  filter: drop-shadow(0 0.35em 0.6em rgb(0 0 0 / 0.28));
+}
+.slipr-picture-soft {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+}
+.slipr-picture-rounded {
+  border-radius: 0.9em;
+}
+.slipr-picture-frame {
+  box-sizing: border-box;
+  border: 0.4em solid var(--slipr-color-bg, #FFFFFF);
+  background: var(--slipr-color-bg, #FFFFFF);
+  box-shadow: 0 0.15em 0.6em rgb(0 0 0 / 0.25);
+}
