@@ -35,6 +35,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 8c. Find & replace (`Ctrl+F`, `Ctrl+H` or the 🔍 button): a word from a slide, a reader block and the notes is listed with its location; clicking a match selects that slide; **Replace in Current Slide** and **Replace All** change the text, and one `Ctrl+Z` undoes each.
 8a. Reader tab: add a block, switch it to *Image with Hotspots*, paste an image, click the image to add a hotspot (its title field gets focus with the default selected), drag a marker, nudge it with the arrow keys, delete one with `Delete`. The reader preview and `viewer/?…&mode=reader` show the hotspots.
 8d. **? Help** and `F1` open `help.html` in a new tab at the section for the current tab (Slide, Reader, Show settings); the start screen links to it too. The manual reads well at 375 px and in dark mode.
+8e. **Export…** saves the open show as one HTML file (unsaved changes included) and the success message gives its size. In Claude's browser pane the save dialog cannot be driven: stub `window.showSaveFilePicker` to return a file handle from the origin-private file system, then load the written file in a same-origin iframe (a `blob:` URL) and check that it presents with no network requests. Without `showSaveFilePicker` the file is downloaded.
 9. The browser console is free of errors.
 
 ## Common pitfalls

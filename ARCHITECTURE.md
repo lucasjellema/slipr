@@ -82,7 +82,7 @@ The viewer and the editor never know which template is in use: everything goes t
 
 - Development: any static file server from the repo root, for example `npx http-server .` or `python -m http.server`. Pages use `fetch()`, so `file://` will not work.
 - Presenting: the same static server on the laptop. Later this could be a packaged offline single-file export (see backlog).
-- Publishing for readers: copy `viewer/`, `shared/`, `vendor/`, the template and the show folder to any static host.
+- Publishing for readers: copy `viewer/`, `shared/`, `vendor/`, the template and the show folder to any static host. Or export the show as **one HTML file** (`npm run export`, or **Export…** in the editor; I-054) and share or host just that file: it presents offline.
 
 ## Testing strategy
 

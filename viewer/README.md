@@ -37,6 +37,16 @@ Profile, path and depth in the URL let you send a tailored link, for example "th
 
 ---
 
+## Exported shows (one file)
+
+A show can be exported as **one HTML file** that contains the show, its template and this viewer: with **Export…** in the editor, or `npm run export -- shows/<name>`. Whoever receives it needs nothing else:
+
+- **Open it** by double-clicking it (or dragging it into a browser). No server, no internet, no installation. Use Chrome or Edge (tested); other current browsers that support import maps (recent Firefox and Safari) should work too, but are untested.
+- It opens in **audience mode**. For **reader mode**, add `?mode=reader` to the end of its address (or press `R`), and `A` goes back. `profile`, `depth` and `path` work as described above.
+- Everything works offline: search, tailoring, glossary popups, hotspots, diagrams, and your own highlights, notes and bookmarks. Those stay in your browser on that computer, as always.
+- An embedded web page only shows when it is part of the show itself, or when you are online for an embedded `https:` site.
+- The file is a few MB: the fonts, images and (for shows with diagrams) the diagram library are inside.
+
 ## Audience mode
 
 Built on Reveal.js. The aim is a polished, linear presentation.

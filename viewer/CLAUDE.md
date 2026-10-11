@@ -54,12 +54,14 @@ With `shows/demo`:
 13a. A show folder: `viewer/?folder=<key>` opens it in both modes, with its images (keys come from the editor or "Open a show folder…"; in Claude's browser pane use an origin-private folder remembered via `shared/folder-handles.js`). An unknown key shows the "not known here" page.
 14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.
+16. Single-file export: `npm run export -- shows/demo`, then open `exports/demo.html` (served: `http://localhost:8080/exports/demo.html`; and by double-click): audience and reader mode work, images, fonts and diagrams show, and DevTools → Network shows no request besides the file itself.
 
 ## Common pitfalls
 
 - Reveal measures slides at init time. Inject the theme CSS and wait for `document.fonts.ready` **before** `Reveal.initialize()`.
 - Relative image paths are relative to `show.json`, not to `viewer/`. Use `ctx.resolveAsset()` / `ctx.resolveTemplateAsset()` from `load.js`.
-- `file://` will not work because of `fetch()`. Always use the dev server (`npm run serve`, or the `slipr` entry in `.claude/launch.json` for Claude's browser pane).
+- `file://` will not work for the viewer itself because of `fetch()`. Always use the dev server (`npm run serve`, or the `slipr` entry in `.claude/launch.json` for Claude's browser pane). A **single-file export** (`npm run export`, I-054) is the exception: it is made to open from `file://`.
+- **Keep the viewer exportable (I-054).** The single-file exporter follows the module graph from `js/main.js` and packs only what it can see: static imports, dynamic `import('./literal')`, and files named with a literal `new URL('./literal', import.meta.url)`. So: load files next to a module only with such literals (no computed or concatenated paths, no folder URL plus a file name); load show and template files only through `ctx.resolveAsset()` / `ctx.resolveTemplateAsset()`; and add stylesheets only through `addStylesheet()`. Anything else works from the server but is missing from an exported file. After such a change, run the export smoke test (step 16).
 - **Never put `<section>` inside a slide.** Reveal treats every nested `<section>` as a vertical slide. A test guards the shipped layouts.
 - Reveal's `reset.css` sets `font: inherit` on everything, which strips bold from `<strong>` and headings. Templates must restore text semantics inside `.slipr-slide` (see `templates/default/theme.css`).
 - Reveal's notes plugin throws `Cannot set properties of null (setting 'marked')` when the popup is blocked. That is the blocked popup, not a Slipr bug.

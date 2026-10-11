@@ -68,6 +68,7 @@ viewer/test/
 
 ## Start-up (`main.js`)
 
+0. A single-file export (I-054; `globalThis.SLIPR_BUNDLE` is defined by the exported page before any module runs) → `loadShow()` with the bundle's `fetch` for the bundled `show.json`, template and layouts; `resolveAsset` and `resolveTemplateAsset` are wrapped so show and template files become object URLs (`SLIPR_BUNDLE.url`). `addStylesheet` (`js/dom.js`) maps virtual URLs the same way, so module-relative stylesheets (`audience.css`, `reader.css`, Reveal's CSS) load from the file too. URL parameters (`mode`, `profile`, `depth`, `path`) and hashes work as usual. How the file is packed: `docs/specs/I-054-single-file-export.md`.
 1. No `show` or `folder` parameter → help page with links to the demo, and "Open a show folder…" where the File System Access API exists (it remembers the folder and reloads as `?folder=<key>`).
 2. `?folder=<key>` → the handle comes from `shared/folder-handles.js` and the show from `loadShowFromFolder()` (D-012). An unknown key shows the load-error page. Without read permission, an access page asks for it from a click (`showAccessPage()`). Loader notices (template resolved by name) go to the console.
 3. `loadShow()` or `loadShowFromFolder()` → a `LoadError` (not found, invalid JSON, server unreachable) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.

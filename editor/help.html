@@ -423,6 +423,12 @@
           <dd>The browser may block the new tab. Allow pop-ups for the editor's address, and check the message bar for a save problem.</dd>
           <dt>The show will not open in the viewer</dt>
           <dd>It has an error. Errors are listed under the preview of the slide that has them, in red.</dd>
+          <dt>Export… does nothing, or nothing is saved</dt>
+          <dd>The save dialog may have been cancelled. Without a save dialog (some browsers) the file is downloaded instead: look in your downloads. A message under the toolbar reports where the file went.</dd>
+          <dt>The exported file stays on "Loading show…"</dt>
+          <dd>Open it in Chrome or Edge (tested); other current browsers should work too, but older ones cannot run it. If it still fails, export again and check the message bar for warnings about missing files.</dd>
+          <dt>An embedded page is empty in the exported file</dt>
+          <dd>Embedded pages from the show folder work only if they are self-contained; embedded <code>https:</code> sites need an internet connection, as always.</dd>
           <dt>A message says the template was found by name</dt>
           <dd>The show refers to its template by a path outside its folder. That's fine: the editor and viewer use the template with that name from Slipr's <code>templates/</code> folder.</dd>
           <dt>My text is cut off on the slide</dt>
