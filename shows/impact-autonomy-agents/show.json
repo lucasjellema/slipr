@@ -29,30 +29,61 @@
   ],
   "slides": [
     {
-      "id": "s-01",
-      "layout": "title-image",
-      "chapter": "default-section",
-      "content": {
-        "title": "Fundament voor autonome (agentic) systemen",
-        "byline": "Lucas Jellema, CTO Conclusion",
-        "image": {
-          "src": "images/slide01-1.jpg",
-          "alt": ""
-        }
-      }
-    },
-    {
       "id": "s-02",
-      "layout": "text",
+      "layout": "text-image",
       "chapter": "default-section",
       "content": {
         "title": "Dat doet ‘ie anders nooit hoor.."
       },
-      "notes": "_[Converter] Not converted from PowerPoint: media._"
+      "notes": "_[Converter] Not converted from PowerPoint: media._",
+      "reader": {
+        "blocks": [
+          {
+            "id": "b-i6fuhv",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-86xnxi",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-tq6v14",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-stbycj",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-ff29ts",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-vuvfq4",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-u624we",
+            "type": "text",
+            "md": ""
+          },
+          {
+            "id": "b-fj8znn",
+            "type": "text",
+            "md": ""
+          }
+        ]
+      }
     },
     {
       "id": "s-03",
-      "layout": "text",
+      "layout": "text-image",
       "chapter": "default-section",
       "content": {
         "title": "De mens (en het bedrijf) achter de agent",
@@ -72,12 +103,11 @@
       }
     },
     {
-      "id": "s-04",
+      "id": "s-09",
       "layout": "text",
       "chapter": "default-section",
       "content": {
-        "title": "De mens (en het bedrijf) achter de agent",
-        "kicker": "Baasje is de baas (of in elk geval verantwoordelijk)"
+        "title": "AI Act"
       },
       "reader": {
         "blocks": [
@@ -85,7 +115,7 @@
             "id": "converted-image-1",
             "type": "image",
             "image": {
-              "src": "images/slide03-1.png",
+              "src": "images/slide08-1.png",
               "alt": ""
             }
           },
@@ -93,12 +123,38 @@
             "id": "converted-image-2",
             "type": "image",
             "image": {
-              "src": "images/slide04-2.png",
+              "src": "images/slide08-3.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-3",
+            "type": "image",
+            "image": {
+              "src": "images/slide08-4.png",
               "alt": ""
             }
           }
         ]
       }
+    },
+    {
+      "id": "s-taws1p",
+      "layout": "title-wave",
+      "content": {
+        "title": "Run to the max",
+        "byline": "Lucas"
+      }
+    },
+    {
+      "id": "s-mc7fs4",
+      "layout": "title-image",
+      "content": {}
+    },
+    {
+      "id": "s-6fl9q3",
+      "layout": "text",
+      "content": {}
     },
     {
       "id": "s-05",
@@ -124,6 +180,19 @@
             }
           }
         ]
+      }
+    },
+    {
+      "id": "s-01",
+      "layout": "title-image",
+      "chapter": "default-section",
+      "content": {
+        "title": "Fundament voor autonome (agentic) systemen",
+        "byline": "Lucas Jellema, CTO Conclusion",
+        "image": {
+          "src": "images/slide01-1.jpg",
+          "alt": ""
+        }
       }
     },
     {
@@ -179,6 +248,35 @@
       }
     },
     {
+      "id": "s-04",
+      "layout": "text",
+      "chapter": "default-section",
+      "content": {
+        "title": "De mens (en het bedrijf) achter de agent",
+        "kicker": "Baasje is de baas (of in elk geval verantwoordelijk)"
+      },
+      "reader": {
+        "blocks": [
+          {
+            "id": "converted-image-1",
+            "type": "image",
+            "image": {
+              "src": "images/slide03-1.png",
+              "alt": ""
+            }
+          },
+          {
+            "id": "converted-image-2",
+            "type": "image",
+            "image": {
+              "src": "images/slide04-2.png",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    },
+    {
       "id": "s-08",
       "layout": "text",
       "chapter": "default-section",
@@ -213,42 +311,6 @@
           },
           {
             "id": "converted-image-4",
-            "type": "image",
-            "image": {
-              "src": "images/slide08-4.png",
-              "alt": ""
-            }
-          }
-        ]
-      }
-    },
-    {
-      "id": "s-09",
-      "layout": "text",
-      "chapter": "default-section",
-      "content": {
-        "title": "AI Act"
-      },
-      "reader": {
-        "blocks": [
-          {
-            "id": "converted-image-1",
-            "type": "image",
-            "image": {
-              "src": "images/slide08-1.png",
-              "alt": ""
-            }
-          },
-          {
-            "id": "converted-image-2",
-            "type": "image",
-            "image": {
-              "src": "images/slide08-3.png",
-              "alt": ""
-            }
-          },
-          {
-            "id": "converted-image-3",
             "type": "image",
             "image": {
               "src": "images/slide08-4.png",

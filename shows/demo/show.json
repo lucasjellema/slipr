@@ -65,7 +65,7 @@
       "id": "deep-dev",
       "label": "Under the hood",
       "description": "For developers who want to see how it is built.",
-      "slides": ["s-two-modes", "s-data-2", "s-architecture", "s-tailored", "s-backup-format", "s-further-reading"]
+      "slides": ["s-two-modes", "s-data-2", "s-architecture", "s-pipeline", "s-tailored", "s-backup-format", "s-further-reading"]
     }
   ],
 
@@ -269,7 +269,43 @@
             "md": "Vanilla HTML, CSS and ES modules: no build step and no framework. Third-party code is vendored so shows present offline. The JSON Schema in `shared/schema/` is the contract between the Python converter and the JavaScript apps."
           },
           { "id": "more", "type": "slide-ref", "slide": "s-backup-format", "label": "See the format details", "depth": 3 }
-        ]
+        ],
+        "related": ["s-pipeline"]
+      }
+    },
+
+    {
+      "id": "s-pipeline",
+      "layout": "diagram",
+      "chapter": "how",
+      "tags": ["pipeline", "mermaid"],
+      "content": {
+        "title": "Data flow from author to reader",
+        "diagram": {
+          "mermaid": "flowchart LR\n    subgraph Authoring[\"Authoring\"]\n        direction TB\n        P[\"PowerPoint .pptx\"]\n        E[\"Slipr Editor\"]\n    end\n    subgraph Storage[\"Show folder\"]\n        S[(\"show.json<br/>+ images/\")]\n    end\n    subgraph Presentation[\"Viewer\"]\n        direction TB\n        A[\"Audience Mode<br/>(Reveal.js)\"]\n        R[\"Reader Mode<br/>(interactive)\"]\n    end\n    P -->|\"slipr-convert\"| S\n    E <-->|\"File System Access\"| S\n    S -->|\"shared render.js\"| A\n    S -->|\"shared render.js\"| R",
+          "caption": "One show folder powers both the audience slideshow and the interactive reader."
+        },
+        "caption": "Rendered dynamically in the browser with vendored Mermaid."
+      },
+      "notes": "Explain how a single source of truth powers both delivery modes.",
+      "reader": {
+        "summary": "Mermaid diagrams are rendered client-side into responsive SVGs.",
+        "blocks": [
+          {
+            "id": "intro",
+            "type": "text",
+            "depth": 1,
+            "md": "Slipr supports **Mermaid diagrams** natively in both audience and reader mode. Diagrams are written as plain text in `show.json` and rendered directly in the browser into lightweight, scalable SVGs using vendored Mermaid."
+          },
+          {
+            "id": "lifecycle-diagram",
+            "type": "diagram",
+            "depth": 2,
+            "mermaid": "sequenceDiagram\n    autonumber\n    actor Author\n    participant Editor as Slipr Editor\n    participant Store as Show (show.json)\n    participant Viewer as Slipr Viewer\n    actor Audience\n\n    Author->>Editor: Edit slides & blocks\n    Editor->>Store: Save via File System API\n    Audience->>Viewer: Open show (?mode=audience)\n    Viewer->>Store: Load JSON & template\n    Viewer-->>Audience: Render slideshow with Reveal.js",
+            "caption": "Presentation lifecycle from editing to delivery."
+          }
+        ],
+        "related": ["s-architecture"]
       }
     },
 

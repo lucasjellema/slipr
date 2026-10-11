@@ -146,6 +146,30 @@
 }
 @media (prefers-reduced-motion: reduce) { .slipr-hotspot { animation: none; } }
 
+/* ---------- diagram ---------- */
+.slipr-block--diagram figure { margin: 0; }
+.slipr-block--diagram .slipr-diagram {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background: var(--slipr-color-surface);
+  border-radius: 0.4rem;
+  padding: 1.5rem 1rem;
+  overflow-x: auto;
+}
+.slipr-block--diagram .slipr-diagram svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.slipr-block--diagram figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.875rem;
+  color: var(--slipr-color-muted);
+  text-align: center;
+}
+
 /* ---------- embed ---------- */
 .slipr-block--embed iframe {
   display: block;

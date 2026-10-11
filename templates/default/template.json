@@ -78,6 +78,17 @@
         { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
         { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
       ]
+    },
+    {
+      "id": "diagram",
+      "name": "Diagram",
+      "description": "One large Mermaid diagram with optional title and caption.",
+      "file": "layouts/diagram.html",
+      "slots": [
+        { "name": "diagram", "type": "diagram", "label": "Diagram", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
     }
   ],
   "pptxMapping": {
