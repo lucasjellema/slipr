@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084) and glossary terms in slides (I-086); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086) and dedicated glossary editor (I-088); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -96,13 +96,17 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-018** [editor] Bug: **Save overwrites changes made to `show.json` on disk** since the editor opened it. The editor writes its in-memory show without checking the file, so newer work from elsewhere (another editor window, a Claude session, a git pull) is silently lost. Happened twice on 2026-10-11/12 with `shows/demo/show.json`: an editor window still holding older content saved over committed changes (I-084 styles, I-086 aliases) and brought back deleted test images. Fix: remember the file's `lastModified` (and content hash) when opening and after each save; before saving, read the file again, and if it changed, don't overwrite silently. Offer **Reload from disk** (discarding the in-memory edits), **Save anyway** (overwrite), or **Cancel**; ideally also notice the change when the window regains focus. Same check for Present / Read (they save first) · todo · —
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
-- [x] **I-088** [editor] **Dedicated Glossary Editor with deck-aware word completion**:
-  - A full page/view in the editor dedicated entirely to managing the show's glossary (replacing the cramped section inside Show Settings).
-  - **Spacious authoring UI**: list/split view of all glossary terms with search, filter, and sort (by name, usage count, or status).
-  - **Term editor**: streamlined editing of term name, stable ID with rename and automatic reference migration across the show, other names / aliases (I-086), Markdown definition with preview, and optional external link.
-  - **Deck-aware completion**: typing a new entry offers autocompletion suggestions based on words, acronyms, and phrases scanned from the show's slides, cards, and reader blocks. Drawer highlights frequently occurring terms in the presentation that lack glossary definitions.
-  - **Usage inspection & cleanup**: displays exact usage count and references per term with click-to-jump to the slide; flags orphaned terms (defined but never used in the deck) and offers safe deletion (keep references vs unlink to plain text).
-  - Quick access from the editor toolbar / navigation (`📖 Glossary`) with keyboard navigation (`↑`/`↓` to switch terms, `Ctrl+N` or `+` to add) · done 2026-10-12 · claude
+- [ ] **I-089** [format/editor/viewer/converter] **Freeform text elements / overlays on slides**:
+  - In addition to layout placeholders, authors can add floating **text elements** on top of the slide canvas, matching the free-placement overlay model of extra images (I-083).
+  - **Position & size**: `x`, `y`, `w`, `h` as fractions (0–1) of the canvas, scaling proportionally with the slide. Visual manipulation on the audience preview (drag to move, resize handles, arrow keys / Alt+arrows, Delete) and numerical inputs in the Slide tab.
+  - **Typography & styling**:
+    - **Font**: selection of template brand fonts (title, body), system fonts, or monospace; responsive font size with presets or direct numeric control.
+    - **Style**: font weight (regular, bold), italic, underline, uppercase, and text alignment (left, center, right).
+    - **Colors**: text/font color (color picker / palette), background fill color with opacity/alpha slider.
+    - **Outlining & borders**: box border (width, style, color, corner radius for badges/pills/chips) and text outline / halo (stroke width and color) for high contrast over photos and colored backgrounds.
+    - **Padding**: configurable internal padding around the text.
+  - **Audience & reader modes**: rendered in front of the layout in `.slipr-overlays`; optional step-by-step appearance (`fragment` with Reveal effects); included in reader search index and accessible screen reader text.
+  - **PPTX converter**: maps non-placeholder PowerPoint text boxes, callouts, and floating badges directly into text overlays, preserving original positions and styles instead of losing them · todo · —
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -175,6 +179,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-088** [editor] Dedicated Glossary Editor with deck-aware word completion: split view, search, filters, sorting, real-time deck word autocompletion and unglossaried suggestions drawer, ID rename with show-wide reference rewriting, live Markdown preview, and slide jump navigation · done 2026-10-12 · claude
 - [x] **I-072** [format/viewer] PDF document: spike chose vendored **PDF.js 4.10.38** (D-011 refined); `pdf` slot and block (show format 0.2) with `page` or `pages: [first, last]`, files from the show folder or https (click-to-load); audience mode fits the page and steps through a range on clicks; reader blocks with page navigation, zoom and screen-reader text; PDF text in reader search (on first use, results open at the page); `pdf` layouts in both templates (default 1.3.0, Conclusion 0.1.3); editor fields with **Choose PDF…** (copied to `docs/`); works in the single-file export. Spec: `docs/specs/I-072-pdf-document.md` · done 2026-10-12 · claude
 - [x] **I-071** [format/viewer] Website embed: `web` slot (show format 0.2) with a `web` layout in both templates (default 1.2.0, Conclusion 0.1.2); `allow` sandbox extras from an allow-list (`same-origin` for other servers only), `aspect` or height on the `embed` block, "Open in new tab" below loaded frames, link card / screenshot fallback; audience mode `present: "live"` (no Load button) or `"static"` (screenshot); editor fields for both (`ui/web-fields.js`). Spec: `docs/specs/I-071-website-embed.md` · done 2026-10-12 · claude
 - [x] **I-070** [format] Shared foundation for rich embeds (D-011): `shared/embeds/` registry with one module per kind (`diagram`, `web` for the reader `embed` block), static fallback inside every embed element (optional `fallback` image, show format 0.2), `hydrateEmbeds()` with lazy-loaded vendored libraries, click-to-load for other servers (per site per tab; `load: "auto"` set by the author in the editor), `embeds.css` from `--slipr-*` tokens; the single-file export drops unused libraries; approved libraries Mermaid, Cytoscape.js, Leaflet, PDF.js. Spec: `docs/specs/I-070-embed-foundation.md` · done 2026-10-12 · claude
