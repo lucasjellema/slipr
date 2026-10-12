@@ -3,7 +3,9 @@
  * Value shapes for the tabs, embed and slide-ref block editors (I-036).
  * DOM-free. Never produces a shape the format rejects: tabs keep at least one
  * tab with a non-empty label; an embed height is an integer of at least 100.
+ * Web pages (I-071): `webValue()` always keeps `url` and a title.
  */
+import { ALLOW_OPTIONS } from '../../shared/embeds/web.js';
 
 /**
  * @param {any} tabs
@@ -81,4 +83,45 @@ export function embedUrlProblem(url) {
 export function embedHeight(text) {
   const n = Number.parseInt(String(text ?? '').trim(), 10);
   return Number.isFinite(n) ? Math.max(100, n) : undefined;
+}
+
+/** Extra sandbox permissions an embedded page may get (I-071), in display order. */
+export const WEB_ALLOW_OPTIONS = ALLOW_OPTIONS;
+
+/** Aspect ratios offered for an embedded page (I-071). */
+export const WEB_ASPECTS = ['16:9', '4:3', '1:1', '9:16'];
+
+/**
+ * Turn one `allow` permission on or off. The list keeps the display order;
+ * an empty list becomes undefined (the field is removed).
+ * @param {any} allow @param {string} option @param {boolean} on
+ * @returns {string[] | undefined}
+ */
+export function toggleAllow(allow, option, on) {
+  const set = new Set(Array.isArray(allow) ? allow : []);
+  if (on) set.add(option);
+  else set.delete(option);
+  const list = WEB_ALLOW_OPTIONS.filter((o) => set.has(o));
+  return list.length ? list : undefined;
+}
+
+/**
+ * A `web` slot value (I-071) from the previous value and a patch. Always has
+ * `url` and a non-empty `title` (the format needs both); an empty title in the
+ * patch is ignored; fields patched to undefined (or "") are removed.
+ * @param {any} previous
+ * @param {Record<string, any>} patch
+ * @returns {Record<string, any>}
+ */
+export function webValue(previous, patch) {
+  const base = previous && typeof previous === 'object' && !Array.isArray(previous) ? previous : {};
+  /** @type {Record<string, any>} */
+  const next = { url: '', title: 'Web page', ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    if (key === 'title' && !String(value ?? '').trim()) continue;
+    if (value === undefined || value === '') delete next[key];
+    else next[key] = value;
+  }
+  if (next.url === undefined) next.url = '';
+  return next;
 }

@@ -8,7 +8,8 @@
  *   library      vendor folder it lazy-loads, or null (the export skips it when unused)
  *   thumbnail    whether editor thumbnails render it live
  *   errorLabel   heading of the error box
- *   attributes(value, ctx)   data attributes for the embed element
+ *   attributes(value, ctx, options)  data attributes for the embed element
+ *                            (options: { mode, slot }, see EmbedOptions)
  *   staticHtml(value, ctx)   { html, fallback } when the value has no fallback image
  *   hydrate(el, live)        render the live content into `live` (async, may throw)
  *
@@ -26,6 +27,8 @@
  *   </div>
  *
  * States: none (static), `waiting` (click-to-load), `loading`, `ready`, `error`.
+ * An element with `data-embed-static` keeps its fallback and is never hydrated
+ * (e.g. a web page set to present as a screenshot in audience mode).
  * Styling: ./embeds.css, from the template's --slipr-* tokens; added to the page
  * by the first hydrateEmbeds().
  *
@@ -43,17 +46,22 @@ import * as web from './web.js';
  * @property {string | null} library
  * @property {boolean} thumbnail
  * @property {string} errorLabel
- * @property {(value: any, ctx: EmbedContext) => Record<string, string>} attributes
+ * @property {(value: any, ctx: EmbedContext, options?: EmbedOptions) => Record<string, string>} attributes
  * @property {(value: any, ctx: EmbedContext) => { html: string, fallback: string }} staticHtml
  * @property {(el: HTMLElement, live: HTMLElement) => Promise<void>} hydrate
  */
 /** @typedef {{ resolveAsset: (src: string) => string }} EmbedContext */
+/**
+ * @typedef {object} EmbedOptions
+ * @property {'audience' | 'reader'} [mode]  The mode it is shown in (default 'reader').
+ * @property {boolean} [slot]  A slot on a slide (the layout sizes it), not a reader block.
+ */
 
 /** @type {Record<string, EmbedKind>} */
 export const EMBED_KINDS = { diagram, web };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web' });
 /** Reader block type → embed kind. */
 const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web' });
 
@@ -83,7 +91,10 @@ export function usedEmbedKinds(show) {
   const kinds = new Set();
   for (const slide of Array.isArray(show?.slides) ? show.slides : []) {
     const content = slide?.content && typeof slide.content === 'object' ? slide.content : {};
-    for (const value of Object.values(content)) if (diagram.isDiagram(value)) kinds.add('diagram');
+    for (const value of Object.values(content)) {
+      if (diagram.isDiagram(value)) kinds.add('diagram');
+      if (web.isWeb(value)) kinds.add('web');
+    }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);
       if (kind) kinds.add(kind);
@@ -97,11 +108,12 @@ export function usedEmbedKinds(show) {
  * @param {string} kind
  * @param {any} value
  * @param {EmbedContext} ctx
+ * @param {EmbedOptions} [options]
  * @returns {Record<string, string>}
  */
-export function embedAttributes(kind, value, ctx) {
+export function embedAttributes(kind, value, ctx, options = {}) {
   const def = EMBED_KINDS[kind];
-  const own = def ? def.attributes(value, ctx) : {};
+  const own = def ? def.attributes(value, ctx, options) : {};
   const { class: ownClass = '', ...rest } = own;
   return { class: `slipr-embed slipr-embed--${kind}${ownClass ? ` ${ownClass}` : ''}`, 'data-embed': kind, ...rest };
 }
@@ -130,10 +142,11 @@ export function embedInnerHtml(kind, value, ctx) {
  * @param {string} kind
  * @param {any} value
  * @param {EmbedContext} ctx
+ * @param {EmbedOptions} [options]
  * @returns {string}
  */
-export function embedHtml(kind, value, ctx) {
-  const attrs = Object.entries(embedAttributes(kind, value, ctx)).map(([k, v]) => ` ${k}="${escape(v)}"`).join('');
+export function embedHtml(kind, value, ctx, options = {}) {
+  const attrs = Object.entries(embedAttributes(kind, value, ctx, options)).map(([k, v]) => ` ${k}="${escape(v)}"`).join('');
   return `<div${attrs}>${embedInnerHtml(kind, value, ctx)}</div>`;
 }
 
@@ -143,9 +156,10 @@ export function embedHtml(kind, value, ctx) {
  * @param {string} kind
  * @param {any} value
  * @param {EmbedContext} ctx
+ * @param {EmbedOptions} [options]  `slot` is implied.
  */
-export function fillEmbedElement(el, kind, value, ctx) {
-  for (const [name, v] of Object.entries(embedAttributes(kind, value, ctx))) {
+export function fillEmbedElement(el, kind, value, ctx, options = {}) {
+  for (const [name, v] of Object.entries(embedAttributes(kind, value, ctx, { ...options, slot: true }))) {
     if (name === 'class') el.classList.add(...v.split(' '));
     else el.setAttribute(name, v);
   }
@@ -166,7 +180,7 @@ export function fillEmbedElement(el, kind, value, ctx) {
 export async function hydrateEmbeds(root, options = {}) {
   const target = root ?? (typeof document !== 'undefined' ? document : null);
   if (!target || typeof target.querySelectorAll !== 'function') return;
-  const elements = /** @type {HTMLElement[]} */ ([...target.querySelectorAll('[data-embed]:not([data-embed-state])')]);
+  const elements = /** @type {HTMLElement[]} */ ([...target.querySelectorAll('[data-embed]:not([data-embed-state]):not([data-embed-static])')]);
   if (!elements.length) return;
   addEmbedStylesheet(elements[0].ownerDocument);
   await Promise.all(elements.map((el) => {

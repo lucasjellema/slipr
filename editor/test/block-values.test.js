@@ -55,3 +55,17 @@ test('edited tabs, embed and slide-ref blocks keep the demo valid', () => {
   assert.deepEqual(validateShow(show, { template }).errors, []);
   assert.deepEqual(validateShow(show, { template }).warnings, []);
 });
+
+test('toggleAllow keeps display order and drops an empty list (I-071)', async () => {
+  const { toggleAllow } = await import('../js/block-values.js');
+  assert.deepEqual(toggleAllow(undefined, 'modals', true), ['modals']);
+  assert.deepEqual(toggleAllow(['modals'], 'same-origin', true), ['same-origin', 'modals']);
+  assert.equal(toggleAllow(['modals'], 'modals', false), undefined);
+});
+
+test('webValue always has url and a title (I-071)', async () => {
+  const { webValue } = await import('../js/block-values.js');
+  assert.deepEqual(webValue(undefined, { url: 'https://x.example' }), { url: 'https://x.example', title: 'Web page' });
+  const v = webValue({ url: 'https://x.example', title: 'X', present: 'static' }, { title: '  ', present: undefined, load: 'auto' });
+  assert.deepEqual(v, { url: 'https://x.example', title: 'X', load: 'auto' });
+});

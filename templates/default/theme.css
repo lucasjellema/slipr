@@ -247,6 +247,12 @@
   display: block;
 }
 
+/* ---------- Layout: web (I-071) ---------- */
+
+.slipr-layout--web { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--web { align-items: stretch; }
+.slipr-web { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
 /* ---------- Reader mode: reflow on narrow screens ----------
  * Below ~640px the slide stops being a scaled 16:9 picture and becomes
  * ordinary flowing content with rem-based type.
@@ -274,6 +280,7 @@
   .slipr-mode-reader .slipr-decor,
   .slipr-mode-reader .slipr-logo { display: none; }
   .slipr-mode-reader .slipr-image { max-height: 60vh; }
+  .slipr-mode-reader .slipr-web { flex: none; height: 70vh; font-size: 0.9rem; }
 }
 
 /* ---------- Picture styles (template format 0.3, D-014, I-084) ----------

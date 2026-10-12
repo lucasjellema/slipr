@@ -80,7 +80,7 @@ describe('block types', () => {
 
   test('embed: a web embed (I-070), relative URL resolved, frame made on hydration', () => {
     const html = renderBlock(block('s-tailored', 'dial'), 's-tailored', ctx);
-    assert.match(html, /data-embed="web" data-embed-src="http:\/\/host\/shows\/demo\/embeds\/depth-dial\.html" data-embed-title="Interactive depth demo" data-embed-height="260"/);
+    assert.match(html, /data-embed="web" data-embed-src="http:\/\/host\/shows\/demo\/embeds\/depth-dial\.html" data-embed-title="Interactive depth demo" data-embed-sandbox="allow-scripts allow-forms allow-popups" data-embed-print="fallback" data-embed-height="260"/);
     assert.doesNotMatch(html, /data-embed-origin/, 'a file in the show loads without asking');
     assert.doesNotMatch(html, /<iframe/);
     assert.equal(FRAME_SANDBOX, 'allow-scripts allow-forms allow-popups');

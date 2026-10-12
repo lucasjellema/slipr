@@ -11,7 +11,8 @@ import { imageValue } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
 import { hotspotEditor } from './hotspot-editor.js';
 import { markdownToolbar } from './markdown-toolbar.js';
-import { addTab, embedHeight, embedUrlProblem, moveTab, removeTab, setTab, tabsArray } from '../block-values.js';
+import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
+import { webAddressFields, webOptionFields } from './web-fields.js';
 import { slideTitle } from '../../../shared/render.js';
 
 /** Actions the reader form dispatches while the user types. */
@@ -549,112 +550,57 @@ function tabsEditor(store, slideId, block) {
 }
 
 /**
- * Embedded page (I-036): URL (with a hint when it will not work), title and height.
+ * Embedded page (I-036, I-070, I-071): address and title, size (aspect ratio
+ * or height), click-to-load, sandbox permissions and the fallback image.
  * @param {import('../store.js').EditorStore} store
  * @param {string} slideId
  * @param {any} block
  */
 function embedEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
   /** @param {Record<string, any>} patch @param {string} field */
-  const update = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, { coalesceKey: `block-${field}-${block.id}` });
-  const problem = embedUrlProblem(block.url ?? '');
-  const hint = h('span', { class: `slipr-help ${problem ? `is-${problem.level}` : ''}`, 'aria-live': 'polite' }, [
-    problem?.message ?? 'Many sites refuse to be shown inside another page; reader mode then shows an empty frame. Check it in the preview.',
-  ]);
+  const write = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, { coalesceKey: `block-${field}-${block.id}` });
+  /** @type {import('./web-fields.js').WebFieldsOptions} */
+  const options = {
+    label: 'Embedded page',
+    kind: 'block',
+    read,
+    write,
+    addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
+    resolveAsset: store.state.resolveAsset,
+  };
   return h('div', { class: 'slipr-embed-editor' }, [
-    h('input', {
-      type: 'url',
-      class: 'slipr-input slipr-input-sm',
-      placeholder: 'https://… or a file in the show folder',
-      'aria-label': 'Embedded page: address',
-      value: block.url ?? '',
-      oninput: (/** @type {Event} */ e) => {
-        const url = /** @type {HTMLInputElement} */ (e.target).value;
-        const p = embedUrlProblem(url);
-        hint.textContent = p?.message ?? '';
-        hint.className = `slipr-help ${p ? `is-${p.level}` : ''}`;
-        update({ url }, 'url');
-      },
-    }),
-    hint,
-    h('input', {
-      type: 'text',
-      class: 'slipr-input slipr-input-sm slipr-input-alt',
-      placeholder: 'Title (for screen readers and the frame)',
-      'aria-label': 'Embedded page: title',
-      value: block.title ?? '',
-      oninput: (/** @type {Event} */ e) => {
-        const input = /** @type {HTMLInputElement} */ (e.target);
-        const empty = input.value.trim() === '';
-        input.setAttribute('aria-invalid', empty ? 'true' : 'false');
-        if (!empty) update({ title: input.value }, 'title');
-      },
-    }),
-    h('label', { class: 'slipr-embed-height' }, [
-      'Height ',
-      h('input', {
-        type: 'number',
-        class: 'slipr-input slipr-input-sm',
-        min: '100',
-        step: '50',
-        placeholder: '400',
-        value: block.height ?? '',
-        'aria-label': 'Embedded page: height in pixels',
-        oninput: (/** @type {Event} */ e) => update({ height: embedHeight(/** @type {HTMLInputElement} */ (e.target).value) }, 'height'),
-      }),
-      ' px',
-    ]),
-    // Click-to-load (I-070, D-011): an external page waits for the reader's consent unless the author says otherwise.
-    h('div', { class: 'slipr-form-checkbox' }, [
+    ...webAddressFields(options),
+    h('div', { class: 'slipr-embed-height' }, [
       h('label', {}, [
+        'Size ',
+        h('select', {
+          class: 'slipr-select slipr-select-sm',
+          'aria-label': 'Embedded page: aspect ratio',
+          onchange: (/** @type {Event} */ e) => write({ aspect: /** @type {HTMLSelectElement} */ (e.target).value || undefined }, 'aspect'),
+        }, [
+          h('option', { value: '', selected: block.aspect ? undefined : true }, ['fixed height']),
+          ...WEB_ASPECTS.map((a) => h('option', { value: a, selected: block.aspect === a ? true : undefined }, [`${a} (scales with the page)`])),
+        ]),
+      ]),
+      h('label', {}, [
+        ' Height ',
         h('input', {
-          type: 'checkbox',
-          checked: block.load === 'auto',
-          onchange: (/** @type {Event} */ e) => update({ load: /** @type {HTMLInputElement} */ (e.target).checked ? 'auto' : undefined }, 'load'),
+          type: 'number',
+          class: 'slipr-input slipr-input-sm',
+          min: '100',
+          step: '50',
+          placeholder: '400',
+          value: block.height ?? '',
+          disabled: block.aspect ? true : undefined,
+          'aria-label': 'Embedded page: height in pixels',
+          oninput: (/** @type {Event} */ e) => write({ height: embedHeight(/** @type {HTMLInputElement} */ (e.target).value) }, 'height'),
         }),
-        ' Load straight away, without asking the reader',
+        ' px',
       ]),
     ]),
-    h('span', { class: 'slipr-help' }, [
-      'Off (the default): a page from another site shows a Load button, so nothing is sent to that site until the reader agrees. Files in the show folder always load directly.',
-    ]),
-    embedFallbackEditor(store, slideId, block),
-  ]);
-}
-
-/**
- * The fallback image of an embed (I-070): shown instead of the link card, in
- * print and in thumbnails. Optional, with alt text and a Remove button.
- * @param {import('../store.js').EditorStore} store
- * @param {string} slideId
- * @param {any} block
- */
-function embedFallbackEditor(store, slideId, block) {
-  const current = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
-    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.fallback;
-  const update = (/** @type {any} */ fallback, /** @type {string} */ field) =>
-    store.dispatch('updateBlock', { slideId, blockId: block.id, patch: { fallback } }, { coalesceKey: `block-${field}-${block.id}` });
-  return h('div', { class: 'slipr-embed-fallback-editor' }, [
-    imageField({
-      label: 'Fallback image',
-      image: block.fallback,
-      resolveAsset: store.state.resolveAsset,
-      onFile: (file) => runImage(() => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' })),
-    }),
-    h('input', {
-      type: 'text',
-      class: 'slipr-input slipr-input-sm slipr-input-alt',
-      placeholder: 'Alt text: what the fallback image shows',
-      'aria-label': 'Fallback image: alt text',
-      value: block.fallback?.alt ?? '',
-      disabled: block.fallback?.src ? undefined : true,
-      oninput: (/** @type {Event} */ e) => {
-        if (current()?.src) update(imageValue(current(), { alt: /** @type {HTMLInputElement} */ (e.target).value }), 'fallback-alt');
-      },
-    }),
-    block.fallback?.src
-      ? h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', onclick: () => update(undefined, 'fallback') }, ['Remove fallback image'])
-      : h('span', { class: 'slipr-help' }, ['Optional: a picture of the page (e.g. a screenshot), shown in print, in thumbnails and before it loads.']),
+    ...webOptionFields(options),
   ]);
 }
 

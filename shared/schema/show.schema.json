@@ -189,6 +189,7 @@
         { "$ref": "#/$defs/quote" },
         { "$ref": "#/$defs/chart" },
         { "$ref": "#/$defs/diagram" },
+        { "$ref": "#/$defs/web" },
         { "$ref": "#/$defs/cards" }
       ]
     },
@@ -265,6 +266,25 @@
         "kind": { "type": "string" },
         "data": { "type": "object" }
       }
+    },
+    "web": {
+      "type": "object",
+      "required": ["url", "title"],
+      "additionalProperties": false,
+      "description": "(0.2) A web page on a slide (slot type 'web', I-071).",
+      "properties": {
+        "url": { "type": "string", "minLength": 1, "description": "Absolute https URL, or path relative to show.json." },
+        "title": { "type": "string", "minLength": 1 },
+        "allow": { "$ref": "#/$defs/webAllow" },
+        "present": { "enum": ["live", "static"], "description": "Audience mode: \"live\" (default) loads the page on the slide; \"static\" shows the fallback image." },
+        "load": { "enum": ["click", "auto"], "description": "Reader mode, a page on another server: \"click\" (default) waits for the reader's consent, \"auto\" loads straight away (D-011)." },
+        "fallback": { "$ref": "#/$defs/image", "description": "Screenshot shown for print, thumbnails, offline presenting and instead of the link card." }
+      }
+    },
+    "webAllow": {
+      "type": "array",
+      "description": "(0.2) Extra sandbox permissions for an embedded page (I-071). same-origin applies to pages on other servers only.",
+      "items": { "enum": ["same-origin", "fullscreen", "modals", "downloads", "presentation"] }
     },
     "diagram": {
       "type": "object",
@@ -415,6 +435,8 @@
         "url": { "type": "string", "minLength": 1, "description": "Absolute URL, or path relative to show.json." },
         "title": { "type": "string", "minLength": 1 },
         "height": { "type": "integer", "minimum": 100 },
+        "aspect": { "type": "string", "pattern": "^[1-9][0-9]{0,3}:[1-9][0-9]{0,3}$", "description": "(0.2) Width:height, e.g. 16:9; the frame scales with the column. Wins over height (I-071)." },
+        "allow": { "$ref": "#/$defs/webAllow" },
         "load": { "enum": ["click", "auto"], "description": "(0.2) A page on another server: \"click\" (default) waits for the reader's consent, \"auto\" loads straight away (D-011)." },
         "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and instead of the link card (I-070)." }
       }

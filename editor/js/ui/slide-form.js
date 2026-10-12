@@ -8,7 +8,9 @@ import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
-import { addImageToSlot, imageFileFrom } from '../image-input.js';
+import { addFallbackToSlot, addImageToSlot, imageFileFrom } from '../image-input.js';
+import { webValue } from '../block-values.js';
+import { webAddressFields, webOptionFields } from './web-fields.js';
 import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
 import { openLayoutPicker } from './layout-picker.js';
@@ -328,6 +330,22 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     inputs = codeEditor({ label: labelText, read: () => current, write });
   } else if (kind === 'cards') {
     inputs = cardsEditor({ store, slideId, slotName, slotDef, label: labelText });
+  } else if (kind === 'web') {
+    // A web page (I-071): the same fields as the Embedded Page block, plus live / screenshot while presenting.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    /** @type {import('./web-fields.js').WebFieldsOptions} */
+    const options = {
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: (patch, field) => {
+        current = webValue(readSlot(), patch);
+        store.dispatch('setSlot', { slideId, slot: slotName, value: current }, { coalesceKey: `${coalesceKey}-${field}` });
+      },
+      addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
+      resolveAsset: store.state.resolveAsset,
+    };
+    inputs = [h('div', { class: 'slipr-embed-editor' }, [...webAddressFields(options), ...(value ? webOptionFields(options) : [])])];
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [

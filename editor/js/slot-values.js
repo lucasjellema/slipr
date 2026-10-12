@@ -8,7 +8,7 @@
  */
 
 /** Slot types with an editable input in the slide form. */
-const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 'cards']);
+const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 'cards', 'web']);
 
 /**
  * Decide how the slide form edits a slot.
@@ -16,14 +16,14 @@ const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 
  * anything else is read-only.
  * @param {string | undefined} slotType
  * @param {any} [value]
- * @returns {'text' | 'textarea' | 'image' | 'quote' | 'code' | 'cards' | 'readonly'}
+ * @returns {'text' | 'textarea' | 'image' | 'quote' | 'code' | 'cards' | 'web' | 'readonly'}
  */
 export function slotEditorKind(slotType, value) {
   if (slotType === undefined) {
     return value === undefined || typeof value === 'string' ? 'text' : 'readonly';
   }
   if (!EDITABLE.has(slotType)) return 'readonly';
-  if (slotType === 'image' || slotType === 'quote' || slotType === 'code' || slotType === 'cards') return slotType;
+  if (slotType === 'image' || slotType === 'quote' || slotType === 'code' || slotType === 'cards' || slotType === 'web') return slotType;
   return slotType === 'text' ? 'text' : 'textarea';
 }
 

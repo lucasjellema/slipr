@@ -24,6 +24,7 @@ import { markdown, markdownInline, markdownListItems, escape } from './markdown.
 import { applyPictureStyle } from './picture.js';
 import { linkGlossaryTerms } from './glossary.js';
 import { embedKindForSlot, fillEmbedElement } from './embeds/index.js';
+import { isBlockedUrl } from './embeds/web.js';
 
 /**
  * @typedef {object} RenderOptions
@@ -214,7 +215,7 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
 
     case 'diagram': {
       // An embed slot (I-070): static fallback now, live content from hydrateEmbeds().
-      fillEmbedElement(el, /** @type {string} */ (embedKindForSlot(type)), value, ctx);
+      fillEmbedElement(el, /** @type {string} */ (embedKindForSlot(type)), value, ctx, { mode: /** @type {any} */ (options.mode) });
       if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
         const figcaption = doc.createElement('figcaption');
         figcaption.className = 'slipr-caption';
@@ -223,6 +224,12 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       }
       break;
     }
+
+    case 'web':
+      // A web page (I-071): link card or screenshot now, the frame from hydrateEmbeds().
+      if (isBlockedUrl(value.url)) el.innerHTML = '<p class="slipr-placeholder">[web page blocked: unsupported URL]</p>';
+      else fillEmbedElement(el, 'web', value, ctx, { mode: /** @type {any} */ (options.mode) });
+      break;
 
     default: // chart: planned slot type
       el.innerHTML = `<p class="slipr-placeholder">[${escape(type)}: not supported yet]</p>`;

@@ -249,6 +249,9 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, value);
+  // A web page slot (I-071) or an embed fallback (I-070) needs format 0.2.
+  const embed02 = value && typeof value === 'object' && !Array.isArray(value) && (typeof value.url === 'string' || value.fallback !== undefined);
+  if (embed02 && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
     const content = { ...(s.content ?? {}) };
@@ -287,13 +290,13 @@ function withPictureFormat(show, value) {
 }
 
 /**
- * An embed's fallback image or load setting (I-070) needs show format 0.2:
- * raise a 0.1 show when a block patch sets one.
+ * Embed settings (I-070, I-071) need show format 0.2: raise a 0.1 show when a
+ * block patch sets one (web slots: see setSlot).
  * @param {any} show @param {any} patch
  * @returns {any}
  */
 function withEmbedFormat(show, patch) {
-  const uses = patch && (patch.fallback !== undefined || patch.load !== undefined);
+  const uses = patch && ['fallback', 'load', 'allow', 'aspect'].some((k) => patch[k] !== undefined);
   return uses && (show.slipr === '0.1' || !show.slipr) ? { ...show, slipr: '0.2' } : show;
 }
 
@@ -594,6 +597,8 @@ export function convertBlock(block, type, defaults = {}) {
       return {
         ...base, url: block.url ?? '', title: title ?? 'Embedded page',
         ...(block.height ? { height: block.height } : {}),
+        ...(block.aspect ? { aspect: block.aspect } : {}),
+        ...(block.allow ? { allow: block.allow } : {}),
         ...(block.load ? { load: block.load } : {}),
         ...(block.fallback ? { fallback: block.fallback } : {}),
       };

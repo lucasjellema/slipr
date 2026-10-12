@@ -71,7 +71,7 @@ export function validateShow(show, options = {}) {
     if (layouts) checkSlots(slide, at, layouts, errors, warnings);
     checkImages(slide, at, options.imageExists, errors, warnings, options.template, show.slipr);
     checkOverlays(slide, at, show.slipr, errors, warnings);
-    checkEmbedFormat(slide, at, show.slipr, errors);
+    checkEmbeds(slide, at, show.slipr, errors, warnings);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -429,19 +429,45 @@ function embedFallbacks(slide, at) {
 }
 
 /**
- * Embed `fallback` and `load` (I-070, D-011): show format 0.2.
- * @param {any} slide @param {string} at @param {unknown} version @param {Issue[]} errors
+ * Embeds (I-070, I-071, D-011): `fallback`, `load`, `allow`, `aspect` and web
+ * slots need show format 0.2. Web pages: an unsafe address is an error;
+ * presenting as a screenshot without one, and same-origin on a file in the
+ * show folder (ignored there), are warnings.
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
  */
-function checkEmbedFormat(slide, at, version, errors) {
-  if (version !== '0.1') return;
-  const message = 'an embed fallback image or load setting needs show format 0.2: set "slipr" to "0.2"';
+function checkEmbeds(slide, at, version, errors, warnings) {
+  const message = 'this embed setting needs show format 0.2: set "slipr" to "0.2"';
+  /** @param {any} value @param {string} path */
+  const checkWeb = (value, path) => {
+    if (/^\s*(javascript|data|vbscript):/i.test(String(value.url ?? ''))) {
+      errors.push({ path: `${path}.url`, code: 'unsafe-url', message: 'this kind of address cannot be embedded' });
+    }
+    if (arrayOf(value.allow).includes('same-origin') && !/^\s*https?:/i.test(String(value.url ?? ''))) {
+      warnings.push({ path: `${path}.allow`, code: 'same-origin-local', message: '"same-origin" is ignored for a file in the show folder: it would let the page reach the reader’s notes' });
+    }
+  };
   for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
-    if (isObject(value) && value.fallback !== undefined) errors.push({ path: `${at}.content.${name}.fallback`, code: 'format-version', message });
+    if (!isObject(value)) continue;
+    const path = `${at}.content.${name}`;
+    if (typeof value.url === 'string') {
+      if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a web page slot needs show format 0.2: set "slipr" to "0.2"' });
+      checkWeb(value, path);
+      if (value.present === 'static' && !isImage(value.fallback)) {
+        warnings.push({ path: `${path}.present`, code: 'static-without-fallback', message: 'presented as a screenshot, but there is no fallback image: the slide shows a link card' });
+      }
+    } else if (value.fallback !== undefined && version === '0.1') {
+      errors.push({ path: `${path}.fallback`, code: 'format-version', message });
+    }
   }
   arrayOf(slide.reader?.blocks).forEach((block, j) => {
-    for (const key of ['fallback', 'load']) {
-      if (block?.[key] !== undefined) errors.push({ path: `${at}.reader.blocks[${j}].${key}`, code: 'format-version', message });
+    const path = `${at}.reader.blocks[${j}]`;
+    if (version === '0.1') {
+      for (const key of ['fallback', 'load', 'allow', 'aspect']) {
+        if (block?.[key] !== undefined) errors.push({ path: `${path}.${key}`, code: 'format-version', message });
+      }
     }
+    if (block?.type === 'embed') checkWeb(block, path);
   });
 }
 
@@ -531,6 +557,7 @@ function matchesSlotType(value, type) {
     case 'quote': return isObject(value) && typeof value.text === 'string';
     case 'chart': return isObject(value) && typeof value.kind === 'string';
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
+    case 'web': return isObject(value) && typeof value.url === 'string';
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -547,6 +574,7 @@ function slotTypeLabel(type) {
     quote: 'a quote object { "text": ..., "source": ... }',
     chart: 'a chart object { "kind": ..., "data": ... }',
     diagram: 'a diagram object { "mermaid": ... }',
+    web: 'a web page object { "url": ..., "title": ... }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

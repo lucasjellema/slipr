@@ -1,7 +1,8 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { isDiagram, clearDiagramCache } from '../embeds/diagram.js';
-import { embedHtml, embedKindForBlock, embedKindForSlot, hydrateEmbeds, usedEmbedKinds } from '../embeds/index.js';
+import { embedAttributes, embedHtml, embedKindForBlock, embedKindForSlot, hydrateEmbeds, usedEmbedKinds } from '../embeds/index.js';
+import { ALLOW_OPTIONS, FRAME_SANDBOX, frameAspect, frameSandbox } from '../embeds/web.js';
 import { externalOrigin, grantConsent, hasConsent } from '../embeds/consent.js';
 import { renderBlock } from '../blocks.js';
 import { validateShow, collectImagePaths } from '../validate.js';
@@ -205,5 +206,77 @@ describe('embed validation (I-070)', () => {
   test('an unknown load value is an error', () => {
     const show = showWith([{ id: 'w', type: 'embed', url: 'https://example.com', title: 'Ex', load: 'never' }]);
     assert.equal(validateShow(show, { template }).ok, false);
+  });
+});
+
+describe('web pages (I-071)', () => {
+  const template = readJson('templates/default/template.json');
+  /** A 0.2 show with one web slide. */
+  const webShow = (page, slipr = '0.2') => ({
+    slipr,
+    id: 'web-test',
+    meta: { title: 'Web test' },
+    template: { ref: 'default', version: '^1.0' },
+    slides: [{ id: 's-1', layout: 'web', content: { title: 'T', page } }],
+  });
+
+  test('sandbox: base plus extras; same-origin only for other servers', () => {
+    assert.equal(frameSandbox({ url: 'https://x.example' }), FRAME_SANDBOX);
+    assert.equal(
+      frameSandbox({ url: 'https://x.example', allow: ['same-origin', 'modals', 'downloads', 'presentation', 'fullscreen', 'modals'] }),
+      `${FRAME_SANDBOX} allow-same-origin allow-modals allow-downloads allow-presentation`,
+    );
+    assert.equal(frameSandbox({ url: 'embeds/page.html', allow: ['same-origin', 'modals'] }), `${FRAME_SANDBOX} allow-modals`);
+    assert.deepEqual(ALLOW_OPTIONS, ['same-origin', 'fullscreen', 'modals', 'downloads', 'presentation']);
+  });
+
+  test('aspect ratio wins over height; slots get neither', () => {
+    assert.equal(frameAspect({ aspect: '16:9' }), '16 / 9');
+    assert.equal(frameAspect({ aspect: '16x9' }), null);
+    const block = embedHtml('web', { url: 'https://x.example', title: 'X', aspect: '4:3', height: 300 }, ctx);
+    assert.match(block, /data-embed-aspect="4 \/ 3"/);
+    assert.doesNotMatch(block, /data-embed-height/);
+    const slot = embedAttributes('web', { url: 'https://x.example', title: 'X', aspect: '4:3' }, ctx, { slot: true });
+    assert.equal(slot['data-embed-aspect'], undefined);
+    assert.equal(slot['data-embed-height'], undefined);
+    assert.equal(embedAttributes('web', { url: 'https://x.example', title: 'X', allow: ['fullscreen'] }, ctx)['data-embed-fullscreen'], '');
+  });
+
+  test('audience mode: live loads without asking, static keeps the screenshot', () => {
+    const live = embedAttributes('web', { url: 'https://x.example', title: 'X' }, ctx, { mode: 'audience', slot: true });
+    assert.equal(live['data-embed-origin'], undefined);
+    assert.equal(live['data-embed-static'], undefined);
+    const still = embedAttributes('web', { url: 'https://x.example', title: 'X', present: 'static' }, ctx, { mode: 'audience', slot: true });
+    assert.equal(still['data-embed-static'], '');
+    const reader = embedAttributes('web', { url: 'https://x.example', title: 'X', present: 'static' }, ctx, { mode: 'reader', slot: true });
+    assert.equal(reader['data-embed-origin'], 'https://x.example', 'reader mode asks, whatever present says');
+    assert.equal(reader['data-embed-static'], undefined);
+  });
+
+  test('web slots: kind, validation and format version', () => {
+    assert.equal(embedKindForSlot('web'), 'web');
+    const page = { url: 'https://x.example', title: 'X', allow: ['fullscreen'], present: 'static', fallback: { src: 'images/x.png', alt: 'X' } };
+    assert.deepEqual([...usedEmbedKinds(webShow(page))], ['web']);
+    const ok = validateShow(webShow(page), { template });
+    assert.deepEqual(ok.errors, []);
+    assert.deepEqual(ok.warnings, []);
+    assert.ok(validateShow(webShow(page, '0.1'), { template }).errors.some((e) => e.code === 'format-version' && e.path === 'slides[0].content.page'));
+    assert.equal(validateShow(webShow({ ...page, allow: ['camera'] }), { template }).ok, false);
+  });
+
+  test('web warnings and errors', () => {
+    const codesOf = (page) => {
+      const r = validateShow(webShow(page), { template });
+      return [...r.errors, ...r.warnings].map((i) => i.code).sort();
+    };
+    assert.deepEqual(codesOf({ url: 'https://x.example', title: 'X', present: 'static' }), ['static-without-fallback']);
+    assert.deepEqual(codesOf({ url: 'embeds/x.html', title: 'X', allow: ['same-origin'] }), ['same-origin-local']);
+    assert.deepEqual(codesOf({ url: 'javascript:alert(1)', title: 'X' }), ['unsafe-url']);
+  });
+
+  test('embed blocks: allow and aspect need 0.2', () => {
+    const show = showWith([{ id: 'w', type: 'embed', url: 'https://x.example', title: 'X', allow: ['modals'], aspect: '16:9' }], undefined, '0.1');
+    const paths = validateShow(show, { template }).errors.filter((e) => e.code === 'format-version').map((e) => e.path);
+    assert.deepEqual(paths, ['slides[0].reader.blocks[0].allow', 'slides[0].reader.blocks[0].aspect']);
   });
 });

@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -386,6 +386,33 @@
           "type": "image",
           "label": "Illustration or diagram",
           "help": "Shown in full (contain), not cropped."
+        }
+      ]
+    },
+    {
+      "id": "web",
+      "name": "Web page",
+      "description": "Title with a live web page (or its screenshot) in the content area.",
+      "file": "layouts/web.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "page",
+          "type": "web",
+          "label": "Web page",
+          "required": true
         }
       ]
     },

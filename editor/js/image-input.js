@@ -11,6 +11,7 @@ import { ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
+import { webValue } from './block-values.js';
 import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
@@ -137,6 +138,26 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
     fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${slot}`,
     read: (s) => s?.content?.[slot],
     write: (value) => store.dispatch('setSlot', { slideId, slot, value }),
+  });
+}
+
+/**
+ * Copy an image into the show folder and make it the fallback image of a
+ * `web` slot (I-071), then ask for alt text.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, slot: string, file: File }} target
+ */
+export async function addFallbackToSlot(store, { slideId, slot, file }) {
+  const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  await addImage(store, {
+    slideId,
+    file,
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${slot}-fallback`,
+    read: (s) => s?.content?.[slot]?.fallback,
+    write: (image) => {
+      const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slot];
+      store.dispatch('setSlot', { slideId, slot, value: webValue(current, { fallback: image }) });
+    },
   });
 }
 

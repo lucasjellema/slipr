@@ -194,6 +194,10 @@ export function showFiles(show) {
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       if (block?.type === 'embed' && typeof block.url === 'string' && block.url && !NOT_RELATIVE.test(block.url)) files.add(block.url);
     }
+    // Web page slots (I-071) with a page from the show folder.
+    for (const value of Object.values(slide?.content && typeof slide.content === 'object' ? slide.content : {})) {
+      if (value && typeof value === 'object' && typeof value.url === 'string' && value.url && !NOT_RELATIVE.test(value.url)) files.add(value.url);
+    }
   }
   return [...files].filter((f) => typeof f === 'string' && f && !NOT_RELATIVE.test(f));
 }

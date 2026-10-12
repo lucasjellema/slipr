@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "default",
   "name": "Slipr Default",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Clean, neutral template used for samples and tests. Uses system fonts, so it needs no font files.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -92,6 +92,17 @@
       "file": "layouts/diagram.html",
       "slots": [
         { "name": "diagram", "type": "diagram", "label": "Diagram", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
+    },
+    {
+      "id": "web",
+      "name": "Web page",
+      "description": "A live web page (or its screenshot) with optional title and caption.",
+      "file": "layouts/web.html",
+      "slots": [
+        { "name": "page", "type": "web", "label": "Web page", "required": true },
         { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
         { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
       ]
