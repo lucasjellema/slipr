@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-12: Glossary terms clickable in slides (I-086, D-015)
+- **Added** `shared/glossary.js`: finds glossary terms and their aliases in text (whole words, case- and accent-insensitive, longest first, once per slide; tested in Node) and links them as `.slipr-term` buttons. `shared/render.js` uses it in reader mode, so terms on slides open their definition like `[[term]]`; audience mode is unchanged.
+- **Added** to show format 0.2: `aliases` on glossary terms. Validation: aliases in a 0.1 show are an error; a name used by two terms is a warning. Reader search finds terms by their aliases.
+- **Changed** the demo show: aliases on Reveal.js, template and layout. Spec `docs/specs/I-086-glossary-in-slides.md`; show and template format docs; D-015.
+
 ### 2026-10-11: Picture styles and opacity (I-084, D-014)
 - **Added** template format **0.3**: `pictureStyles` (id, label, description, `pptxEffect`), each a class `slipr-picture-<id>` in `theme.css`. Both templates are 0.3 and offer `shadow`, `soft`, `rounded` and `frame` (default 1.0.0 → 1.1.0, Conclusion 0.1.0 → 0.1.1 so `^0.1` shows stay in range; the Conclusion styles are on-brand and subject to I-043d).
 - **Added** to show format 0.2: `style` and `opacity` (0–1) on every image value (image slots, card images, reader image blocks, extra images). Validation: either in a 0.1 show is an error; a style the template lacks is a warning and renders unstyled.

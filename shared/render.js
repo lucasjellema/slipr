@@ -21,6 +21,7 @@
  */
 import { markdown, markdownInline, markdownListItems, escape } from './markdown.js';
 import { applyPictureStyle } from './picture.js';
+import { linkGlossaryTerms } from './glossary.js';
 
 /**
  * @typedef {object} RenderOptions
@@ -77,6 +78,8 @@ export function renderSlide(slide, ctx, options = {}) {
     fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode, def });
   }
   if (overlays.length) canvas.append(renderOverlays(overlays, ctx, doc, mode));
+  // Reader mode: glossary terms in the slide's text open their definition (I-086).
+  if (mode === 'reader') linkGlossaryTerms(canvas, ctx.show.glossary);
   return root;
 }
 

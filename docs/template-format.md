@@ -183,6 +183,7 @@ The template also owns the look of reader mode. A template may ship a `reader.cs
 - the reader blocks: `.slipr-block--text`, `--details`, `--callout` (with `[data-variant]`), `--tabs`, `--image`, `--embed`, `--slide-ref`
 - popovers: `.slipr-popover` with `.slipr-popover-title` (glossary, footnotes, hotspots), glossary term markers `.slipr-term`, footnote markers `.slipr-footnote-ref`
 - hotspots: `.slipr-hotspot` buttons, positioned in percentages inside `.slipr-hotspot-frame` (which must be `position: relative`)
+- glossary terms are also linked inside **slides** in reader mode (D-015): the same `.slipr-term` buttons, inside layout text, so keep `.slipr-term` unscoped with `font: inherit` and `color: inherit` (the shipped templates do)
 - badges: `.slipr-block-badges` > `.slipr-badge[data-kind="profile"|"depth"]` ("For Developer", "Deep dive")
 - reader typography: article width, headings, chapter headers
 

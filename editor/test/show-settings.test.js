@@ -106,3 +106,21 @@ describe('metadata, tags and audience options (E-015)', async () => {
     assert.equal(actions.setSlideAudience(hidden, { slideId: id, patch: { autoAnimate: false } }).slides[0].audience.hidden, true, 'hidden is kept');
   });
 });
+
+describe('glossary other names (I-086)', () => {
+  test('aliases are parsed, kept on other edits, removed when emptied; the first makes the show 0.2', async () => {
+    const { upsertGlossaryTerm, glossaryAliases } = await import('../js/actions.js');
+    assert.deepEqual(glossaryAliases(' AI, A.I. ,, ai , artificial intel '), ['AI', 'A.I.', 'artificial intel']);
+    assert.deepEqual(glossaryAliases(undefined), []);
+    const show = { slipr: '0.1', glossary: { ai: { term: 'artificial intelligence', definition: 'x' } } };
+    let next = upsertGlossaryTerm(show, { id: 'ai', term: 'artificial intelligence', definition: 'x', aliases: 'AI, A.I.' });
+    assert.deepEqual(next.glossary.ai, { term: 'artificial intelligence', aliases: ['AI', 'A.I.'], definition: 'x' });
+    assert.equal(next.slipr, '0.2');
+    next = upsertGlossaryTerm(next, { id: 'ai', term: 'AI', definition: 'y', aliases: next.glossary.ai.aliases });
+    assert.deepEqual(next.glossary.ai.aliases, ['AI', 'A.I.'], 'kept when another field changes');
+    next = upsertGlossaryTerm(next, { id: 'ai', term: 'AI', definition: 'y', aliases: '' });
+    assert.equal('aliases' in next.glossary.ai, false);
+    assert.equal(next.slipr, '0.2', 'a show stays 0.2');
+    assert.equal(upsertGlossaryTerm(show, { id: 'ai', term: 'x', definition: 'x' }).slipr, '0.1');
+  });
+});

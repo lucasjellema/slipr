@@ -101,7 +101,7 @@ On screens of 1400 px and wider, "My notes" docks beside the article. On smaller
 ```
 
 ### Interactive content
-- **Popups on hover or tap**: glossary terms (dotted underline), inline footnotes, and hotspots on images.
+- **Popups on hover or tap**: glossary terms (dotted underline), inline footnotes, and hotspots on images. Glossary terms are marked on the slides too (the first time each appears on a slide), also under another name the glossary lists for them.
 - **Collapsible panels** for background and side topics.
 - **Tabs** for alternatives, such as code in several languages or *before / after*.
 - **Callouts** for tips, warnings and quotes.

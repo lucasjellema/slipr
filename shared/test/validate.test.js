@@ -15,6 +15,13 @@ function validateVariant(mutate) {
   return validateShow(show, { template });
 }
 
+/** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases). */
+function withoutFormat02(s) {
+  for (const slide of s.slides) delete slide.overlays;
+  for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
+  for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
+}
+
 describe('valid inputs', () => {
   test('the default template is valid', () => {
     const result = validateTemplate(template);
@@ -236,12 +243,7 @@ describe('extra images (overlays, format 0.2, I-083)', () => {
   });
 
   test('both 0.1 and 0.2 shows without overlays are valid', () => {
-    // Without the 0.2 features: overlays, picture styles and opacity.
-    const noOverlays = (s) => {
-      for (const slide of s.slides) delete slide.overlays;
-      for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
-    };
-    for (const version of ['0.1', '0.2']) assert.equal(validateVariant((s) => { noOverlays(s); s.slipr = version; }).ok, true, version);
+    for (const version of ['0.1', '0.2']) assert.equal(validateVariant((s) => { withoutFormat02(s); s.slipr = version; }).ok, true, version);
     assert.ok(codes(validateVariant((s) => { s.slipr = '0.3'; }).errors).includes('enum'));
   });
 
@@ -307,8 +309,8 @@ describe('picture styles and opacity (D-014, I-084)', () => {
 
   test('in a 0.1 show they are an error', () => {
     const result = validateVariant((s) => {
+      withoutFormat02(s);
       s.slipr = '0.1';
-      for (const slide of s.slides) delete slide.overlays;
       imageSlide(s).content.image.opacity = 0.5;
     });
     assert.ok(codes(result.errors).includes('format-version'));
@@ -324,6 +326,27 @@ describe('picture styles and opacity (D-014, I-084)', () => {
     const show = clone(demo);
     imageSlide(show).content.image.style = 'sparkle';
     assert.deepEqual(validateShow(show).warnings, []);
+  });
+});
+
+describe('glossary aliases (I-086)', () => {
+  test('aliases are valid in 0.2, an error in 0.1, and must be non-empty strings', () => {
+    assert.deepEqual(validateVariant((s) => { s.glossary.layout.aliases = ['layouts', 'base layout']; }).errors, []);
+    const old = validateVariant((s) => {
+      withoutFormat02(s);
+      s.slipr = '0.1';
+      s.glossary.layout.aliases = ['layouts'];
+    });
+    assert.deepEqual(codes(old.errors), ['format-version']);
+    assert.equal(validateVariant((s) => { s.glossary.layout.aliases = ['']; }).ok, false);
+  });
+
+  test('a name used by two terms is a warning', () => {
+    const { warnings } = validateVariant((s) => {
+      const [first, second] = Object.keys(s.glossary);
+      s.glossary[second].aliases = [s.glossary[first].term.toUpperCase()];
+    });
+    assert.ok(codes(warnings).includes('duplicate-glossary-name'));
   });
 });
 

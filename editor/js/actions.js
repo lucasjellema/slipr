@@ -834,17 +834,40 @@ export function deleteChapter(show, { chapterId }) {
 /**
  * Upsert a glossary term in show.glossary.
  * @param {any} show
- * @param {{ id: string, term: string, definition: string, link?: string }} payload
+ * @param {{ id: string, term: string, definition: string, link?: string, aliases?: string[] | string }} payload
  * @returns {any}
  */
-export function upsertGlossaryTerm(show, { id, term, definition, link }) {
+export function upsertGlossaryTerm(show, { id, term, definition, link, aliases }) {
   const glossary = { ...(show.glossary ?? {}) };
-  const entry = { term, definition };
+  /** @type {Record<string, any>} */
+  const entry = { term };
+  // Other names (I-086, show format 0.2): trimmed, no empties or repeats.
+  const names = glossaryAliases(aliases);
+  if (names.length) entry.aliases = names;
+  entry.definition = definition;
   if (link && link.trim() !== '') {
     entry.link = link;
   }
   glossary[id] = entry;
-  return { ...show, glossary };
+  const slipr = names.length && (show.slipr === '0.1' || !show.slipr) ? '0.2' : show.slipr;
+  return { ...show, slipr, glossary };
+}
+
+/**
+ * A glossary term's other names from a list or a comma-separated text:
+ * trimmed, without empties or repeats (case-insensitive).
+ * @param {string[] | string | undefined} value
+ * @returns {string[]}
+ */
+export function glossaryAliases(value) {
+  const list = Array.isArray(value) ? value : typeof value === 'string' ? value.split(',') : [];
+  /** @type {string[]} */
+  const out = [];
+  for (const raw of list) {
+    const name = typeof raw === 'string' ? raw.trim() : '';
+    if (name && !out.some((n) => n.toLowerCase() === name.toLowerCase())) out.push(name);
+  }
+  return out;
 }
 
 /**

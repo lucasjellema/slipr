@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays and picture style / opacity; a 0.1 show without them is still valid." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays, picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -111,6 +111,11 @@
       "additionalProperties": false,
       "properties": {
         "term": { "type": "string", "minLength": 1 },
+        "aliases": {
+          "type": "array",
+          "description": "(0.2) Other names for the term (plurals, abbreviations, synonyms), matched like the term in reader-mode slides (I-086).",
+          "items": { "type": "string", "minLength": 1 }
+        },
         "definition": { "$ref": "#/$defs/markdown" },
         "link": { "type": "string" }
       }

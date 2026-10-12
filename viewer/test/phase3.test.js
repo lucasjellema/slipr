@@ -184,6 +184,13 @@ describe('search', () => {
     assert.ok(search(docs, 'maxItems').results.some((r) => r.doc.blockId === 'dev-code'));
   });
 
+  test('finds a glossary term by one of its other names (I-086)', () => {
+    const show = structuredClone(demo);
+    show.glossary.layout.aliases = ['slide format'];
+    const results = search(buildSearchIndex(show), 'slide format').results;
+    assert.ok(results.some((r) => r.doc.kind === 'glossary' && r.doc.blockId === 'layout'));
+  });
+
   test('snippets are escaped and marked', () => {
     const r = search(docs, 'business case').results.find((x) => x.doc.blockId === 'mgr-value');
     assert.match(r.snippetHtml, /<mark>business<\/mark> <mark>case<\/mark>/);

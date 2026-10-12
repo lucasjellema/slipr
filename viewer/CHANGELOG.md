@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Glossary terms in slides (I-086)
+- **Added** in reader mode, glossary terms (and their aliases) on a slide open their definition on hover, tap or Enter, like terms in reader text; the first occurrence per slide is linked (by `shared/render.js`). Pin mode keeps priority. Audience mode is unchanged.
+- **Added** reader search finds a glossary term by its other names.
+
 ### 2026-10-11: Picture styles (I-084)
 - **Changed** an extra image's fragment class now goes on its box (`div.slipr-overlay`), not the `<img>`: the picture carries its style and opacity, and an inline opacity would otherwise show the image before its click. Picture styles themselves are rendered by `shared/` and styled by the template.
 

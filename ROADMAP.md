@@ -114,6 +114,7 @@ Pick from the *Next* section of the backlog. Likely candidates: PDF export, hous
 3. ✅ Light and dark theme for the editor, with a lighter dark theme (done 2026-10-11). [I-082]
 4. ✅ Extra images placed freely on a slide: show format 0.2, renderer, editor (move and resize on the preview), converter (done 2026-10-11). [I-083, D-013]
 5. ✅ Picture styles (shadow, soft edges, rounded, frame) from the template, plus a free opacity: template format 0.3, editor style picker, converter (done 2026-10-11). [I-084, D-014]
+6. ✅ Glossary terms clickable in reader-mode slides, with other names (aliases) per term (done 2026-10-12). [I-086, D-015]
 
 ---
 

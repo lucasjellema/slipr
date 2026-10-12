@@ -14,6 +14,7 @@
  * See docs/show-format.md → Validation rules.
  */
 import { checkSchema } from './schema-check.js';
+import { foldText } from './glossary.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
 
@@ -45,6 +46,7 @@ export function validateShow(show, options = {}) {
   const slides = arrayOf(show.slides);
   const slideIds = new Set();
   const glossaryIds = new Set(isObject(show.glossary) ? Object.keys(show.glossary) : []);
+  checkGlossaryNames(show, errors, warnings);
   const profileIds = collectIds(show.profiles, 'profiles', errors);
   const chapterIds = collectIds(show.chapters, 'chapters', errors);
   collectIds(show.paths, 'paths', errors);
@@ -371,6 +373,33 @@ function checkImages(slide, at, imageExists, errors, warnings, template, version
     }
     if (imageExists && !imageExists(image.src)) {
       warnings.push({ path, code: 'missing-file', message: `image file "${image.src}" not found` });
+    }
+  }
+}
+
+/**
+ * Glossary aliases (I-086): show format 0.2; a name (term or alias) used by
+ * two terms is a warning, because slides link it to the first one only.
+ * @param {any} show @param {Issue[]} errors @param {Issue[]} warnings
+ */
+function checkGlossaryNames(show, errors, warnings) {
+  if (!isObject(show.glossary)) return;
+  /** @type {Map<string, string>} */
+  const owner = new Map();
+  for (const [id, entry] of Object.entries(show.glossary)) {
+    if (!isObject(entry)) continue;
+    if (entry.aliases !== undefined && show.slipr === '0.1') {
+      errors.push({ path: `glossary.${id}.aliases`, code: 'format-version', message: 'glossary aliases need show format 0.2: set "slipr" to "0.2"' });
+    }
+    for (const name of [entry.term, ...arrayOf(entry.aliases)]) {
+      if (typeof name !== 'string') continue;
+      const key = foldText(name.trim()).folded;
+      if (!key) continue;
+      const first = owner.get(key);
+      if (first === undefined) owner.set(key, id);
+      else if (first !== id) {
+        warnings.push({ path: `glossary.${id}`, code: 'duplicate-glossary-name', message: `"${name.trim()}" is also a name of glossary term "${first}"; slides link it to "${first}"` });
+      }
     }
   }
 }

@@ -81,7 +81,12 @@ export function buildSearchIndex(show) {
   for (const [id, entry] of Object.entries(glossary)) {
     docs.push({
       kind: 'glossary', slideId: null, blockId: id, title: `Glossary: ${entry.term}`, order: order++,
-      fields: [{ name: 'term', text: entry.term, weight: 4 }, { name: 'definition', text: text(entry.definition), weight: 1 }],
+      fields: [
+        { name: 'term', text: entry.term, weight: 4 },
+        // Other names (I-086) are found like the term itself.
+        { name: 'aliases', text: (Array.isArray(entry.aliases) ? entry.aliases : []).join(', '), weight: 3 },
+        { name: 'definition', text: text(entry.definition), weight: 1 },
+      ],
     });
   }
   return docs;

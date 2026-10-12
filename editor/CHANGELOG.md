@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Other names for glossary terms (I-086)
+- **Added** an **Other names** field per glossary term in Show settings (comma-separated), stored as `aliases`; `upsertGlossaryTerm` keeps them on other edits (it used to rebuild the entry from term, definition and link only) and sets the show to format 0.2 for the first one. New helper `glossaryAliases()`. The reader preview links terms on the slide, like the viewer.
+
 ### 2026-10-11: Picture styles and opacity (I-084)
 - **Added** a style picker and an opacity slider to every image field with a picture: image slots, card images, reader image blocks and extra images (`ui/picture-style.js`). The picker shows "None" and one button per picture style of the template, each with this picture in that style (the template's `.slipr-picture-<id>` classes are loaded in the editor page). The slider (0–100 %, 5 % steps) updates its readout while dragging and stores on release, so a form re-render never interrupts a drag; 100 % removes `opacity`. A style the template lacks is reported with a "Remove it" button.
 - **Added** `usesPictureStyle()`: `setSlot` and `updateBlock` raise a 0.1 show to format 0.2 when a picture gets a style or opacity. Tests in `editor/test/picture-style.test.js`.

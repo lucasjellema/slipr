@@ -40,7 +40,7 @@ With `shows/demo`:
 
 5. The welcome chooser appears on first visit (clear the site data, or use a private window, to see it again) and is skipped on the next visit, and also when the link carries `profile`, `depth` or `path`.
 6. `?profile=dev&depth=3` shows the developer deep-dive blocks (tabs on "A show is just data"), `?profile=mgr` hides them, and `?path=quick` shows 5 slides. ⚙ Tailor and `D` change this without losing the scroll position, and the choice survives a reload.
-7. Glossary terms, footnotes and hotspots open popovers on hover (mouse), on tap (touch emulation) and with Enter (keyboard).
+7. Glossary terms, footnotes and hotspots open popovers on hover (mouse), on tap (touch emulation) and with Enter (keyboard). On slides too: "A show is just data" links *template* and *layout* (inside bold), the section slide *templates* (an alias); each term once per slide; none in audience mode. In pin mode a click on a term places the pin.
 8. Details panels and tabs work. Embeds load lazily.
 9. `/` search finds text in a reader block and jumps to it with a highlight.
 10. Select text in a block → Highlight / Add note. After a reload it is still highlighted and the note is back. With a profile that hides that block, the note moves to "Hidden by your tailoring". Export Markdown and JSON download files, and importing the JSON again reports "0 new".

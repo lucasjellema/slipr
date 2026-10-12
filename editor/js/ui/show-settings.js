@@ -402,7 +402,7 @@ function glossarySection(store, show) {
     /** @param {Record<string, any>} patch */
     const update = (patch, /** @type {string} */ key) => {
       const current = store.state.show?.glossary?.[id] ?? term;
-      store.dispatch('upsertGlossaryTerm', { id, term: current.term, definition: current.definition ?? '', link: current.link, ...patch }, { coalesceKey: `glossary-${key}-${id}` });
+      store.dispatch('upsertGlossaryTerm', { id, term: current.term, aliases: current.aliases, definition: current.definition ?? '', link: current.link, ...patch }, { coalesceKey: `glossary-${key}-${id}` });
     };
     const definition = /** @type {HTMLTextAreaElement} */ (h('textarea', {
       class: 'slipr-textarea slipr-textarea-sm',
@@ -429,6 +429,13 @@ function glossarySection(store, show) {
           });
         }),
       ]),
+      // Other names (I-086): matched like the term in reader-mode slides, and found by search.
+      optionalInput({
+        value: Array.isArray(term.aliases) ? term.aliases.join(', ') : '',
+        label: `Glossary "${term.term}": other names`,
+        placeholder: 'Other names, comma-separated (optional): plurals, abbreviations',
+        onValue: (text) => update({ aliases: text ?? '' }, 'aliases'),
+      }),
       markdownToolbar(definition, { show, slideId: '' }),
       definition,
       optionalInput({

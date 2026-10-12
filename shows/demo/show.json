@@ -23,6 +23,7 @@
   "glossary": {
     "reveal-js": {
       "term": "Reveal.js",
+      "aliases": ["Reveal"],
       "definition": "Open-source framework for HTML presentations. Slipr uses it for **audience mode** only.",
       "link": "https://revealjs.com"
     },
@@ -36,10 +37,12 @@
     },
     "template": {
       "term": "template",
+      "aliases": ["templates"],
       "definition": "A style guide (colors, fonts, illustrations) plus a set of base slide layouts. Every show links to one."
     },
     "layout": {
       "term": "layout",
+      "aliases": ["layouts"],
       "definition": "A base slide format in a template, such as *title*, *bullets* or *two-column*. It defines named slots."
     },
     "slot": {
