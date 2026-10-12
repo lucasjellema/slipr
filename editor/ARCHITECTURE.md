@@ -55,7 +55,7 @@ editor/
     │   ├── images.js     ✅ DOM-free: supported image types, `images/<slug>-<hash8>.<ext>` names, content suffix (E-006)
     │   ├── serialize.js  ✅ DOM-free: show.json text with schema key order and 2-space indent
     │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
-    │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
+    │   └── draft-store.js   ✅ IndexedDB drafts for autosave and crash recovery (I-020)
     └── ui/
         ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read, glossary, ? Help
         ├── show-grid.js     ✅ the show grid: all slides as thumbnails in chapter runs; select, drag, batch operations, chapter moves (I-081)
@@ -78,7 +78,7 @@ editor/
         └── dialogs.js       ✅ start screen, access screen, new-show, choose-folder, alt-text and confirm dialogs, `openDialog()`, banners
 ```
 
-**Current limits:** No draft autosave yet (I-020). Only unknown reader block types are read-only. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code` and `cards` have their own editors (`ui/field-editors.js`, values from `card-values.js`); `chart`, `diagram` and unknown slot types are shown read-only.
+**Current limits:** Only unknown reader block types are read-only. The slide form has inputs for `text`, `richtext`, `list` and `image` (path + alt text) slots, built by the rules in `slot-values.js` so they always write the shape the format requires. `quote`, `code` and `cards` have their own editors (`ui/field-editors.js`, values from `card-values.js`); `chart`, `diagram` and unknown slot types are shown read-only.
 
 ## Key components
 
@@ -119,7 +119,7 @@ In **audience** mode it renders the selected slide with `shared/render.js` into 
 - **New**: title + template (from `templates/index.json`) → pick an empty folder → write `show.json` (template ref `/templates/<id>`) and `images/` → open it like *Open*.
 - **Save**: write `show.json` (`io/serialize.js`: 2-space indent, key order from the JSON Schema, like the converter's output). Saving a hand-formatted file reformats it once. A show opened by URL (`?show=`) first asks for its folder and checks the show id. Edits made while saving stay dirty (`store.markSaved()`).
 - **Images** (`image-input.js`): written to `images/<slug>-<hash8>.<ext>`, where the hash is of the content. The slug is the file name, or for pasted images (`image.png`) the slide title and slot. An image whose hash is already in `images/` is reused, whatever its name. The slot gets `{ src, alt }` through `setSlot`, so undo works; the file is never deleted. Folder shows resolve images as `blob:` URLs, so a new image is registered with `ctx.registerAsset()` (`shared/load.js`).
-- **Drafts** (planned, I-020): the current show goes to IndexedDB every 5 s while dirty. On open, if a newer draft exists, the editor offers to restore it.
+- **Drafts** (`io/draft-store.js`, I-020): the current show goes to IndexedDB (`slipr-drafts`, falling back to localStorage / memory) every 5 s while dirty, and immediately on page hide or tab close. When saved, the draft is cleared. On open, if a newer unsaved draft exists, the editor offers to restore it via a recovery dialog, pushing the disk version into the undo stack.
 - Folder handles are remembered in IndexedDB for "recent shows" (start screen). Permission is re-requested on reopen, from a click.
 
 ### Find & replace (`ui/find-replace.js`, `actions.js`)

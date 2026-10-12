@@ -1981,7 +1981,18 @@ export function moveOverlay(show, { slideId, index, toIndex }) {
   });
 }
 
+/**
+ * Replace the entire show with a recovered draft (I-020).
+ * @param {any} _currentShow
+ * @param {any} draftShow
+ * @returns {any}
+ */
+export function restoreDraft(_currentShow, draftShow) {
+  return clone(draftShow);
+}
+
 export const actions = {
+  restoreDraft,
   addOverlay,
   updateOverlay,
   deleteOverlay,

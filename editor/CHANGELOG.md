@@ -4,6 +4,14 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Autosave draft to IndexedDB with crash recovery (I-020)
+- **Added** draft storage module (`io/draft-store.js`): persists unsaved show drafts into IndexedDB (`slipr-drafts`, object store `drafts`), falling back to `localStorage` or in-memory storage. Keyed stably by folder key (`folder:<key>`), show URL (`url:<url>`), or show ID (`id:<id>`).
+- **Added** automatic background autosaving (`startAutosave`): checks dirty status every 5 seconds and persists modified shows without redundant serialization. Flushes immediately upon `visibilitychange` (tab hidden), `pagehide`, and `beforeunload`.
+- **Added** crash recovery on open (`checkDraftRecovery`, `openDraftRecoveryDialog`): detects unpersisted drafts when opening a show, displays a recovery dialog showing draft timestamp (`formatDraftTime`), and offers **Restore draft** or **Discard draft**. Restoring dispatches the `restoreDraft` action, placing the draft into the editor with the pre-restoration disk show preserved in the undo stack (`Ctrl+Z` to undo).
+- **Added** banner recovery fallback: dismissing the recovery dialog leaves a non-intrusive banner with one-click **Restore draft** and **Discard** actions.
+- **Added** draft lifecycle integration: successful disk saves (`save(store)`) and intentional discards in folder switches automatically remove the draft from IndexedDB.
+- **Added** 15 unit tests in `editor/test/draft-store.test.js`.
+
 ### 2026-10-12: Dedicated Glossary Editor with deck-aware completion (I-088)
 - **Added** a dedicated, full-screen Glossary Editor (`ui/glossary-editor.js`, `glossary-model.js`): split view with real-time search, filters (`All`, `In Use`, `Unused`, `No Def`), and sorts (`A → Z`, `Z → A`, `Most used`, `Least used`). Accessible via the toolbar (`📖 Glossary`), the Show Settings panel, and keyboard shortcut (`Esc` closes, `↑`/`↓` switches terms, `Ctrl+N` or `+` adds a new term).
 - **Added** deck-aware word completion: scans words, acronyms, CamelCase terms, and technical phrases across slides, cards, notes, and reader blocks to offer real-time autocompletion suggestions when typing term names, plus a **Deck suggestions** drawer that lists frequently occurring unglossaried terms with one-click addition.

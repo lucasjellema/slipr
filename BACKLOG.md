@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086) and dedicated glossary editor (I-088); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -82,7 +82,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-034** [viewer] Show my pins and notes in audience mode too (presenter's private view, e.g. in the speaker window), and pins on reader-block images (hotspot-style)
 
 ### Editor
-- [ ] **I-020** [editor] Autosave draft to IndexedDB with crash recovery
 - [ ] **I-021** [editor] Text-overflow detection: warn when content does not fit the layout at 1920×1080
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
@@ -179,6 +178,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-020** [editor] Autosave draft to IndexedDB with crash recovery: automatic persistence to IndexedDB every 5 s while dirty, flush on tab hide/close, recovery dialog on open with relative timestamps, undoable restoreDraft action, banner fallback, and cleanup on clean save · done 2026-10-12 · claude
 - [x] **I-088** [editor] Dedicated Glossary Editor with deck-aware word completion: split view, search, filters, sorting, real-time deck word autocompletion and unglossaried suggestions drawer, ID rename with show-wide reference rewriting, live Markdown preview, and slide jump navigation · done 2026-10-12 · claude
 - [x] **I-072** [format/viewer] PDF document: spike chose vendored **PDF.js 4.10.38** (D-011 refined); `pdf` slot and block (show format 0.2) with `page` or `pages: [first, last]`, files from the show folder or https (click-to-load); audience mode fits the page and steps through a range on clicks; reader blocks with page navigation, zoom and screen-reader text; PDF text in reader search (on first use, results open at the page); `pdf` layouts in both templates (default 1.3.0, Conclusion 0.1.3); editor fields with **Choose PDF…** (copied to `docs/`); works in the single-file export. Spec: `docs/specs/I-072-pdf-document.md` · done 2026-10-12 · claude
 - [x] **I-071** [format/viewer] Website embed: `web` slot (show format 0.2) with a `web` layout in both templates (default 1.2.0, Conclusion 0.1.2); `allow` sandbox extras from an allow-list (`same-origin` for other servers only), `aspect` or height on the `embed` block, "Open in new tab" below loaded frames, link card / screenshot fallback; audience mode `present: "live"` (no Load button) or `"static"` (screenshot); editor fields for both (`ui/web-fields.js`). Spec: `docs/specs/I-071-website-embed.md` · done 2026-10-12 · claude

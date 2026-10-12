@@ -261,6 +261,14 @@ export class EditorStore {
   }
 
   /**
+   * Restore an unsaved draft from crash recovery (I-020).
+   * @param {any} draftShow
+   */
+  restoreDraft(draftShow) {
+    this.dispatch('restoreDraft', draftShow);
+  }
+
+  /**
    * Remember the folder the show is saved to (E-002).
    * @param {any} folderHandle  A FileSystemDirectoryHandle, or null.
    */

@@ -2,7 +2,7 @@
 
 The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, write the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) done (2026-10-11): every part of a show can be made and changed in the editor. Since then (Phase 6): the show grid, Export…, a light / dark theme, extra images placed freely on a slide, picture styles and opacity, and other names for glossary terms. Not yet: draft autosave (I-020). See [CHANGELOG.md](CHANGELOG.md) for what changed when.
+> **Status:** Phase 5 (Editor MVP) done (2026-10-11): every part of a show can be made and changed in the editor. Since then (Phase 6): the show grid, Export…, a light / dark theme, extra images placed freely on a slide, picture styles and opacity, other names for glossary terms, the dedicated glossary editor, and draft autosave with crash recovery (I-020). See [CHANGELOG.md](CHANGELOG.md) for what changed when.
 
 ## User manual
 

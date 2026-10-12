@@ -22,9 +22,10 @@ import { mountSlideForm } from './ui/slide-form.js';
 import { mountReaderForm } from './ui/reader-form.js';
 import { mountShowSettings } from './ui/show-settings.js';
 import { mountPreview } from './ui/preview.js';
-import { renderAccessScreen, renderStartScreen, showBanner } from './ui/dialogs.js';
+import { renderAccessScreen, renderStartScreen, showBanner, checkDraftRecovery } from './ui/dialogs.js';
 import { openFindReplaceDialog } from './ui/find-replace.js';
 import { registerShortcuts } from './shortcuts.js';
+import { getDraftKey, openDraftStore, startAutosave } from './io/draft-store.js';
 
 /**
  * Entry: `?folder=<key>` opens a remembered show folder (E-002, D-012),
@@ -222,6 +223,20 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
     onPresent: () => present('audience'),
     onFindReplace: () => openFindReplaceDialog(store),
   });
+
+  // 9. Draft autosave and crash recovery (I-020)
+  const folderKey = new URLSearchParams(window.location.search).get('folder');
+  const draftKey = getDraftKey({ folderKey, showUrl, showId: ctx.show?.id });
+  const draftStore = await openDraftStore();
+  // @ts-ignore
+  store.draftKey = draftKey;
+  // @ts-ignore
+  store.draftStore = draftStore;
+  const autosave = startAutosave(store, { draftKey, draftStore, meta: { folderKey, showUrl } });
+  // @ts-ignore
+  store.autosave = autosave;
+
+  run(() => checkDraftRecovery(store, { draftStore, draftKey, diskShow: ctx.show }));
 }
 
 /**

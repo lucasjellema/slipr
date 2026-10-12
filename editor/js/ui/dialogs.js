@@ -4,6 +4,8 @@
  * new-show dialog, choose-folder dialog, and notice banners.
  */
 import { h } from '../dom.js';
+import { formatDraftTime } from '../io/draft-store.js';
+import { serializeShow } from '../io/serialize.js';
 
 /**
  * @typedef {object} RecentFolder
@@ -240,18 +242,147 @@ export function openConfirmDialog({ title, text, items = [], actions }) {
  * A dismissible notice under the toolbar.
  * @param {string} message
  * @param {'info' | 'error' | 'success'} [kind]
- * @param {{ timeout?: number }} [options]  Auto-hide after ms (success notices).
+ * @param {{ timeout?: number, actions?: { label: string, run: () => void }[] }} [options]  Auto-hide after ms (success notices).
+ * @returns {HTMLElement}
  */
-export function showBanner(message, kind = 'info', { timeout } = {}) {
+export function showBanner(message, kind = 'info', { timeout, actions = [] } = {}) {
   let host = document.getElementById('slipr-editor-banners');
   if (!host) {
     host = h('div', { id: 'slipr-editor-banners', class: 'slipr-banners', 'aria-live': 'polite' });
     document.getElementById('slipr-editor-toolbar')?.after(host);
   }
+  const actionBtns = actions.map((act) =>
+    h('button', {
+      type: 'button',
+      class: 'slipr-btn slipr-btn-sm',
+      onclick: () => {
+        banner.remove();
+        act.run();
+      },
+    }, [act.label])
+  );
+  const bannerActions = h('div', { class: 'slipr-banner-actions' }, [
+    ...actionBtns,
+    h('button', { class: 'slipr-btn slipr-btn-sm', 'aria-label': 'Dismiss', onclick: () => banner.remove() }, ['×']),
+  ]);
   const banner = h('div', { class: `slipr-banner slipr-banner--${kind}`, role: kind === 'error' ? 'alert' : 'status' }, [
     h('span', {}, [message]),
-    h('button', { class: 'slipr-btn slipr-btn-sm', 'aria-label': 'Dismiss', onclick: () => banner.remove() }, ['×']),
+    bannerActions,
   ]);
   host.append(banner);
   if (timeout) setTimeout(() => banner.remove(), timeout);
+  return banner;
 }
+
+/**
+ * Prompt user when an unsaved draft is discovered on open (I-020).
+ * @param {{
+ *   draft: import('../io/draft-store.js').DraftRecord,
+ *   onRestore: () => void,
+ *   onDiscard: () => void,
+ *   onDismiss?: () => void,
+ * }} options
+ * @returns {HTMLDialogElement}
+ */
+export function openDraftRecoveryDialog({ draft, onRestore, onDiscard, onDismiss }) {
+  let resolved = false;
+  const timeStr = formatDraftTime(draft.updatedAt);
+  const title = 'Restore unsaved draft?';
+  const dialog = openDialog(title, (close) => [
+    h('p', {}, [
+      `An unsaved draft of this show from ${timeStr} was found in your browser. It contains changes that were not saved to disk.`
+    ]),
+    h('p', { class: 'slipr-help' }, [
+      'You can restore the draft to continue editing where you left off, or discard it to keep the file currently on disk.'
+    ]),
+    h('div', { class: 'slipr-dialog-actions' }, [
+      h('button', {
+        type: 'button',
+        class: 'slipr-btn slipr-btn-danger',
+        onclick: () => {
+          resolved = true;
+          close();
+          onDiscard();
+        },
+      }, ['Discard draft']),
+      h('button', {
+        type: 'button',
+        class: 'slipr-btn slipr-btn-primary',
+        onclick: () => {
+          resolved = true;
+          close();
+          onRestore();
+        },
+      }, ['Restore draft']),
+    ]),
+  ]);
+  if (onDismiss) {
+    dialog.addEventListener('close', () => {
+      if (!resolved) onDismiss();
+    });
+  }
+  return dialog;
+}
+
+/**
+ * Check if an unsaved draft exists on disk/session open and offer recovery (I-020).
+ * @param {import('../store.js').EditorStore} store
+ * @param {{
+ *   draftStore: import('../io/draft-store.js').DraftStore,
+ *   draftKey: string,
+ *   diskShow: any,
+ *   onRestored?: () => void,
+ * }} options
+ * @returns {Promise<boolean>}
+ */
+export async function checkDraftRecovery(store, { draftStore, draftKey, diskShow, onRestored }) {
+  const draft = await draftStore.getDraft(draftKey);
+  if (!draft?.show) return false;
+
+  // If identical to what was loaded from disk, silently clean up redundant draft
+  if (serializeShow(draft.show) === serializeShow(diskShow)) {
+    await draftStore.deleteDraft(draftKey);
+    return false;
+  }
+
+  const timeStr = formatDraftTime(draft.updatedAt);
+  return new Promise((resolve) => {
+    openDraftRecoveryDialog({
+      draft,
+      onRestore: () => {
+        store.restoreDraft(draft.show);
+        showBanner(`Restored draft from ${timeStr}. Save (Ctrl+S) when ready.`, 'info', { timeout: 6000 });
+        if (onRestored) onRestored();
+        resolve(true);
+      },
+      onDiscard: async () => {
+        await draftStore.deleteDraft(draftKey);
+        showBanner('Draft discarded. Keeping version from disk.', 'info', { timeout: 3000 });
+        resolve(false);
+      },
+      onDismiss: () => {
+        showBanner(`Unsaved draft from ${timeStr} was not restored.`, 'info', {
+          actions: [
+            {
+              label: 'Restore draft',
+              run: () => {
+                store.restoreDraft(draft.show);
+                showBanner(`Restored draft from ${timeStr}. Save (Ctrl+S) when ready.`, 'info', { timeout: 6000 });
+                if (onRestored) onRestored();
+              },
+            },
+            {
+              label: 'Discard',
+              run: async () => {
+                await draftStore.deleteDraft(draftKey);
+                showBanner('Draft discarded.', 'info', { timeout: 2500 });
+              },
+            },
+          ],
+        });
+        resolve(false);
+      },
+    });
+  });
+}
+

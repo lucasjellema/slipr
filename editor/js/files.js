@@ -33,7 +33,14 @@ export function goToFolder(key) {
 
 /** @param {import('./store.js').EditorStore | undefined} store */
 function okToLeave(store) {
-  return !store?.state.dirty || confirm('You have unsaved changes. Discard them?');
+  if (!store?.state.dirty) return true;
+  if (confirm('You have unsaved changes. Discard them?')) {
+    if (store?.draftStore && store?.draftKey) {
+      store.draftStore.deleteDraft(store.draftKey);
+    }
+    return true;
+  }
+  return false;
 }
 
 /**

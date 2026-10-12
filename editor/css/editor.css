@@ -837,6 +837,13 @@ body.is-screen #slipr-editor-banners {
   color: var(--slipr-editor-success-text);
 }
 
+.slipr-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
 /* ---------- Image fields (E-006) ---------- */
 
 .slipr-image-zone {

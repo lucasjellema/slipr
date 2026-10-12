@@ -660,6 +660,8 @@
           <li><strong>↶</strong> or <kbd>Ctrl</kbd>+<kbd>Z</kbd> undoes the last change; <strong>↷</strong>, <kbd>Ctrl</kbd>+<kbd>Y</kbd> or <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> redoes it. The editor remembers the last 100 steps.</li>
           <li>Typing in one field counts as one step until you pause for a second. Dragging a hotspot or a slide is one step too.</li>
           <li>Undo works for everything that changes the show, including deleting slides and replacing text. It does not delete image files that were copied in.</li>
+          <li><strong>Saving:</strong> press <kbd>Ctrl</kbd>+<kbd>S</kbd> or click <strong>Save</strong> in the toolbar to write <code>show.json</code> to disk. Saving clears the dirty dot next to the title.</li>
+          <li><strong>Autosave drafts &amp; crash recovery:</strong> while you have unsaved changes, the editor automatically persists a draft to your browser's local storage (IndexedDB) every 5 seconds, as well as whenever you switch away or close the tab. If the browser closes unexpectedly or crashes, opening the show again displays a dialog offering to restore your unsaved draft. Restoring places your draft back into the editor with the pre-restore state available in the undo stack. Saving to disk or discarding the draft removes it from browser storage.</li>
           <li>Undo history is lost when you reload the page. Saving does not clear it.</li>
         </ul>
       </section>
