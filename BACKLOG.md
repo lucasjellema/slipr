@@ -23,8 +23,7 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 **Handover notes (state on 2026-10-11, for the next session)**
 - **Waiting for Lucas:**
   - **E-017** (under *Ideas → Editor*): when deleting slides empties a reading route, should the route be removed or turned into "all slides"?
-  - **I-086** (glossary terms clickable in slides) is specified and ready to start once he chooses it. I-083 (extra images) and I-084 (picture styles) are done.
-  - I-086 (the optional glossary `aliases`) changes a format. They need a spec in `docs/specs/`, a schema and version bump, and a migration check before code.
+  - I-083 (extra images), I-084 (picture styles) and I-086 (glossary terms in slides) are done.
 - **Not verified in Claude's browser pane, so Lucas checks these in a real browser:**
   - an exported file opened by double-click (`file://`);
   - a real mouse drag in the show grid and the slide list (tested with synthetic events);
@@ -82,7 +81,6 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 - [ ] **I-031** [format] Glossary auto-linking: mark the first occurrence of each term per slide automatically
 - [ ] **I-032** [viewer] Step through a slide's build animations inside reader mode
 - [ ] **I-034** [viewer] Show my pins and notes in audience mode too (presenter's private view, e.g. in the speaker window), and pins on reader-block images (hotspot-style)
-- [ ] **I-086** [viewer/format] **Glossary terms clickable in the slides, in reader mode**: when a slide is shown in reader mode, the glossary terms that appear in it (titles, text, bullets, card fields) can be clicked or tapped, or reached with the keyboard, to open the same definition popover as `[[term]]` in reader blocks. Audience mode stays unchanged (plain text, no popovers), so slides stay clean for the room. Today only explicit `[[term]]` markup in Markdown slots becomes a term (that should already open in reader mode; to verify), and plain `text` slots (titles, kickers, most card fields) cannot hold markup at all. Approach: **automatic detection** in reader mode: match each glossary term as whole words, case-insensitive, outside links and existing terms, longest term first (*layout picker* before *layout*); first occurrence per slide only, like I-031 (auto-linking in Markdown), which this covers for the slide visual. **Decided by Lucas (2026-10-11):** always on (no show setting); **pin mode keeps priority** (while placing a pin, a click on a term places the pin; otherwise it opens the definition). Other names for a term (plural or inflected forms, abbreviations, synonyms), **decided by Lucas (option b):** an optional `aliases` list per glossary term (for example `"aliases": ["AI", "A.I."]`), matched like the term itself. This is a show-format change (schema, `docs/show-format.md`, version bump; older shows stay valid since the field is optional), with an **Other names** field per term in the editor's Show Settings and aliases included in reader search. Underline style from the template's `reader.css`. Tests: matching (word boundaries, accents, overlapping terms, aliases)
 
 ### Editor
 - [ ] **I-020** [editor] Autosave draft to IndexedDB with crash recovery
@@ -111,6 +109,15 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 - [ ] **I-051** [templates] Auto-generated style-guide page: all layouts, blocks, colors and fonts of a template
 - [ ] **I-052** [templates] Generate `styleguide` JSON from `theme.css` (or vice versa)
 - [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder)
+- [ ] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**:
+  - A user specifies the location of a zipped Slipr presentation (e.g. on GitHub releases, a raw zipball URL, or any web server) in a URL parameter: `viewer/?zip=https://example.com/show.zip` (or `?zip=...&mode=reader`).
+  - The viewer downloads the zip file client-side via `fetch()`, displaying download progress.
+  - Decompresses in memory using a lightweight vendored zip reader (or standard browser streams), keeping D-001/D-002 (zero build step, offline once loaded, no backend server needed).
+  - Adapts unzipped files into an in-memory source (similar to `shared/folder-source.js` for File System Access handles): parses `show.json` and creates `blob:` object URLs for images and assets.
+  - **GitHub compatibility**: handles GitHub archive downloads where files are wrapped in a single top-level directory (e.g. `repo-main/show.json`) by auto-detecting `show.json` at root or one level down, with an optional `&path=` parameter for repos with multiple shows.
+  - Presents the show in either audience mode or reader mode (`&mode=reader`), preserving deep links and personal annotations.
+  - Clear error states for CORS restrictions (explaining why cross-origin fetches fail and how to use CORS-enabled hosting like GitHub Pages/raw), download failures, or missing `show.json`.
+  - Pairs naturally with **I-053** (`.slipr` zip package) and makes sharing and embedding full shows as simple as sharing a link · todo · —
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
@@ -177,6 +184,7 @@ Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas
 
 ## Done
 
+- [x] **I-086** [viewer/format] Glossary terms clickable in slides in reader mode (D-015): automatic linking of the first occurrence per slide (whole words, case- and accent-insensitive, longest first, also in plain text slots), pin mode keeps priority, audience mode unchanged; optional `aliases` per term (show format 0.2), in validation, reader search and the editor's Show settings (Other names). Spec: `docs/specs/I-086-glossary-in-slides.md` · done 2026-10-12 · claude
 - [x] **I-084** [format/editor/templates/converter] Picture styles (D-014): template format 0.3 `pictureStyles` (shadow, soft, rounded, frame in both templates), `style` and `opacity` on image values (show format 0.2), rendering via `shared/picture.js`, validation, a style picker with live previews and an opacity slider in every image field, and the converter mapping PowerPoint shadow / soft edges / rounded corners / outline and transparency. Spec: `docs/specs/I-084-picture-styles.md` · done 2026-10-11 · claude
 - [x] **I-083** [format/editor/viewer/converter] Extra images on a slide (D-013, show format 0.2): `slide.overlays` with position and size as fractions of the canvas, in front of the layout, optionally one by one; reader mode keeps such a slide a picture on narrow screens; editor: "Extra images" in the Slide tab (choose / drop / paste, alt text, order, appear one by one) and move / resize on the audience preview (drag, corners with aspect lock, arrow keys, Alt+arrows, Delete); the converter places pictures that fit no slot as extra images. Spec: `docs/specs/I-083-extra-images.md` · done 2026-10-11 · claude
 - [x] **I-082** [editor] Light / dark theme switch (Light, Dark, System) in the toolbar, remembered per browser, applied before the first paint; a lighter dark theme; all colours as tokens; the manual follows the choice; WCAG AA contrast checked by a test · done 2026-10-11 · claude
