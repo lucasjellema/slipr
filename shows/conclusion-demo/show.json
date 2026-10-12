@@ -148,6 +148,16 @@
       }
     },
     {
+      "id": "s-pdf",
+      "layout": "pdf",
+      "chapter": "sections",
+      "content": {
+        "kicker": "PDF",
+        "title": "A document on a slide",
+        "document": { "pdf": "docs/slipr-in-four-pages.pdf", "title": "Slipr in four pages", "page": 1 }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",

@@ -26,8 +26,8 @@ describe('changing a block type keeps the show valid', () => {
       assert.equal(block.type, type);
       assert.equal(block.depth, 3, 'depth survives');
       const errors = validateShow(next, { template }).errors;
-      if (type === 'image' || type === 'embed') {
-        // A new image block has no image yet, a new embed no URL: the user fills those in.
+      if (type === 'image' || type === 'embed' || type === 'pdf') {
+        // A new image block has no image yet, a new embed no URL, a new PDF no file: the user fills those in.
         assert.ok(errors.length > 0 && errors.every((e) => e.path.startsWith('slides[0].reader.blocks')), JSON.stringify(errors));
         assert.equal(block.md, undefined, 'no stray md on an image block');
       } else {
@@ -113,4 +113,20 @@ test('embed load and fallback (I-070): a 0.1 show becomes 0.2, removal keeps it 
   assert.equal(actions.updateBlock(old, { ...ids, patch: { height: 300 } }).slipr, '0.1', 'other fields keep the version');
   next = actions.updateBlock(next, { ...ids, patch: { load: undefined } });
   assert.ok(!('load' in next.slides.find((s) => s.id === slide.id).reader.blocks.find((b) => b.id === embed.id)));
+});
+
+test('PDF blocks (I-072): conversion keeps fields, a 0.1 show becomes 0.2', () => {
+  const slide = demo.slides.find((s) => s.reader?.blocks?.length);
+  const block = slide.reader.blocks[0];
+  const old = { ...demo, slipr: '0.1' };
+  const next = actions.setBlockType(old, { slideId: slide.id, blockId: block.id, type: 'pdf' });
+  assert.equal(next.slipr, '0.2');
+  const pdf = next.slides.find((s) => s.id === slide.id).reader.blocks.find((b) => b.id === block.id);
+  assert.equal(pdf.type, 'pdf');
+  assert.equal(pdf.pdf, '');
+  assert.ok(pdf.title);
+  const back = actions.convertBlock({ ...pdf, pdf: 'docs/a.pdf', pages: [2, 3], load: 'auto' }, 'pdf');
+  assert.deepEqual([back.pdf, back.pages, back.load], ['docs/a.pdf', [2, 3], 'auto']);
+  const withSlot = actions.setSlot(old, { slideId: slide.id, slot: 'document', value: { pdf: 'docs/a.pdf', title: 'A' } });
+  assert.equal(withSlot.slipr, '0.2');
 });

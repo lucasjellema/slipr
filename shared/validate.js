@@ -15,6 +15,7 @@
  */
 import { checkSchema } from './schema-check.js';
 import { foldText } from './glossary.js';
+import { pdfEntries } from './embeds/pdf.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
 
@@ -71,7 +72,7 @@ export function validateShow(show, options = {}) {
     if (layouts) checkSlots(slide, at, layouts, errors, warnings);
     checkImages(slide, at, options.imageExists, errors, warnings, options.template, show.slipr);
     checkOverlays(slide, at, show.slipr, errors, warnings);
-    checkEmbeds(slide, at, show.slipr, errors, warnings);
+    checkEmbeds(slide, at, show.slipr, errors, warnings, options.imageExists);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -197,8 +198,9 @@ export function validateTemplate(template) {
 }
 
 /**
- * Collect every image src used by a show (slots, image blocks), e.g. to check
- * that the files exist.
+ * Collect every image src used by a show (slots, image blocks, extra images,
+ * embed fallbacks) and every PDF in the show folder (I-072), e.g. to check that
+ * the files exist, embed them in an export, or open them from a folder.
  * @param {any} show
  * @returns {string[]}
  */
@@ -219,6 +221,10 @@ export function collectImagePaths(show) {
       if (isImage(overlay?.image)) found.push(overlay.image.src);
     }
     for (const [image] of embedFallbacks(slide, '')) found.push(image.src);
+    // PDF files in the show folder (I-072): checked, embedded and opened like images.
+    for (const { value } of pdfEntries({ slides: [slide] })) {
+      if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
+    }
   }
   return [...new Set(found)];
 }
@@ -433,10 +439,13 @@ function embedFallbacks(slide, at) {
  * slots need show format 0.2. Web pages: an unsafe address is an error;
  * presenting as a screenshot without one, and same-origin on a file in the
  * show folder (ignored there), are warnings.
+ * PDFs (I-072): the same address rules, a missing local file, and `page`
+ * with `pages` or a reversed range are warnings.
  * @param {any} slide @param {string} at @param {unknown} version
  * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
  */
-function checkEmbeds(slide, at, version, errors, warnings) {
+function checkEmbeds(slide, at, version, errors, warnings, fileExists) {
   const message = 'this embed setting needs show format 0.2: set "slipr" to "0.2"';
   /** @param {any} value @param {string} path */
   const checkWeb = (value, path) => {
@@ -447,10 +456,28 @@ function checkEmbeds(slide, at, version, errors, warnings) {
       warnings.push({ path: `${path}.allow`, code: 'same-origin-local', message: '"same-origin" is ignored for a file in the show folder: it would let the page reach the reader’s notes' });
     }
   };
+  /** @param {any} value @param {string} path */
+  const checkPdf = (value, path) => {
+    const src = String(value.pdf ?? '');
+    if (/^\s*(javascript|data|vbscript):/i.test(src)) {
+      errors.push({ path: `${path}.pdf`, code: 'unsafe-url', message: 'this kind of address cannot be embedded' });
+    } else if (fileExists && !/^[a-z][a-z0-9+.-]*:/i.test(src) && !fileExists(src)) {
+      warnings.push({ path: `${path}.pdf`, code: 'missing-file', message: `PDF file "${src}" not found` });
+    }
+    if (value.page !== undefined && value.pages !== undefined) {
+      warnings.push({ path: `${path}.page`, code: 'pdf-page-and-pages', message: 'both "page" and "pages" are set; "pages" is used' });
+    }
+    if (Array.isArray(value.pages) && value.pages[0] > value.pages[1]) {
+      warnings.push({ path: `${path}.pages`, code: 'pdf-pages-order', message: 'the first page comes after the last; the range is shown in order' });
+    }
+  };
   for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
     if (!isObject(value)) continue;
     const path = `${at}.content.${name}`;
-    if (typeof value.url === 'string') {
+    if (typeof value.pdf === 'string') {
+      if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a PDF slot needs show format 0.2: set "slipr" to "0.2"' });
+      checkPdf(value, path);
+    } else if (typeof value.url === 'string') {
       if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a web page slot needs show format 0.2: set "slipr" to "0.2"' });
       checkWeb(value, path);
       if (value.present === 'static' && !isImage(value.fallback)) {
@@ -468,6 +495,10 @@ function checkEmbeds(slide, at, version, errors, warnings) {
       }
     }
     if (block?.type === 'embed') checkWeb(block, path);
+    if (block?.type === 'pdf') {
+      if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a PDF block needs show format 0.2: set "slipr" to "0.2"' });
+      checkPdf(block, path);
+    }
   });
 }
 
@@ -558,6 +589,7 @@ function matchesSlotType(value, type) {
     case 'chart': return isObject(value) && typeof value.kind === 'string';
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
     case 'web': return isObject(value) && typeof value.url === 'string';
+    case 'pdf': return isObject(value) && typeof value.pdf === 'string';
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -575,6 +607,7 @@ function slotTypeLabel(type) {
     chart: 'a chart object { "kind": ..., "data": ... }',
     diagram: 'a diagram object { "mermaid": ... }',
     web: 'a web page object { "url": ..., "title": ... }',
+    pdf: 'a PDF object { "pdf": ..., "title": ... }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

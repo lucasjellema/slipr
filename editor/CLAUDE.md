@@ -43,6 +43,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 8j. **Glossary**: Show settings → Glossary → **Other names** (`layouts, base layout`): stored as `aliases`, kept when the term or definition changes, removed when emptied; the reader preview links the term (and its other names) on the slide once.
 8k. **Embedded Page** (Reader tab): tick **Load straight away**: the reader preview loads the page without a Load button; untick: the card and Load button return. Add a fallback image (paste) with alt text: it replaces the card in the preview and the show grid; **Remove fallback image** removes it. A 0.1 show becomes 0.2 on either. One Ctrl+Z each.
 8l. **Web page slot** (Conclusion demo, slide "A website on a slide"): switch **While presenting** to live and back (the audience preview loads the frame / shows the screenshot), tick a permission (the frame gets it), change the Embedded Page block's **Size** to 16:9 (height disabled). One Ctrl+Z each; a new Web page slide in a 0.1 show makes it 0.2.
+8m. **PDF** (demo, slide "A PDF, page by page"): the slot shows the file and pages 1 to 4; set both to 2 (the preview shows page 2), undo. Reader tab: the PDF Document block; switch a text block to PDF Document (empty file, validation error until chosen). **Choose PDF…** (origin-private show folder in Claude's pane) copies the file to `docs/` and fills the title.
 9. The browser console is free of errors.
 
 ## Common pitfalls

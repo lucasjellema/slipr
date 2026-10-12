@@ -127,6 +127,7 @@ Renderer rules:
 | `quote` | `<blockquote>` | text plus `<cite>` |
 | `cards` | any container | One clone of the slot's `<template>` blueprint per card (see below) |
 | `diagram` | any container | Rendered SVG diagram from Mermaid source |
+| `pdf` | any container (give it a size; it becomes a flex column) | A page of a PDF, fitted to the element; with a page range, one page per click in audience mode (I-072). Shows format 0.2 |
 | `web` | any container (give it a size; it becomes a flex column) | A live web page in a sandboxed frame that fills the element, or the show's screenshot (I-071). Shows format 0.2 |
 
 - An element whose optional slot is **empty** gets the attribute `data-empty` so CSS can hide it or reflow around it.
@@ -255,4 +256,4 @@ Roles matter for corporate templates, where structural elements are often "body"
 |---|---|
 | 0.1 | Initial format |
 | 0.2 | `pptxMapping` values may be objects with placeholder roles; new `pptxIgnore`. New slot type `cards` with `fields`, and card roles (`cards[i]`, `cards[i].field`). 0.1 templates remain valid unchanged |
-| 0.3 | `pictureStyles` (D-014, I-084). 0.1 and 0.2 templates remain valid unchanged; `pictureStyles` in a 0.1 or 0.2 template is an error. Both shipped templates are 0.3. Slot type `web` added 2026-10-12 (I-071), additive: both shipped templates have a `web` layout (default 1.2.0, Conclusion 0.1.2) |
+| 0.3 | `pictureStyles` (D-014, I-084). 0.1 and 0.2 templates remain valid unchanged; `pictureStyles` in a 0.1 or 0.2 template is an error. Both shipped templates are 0.3. Slot types `web` (I-071) and `pdf` (I-072) added 2026-10-12, additive: both shipped templates have `web` and `pdf` layouts (default 1.3.0, Conclusion 0.1.3) |

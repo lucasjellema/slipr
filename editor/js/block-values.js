@@ -125,3 +125,43 @@ export function webValue(previous, patch) {
   if (next.url === undefined) next.url = '';
   return next;
 }
+
+/**
+ * A PDF value (I-072), slot or block, from the previous value and a patch.
+ * Always has `pdf` and a non-empty `title`; an empty title in the patch is
+ * ignored; fields patched to undefined (or "") are removed.
+ * @param {any} previous
+ * @param {Record<string, any>} patch
+ * @returns {Record<string, any>}
+ */
+export function pdfValue(previous, patch) {
+  const base = previous && typeof previous === 'object' && !Array.isArray(previous) ? previous : {};
+  /** @type {Record<string, any>} */
+  const next = { pdf: '', title: 'PDF document', ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    if (key === 'title' && !String(value ?? '').trim()) continue;
+    if (value === undefined || value === '') delete next[key];
+    else next[key] = value;
+  }
+  if (next.pdf === undefined) next.pdf = '';
+  return next;
+}
+
+/**
+ * The `page` / `pages` patch for what was typed in "first page" and "last
+ * page": nothing → the whole document; one page (or both the same) → `page`;
+ * two → `pages` in order.
+ * @param {string} firstText @param {string} lastText
+ * @returns {{ page: number | undefined, pages: [number, number] | undefined }}
+ */
+export function pdfPagesPatch(firstText, lastText) {
+  const n = (/** @type {string} */ t) => {
+    const v = Number.parseInt(String(t ?? '').trim(), 10);
+    return Number.isFinite(v) && v >= 1 ? v : null;
+  };
+  const a = n(firstText);
+  const b = n(lastText);
+  if (a === null && b === null) return { page: undefined, pages: undefined };
+  if (a === null || b === null || a === b) return { page: /** @type {number} */ (a ?? b), pages: undefined };
+  return { page: undefined, pages: [Math.min(a, b), Math.max(a, b)] };
+}

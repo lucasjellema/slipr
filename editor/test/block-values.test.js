@@ -69,3 +69,23 @@ test('webValue always has url and a title (I-071)', async () => {
   const v = webValue({ url: 'https://x.example', title: 'X', present: 'static' }, { title: '  ', present: undefined, load: 'auto' });
   assert.deepEqual(v, { url: 'https://x.example', title: 'X', load: 'auto' });
 });
+
+test('pdfValue and pdfPagesPatch (I-072)', async () => {
+  const { pdfValue, pdfPagesPatch } = await import('../js/block-values.js');
+  assert.deepEqual(pdfValue(undefined, { pdf: 'docs/a.pdf' }), { pdf: 'docs/a.pdf', title: 'PDF document' });
+  assert.deepEqual(pdfValue({ pdf: 'a.pdf', title: 'A', page: 2 }, { title: ' ', page: undefined }), { pdf: 'a.pdf', title: 'A' });
+  assert.deepEqual(pdfPagesPatch('', ''), { page: undefined, pages: undefined });
+  assert.deepEqual(pdfPagesPatch('3', ''), { page: 3, pages: undefined });
+  assert.deepEqual(pdfPagesPatch('3', '3'), { page: 3, pages: undefined });
+  assert.deepEqual(pdfPagesPatch('7', '3'), { page: undefined, pages: [3, 7] });
+  assert.deepEqual(pdfPagesPatch('x', '0'), { page: undefined, pages: undefined });
+});
+
+test('pdfPath puts PDFs in docs/ with a content hash (I-072)', async () => {
+  const { pdfPath, isPdfFile } = await import('../js/io/images.js');
+  const bytes = new TextEncoder().encode('%PDF-1.4');
+  assert.match(await pdfPath({ name: 'Annual Report 2026.pdf', type: 'application/pdf', bytes }), /^docs\/annual-report-2026-[0-9a-f]{8}\.pdf$/);
+  assert.equal(isPdfFile({ name: 'x.PDF' }), true);
+  assert.equal(isPdfFile({ name: 'x.png', type: 'image/png' }), false);
+  await assert.rejects(() => pdfPath({ name: 'x.png', type: 'image/png', bytes }));
+});

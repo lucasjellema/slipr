@@ -13,6 +13,8 @@ import { hotspotEditor } from './hotspot-editor.js';
 import { markdownToolbar } from './markdown-toolbar.js';
 import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
+import { pdfFields } from './pdf-fields.js';
+import { addPdf } from '../image-input.js';
 import { slideTitle } from '../../../shared/render.js';
 
 /** Actions the reader form dispatches while the user types. */
@@ -26,6 +28,7 @@ const BLOCK_TYPES = [
   { type: 'image', label: 'Image with Hotspots' },
   { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
+  { type: 'pdf', label: 'PDF Document' },
 ];
 
 /** Block ids whose "For" picker is open, so a re-render keeps it open. */
@@ -250,6 +253,8 @@ export function mountReaderForm(container, store) {
         bodyEl.append(tabsEditor(store, slide.id, block));
       } else if (block.type === 'embed') {
         bodyEl.append(embedEditor(store, slide.id, block));
+      } else if (block.type === 'pdf') {
+        bodyEl.append(pdfBlockEditor(store, slide.id, block));
       } else if (block.type === 'slide-ref') {
         bodyEl.append(slideRefEditor(store, slide, block));
       } else if (block.type !== 'text') {
@@ -385,6 +390,7 @@ function describeBlock(block) {
   if (block.type === 'tabs') return `${block.tabs?.length ?? 0} tab(s): ${(block.tabs ?? []).map((/** @type {any} */ t) => t.label).join(', ')}`;
   if (block.type === 'embed') return `${block.title || 'Embedded page'}: ${block.url || '(no URL yet)'}`;
   if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
+  if (block.type === 'pdf') return `${block.title || 'PDF document'}: ${block.pdf || '(no file yet)'}`;
   return block.type;
 }
 
@@ -603,6 +609,33 @@ function embedEditor(store, slideId, block) {
     ]),
     ...webOptionFields(options),
   ]);
+}
+
+/**
+ * PDF document (I-072): file, title, pages, click-to-load, fallback image.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function pdfBlockEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
+  /** @param {Record<string, any>} patch @param {string} field */
+  const write = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch },
+    ['pdf', 'title', 'fallback-alt'].includes(field) ? { coalesceKey: `block-${field}-${block.id}` } : {});
+  return h('div', { class: 'slipr-embed-editor' }, pdfFields({
+    label: 'PDF document',
+    kind: 'block',
+    read,
+    write,
+    addPdf: (file) => addPdf(store, {
+      file,
+      fallbackName: block.title || 'document',
+      write: (path) => write({ pdf: path, ...(read()?.title && read()?.title !== 'PDF document' ? {} : { title: file.name.replace(/\.pdf$/i, '') }) }, 'file'),
+    }),
+    addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
+    resolveAsset: store.state.resolveAsset,
+  }));
 }
 
 /**

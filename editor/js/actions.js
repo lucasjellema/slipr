@@ -249,8 +249,9 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, value);
-  // A web page slot (I-071) or an embed fallback (I-070) needs format 0.2.
-  const embed02 = value && typeof value === 'object' && !Array.isArray(value) && (typeof value.url === 'string' || value.fallback !== undefined);
+  // A web page (I-071) or PDF (I-072) slot, or an embed fallback (I-070), needs format 0.2.
+  const embed02 = value && typeof value === 'object' && !Array.isArray(value)
+    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined);
   if (embed02 && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
@@ -554,7 +555,7 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
 }
 
 /** Block types and the order of the type picker. */
-export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref'];
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf'];
 
 /**
  * A block converted to another type, in a valid shape for that type (see the
@@ -604,6 +605,14 @@ export function convertBlock(block, type, defaults = {}) {
       };
     case 'slide-ref':
       return { ...base, slide: block.slide ?? defaults.slideId ?? '', ...(block.label ? { label: block.label } : {}) };
+    case 'pdf':
+      return {
+        ...base, pdf: block.pdf ?? '', title: title ?? 'PDF document',
+        ...(block.page ? { page: block.page } : {}),
+        ...(block.pages ? { pages: block.pages } : {}),
+        ...(block.load ? { load: block.load } : {}),
+        ...(block.fallback ? { fallback: block.fallback } : {}),
+      };
     default:
       return { ...block, type };
   }
@@ -620,6 +629,8 @@ export function setBlockType(show, { slideId, blockId, type }) {
   if (!Array.isArray(show.slides)) return show;
   const index = show.slides.findIndex((/** @type {any} */ s) => s.id === slideId);
   const neighbour = show.slides[index + 1] ?? show.slides[index - 1];
+  // A PDF block (I-072) needs show format 0.2.
+  if (type === 'pdf' && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   return mapBlock(show, slideId, blockId, (b) => (b.type === type ? b : convertBlock(b, type, { slideId: neighbour?.id })));
 }
 

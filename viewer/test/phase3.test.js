@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readJson } from '../../shared/test/helpers.js';
 import { defaultState, migrate, createStore, memoryAdapter, openReaderState, isAnnotation } from '../reader/state.js';
 import { describeQuote, locateQuote } from '../reader/quote.js';
-import { buildSearchIndex, search, fold, tokens } from '../reader/search-index.js';
+import { buildSearchIndex, search, fold, tokens, pdfSearchDocs } from '../reader/search-index.js';
 import { personalize } from '../reader/personalize.js';
 import { annotationsToMarkdown, annotationsToJson, mergeImportedAnnotations } from '../reader/notes-export.js';
 
@@ -220,4 +220,19 @@ describe('search', () => {
     assert.equal(results.length, 0);
     assert.equal(hidden, 1);
   });
+});
+
+test('PDF page text joins the search index after its slide (I-072)', () => {
+  const show = readJson('shows/demo/show.json');
+  const docs = buildSearchIndex(show);
+  const extra = pdfSearchDocs(show, docs, [
+    { slideId: 's-pdf', blockId: 'pdf-doc', title: 'The whole document', page: 3, text: 'Layouts are HTML fragments with named slots.' },
+  ]);
+  assert.equal(extra.length, 1);
+  assert.equal(extra[0].page, 3);
+  assert.equal(extra[0].title, 'A PDF, page by page › The whole document, page 3');
+  const own = docs.filter((d) => d.slideId === 's-pdf').map((d) => d.order);
+  assert.ok(extra[0].order > Math.max(...own) && extra[0].order < Math.max(...own) + 1);
+  const { results } = search([...docs, ...extra], 'fragments named');
+  assert.equal(results[0].doc.page, 3);
 });

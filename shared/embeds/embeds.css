@@ -67,6 +67,50 @@
 /* A screenshot on a slide fills the slot. */
 [data-slot].slipr-embed--web > .slipr-embed-fallback > img { flex: 1 1 0; min-height: 0; width: 100%; height: auto; object-fit: contain; }
 
+/* ---------- PDF documents (I-072) ---------- */
+.slipr-embed--pdf { display: flex; flex-direction: column; }
+.slipr-pdf-page {
+  overflow: auto;
+  max-width: 100%;
+  border: 1px solid var(--slipr-color-surface, #e5e7eb);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: #fff;
+}
+.slipr-pdf-page canvas { display: block; }
+/* On a slide (or fitted): the page is centred in the slot. */
+.slipr-pdf-page--fit { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; border: 0; background: none; overflow: hidden; }
+.slipr-pdf-page--fit canvas { box-shadow: 0 0.1em 0.6em rgb(0 0 0 / 0.18); background: #fff; }
+.slipr-pdf-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  margin-top: 0.4em;
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+  font-size: 0.85em;
+  color: var(--slipr-color-muted, #5b6573);
+}
+.slipr-pdf-button {
+  font: inherit;
+  min-width: 2.2em;
+  padding: 0.25em 0.6em;
+  border: 1px solid var(--slipr-color-surface, #e5e7eb);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-bg, #fff);
+  color: var(--slipr-color-text, #1e2329);
+  cursor: pointer;
+}
+.slipr-pdf-button:disabled { opacity: 0.4; cursor: default; }
+.slipr-pdf-button:focus-visible { outline: 2px solid var(--slipr-color-accent, #f2a900); outline-offset: 2px; }
+.slipr-pdf-status { min-width: 6em; text-align: center; }
+.slipr-pdf-bar .slipr-embed-open { margin: 0 0 0 auto; align-self: center; }
+.slipr-block--pdf .slipr-embed--pdf { position: relative; }
+.slipr-pdf-text {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+.slipr-pdf-step { display: none; }
+
 /* ---------- click-to-load ---------- */
 .slipr-embed-consent {
   display: flex;

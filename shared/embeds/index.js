@@ -11,6 +11,7 @@
  *   attributes(value, ctx, options)  data attributes for the embed element
  *                            (options: { mode, slot }, see EmbedOptions)
  *   staticHtml(value, ctx)   { html, fallback } when the value has no fallback image
+ *   afterHtml(value, options) optional: markup after the fallback (e.g. Reveal fragments)
  *   hydrate(el, live)        render the live content into `live` (async, may throw)
  *
  * Rendering is two-step. `render.js` and `blocks.js` write an embed element
@@ -39,6 +40,7 @@ import { escape } from '../markdown.js';
 import { pictureAttributes } from '../picture.js';
 import { grantConsent, hasConsent } from './consent.js';
 import * as diagram from './diagram.js';
+import * as pdf from './pdf.js';
 import * as web from './web.js';
 
 /**
@@ -49,6 +51,7 @@ import * as web from './web.js';
  * @property {(value: any, ctx: EmbedContext, options?: EmbedOptions) => Record<string, string>} attributes
  * @property {(value: any, ctx: EmbedContext) => { html: string, fallback: string }} staticHtml
  * @property {(el: HTMLElement, live: HTMLElement) => Promise<void>} hydrate
+ * @property {(value: any, options?: EmbedOptions) => string} [afterHtml]
  */
 /** @typedef {{ resolveAsset: (src: string) => string }} EmbedContext */
 /**
@@ -58,12 +61,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web };
+export const EMBED_KINDS = { diagram, web, pdf };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -94,6 +97,7 @@ export function usedEmbedKinds(show) {
     for (const value of Object.values(content)) {
       if (diagram.isDiagram(value)) kinds.add('diagram');
       if (web.isWeb(value)) kinds.add('web');
+      if (pdf.isPdf(value)) kinds.add('pdf');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);
@@ -124,17 +128,19 @@ export function embedAttributes(kind, value, ctx, options = {}) {
  * @param {string} kind
  * @param {any} value
  * @param {EmbedContext} ctx
+ * @param {EmbedOptions} [options]
  * @returns {string}
  */
-export function embedInnerHtml(kind, value, ctx) {
+export function embedInnerHtml(kind, value, ctx, options = {}) {
+  const def = EMBED_KINDS[kind];
+  const after = def?.afterHtml ? def.afterHtml(value, options) : '';
   const image = value?.fallback;
   if (image && typeof image === 'object' && typeof image.src === 'string' && image.src) {
     return `<div class="slipr-embed-fallback" data-fallback="image">`
-      + `<img src="${escape(ctx.resolveAsset(image.src))}" alt="${escape(String(image.alt ?? ''))}"${pictureAttributes(image)} loading="lazy" decoding="async"></div>`;
+      + `<img src="${escape(ctx.resolveAsset(image.src))}" alt="${escape(String(image.alt ?? ''))}"${pictureAttributes(image)} loading="lazy" decoding="async"></div>${after}`;
   }
-  const def = EMBED_KINDS[kind];
   const { html, fallback } = def ? def.staticHtml(value, ctx) : { html: '', fallback: 'none' };
-  return `<div class="slipr-embed-fallback" data-fallback="${escape(fallback)}">${html}</div>`;
+  return `<div class="slipr-embed-fallback" data-fallback="${escape(fallback)}">${html}</div>${after}`;
 }
 
 /**
@@ -147,7 +153,7 @@ export function embedInnerHtml(kind, value, ctx) {
  */
 export function embedHtml(kind, value, ctx, options = {}) {
   const attrs = Object.entries(embedAttributes(kind, value, ctx, options)).map(([k, v]) => ` ${k}="${escape(v)}"`).join('');
-  return `<div${attrs}>${embedInnerHtml(kind, value, ctx)}</div>`;
+  return `<div${attrs}>${embedInnerHtml(kind, value, ctx, options)}</div>`;
 }
 
 /**
@@ -163,7 +169,7 @@ export function fillEmbedElement(el, kind, value, ctx, options = {}) {
     if (name === 'class') el.classList.add(...v.split(' '));
     else el.setAttribute(name, v);
   }
-  el.innerHTML = embedInnerHtml(kind, value, ctx); // built with escape() only
+  el.innerHTML = embedInnerHtml(kind, value, ctx, { ...options, slot: true }); // built with escape() only
 }
 
 /**

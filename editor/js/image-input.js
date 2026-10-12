@@ -6,12 +6,12 @@
  * `{ src, alt }`, and the alt-text dialog opens. Undo restores the previous
  * image; the copied file stays (images are never deleted automatically).
  */
-import { contentSuffix, imagePath, imageType, IMAGE_TYPES, LARGE_IMAGE_BYTES } from './io/images.js';
+import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath } from './io/images.js';
 import { ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
-import { webValue } from './block-values.js';
+import { pdfValue, webValue } from './block-values.js';
 import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
@@ -143,7 +143,7 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
 
 /**
  * Copy an image into the show folder and make it the fallback image of a
- * `web` slot (I-071), then ask for alt text.
+ * `web` (I-071) or `pdf` (I-072) slot, then ask for alt text.
  * @param {import('./store.js').EditorStore} store
  * @param {{ slideId: string, slot: string, file: File }} target
  */
@@ -156,7 +156,8 @@ export async function addFallbackToSlot(store, { slideId, slot, file }) {
     read: (s) => s?.content?.[slot]?.fallback,
     write: (image) => {
       const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slot];
-      store.dispatch('setSlot', { slideId, slot, value: webValue(current, { fallback: image }) });
+      const merge = current && typeof current.pdf === 'string' ? pdfValue : webValue;
+      store.dispatch('setSlot', { slideId, slot, value: merge(current, { fallback: image }) });
     },
   });
 }
@@ -275,4 +276,27 @@ export async function addImageToOverlay(store, { slideId, index, file }) {
     read: (s) => s?.overlays?.[index]?.image,
     write: (image) => store.dispatch('updateOverlay', { slideId, index, patch: { image } }),
   });
+}
+
+/**
+ * Copy a PDF into the show folder's docs/ (I-072) and hand its path to
+ * `write`. The same file (same content hash) is written once.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, fallbackName: string, write: (path: string) => void }} target
+ */
+export async function addPdf(store, { file, fallbackName, write }) {
+  const handle = store.state.folderHandle;
+  if (!handle) {
+    showBanner('To add a PDF, Slipr needs to write to the show folder. Choose it, then add the PDF again.', 'info', { timeout: 6000 });
+    askForShowFolder(store);
+    return;
+  }
+  if (!isPdfFile(file)) throw new Error(`"${file.name || 'This file'}" is not a PDF.`);
+  if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
+  const bytes = await file.arrayBuffer();
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const path = await pdfPath({ name: file.name, type: 'application/pdf', bytes }, fallbackName);
+  await writeImage(handle, path, blob); // writes any file; keeps an existing one
+  store.state.registerAsset?.(path, blob);
+  write(path);
 }

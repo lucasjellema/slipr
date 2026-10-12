@@ -231,6 +231,12 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       else fillEmbedElement(el, 'web', value, ctx, { mode: /** @type {any} */ (options.mode) });
       break;
 
+    case 'pdf':
+      // A PDF (I-072): card or fallback image now, the page from hydrateEmbeds().
+      if (isBlockedUrl(value.pdf)) el.innerHTML = '<p class="slipr-placeholder">[PDF blocked: unsupported URL]</p>';
+      else fillEmbedElement(el, 'pdf', value, ctx, { mode: /** @type {any} */ (options.mode) });
+      break;
+
     default: // chart: planned slot type
       el.innerHTML = `<p class="slipr-placeholder">[${escape(type)}: not supported yet]</p>`;
   }

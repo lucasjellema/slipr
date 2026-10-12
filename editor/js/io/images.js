@@ -71,3 +71,24 @@ export async function imagePath(file, fallbackName = 'image') {
 export function contentSuffix(path) {
   return /-[0-9a-f]{8}\.[a-z0-9]+$/.exec(path)?.[0] ?? null;
 }
+
+/**
+ * Path (relative to show.json) for a PDF file (I-072): `docs/<slug>-<hash8>.pdf`.
+ * @param {{ name?: string, type?: string, bytes: ArrayBuffer | Uint8Array }} file
+ * @param {string} [fallbackName]
+ * @returns {Promise<string>}
+ */
+export async function pdfPath(file, fallbackName = 'document') {
+  if (!isPdfFile(file)) throw new Error(`"${file.name || 'This file'}" is not a PDF.`);
+  const base = (file.name ?? '').replace(/\.pdf$/i, '');
+  const slug = slugify(base || fallbackName).slice(0, 40).replace(/-+$/, '') || 'document';
+  return `docs/${slug}-${await shortHash(file.bytes)}.pdf`;
+}
+
+/**
+ * Is this file a PDF (by type or name)?
+ * @param {{ name?: string, type?: string }} file
+ */
+export function isPdfFile(file) {
+  return file.type === 'application/pdf' || /\.pdf$/i.test(file.name ?? '');
+}

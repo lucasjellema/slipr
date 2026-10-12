@@ -33,6 +33,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('code' in value) return { keys: keysOf(defs.code) };
   if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
+  if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
   if ('kind' in value) return { keys: keysOf(defs.chart) };
   if ('text' in value) return { keys: keysOf(defs.quote) };
   return {};

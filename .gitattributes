@@ -19,6 +19,8 @@
 *.ttf   binary
 *.otf   binary
 *.pdf   binary
+*.pfb   binary
+*.bcmap binary
 *.pptx  binary
 *.zip   binary
 *.slipr binary

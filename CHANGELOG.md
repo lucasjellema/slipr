@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-12: PDF documents (I-072)
+- **Added** `vendor/pdfjs-4.10.38/` (PDF.js, Apache-2.0, from npm `pdfjs-dist@4.10.38`, integrity checked; only `build/pdf.min.mjs`, the worker, `cmaps/`, `standard_fonts/`, see its `VENDORED.md`). `.gitattributes` marks `.pfb` and `.bcmap` as binary.
+- **Added** to show format 0.2: the `pdf` slot type and `pdf` block (`pdf`, `title`, `page?`, `pages?: [first, last]`, `load?`, `fallback?`). Validation: unsafe addresses are an error; a missing local file, `page` with `pages`, and a reversed range are warnings. Template slot type `pdf`, and a `pdf` layout in both templates (default 1.3.0, Conclusion 0.1.3).
+- **Added** `shared/embeds/pdf.js`: audience slots fit the page and step through a range with hidden Reveal fragments; reader blocks have page navigation, zoom, "Open PDF" and screen-reader text; PDFs on other servers are click-to-load in reader mode. Local PDFs join `collectImagePaths()` (file checks, folder sources, single-file export, where the PDF.js worker runs on the page).
+- **Changed** audience mode no longer waits for embeds before showing the show (a large PDF or slow page would hold it up). PDF pages render with PDF.js's print intent, so they also render in hidden or background tabs.
+- **Changed** the demo (`s-pdf`, `docs/slipr-in-four-pages.pdf`) and the Conclusion demo (`s-pdf`). Spec `docs/specs/I-072-pdf-document.md`; D-011 refined; show and template format docs.
+
 ### 2026-10-12: Web pages on slides and in the reader (I-071)
 - **Added** to show format 0.2: slot type `web` (`url`, `title`, `allow?`, `present?`, `load?`, `fallback?`), and `allow` / `aspect` on the `embed` block. `allow` loosens the frame sandbox from an allow-list (`same-origin`, `fullscreen`, `modals`, `downloads`, `presentation`); `same-origin` applies to pages on other servers only. Validation: unsafe addresses are an error; `present: "static"` without a fallback and `same-origin` on a show file are warnings.
 - **Added** template slot type `web`, and a `web` layout in both templates (default 1.2.0, Conclusion 0.1.2).

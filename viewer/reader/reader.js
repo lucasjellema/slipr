@@ -13,6 +13,8 @@
 import { renderSlide, slideTitle } from '../../shared/render.js';
 import { renderBlocks, blockDomId } from '../../shared/blocks.js';
 import { hydrateEmbeds } from '../../shared/embeds/index.js';
+import { extractPdfText, pageRange, pdfEntries, pdfUrl } from '../../shared/embeds/pdf.js';
+import { externalOrigin, hasConsent } from '../../shared/embeds/consent.js';
 import { markdown } from '../../shared/markdown.js';
 import { addStylesheet, h } from '../js/dom.js';
 import { audienceUrl, parseReaderHash } from '../js/mode-switch.js';
@@ -21,7 +23,7 @@ import { buildContents, createScrollSpy, trackVisits } from './nav.js';
 import { setupInteractions } from './interactions.js';
 import { openReaderState } from './state.js';
 import { openWelcome, createTailorPanel, DEPTHS } from './tailor.js';
-import { buildSearchIndex } from './search-index.js';
+import { buildSearchIndex, pdfSearchDocs } from './search-index.js';
 import { createSearch } from './search.js';
 import { createAnnotations } from './annotations.js';
 
@@ -60,9 +62,33 @@ export async function startReader(app, ctx) {
     includeNotes: () => store.get().showNotes,
     onSelect: (doc) => {
       if (!doc.slideId) return null; // glossary entries have no place to jump to
-      return go(doc.blockId ? `#${doc.slideId}/${doc.blockId}` : `#${doc.slideId}`, 'smooth');
+      const slot = doc.blockId?.startsWith('slot:');
+      const target = go(doc.blockId && !slot ? `#${doc.slideId}/${doc.blockId}` : `#${doc.slideId}`, 'smooth');
+      // A PDF page (I-072): open the PDF at that page.
+      if (doc.page && target) {
+        const pdf = slot ? target.querySelector(`[data-slot="${CSS.escape(String(doc.blockId).slice(5))}"][data-embed="pdf"]`) : target.querySelector('[data-embed="pdf"]');
+        if (pdf instanceof HTMLElement) pdf.dataset.pdfGoto = String(doc.page); // for a PDF that is not loaded yet
+        pdf?.dispatchEvent(new CustomEvent('slipr:pdf-page', { detail: doc.page }));
+      }
+      return target;
     },
     onShowEverything: () => setPrefs({ profile: null, depth: 3, path: null }),
+    // PDF text (I-072) joins the index on the first search: local PDFs, and
+    // remote ones only when they may load (load "auto", or the reader agreed).
+    prepare: async () => {
+      const pages = [];
+      for (const { slideId, blockId, value } of pdfEntries(show)) {
+        const origin = externalOrigin(String(value.pdf));
+        if (origin && value.load !== 'auto' && !hasConsent(origin)) continue;
+        const [first, last] = pageRange(value);
+        try {
+          for (const p of await extractPdfText(pdfUrl(value, ctx), first, last)) pages.push({ slideId, blockId, title: value.title, ...p });
+        } catch (err) {
+          console.warn(`Slipr: could not read PDF "${value.pdf}" for search:`, err);
+        }
+      }
+      docs.push(...pdfSearchDocs(show, docs, pages));
+    },
   });
   const main = h('main', { class: 'reader-main', id: 'top' });
   const notes = createAnnotations({

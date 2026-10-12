@@ -17,7 +17,7 @@ function validateVariant(mutate) {
 
 /** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases). */
 function withoutFormat02(s) {
-  s.slides = s.slides.filter((x) => x.layout !== 'web');
+  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
@@ -364,8 +364,8 @@ describe('robustness', () => {
 });
 
 describe('helpers', () => {
-  test('collectImagePaths lists unique image sources', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
+  test('collectImagePaths lists unique image sources and local PDFs', () => {
+    assert.deepEqual(collectImagePaths(demo).sort(), ['docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {

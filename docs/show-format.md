@@ -198,12 +198,13 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `embed` | `url`, `title`, `height?`, `aspect?`, `allow?`, `load?`, `fallback?` | Sandboxed iframe (live demo, video). A page on another server is **click-to-load** unless `load` is `"auto"` (0.2); see *Embeds* below |
 | `slide-ref` | `slide`, `label?` | Link card to another slide |
 | `diagram` | `mermaid`, `caption?`, `fallback?` | Rendered SVG diagram from Mermaid source |
+| `pdf` | `pdf`, `title`, `page?`, `pages?`, `load?`, `fallback?` | (0.2) A PDF document with page navigation, zoom and searchable text; see *PDF documents* below |
 
 *Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
 
 ### Embeds (I-070, D-011)
 
-Content that needs a library or another server is an **embed**: today `diagram` (slot and block) and web pages (`web` slot and `embed` block, I-071). Embeds share two optional fields (format 0.2):
+Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071) and PDF documents (`pdf` slot and block, I-072). Embeds share two optional fields (format 0.2):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -213,6 +214,22 @@ Content that needs a library or another server is an **embed**: today `diagram` 
 ```json
 { "id": "docs", "type": "embed", "title": "Reveal.js documentation", "url": "https://revealjs.com/", "height": 420,
   "fallback": { "src": "images/revealjs-screenshot.png", "alt": "The Reveal.js documentation home page" } }
+```
+
+#### PDF documents (`pdf` slot and block; I-072, format 0.2)
+
+| Field | Meaning |
+|---|---|
+| `pdf`, `title` | Required. The file: a path relative to `show.json` (e.g. `docs/report.pdf`), or an `https:` URL (its server must allow cross-origin requests, CORS). The key is `pdf`, not `src`, so a PDF value is never mistaken for an image |
+| `page` | Show this one page |
+| `pages` | `[first, last]`, inclusive. **Audience mode** starts at `first` and each click (a Reveal fragment) shows the next page. **Reader mode** opens at `first` and limits page navigation to the range. Wins over `page` (warning if both are set) |
+| `load` | As for web pages: a PDF on another server is click-to-load in reader mode unless `"auto"` |
+| `fallback` | As for every embed |
+
+Without `page` or `pages`: page 1 on a slide, the whole document in a reader block. Reader blocks have a bar with previous / next, zoom and *Open PDF ↗*; a slot in reader mode has a compact bar. **Reader search** finds text in the shown pages (local PDFs, and remote ones once they may load), and a result opens the PDF at that page. PDFs are rendered with the vendored PDF.js (D-011), loaded only when a show has a PDF.
+
+```json
+"document": { "pdf": "docs/annual-report.pdf", "title": "Annual report 2026", "pages": [4, 7] }
 ```
 
 #### Web pages (`web` slot, `embed` block; I-071, format 0.2)
@@ -268,6 +285,7 @@ The template defines which slots a layout has and the type of each slot.
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
 | `diagram` | object | `{ "mermaid": "flowchart LR; A-->B", "caption": "...", "fallback": { "src": "images/flow.png", "alt": "..." } }` rendered as an SVG diagram; `fallback` (0.2) as for embeds |
+| `pdf` | object | (0.2) `{ "pdf": "docs/report.pdf", "title": "...", "page": 3 }` or `"pages": [3, 7]`: a PDF on the slide, see *PDF documents* above |
 | `web` | object | (0.2) `{ "url": "https://…", "title": "...", "allow": [...], "present": "live" \| "static", "load": "click" \| "auto", "fallback": {...} }`: a web page on the slide, see *Web pages* above |
 
 ## Template references
@@ -284,11 +302,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` slot value in a 0.1 show; an unsafe web page address.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` slot value or `pdf` block in a 0.1 show; an unsafe web page or PDF address.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (I-083), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), and the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (I-083), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), and the `pdf` slot and block types (I-072, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

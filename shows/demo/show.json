@@ -349,6 +349,35 @@
     },
 
     {
+      "id": "s-pdf",
+      "layout": "pdf",
+      "chapter": "how",
+      "tags": ["embed", "pdf"],
+      "content": {
+        "title": "A PDF, page by page",
+        "document": { "pdf": "docs/slipr-in-four-pages.pdf", "title": "Slipr in four pages", "pages": [1, 4] },
+        "caption": "Each click shows the next page."
+      },
+      "reader": {
+        "summary": "Slides and the reader layer can show PDF documents.",
+        "blocks": [
+          {
+            "id": "pdf-how",
+            "type": "text",
+            "md": "A **PDF** slot shows one page, or steps through a range of pages on clicks. In reader mode, a PDF block has page navigation and zoom, and the PDF's text turns up in search."
+          },
+          {
+            "id": "pdf-doc",
+            "type": "pdf",
+            "depth": 2,
+            "pdf": "docs/slipr-in-four-pages.pdf",
+            "title": "The whole document"
+          }
+        ]
+      }
+    },
+
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

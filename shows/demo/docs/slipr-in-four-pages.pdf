@@ -1,0 +1,90 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [5 0 R 7 0 R 9 0 R 11 0 R] /Count 4 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+6 0 obj
+<< /Length 370 >>
+stream
+0.12 0.23 0.37 rg 0 555 842 40 re f
+BT /F2 34 Tf 0.12 0.23 0.37 rg 60 470 Td (Slipr in four pages) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 400 Td (One show, two experiences.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 360 Td (Audience mode presents; reader mode explains.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 320 Td (Page 1 of 4.) Tj ET
+0.95 0.66 0 rg 60 120 120 6 re f
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+8 0 obj
+<< /Length 400 >>
+stream
+0.12 0.23 0.37 rg 0 555 842 40 re f
+BT /F2 34 Tf 0.12 0.23 0.37 rg 60 470 Td (1. A show is data) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 400 Td (show.json holds the slides and the reader layer.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 360 Td (Images and documents sit next to it in the show folder.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 320 Td (Page 2 of 4.) Tj ET
+0.95 0.66 0 rg 60 120 120 6 re f
+endstream
+endobj
+9 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+10 0 obj
+<< /Length 396 >>
+stream
+0.12 0.23 0.37 rg 0 555 842 40 re f
+BT /F2 34 Tf 0.12 0.23 0.37 rg 60 470 Td (2. Templates own the looks) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 400 Td (Layouts are HTML fragments with named slots.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 360 Td (Swap the template and the whole show restyles.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 320 Td (Page 3 of 4.) Tj ET
+0.95 0.66 0 rg 60 120 120 6 re f
+endstream
+endobj
+11 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 12 0 R >>
+endobj
+12 0 obj
+<< /Length 375 >>
+stream
+0.12 0.23 0.37 rg 0 555 842 40 re f
+BT /F2 34 Tf 0.12 0.23 0.37 rg 60 470 Td (3. Rich embeds) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 400 Td (Diagrams, web pages and PDFs like this one.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 360 Td (PDF text is searchable in reader mode.) Tj ET
+BT /F1 20 Tf 0.15 0.15 0.15 rg 60 320 Td (Page 4 of 4.) Tj ET
+0.95 0.66 0 rg 60 120 120 6 re f
+endstream
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000140 00000 n 
+0000000237 00000 n 
+0000000339 00000 n 
+0000000475 00000 n 
+0000000896 00000 n 
+0000001032 00000 n 
+0000001483 00000 n 
+0000001620 00000 n 
+0000002068 00000 n 
+0000002206 00000 n 
+trailer
+<< /Size 13 /Root 1 0 R /Info << /Title (Slipr in four pages) >> >>
+startxref
+2633
+%%EOF

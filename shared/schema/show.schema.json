@@ -190,6 +190,7 @@
         { "$ref": "#/$defs/chart" },
         { "$ref": "#/$defs/diagram" },
         { "$ref": "#/$defs/web" },
+        { "$ref": "#/$defs/pdf" },
         { "$ref": "#/$defs/cards" }
       ]
     },
@@ -281,6 +282,27 @@
         "fallback": { "$ref": "#/$defs/image", "description": "Screenshot shown for print, thumbnails, offline presenting and instead of the link card." }
       }
     },
+    "pdf": {
+      "type": "object",
+      "required": ["pdf", "title"],
+      "additionalProperties": false,
+      "description": "(0.2) A PDF document on a slide (slot type 'pdf', I-072).",
+      "properties": {
+        "pdf": { "type": "string", "minLength": 1, "description": "The PDF: a path relative to show.json, or an https URL (the server must allow CORS)." },
+        "title": { "type": "string", "minLength": 1 },
+        "page": { "type": "integer", "minimum": 1, "description": "Show this one page." },
+        "pages": { "$ref": "#/$defs/pdfPages" },
+        "load": { "enum": ["click", "auto"], "description": "Reader mode, a PDF on another server: \"click\" (default) waits for the reader's consent, \"auto\" loads straight away (D-011)." },
+        "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when the PDF cannot be shown." }
+      }
+    },
+    "pdfPages": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "integer", "minimum": 1 },
+      "description": "(0.2) First and last page (inclusive). Audience mode steps through them on clicks; reader mode limits page navigation to them."
+    },
     "webAllow": {
       "type": "array",
       "description": "(0.2) Extra sandbox permissions for an embedded page (I-071). same-origin applies to pages on other servers only.",
@@ -338,7 +360,8 @@
         { "$ref": "#/$defs/blockImage" },
         { "$ref": "#/$defs/blockEmbed" },
         { "$ref": "#/$defs/blockSlideRef" },
-        { "$ref": "#/$defs/blockDiagram" }
+        { "$ref": "#/$defs/blockDiagram" },
+        { "$ref": "#/$defs/blockPdf" }
       ]
     },
     "for": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "description": "Profile ids that see this block; absent = everyone." },
@@ -462,6 +485,22 @@
         "mermaid": { "type": "string", "minLength": 1 },
         "caption": { "type": "string" },
         "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and when rendering fails (I-070)." }
+      }
+    },
+    "blockPdf": {
+      "type": "object",
+      "required": ["id", "type", "pdf", "title"],
+      "additionalProperties": false,
+      "description": "(0.2) A PDF document in the reader layer (I-072).",
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "type": { "const": "pdf" },
+        "for": { "$ref": "#/$defs/for" }, "depth": { "$ref": "#/$defs/depth" },
+        "pdf": { "type": "string", "minLength": 1, "description": "A path relative to show.json, or an https URL (the server must allow CORS)." },
+        "title": { "type": "string", "minLength": 1 },
+        "page": { "type": "integer", "minimum": 1 },
+        "pages": { "$ref": "#/$defs/pdfPages" },
+        "load": { "enum": ["click", "auto"] },
+        "fallback": { "$ref": "#/$defs/image" }
       }
     }
   }

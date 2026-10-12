@@ -115,6 +115,13 @@ export function renderBlock(block, slideId, ctx) {
       return `<div ${attrs}>${badges}<a href="${escape(href)}" data-slide-link="${escape(block.slide)}">${escape(label)}</a></div>`;
     }
 
+    case 'pdf': {
+      if (isBlockedUrl(block.pdf)) {
+        return `<div ${attrs}><p class="slipr-block-body">[PDF blocked: unsupported URL]</p></div>`;
+      }
+      return `<div ${attrs}>${badges}<p class="slipr-block-title">${escape(block.title)}</p>${embedHtml('pdf', block, ctx)}</div>`;
+    }
+
     case 'diagram': {
       const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
       return `<div ${attrs}>${badges}<figure class="slipr-figure slipr-figure--diagram">`

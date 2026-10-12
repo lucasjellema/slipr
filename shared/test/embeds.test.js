@@ -1,7 +1,8 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { isDiagram, clearDiagramCache } from '../embeds/diagram.js';
-import { embedAttributes, embedHtml, embedKindForBlock, embedKindForSlot, hydrateEmbeds, usedEmbedKinds } from '../embeds/index.js';
+import { embedAttributes, embedHtml, embedInnerHtml, embedKindForBlock, embedKindForSlot, hydrateEmbeds, usedEmbedKinds } from '../embeds/index.js';
+import { afterHtml, pageLabel, pageRange, pdfEntries, pdfUrl } from '../embeds/pdf.js';
 import { ALLOW_OPTIONS, FRAME_SANDBOX, frameAspect, frameSandbox } from '../embeds/web.js';
 import { externalOrigin, grantConsent, hasConsent } from '../embeds/consent.js';
 import { renderBlock } from '../blocks.js';
@@ -95,7 +96,7 @@ describe('embed registry (I-070)', () => {
     const show = showWith([{ id: 'w', type: 'embed', url: 'https://example.com', title: 'Ex' }]);
     show.slides[0].content = { title: 'no diagram' };
     assert.deepEqual([...usedEmbedKinds(show)], ['web']);
-    assert.deepEqual([...usedEmbedKinds(readJson('shows/conclusion-demo/show.json'))], ['web']);
+    assert.deepEqual([...usedEmbedKinds(readJson('shows/conclusion-demo/show.json'))].sort(), ['pdf', 'web']);
   });
 
   test('diagram markup: kind class, template hook, escaped source as fallback', () => {
@@ -278,5 +279,79 @@ describe('web pages (I-071)', () => {
     const show = showWith([{ id: 'w', type: 'embed', url: 'https://x.example', title: 'X', allow: ['modals'], aspect: '16:9' }], undefined, '0.1');
     const paths = validateShow(show, { template }).errors.filter((e) => e.code === 'format-version').map((e) => e.path);
     assert.deepEqual(paths, ['slides[0].reader.blocks[0].allow', 'slides[0].reader.blocks[0].aspect']);
+  });
+});
+
+describe('PDF documents (I-072)', () => {
+  const template = readJson('templates/default/template.json');
+  /** A 0.2 show with one PDF slide and optional blocks. */
+  const pdfShow = (document, blocks = [], slipr = '0.2') => ({
+    slipr,
+    id: 'pdf-test',
+    meta: { title: 'PDF test' },
+    template: { ref: 'default', version: '^1.0' },
+    slides: [{ id: 's-1', layout: 'pdf', content: { title: 'T', document }, reader: { blocks } }],
+  });
+
+  test('page ranges: pages wins, reversed ranges are ordered, nothing means all', () => {
+    assert.deepEqual(pageRange({ page: 3 }), [3, 3]);
+    assert.deepEqual(pageRange({ pages: [2, 5], page: 9 }), [2, 5]);
+    assert.deepEqual(pageRange({ pages: [5, 2] }), [2, 5]);
+    assert.deepEqual(pageRange({}), [1, null]);
+    assert.deepEqual(pageRange({ page: 0 }), [1, null]);
+    assert.equal(pageLabel({ page: 3 }), 'page 3');
+    assert.equal(pageLabel({ pages: [3, 7] }), 'pages 3–7');
+    assert.equal(pageLabel({}), '');
+  });
+
+  test('markup: card fallback, range attributes, bar per place', () => {
+    const block = embedHtml('pdf', { pdf: 'docs/a.pdf', title: 'A <b>', pages: [2, 4] }, ctx);
+    assert.match(block, /data-embed="pdf" data-embed-pdf="\/shows\/x\/docs\/a.pdf" data-embed-title="A &lt;b&gt;" data-pdf-first="2" data-pdf-bar="full" data-pdf-last="4"/);
+    assert.match(block, /PDF · pages 2–4 · File in this show/);
+    assert.match(block, /href="\/shows\/x\/docs\/a.pdf#page=2"/);
+    assert.doesNotMatch(block, /data-embed-origin|slipr-pdf-step/);
+    assert.equal(embedAttributes('pdf', { pdf: 'a.pdf', title: 'A' }, ctx, { slot: true, mode: 'reader' })['data-pdf-bar'], 'compact');
+    assert.equal(embedAttributes('pdf', { pdf: 'a.pdf', title: 'A' }, ctx, { slot: true, mode: 'audience' })['data-pdf-bar'], 'none');
+  });
+
+  test('audience slots step through a range with hidden fragments', () => {
+    const html = embedInnerHtml('pdf', { pdf: 'a.pdf', title: 'A', pages: [3, 5] }, ctx, { mode: 'audience', slot: true });
+    assert.equal((html.match(/class="fragment slipr-pdf-step"/g) ?? []).length, 2);
+    assert.match(html, /data-pdf-page="4".*data-pdf-page="5"/);
+    assert.equal(afterHtml({ pdf: 'a.pdf', title: 'A', pages: [3, 5] }, { mode: 'reader', slot: true }), '');
+    assert.equal(afterHtml({ pdf: 'a.pdf', title: 'A', page: 3 }, { mode: 'audience', slot: true }), '');
+  });
+
+  test('remote PDFs: click-to-load in reader mode only', () => {
+    const remote = { pdf: 'https://docs.example/a.pdf', title: 'A' };
+    assert.equal(embedAttributes('pdf', remote, ctx)['data-embed-origin'], 'https://docs.example');
+    assert.equal(embedAttributes('pdf', { ...remote, load: 'auto' }, ctx)['data-embed-origin'], undefined);
+    assert.equal(embedAttributes('pdf', remote, ctx, { mode: 'audience', slot: true })['data-embed-origin'], undefined);
+    assert.equal(pdfUrl(remote, ctx), 'https://docs.example/a.pdf');
+  });
+
+  test('pdfEntries and usedEmbedKinds find slots and blocks', () => {
+    const show = pdfShow({ pdf: 'a.pdf', title: 'A' }, [{ id: 'b', type: 'pdf', pdf: 'b.pdf', title: 'B' }]);
+    assert.deepEqual(pdfEntries(show).map((e) => [e.slideId, e.blockId, e.value.pdf]), [['s-1', 'slot:document', 'a.pdf'], ['s-1', 'b', 'b.pdf']]);
+    assert.deepEqual([...usedEmbedKinds(show)], ['pdf']);
+    assert.equal(embedKindForSlot('pdf'), 'pdf');
+    assert.equal(embedKindForBlock('pdf'), 'pdf');
+    assert.deepEqual(collectImagePaths(pdfShow({ pdf: 'https://x.example/a.pdf', title: 'A' }, [{ id: 'b', type: 'pdf', pdf: 'b.pdf', title: 'B' }])), ['b.pdf']);
+  });
+
+  test('validation: valid in 0.2, errors and warnings', () => {
+    const ok = validateShow(pdfShow({ pdf: 'a.pdf', title: 'A', pages: [1, 3] }, [{ id: 'b', type: 'pdf', pdf: 'a.pdf', title: 'B', page: 2 }]), { template, imageExists: () => true });
+    assert.deepEqual(ok.errors, []);
+    assert.deepEqual(ok.warnings, []);
+    const old = validateShow(pdfShow({ pdf: 'a.pdf', title: 'A' }, [{ id: 'b', type: 'pdf', pdf: 'a.pdf', title: 'B' }], '0.1'), { template });
+    assert.deepEqual(old.errors.filter((e) => e.code === 'format-version').map((e) => e.path), ['slides[0].content.document', 'slides[0].reader.blocks[0]']);
+    const codesOf = (document) => {
+      const r = validateShow(pdfShow(document), { template, imageExists: () => false });
+      return [...r.errors, ...r.warnings].map((i) => i.code).sort();
+    };
+    assert.deepEqual(codesOf({ pdf: 'a.pdf', title: 'A', page: 1, pages: [3, 2] }), ['missing-file', 'pdf-page-and-pages', 'pdf-pages-order']);
+    assert.deepEqual(codesOf({ pdf: 'javascript:x', title: 'A' }), ['unsafe-url']);
+    assert.deepEqual(codesOf({ pdf: 'https://x.example/a.pdf', title: 'A' }), []);
+    assert.equal(validateShow(pdfShow({ pdf: 'a.pdf', title: 'A', pages: [1] }), { template }).ok, false);
   });
 });

@@ -8,9 +8,10 @@ import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
-import { addFallbackToSlot, addImageToSlot, imageFileFrom } from '../image-input.js';
-import { webValue } from '../block-values.js';
+import { addFallbackToSlot, addImageToSlot, addPdf, imageFileFrom } from '../image-input.js';
+import { pdfValue, webValue } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
+import { pdfFields } from './pdf-fields.js';
 import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
 import { openLayoutPicker } from './layout-picker.js';
@@ -20,7 +21,7 @@ import { parseTags } from '../show-entities.js';
 /** Actions the slide form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSlot', 'setNotes', 'setTags', 'updateOverlay']);
 /** Web page fields that are typed (I-071); the others are choices. */
-const TYPED_WEB_FIELDS = new Set(['url', 'title', 'fallback-alt']);
+const TYPED_WEB_FIELDS = new Set(['url', 'pdf', 'title', 'fallback-alt']);
 
 /**
  * Mount the slide form into a container.
@@ -349,6 +350,27 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       resolveAsset: store.state.resolveAsset,
     };
     inputs = [h('div', { class: 'slipr-embed-editor' }, [...webAddressFields(options), ...webOptionFields(options)])];
+  } else if (kind === 'pdf') {
+    // A PDF document (I-072): the same fields as the PDF block.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    /** @param {Record<string, any>} patch @param {string} field */
+    const writePdf = (patch, field) => {
+      current = pdfValue(readSlot(), patch);
+      store.dispatch('setSlot', { slideId, slot: slotName, value: current }, TYPED_WEB_FIELDS.has(field) ? { coalesceKey: `${coalesceKey}-${field}` } : {});
+    };
+    inputs = [h('div', { class: 'slipr-embed-editor' }, pdfFields({
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: writePdf,
+      addPdf: (file) => addPdf(store, {
+        file,
+        fallbackName: slotName,
+        write: (path) => writePdf({ pdf: path, ...(readSlot()?.title ? {} : { title: file.name.replace(/\.pdf$/i, '') }) }, 'file'),
+      }),
+      addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
+      resolveAsset: store.state.resolveAsset,
+    }))];
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [

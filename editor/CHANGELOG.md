@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: PDF slots and blocks (I-072)
+- **Added** a field editor for `pdf` slots and a **PDF Document** block type (`ui/pdf-fields.js`): file path or https address, **Choose PDF…** (copied into the show's `docs/` folder with a content hash, `addPdf()`, `pdfPath()`), title (taken from the file name when empty), pages (first and last), click-to-load for remote PDFs, and the fallback image (`fallbackImageField()`, now shared with web pages). `pdfValue()`, `pdfPagesPatch()`; `setSlot` and `setBlockType` raise a 0.1 show to 0.2; key order for PDF values follows the schema.
+
 ### 2026-10-12: Web page slots and page options (I-071)
 - **Added** a field editor for `web` slots (Slide tab): address, title, **While presenting** (live page / fallback image), click-to-load for reader mode, **Allow the page to…** (same origin, full screen, dialogs, downloads, presentation) and the fallback image (`ui/web-fields.js`, `addFallbackToSlot()`). The Embedded Page block uses the same fields, plus **Size** (fixed height or an aspect ratio). Choices re-render the form; typing coalesces. New helpers `webValue()`, `toggleAllow()`; `setSlot` raises a 0.1 show to 0.2 for a web page; key order for web values follows the schema.
 

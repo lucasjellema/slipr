@@ -18,6 +18,7 @@ import { slideTitle } from '../../shared/render.js';
  * @property {string} title      Shown as the result heading.
  * @property {number} order      Position in the show (for stable sorting).
  * @property {{ name: string, text: string, weight: number }[]} fields
+ * @property {number} [page]   A PDF page (I-072): the result opens the PDF at it.
  */
 
 /**
@@ -90,6 +91,32 @@ export function buildSearchIndex(show) {
     });
   }
   return docs;
+}
+
+/**
+ * Search documents for the text of PDF pages (I-072), one per page, placed
+ * right after the other documents of their slide. The text is extracted by
+ * the caller (shared/embeds/pdf.js), so this stays pure.
+ * @param {any} show
+ * @param {SearchDoc[]} docs  The existing index (for the order).
+ * @param {{ slideId: string, blockId: string, title: string, page: number, text: string }[]} pages
+ *   `blockId`: the PDF block's id, or `slot:<name>` for a PDF slot.
+ * @returns {SearchDoc[]}
+ */
+export function pdfSearchDocs(show, docs, pages) {
+  return pages.map((p, i) => {
+    const slide = (show.slides ?? []).find((/** @type {any} */ s) => s.id === p.slideId);
+    const orders = docs.filter((d) => d.slideId === p.slideId).map((d) => d.order);
+    return {
+      kind: 'block',
+      slideId: p.slideId,
+      blockId: p.blockId,
+      title: `${slide ? slideTitle(slide) : p.slideId} › ${p.title}, page ${p.page}`,
+      order: (orders.length ? Math.max(...orders) : 0) + (i + 1) / (pages.length + 1),
+      fields: [{ name: 'pdf', text: p.text, weight: 1 }],
+      page: p.page,
+    };
+  });
 }
 
 /**

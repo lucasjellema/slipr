@@ -173,7 +173,6 @@ export async function hydrate(el, live) {
   frame.referrerPolicy = 'no-referrer';
   if (el.dataset.embedFullscreen !== undefined) {
     frame.allow = 'fullscreen';
-    frame.allowFullscreen = true;
   }
   if (el.dataset.embedAspect) frame.style.aspectRatio = el.dataset.embedAspect;
   else if (el.dataset.embedHeight) frame.style.height = `${Number(el.dataset.embedHeight) || 400}px`;

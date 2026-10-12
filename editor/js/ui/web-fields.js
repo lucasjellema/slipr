@@ -137,13 +137,25 @@ export function webOptionFields(options) {
   ]));
 
   // Fallback image (I-070): print, thumbnails, offline presenting, failures.
-  const fallback = value.fallback;
-  fields.push(h('div', { class: 'slipr-embed-fallback-editor' }, [
+  fields.push(fallbackImageField(options, 'Optional: a screenshot of the page, shown in print, in thumbnails, before it loads and (if you choose) while presenting.'));
+
+  return fields;
+}
+
+/**
+ * The fallback image of an embed (I-070): picture, alt text, Remove.
+ * @param {Pick<WebFieldsOptions, 'label' | 'read' | 'write' | 'addFallback' | 'resolveAsset'>} options
+ * @param {string} help  Shown while there is no fallback image.
+ * @returns {HTMLElement}
+ */
+export function fallbackImageField({ label, read, write, addFallback, resolveAsset }, help) {
+  const fallback = read()?.fallback;
+  return h('div', { class: 'slipr-embed-fallback-editor' }, [
     imageField({
       label: `${label}: fallback image`,
       image: fallback,
-      resolveAsset: options.resolveAsset,
-      onFile: (file) => runImage(() => options.addFallback(file)),
+      resolveAsset,
+      onFile: (file) => runImage(() => addFallback(file)),
     }),
     h('input', {
       type: 'text',
@@ -159,8 +171,6 @@ export function webOptionFields(options) {
     }),
     fallback?.src
       ? h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', onclick: () => write({ fallback: undefined }, 'fallback') }, ['Remove fallback image'])
-      : h('span', { class: 'slipr-help' }, ['Optional: a screenshot of the page, shown in print, in thumbnails, before it loads and (if you choose) while presenting.']),
-  ]));
-
-  return fields;
+      : h('span', { class: 'slipr-help' }, [help]),
+  ]);
 }

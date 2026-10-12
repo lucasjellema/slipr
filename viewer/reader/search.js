@@ -14,7 +14,9 @@ import { search, tokens, fold } from './search-index.js';
  *   includeNotes: () => boolean,
  *   onSelect: (doc: import('./search-index.js').SearchDoc) => HTMLElement | null,
  *   onShowEverything: () => void,
+ *   prepare?: () => Promise<void>,
  * }} io
+ *   `prepare`: runs once, on the first open (e.g. reading PDF text into `docs`, I-072).
  */
 export function createSearch(io) {
   const input = /** @type {HTMLInputElement} */ (h('input', {
@@ -87,11 +89,17 @@ export function createSearch(io) {
     if (target) highlightTerms(target, tokens(query));
   };
 
+  /** @type {Promise<void> | null} */
+  let prepared = null;
   const open = () => {
     if (dialog.open) return;
     dialog.showModal();
     input.select();
     run();
+    if (io.prepare && !prepared) {
+      status.textContent = 'Reading the PDFs in this show…';
+      prepared = io.prepare().catch((err) => console.warn('Slipr: search preparation failed:', err)).finally(() => run());
+    }
   };
   return { button, open };
 }
