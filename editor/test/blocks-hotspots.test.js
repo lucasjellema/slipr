@@ -102,3 +102,15 @@ test('updateBlock removes fields patched to undefined', () => {
   assert.ok(!('caption' in block));
   assert.deepEqual(validateShow(next, { template }).errors, []);
 });
+
+test('embed load and fallback (I-070): a 0.1 show becomes 0.2, removal keeps it valid', () => {
+  const slide = demo.slides.find((s) => s.reader?.blocks?.some((b) => b.type === 'embed'));
+  const embed = slide.reader.blocks.find((b) => b.type === 'embed');
+  const ids = { slideId: slide.id, blockId: embed.id };
+  const old = { ...demo, slipr: '0.1' };
+  let next = actions.updateBlock(old, { ...ids, patch: { load: 'auto' } });
+  assert.equal(next.slipr, '0.2');
+  assert.equal(actions.updateBlock(old, { ...ids, patch: { height: 300 } }).slipr, '0.1', 'other fields keep the version');
+  next = actions.updateBlock(next, { ...ids, patch: { load: undefined } });
+  assert.ok(!('load' in next.slides.find((s) => s.id === slide.id).reader.blocks.find((b) => b.id === embed.id)));
+});

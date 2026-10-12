@@ -1491,6 +1491,7 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-tabs-editor,
 .slipr-embed-editor,
+.slipr-embed-fallback-editor,
 .slipr-slide-ref-editor {
   display: flex;
   flex-direction: column;

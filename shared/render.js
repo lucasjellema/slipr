@@ -17,11 +17,13 @@
  * narrow-screen reflow rules leave it a picture (I-083).
  *
  * Text goes in via textContent; Markdown via shared/markdown.js (escaped);
- * nothing else from the show reaches innerHTML.
+ * embed slots via shared/embeds/ (escaped; live content added later by
+ * hydrateEmbeds()); nothing else from the show reaches innerHTML.
  */
 import { markdown, markdownInline, markdownListItems, escape } from './markdown.js';
 import { applyPictureStyle } from './picture.js';
 import { linkGlossaryTerms } from './glossary.js';
+import { embedKindForSlot, fillEmbedElement } from './embeds/index.js';
 
 /**
  * @typedef {object} RenderOptions
@@ -211,12 +213,8 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
     }
 
     case 'diagram': {
-      el.classList.add('slipr-diagram');
-      el.dataset.mermaid = value.mermaid;
-      const pre = doc.createElement('pre');
-      pre.className = 'mermaid';
-      pre.textContent = value.mermaid;
-      el.replaceChildren(pre);
+      // An embed slot (I-070): static fallback now, live content from hydrateEmbeds().
+      fillEmbedElement(el, /** @type {string} */ (embedKindForSlot(type)), value, ctx);
       if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
         const figcaption = doc.createElement('figcaption');
         figcaption.className = 'slipr-caption';

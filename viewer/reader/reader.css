@@ -670,27 +670,6 @@ body.slipr-reader {
   height: auto;
   display: block;
 }
-.slipr-diagram-error {
-  border: 1px solid #d97706;
-  background: #fffbeb;
-  color: #92400e;
-  padding: 1rem;
-  border-radius: 0.4rem;
-  font-size: 0.85rem;
-  width: 100%;
-  box-sizing: border-box;
-}
-.slipr-diagram-error-badge {
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  color: #b45309;
-}
-.slipr-diagram-error-text {
-  margin: 0.5rem 0 0;
-  white-space: pre-wrap;
-  font-family: var(--slipr-font-code, monospace);
-  font-size: 0.8rem;
-}
+/* Error boxes, link cards and click-to-load: shared/embeds/embeds.css */
+
 

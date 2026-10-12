@@ -20,6 +20,8 @@ function withoutFormat02(s) {
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
+  for (const slide of s.slides) for (const value of Object.values(slide.content ?? {})) if (value && typeof value === 'object') delete value.fallback;
+  for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) { delete block.fallback; delete block.load; }
 }
 
 describe('valid inputs', () => {

@@ -14,7 +14,7 @@
  */
 import { h } from '../dom.js';
 import { renderSlide, slideTitle } from '../../../shared/render.js';
-import { renderDiagrams } from '../../../shared/diagram.js';
+import { hydrateEmbeds } from '../../../shared/embeds/index.js';
 import { issuesForSlide } from '../store.js';
 import { emptyChapters, gridMove, selectRange, slideRuns } from '../show-grid-model.js';
 import { uniqueId } from '../show-entities.js';
@@ -100,7 +100,7 @@ export function mountShowGrid(host, store) {
         el = h('span', { class: 'slipr-layout-thumb-error' }, ['No preview']);
       }
       // Diagrams (Mermaid) are drawn after rendering, as in the preview and the viewer.
-      renderDiagrams(el).catch(() => {});
+      hydrateEmbeds(el, { thumbnail: true }).catch(() => {});
       thumbs.set(slide, el);
     }
     return el;

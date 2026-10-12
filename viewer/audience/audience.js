@@ -13,7 +13,7 @@ import { markdown } from '../../shared/markdown.js';
 import { addStylesheet, h } from '../js/dom.js';
 import { buildAgendaSlide, createChapterBar } from './agenda.js';
 import { readerUrl } from '../js/mode-switch.js';
-import { renderDiagrams } from '../../shared/diagram.js';
+import { hydrateEmbeds } from '../../shared/embeds/index.js';
 
 const COLOR = /^(#[0-9a-f]{3,8}|(rgb|hsl|oklch|color)\(.*\)|[a-z]+)$/i;
 
@@ -56,7 +56,7 @@ export async function startAudience(app, ctx) {
     slidesEl.append(section);
   }
 
-  await renderDiagrams(slidesEl);
+  await hydrateEmbeds(slidesEl);
 
   document.body.classList.add('slipr-audience');
   app.replaceChildren(revealEl);

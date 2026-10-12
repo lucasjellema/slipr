@@ -1,6 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { renderBlock, renderBlocks, blockDomId } from '../blocks.js';
+import { FRAME_SANDBOX } from '../embeds/web.js';
 import { readJson } from './helpers.js';
 
 const demo = readJson('shows/demo/show.json');
@@ -77,11 +78,12 @@ describe('block types', () => {
     assert.doesNotMatch(html, /<script>|slipr-picture-|opacity/, 'a malformed style and full opacity add nothing');
   });
 
-  test('embed: sandboxed lazy iframe, relative URL resolved', () => {
+  test('embed: a web embed (I-070), relative URL resolved, frame made on hydration', () => {
     const html = renderBlock(block('s-tailored', 'dial'), 's-tailored', ctx);
-    assert.match(html, /<iframe src="http:\/\/host\/shows\/demo\/embeds\/depth-dial\.html" title="Interactive depth demo" loading="lazy" sandbox="allow-scripts allow-forms allow-popups"/);
-    assert.match(html, /style="height:260px"/);
-    assert.doesNotMatch(html, /allow-same-origin/);
+    assert.match(html, /data-embed="web" data-embed-src="http:\/\/host\/shows\/demo\/embeds\/depth-dial\.html" data-embed-title="Interactive depth demo" data-embed-height="260"/);
+    assert.doesNotMatch(html, /data-embed-origin/, 'a file in the show loads without asking');
+    assert.doesNotMatch(html, /<iframe/);
+    assert.equal(FRAME_SANDBOX, 'allow-scripts allow-forms allow-popups');
   });
 
   test('embed: dangerous URLs are blocked', () => {
@@ -102,7 +104,7 @@ describe('block types', () => {
       caption: 'Flow overview',
     }, 's-arch', ctx);
     assert.match(html, /class="slipr-block slipr-block--diagram"/);
-    assert.match(html, /<div class="slipr-diagram" data-mermaid="graph TD/);
+    assert.match(html, /<div class="slipr-embed slipr-embed--diagram slipr-diagram" data-embed="diagram" data-mermaid="graph TD/);
     assert.match(html, /<pre class="mermaid">graph TD\n  A --&gt; B<\/pre>/);
     assert.match(html, /<figcaption class="slipr-caption">Flow overview<\/figcaption>/);
   });

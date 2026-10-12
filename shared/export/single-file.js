@@ -13,6 +13,7 @@
  * embedded file table served by a small runtime (`globalThis.SLIPR_BUNDLE`).
  */
 import { collectImagePaths } from '../validate.js';
+import { EMBED_KINDS, usedEmbedKinds } from '../embeds/index.js';
 
 export const VIRTUAL_ROOT = 'https://slipr.invalid/';
 
@@ -197,8 +198,18 @@ export function showFiles(show) {
   return [...files].filter((f) => typeof f === 'string' && f && !NOT_RELATIVE.test(f));
 }
 
-/** Does the show use a Mermaid diagram (slot or block)? */
-const usesDiagrams = (/** @type {any} */ show) => JSON.stringify(show).includes('"mermaid"');
+/**
+ * Vendor folders of embed kinds the show does not use (I-070): their libraries
+ * are loaded by computed URL, so they stay out of the file.
+ * @param {any} show
+ * @returns {string[]}
+ */
+const unusedLibraries = (show) => {
+  const used = usedEmbedKinds(show);
+  return Object.entries(EMBED_KINDS)
+    .filter(([kind, def]) => def.library && !used.has(kind))
+    .map(([, def]) => /** @type {string} */ (def.library));
+};
 
 /** JSON for inside a <script> element: `<` escaped so `</script>` cannot end it. */
 const scriptJson = (/** @type {any} */ value) => JSON.stringify(value).replace(/</g, '\\u003c');
@@ -306,7 +317,7 @@ export async function packShow({ readFile, showDir, templateDir, entry = 'viewer
   }
 
   // ---- the viewer: follow the module graph from the entry ----
-  const withDiagrams = usesDiagrams(show);
+  const skipLibraries = unusedLibraries(show);
   /** @type {Record<string, string>} */
   const importMap = {};
   const queue = [entry];
@@ -329,8 +340,8 @@ export async function packShow({ readFile, showDir, templateDir, entry = 'viewer
     queue.push(...imports);
     for (const target of metaUrls) {
       if (/\.m?js$/.test(target)) {
-        // A module loaded by computed URL: only Mermaid today, needed only for diagrams.
-        if (!target.includes('/mermaid') || withDiagrams) queue.push(target);
+        // A module loaded by computed URL: an embed library, needed only when its kind is used.
+        if (!skipLibraries.some((lib) => target.startsWith(lib))) queue.push(target);
       } else if (target.endsWith('.css')) {
         const css = await readText(target);
         if (css !== null) addFile(target, await inlineCssUrls(css, target, readFile, warnings), 'text/css');

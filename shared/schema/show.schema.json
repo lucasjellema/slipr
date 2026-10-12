@@ -273,7 +273,8 @@
       "description": "Mermaid diagram.",
       "properties": {
         "mermaid": { "type": "string" },
-        "caption": { "type": "string" }
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and when rendering fails (I-070)." }
       }
     },
 
@@ -413,7 +414,9 @@
         "for": { "$ref": "#/$defs/for" }, "depth": { "$ref": "#/$defs/depth" },
         "url": { "type": "string", "minLength": 1, "description": "Absolute URL, or path relative to show.json." },
         "title": { "type": "string", "minLength": 1 },
-        "height": { "type": "integer", "minimum": 100 }
+        "height": { "type": "integer", "minimum": 100 },
+        "load": { "enum": ["click", "auto"], "description": "(0.2) A page on another server: \"click\" (default) waits for the reader's consent, \"auto\" loads straight away (D-011)." },
+        "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and instead of the link card (I-070)." }
       }
     },
     "blockSlideRef": {
@@ -435,7 +438,8 @@
         "id": { "$ref": "#/$defs/id" }, "type": { "const": "diagram" },
         "for": { "$ref": "#/$defs/for" }, "depth": { "$ref": "#/$defs/depth" },
         "mermaid": { "type": "string", "minLength": 1 },
-        "caption": { "type": "string" }
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and when rendering fails (I-070)." }
       }
     }
   }

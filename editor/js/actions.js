@@ -287,6 +287,17 @@ function withPictureFormat(show, value) {
 }
 
 /**
+ * An embed's fallback image or load setting (I-070) needs show format 0.2:
+ * raise a 0.1 show when a block patch sets one.
+ * @param {any} show @param {any} patch
+ * @returns {any}
+ */
+function withEmbedFormat(show, patch) {
+  const uses = patch && (patch.fallback !== undefined || patch.load !== undefined);
+  return uses && (show.slipr === '0.1' || !show.slipr) ? { ...show, slipr: '0.2' } : show;
+}
+
+/**
  * Set speaker notes on a slide.
  * @param {any} show
  * @param {{ slideId: string, notes: string | null }} payload
@@ -484,6 +495,7 @@ export function addBlock(show, { slideId, block, afterBlockId = null }) {
 export function updateBlock(show, { slideId, blockId, patch }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, patch?.image);
+  show = withEmbedFormat(show, patch);
   const slides = show.slides.map((s) => {
     if (s.id !== slideId || !Array.isArray(s.reader?.blocks)) return s;
     const blocks = s.reader.blocks.map((b) => {
@@ -579,7 +591,12 @@ export function convertBlock(block, type, defaults = {}) {
         ...(Array.isArray(block.hotspots) ? { hotspots: block.hotspots } : {}),
       };
     case 'embed':
-      return { ...base, url: block.url ?? '', title: title ?? 'Embedded page', ...(block.height ? { height: block.height } : {}) };
+      return {
+        ...base, url: block.url ?? '', title: title ?? 'Embedded page',
+        ...(block.height ? { height: block.height } : {}),
+        ...(block.load ? { load: block.load } : {}),
+        ...(block.fallback ? { fallback: block.fallback } : {}),
+      };
     case 'slide-ref':
       return { ...base, slide: block.slide ?? defaults.slideId ?? '', ...(block.label ? { label: block.label } : {}) };
     default:

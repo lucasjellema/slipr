@@ -112,7 +112,7 @@ export function findTerms(text, phrases, seen) {
 }
 
 /** Elements whose text is never linked. */
-const SKIP = 'a, button, .slipr-term, code, pre, script, style, svg, .slipr-diagram, .slipr-overlays, [data-no-glossary]';
+const SKIP = 'a, button, .slipr-term, code, pre, script, style, svg, .slipr-diagram, .slipr-embed, .slipr-overlays, [data-no-glossary]';
 
 /**
  * Link the first occurrence of each glossary term in an element's text, in

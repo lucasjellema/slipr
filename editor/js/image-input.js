@@ -141,18 +141,19 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
 }
 
 /**
- * Copy an image into the show folder and put it in a reader image block, then ask for alt text.
+ * Copy an image into the show folder and put it in a reader block's image
+ * field (`image`, or an embed's `fallback`, I-070), then ask for alt text.
  * @param {import('./store.js').EditorStore} store
- * @param {{ slideId: string, blockId: string, file: File }} target
+ * @param {{ slideId: string, blockId: string, file: File, field?: 'image' | 'fallback' }} target
  */
-export async function addImageToBlock(store, { slideId, blockId, file }) {
+export async function addImageToBlock(store, { slideId, blockId, file, field = 'image' }) {
   const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
   await addImage(store, {
     slideId,
     file,
-    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-reader`,
-    read: (s) => s?.reader?.blocks?.find((/** @type {any} */ b) => b.id === blockId)?.image,
-    write: (image) => store.dispatch('updateBlock', { slideId, blockId, patch: { image } }),
+    fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${field === 'image' ? 'reader' : field}`,
+    read: (s) => s?.reader?.blocks?.find((/** @type {any} */ b) => b.id === blockId)?.[field],
+    write: (image) => store.dispatch('updateBlock', { slideId, blockId, patch: { [field]: image } }),
   });
 }
 

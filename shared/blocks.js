@@ -3,8 +3,9 @@
  * Render reader blocks (the reader layer of a slide) to HTML strings.
  * Used by reader mode and, later, the editor preview (D-005, D-009).
  *
- * Output is built only from escape() and shared/markdown.js, so it is safe to
- * assign to innerHTML. Interactive behaviour (popovers for glossary terms,
+ * Output is built only from escape(), shared/markdown.js and shared/embeds/, so
+ * it is safe to assign to innerHTML. Embed blocks (diagram, embed) carry a static
+ * fallback; their live content comes from hydrateEmbeds() (I-070). Interactive behaviour (popovers for glossary terms,
  * footnotes and hotspots; tab switching) is added by viewer/reader/interactions.js.
  *
  * Element ids: a block is `<slideId>--<blockId>`, so `#s-05/b3` deep links and
@@ -13,6 +14,8 @@
 import { markdown, escape } from './markdown.js';
 import { pictureAttributes } from './picture.js';
 import { slideTitle } from './render.js';
+import { embedHtml } from './embeds/index.js';
+import { isBlockedUrl } from './embeds/web.js';
 
 /**
  * @typedef {object} BlockContext
@@ -99,14 +102,10 @@ export function renderBlock(block, slideId, ctx) {
     }
 
     case 'embed': {
-      const url = String(block.url ?? '');
-      if (/^\s*(javascript|data|vbscript):/i.test(url)) {
+      if (isBlockedUrl(block.url)) {
         return `<div ${attrs}><p class="slipr-block-body">[embed blocked: unsupported URL]</p></div>`;
       }
-      const src = /^https?:/i.test(url) ? url : ctx.resolveAsset(url);
-      const height = Math.max(100, Number(block.height) || 400);
-      return `<div ${attrs}>${badges}<iframe src="${escape(src)}" title="${escape(block.title)}" loading="lazy"`
-        + ` sandbox="allow-scripts allow-forms allow-popups" referrerpolicy="no-referrer" style="height:${height}px"></iframe></div>`;
+      return `<div ${attrs}>${badges}${embedHtml('web', block, ctx)}</div>`;
     }
 
     case 'slide-ref': {
@@ -119,9 +118,7 @@ export function renderBlock(block, slideId, ctx) {
     case 'diagram': {
       const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
       return `<div ${attrs}>${badges}<figure class="slipr-figure slipr-figure--diagram">`
-        + `<div class="slipr-diagram" data-mermaid="${escape(block.mermaid)}">`
-        + `<pre class="mermaid">${escape(block.mermaid)}</pre>`
-        + `</div>${caption}</figure></div>`;
+        + `${embedHtml('diagram', block, ctx)}${caption}</figure></div>`;
     }
 
     default:

@@ -372,12 +372,13 @@
             <tr><td><strong>Callout Box</strong></td><td>A highlighted box: Info, Tip, Warning or Quote</td><td>Kind, optional title, Markdown</td></tr>
             <tr><td><strong>Tabs</strong></td><td>Alternatives side by side, such as the same example in several languages</td><td>A label and Markdown per tab; <strong>+ Add tab</strong>, move, remove (one tab always stays)</td></tr>
             <tr><td><strong>Image with Hotspots</strong></td><td>An image with numbered markers that open popups</td><td>Image, alt text, optional caption, <a href="#hotspots">hotspots</a></td></tr>
-            <tr><td><strong>Embedded Page</strong></td><td>Another web page inside the reader view</td><td>Address (https, or a file in the show folder), a title, an optional height</td></tr>
+            <tr><td><strong>Embedded Page</strong></td><td>Another web page inside the reader view. A page from another site first shows a card with a <strong>Load</strong> button</td><td>Address (https, or a file in the show folder), a title, an optional height, <strong>Load straight away</strong>, an optional fallback image</td></tr>
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
+        <p><strong>Click-to-load.</strong> A page from another site does not load until the reader agrees: they see its title, the site and <em>Open in new tab</em>, plus a <strong>Load</strong> button. Nothing is sent to that site before the click, and after it other pages from the same site load directly until the tab is closed. Tick <strong>Load straight away, without asking the reader</strong> to skip the question for one page. Files in the show folder always load directly. The <strong>fallback image</strong> (optional, for example a screenshot of the page) replaces the card, and is what prints and what the show grid shows. A Mermaid diagram can have a fallback image too, set in <code>show.json</code> (<code>"fallback": { "src": …, "alt": … }</code>).</p>
 
         <h3>Who sees a block</h3>
         <dl>
@@ -705,7 +706,7 @@
           <dt>My text is cut off on the slide</dt>
           <dd>The layout has a limit for that field; a warning says so. Shorten it, choose a layout with more room, or move the details to the reader layer.</dd>
           <dt>An embedded page stays empty</dt>
-          <dd>The site does not allow being embedded. Use a link in a text block instead.</dd>
+          <dd>The site does not allow being embedded. Before <strong>Load</strong>, readers can use <em>Open in new tab</em> on the card; after it they see an empty frame. Use a link in a text block instead.</dd>
           <dt>A diagram shows a red "Diagram syntax error" box</dt>
           <dd>There is a typo or unsupported syntax in the Mermaid code. The error box explains what line and token Mermaid could not understand. Check the syntax or test it in the Mermaid Live Editor.</dd>
         </dl>

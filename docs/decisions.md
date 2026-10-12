@@ -80,6 +80,18 @@ Status · Date
 **Decision**: Store it client-side in IndexedDB, keyed by `show.id`, with export/import as Markdown/JSON. There is no backend, no accounts and no analytics.
 **Consequences**: It is private and works on any static host. State does not sync across devices. Optional sync, or shared annotations, would need a backend later (backlog idea).
 
+## D-011: Embed architecture, click-to-load, approved libraries
+**Accepted** · 2026-10-12 (Lucas; backlog I-070, spec `docs/specs/I-070-embed-foundation.md`)
+**Context**: Rich content (diagrams, web pages, PDFs, graphs, maps) needs third-party libraries or other servers. Without a common shape each kind would invent its own rendering, loading and fallback, the core would grow with every library, and content from other servers would be fetched without the reader's consent (against D-010).
+**Decision**:
+- **One module per embed kind**, `shared/embeds/<kind>.js`, registered in `shared/embeds/index.js`. Every kind is available as an audience **slot type** and a reader **block type**; `render.js` and `blocks.js` call the registry and never render a kind themselves.
+- **Two-step rendering**: the renderers write an embed element with a **static fallback** inside (the value's optional `fallback` image, or the kind's own: Mermaid source, a link card); `hydrateEmbeds(root)` then renders the live content. Print, editor thumbnails and failures fall back to the static content.
+- **Libraries are vendored (D-002) and lazy-loaded**: a kind imports its library only when the first embed of that kind is hydrated, and the single-file export leaves out the libraries of kinds a show does not use.
+- **Click-to-load**: content from another server waits behind a **Load** button that names the site. Consent is remembered **per site (origin) for the tab** (sessionStorage), never persisted. The author may set **`load: "auto"`** on an embed to load it straight away; the default is click-to-load. Files next to `show.json` always load directly.
+- **Styling** comes from the template's `--slipr-*` tokens (`shared/embeds/embeds.css`); kinds keep their template hooks (e.g. `.slipr-diagram`).
+- **Approved libraries**: Mermaid (in use, `vendor/mermaid-11.4.1`, I-073), Cytoscape.js (I-074), Leaflet (I-075) and PDF.js (I-072, if its spike chooses it over the browser's built-in viewer). Another library needs a new decision.
+**Consequences**: Show format 0.2 (still a draft) gains `fallback` on embed values and `load` on embeds; a 0.1 show using them is an error. Adding a kind is one module plus a slot/block type in the schema and spec. A reader who wants an external page must click once per site and tab. Editor thumbnails show web pages as their card. An author who chooses `load: "auto"` takes responsibility for that page contacting its server.
+
 ## D-012: Show folders outside the server root (shared folder handle, templates by name)
 **Accepted** · 2026-10-10 (options and trade-offs: `docs/specs/E-007-shows-outside-server-root.md`)
 **Context**: The editor opens show folders with `showDirectoryPicker()` (D-007). A directory handle has no path or URL, so the viewer can't load such a show by URL, and a relative `template.ref` that points outside the folder can't be read through the handle. For new shows, the editor also can't compute a relative ref.

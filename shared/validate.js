@@ -71,6 +71,7 @@ export function validateShow(show, options = {}) {
     if (layouts) checkSlots(slide, at, layouts, errors, warnings);
     checkImages(slide, at, options.imageExists, errors, warnings, options.template, show.slipr);
     checkOverlays(slide, at, show.slipr, errors, warnings);
+    checkEmbedFormat(slide, at, show.slipr, errors);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -217,6 +218,7 @@ export function collectImagePaths(show) {
     for (const overlay of arrayOf(slide?.overlays)) {
       if (isImage(overlay?.image)) found.push(overlay.image.src);
     }
+    for (const [image] of embedFallbacks(slide, '')) found.push(image.src);
   }
   return [...new Set(found)];
 }
@@ -359,6 +361,7 @@ function checkImages(slide, at, imageExists, errors, warnings, template, version
   arrayOf(slide.overlays).forEach((overlay, j) => {
     if (isImage(overlay?.image)) images.push([overlay.image, `${at}.overlays[${j}].image`]);
   });
+  images.push(...embedFallbacks(slide, at));
   const styles = pictureStyleIds(template);
   for (const [image, path] of images) {
     // Picture style and opacity (D-014, I-084): show format 0.2; unknown styles render unstyled.
@@ -406,6 +409,41 @@ function checkGlossaryNames(show, errors, warnings) {
 
 /** How far an overlay may stick out of the canvas before it is reported (rounding, nudging). */
 const OVERLAY_TOLERANCE = 0.005;
+
+/**
+ * The fallback images of a slide's embeds (I-070): of embed slot values
+ * (anything with `fallback`) and of embed blocks, with their paths.
+ * @param {any} slide @param {string} at
+ * @returns {[any, string][]}
+ */
+function embedFallbacks(slide, at) {
+  /** @type {[any, string][]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isObject(value) && isImage(value.fallback)) found.push([value.fallback, `${at}.content.${name}.fallback`]);
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type !== 'image' && isImage(block?.fallback)) found.push([block.fallback, `${at}.reader.blocks[${j}].fallback`]);
+  });
+  return found;
+}
+
+/**
+ * Embed `fallback` and `load` (I-070, D-011): show format 0.2.
+ * @param {any} slide @param {string} at @param {unknown} version @param {Issue[]} errors
+ */
+function checkEmbedFormat(slide, at, version, errors) {
+  if (version !== '0.1') return;
+  const message = 'an embed fallback image or load setting needs show format 0.2: set "slipr" to "0.2"';
+  for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
+    if (isObject(value) && value.fallback !== undefined) errors.push({ path: `${at}.content.${name}.fallback`, code: 'format-version', message });
+  }
+  arrayOf(slide.reader?.blocks).forEach((block, j) => {
+    for (const key of ['fallback', 'load']) {
+      if (block?.[key] !== undefined) errors.push({ path: `${at}.reader.blocks[${j}].${key}`, code: 'format-version', message });
+    }
+  });
+}
 
 /**
  * Extra images (D-013, I-083): only in format 0.2, and inside the canvas.

@@ -94,6 +94,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
 - [ ] **E-017** [editor] Bug: deleting slides can leave a reading route with no slides, which the schema rejects (`paths[].slides` needs at least one). Seen while building the show grid's multi-delete. Ask what to do (remove the empty route, or keep it as "all slides"), then fix in `deleteSlide` with a test
 - [ ] **E-018** [editor] Bug: **Save overwrites changes made to `show.json` on disk** since the editor opened it. The editor writes its in-memory show without checking the file, so newer work from elsewhere (another editor window, a Claude session, a git pull) is silently lost. Happened twice on 2026-10-11/12 with `shows/demo/show.json`: an editor window still holding older content saved over committed changes (I-084 styles, I-086 aliases) and brought back deleted test images. Fix: remember the file's `lastModified` (and content hash) when opening and after each save; before saving, read the file again, and if it changed, don't overwrite silently. Offer **Reload from disk** (discarding the in-memory edits), **Save anyway** (overwrite), or **Cancel**; ideally also notice the change when the window regains focus. Same check for Present / Read (they save first) · todo · —
+- [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
 
 ### Converter
@@ -123,13 +124,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
-- [ ] **I-070** [format] **Shared foundation for rich embeds** (do this first; I-071…I-075 build on it):
-  - Every embed kind is available both as an audience **slot type** and a reader **block type**, with one renderer per kind in `shared/embeds/<kind>.js`, called by `render.js` and `blocks.js`.
-  - Libraries are vendored (D-002) and **lazy-loaded** only on slides that use them, so the core stays light.
-  - Styling comes from the template's `--slipr-*` tokens.
-  - Every kind has a static fallback (image or link card) for print/PDF, editor thumbnails and failures.
-  - **Click-to-load** for anything that contacts an external server (websites, map tiles), so no reader data leaves the browser without consent (D-010).
-  - Needs a new decision entry (D-011: embed architecture and the list of approved libraries) · todo · —
 - [ ] **I-071** [format/viewer] **Website embed**:
   - Upgrade the reader `embed` block, and add a `web` slot for audience mode.
   - Per-embed sandbox options (`allow-same-origin` only on explicit opt-in), an "Open in new tab" link, and an aspect ratio or height.
@@ -150,7 +144,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - Reader mode: pan and zoom, with marker popups as Slipr popovers.
   - Audience mode: fragments as a `flyTo` tour from marker to marker.
   - **Offline and privacy:** map tiles come from a server, which conflicts with D-002 (offline) and D-010 (privacy). Solutions:
-    - click-to-load (I-070)
+    - click-to-load (I-070: done, per site per tab, `load: "auto"` to skip)
     - a static image fallback rendered at authoring time
     - optional local tiles for offline presenting
   - Respect the tile provider's usage policy and show the required attribution (e.g. OpenStreetMap) · todo · —
@@ -184,6 +178,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-070** [format] Shared foundation for rich embeds (D-011): `shared/embeds/` registry with one module per kind (`diagram`, `web` for the reader `embed` block), static fallback inside every embed element (optional `fallback` image, show format 0.2), `hydrateEmbeds()` with lazy-loaded vendored libraries, click-to-load for other servers (per site per tab; `load: "auto"` set by the author in the editor), `embeds.css` from `--slipr-*` tokens; the single-file export drops unused libraries; approved libraries Mermaid, Cytoscape.js, Leaflet, PDF.js. Spec: `docs/specs/I-070-embed-foundation.md` · done 2026-10-12 · claude
 - [x] **I-086** [viewer/format] Glossary terms clickable in slides in reader mode (D-015): automatic linking of the first occurrence per slide (whole words, case- and accent-insensitive, longest first, also in plain text slots), pin mode keeps priority, audience mode unchanged; optional `aliases` per term (show format 0.2), in validation, reader search and the editor's Show settings (Other names). Spec: `docs/specs/I-086-glossary-in-slides.md` · done 2026-10-12 · claude
 - [x] **I-084** [format/editor/templates/converter] Picture styles (D-014): template format 0.3 `pictureStyles` (shadow, soft, rounded, frame in both templates), `style` and `opacity` on image values (show format 0.2), rendering via `shared/picture.js`, validation, a style picker with live previews and an opacity slider in every image field, and the converter mapping PowerPoint shadow / soft edges / rounded corners / outline and transparency. Spec: `docs/specs/I-084-picture-styles.md` · done 2026-10-11 · claude
 - [x] **I-083** [format/editor/viewer/converter] Extra images on a slide (D-013, show format 0.2): `slide.overlays` with position and size as fractions of the canvas, in front of the layout, optionally one by one; reader mode keeps such a slide a picture on narrow screens; editor: "Extra images" in the Slide tab (choose / drop / paste, alt text, order, appear one by one) and move / resize on the audience preview (drag, corners with aspect lock, arrow keys, Alt+arrows, Delete); the converter places pictures that fit no slot as extra images. Spec: `docs/specs/I-083-extra-images.md` · done 2026-10-11 · claude

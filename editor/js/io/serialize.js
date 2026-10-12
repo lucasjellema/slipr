@@ -31,7 +31,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (value === null || typeof value !== 'object') return {};
   if ('src' in value) return image;
   if ('code' in value) return { keys: keysOf(defs.code) };
-  if ('mermaid' in value) return { keys: keysOf(defs.diagram) };
+  if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('kind' in value) return { keys: keysOf(defs.chart) };
   if ('text' in value) return { keys: keysOf(defs.quote) };
   return {};
@@ -45,6 +45,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
     keys: keysOf(def),
     fields: {
       image,
+      fallback: image,
       tabs: { items: { keys: keysOf(def?.properties?.tabs?.items) } },
       hotspots: { items: { keys: keysOf(def?.properties?.hotspots?.items) } },
     },

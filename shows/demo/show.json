@@ -294,7 +294,8 @@
         "title": "Data flow from author to reader",
         "diagram": {
           "mermaid": "flowchart LR\n    subgraph Authoring[\"Authoring\"]\n        direction TB\n        P[\"PowerPoint .pptx\"]\n        E[\"Slipr Editor\"]\n    end\n    subgraph Storage[\"Show folder\"]\n        S[(\"show.json<br/>+ images/\")]\n    end\n    subgraph Presentation[\"Viewer\"]\n        direction TB\n        A[\"Audience Mode<br/>(Reveal.js)\"]\n        R[\"Reader Mode<br/>(interactive)\"]\n    end\n    P -->|\"slipr-convert\"| S\n    E <-->|\"File System Access\"| S\n    S -->|\"shared render.js\"| A\n    S -->|\"shared render.js\"| R",
-          "caption": "One show folder powers both the audience slideshow and the interactive reader."
+          "caption": "One show folder powers both the audience slideshow and the interactive reader.",
+          "fallback": { "src": "images/architecture.svg", "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core" }
         },
         "caption": "Rendered dynamically in the browser with vendored Mermaid."
       },
@@ -345,6 +346,14 @@
             "title": "Interactive depth demo",
             "url": "embeds/depth-dial.html",
             "height": 260
+          },
+          {
+            "id": "presentation-programs",
+            "type": "embed",
+            "depth": 3,
+            "title": "Presentation programs on Wikipedia",
+            "url": "https://en.wikipedia.org/wiki/Presentation_program",
+            "height": 420
           },
           {
             "id": "privacy",

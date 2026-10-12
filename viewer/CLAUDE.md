@@ -52,6 +52,7 @@ With `shows/demo`:
 
 13. `R` / `A` switch modes and keep the position.
 13a. A show folder: `viewer/?folder=<key>` opens it in both modes, with its images (keys come from the editor or "Open a show folder…"; in Claude's browser pane use an origin-private folder remembered via `shared/folder-handles.js`). An unknown key shows the "not known here" page.
+13b. Embeds (I-070): reader mode at depth *Deep dive*, slide "Tailored to every reader": the Wikipedia embed shows a card with site and **Load**; nothing from `wikipedia.org` appears in the network log before the click; after it the frame loads, and after a re-render (change the profile) it loads without asking. A new tab asks again. The local depth dial loads directly. Diagrams render in both modes.
 14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.
 16. Single-file export: `npm run export -- shows/demo`, then open `exports/demo.html` (served: `http://localhost:8080/exports/demo.html`; and by double-click): audience and reader mode work, images, fonts and diagrams show, and DevTools → Network shows no request besides the file itself.

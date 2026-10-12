@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Click-to-load and fallback image for embedded pages (I-070)
+- **Added** to the Embedded Page block editor: **Load straight away, without asking the reader** (stored as `load: "auto"`; off by default, so a page from another site waits for a click) and an optional **fallback image** with alt text and a Remove button (choose, drop or paste; `addImageToBlock()` takes a `field`). `updateBlock` raises a 0.1 show to format 0.2 for either; changing the block type keeps them; `show.json` key order follows the schema.
+- **Changed** the preview and the show grid call `hydrateEmbeds()`; grid thumbnails show embedded pages as their link card (or fallback image) instead of loading them.
+
 ### 2026-10-12: Other names for glossary terms (I-086)
 - **Added** an **Other names** field per glossary term in Show settings (comma-separated), stored as `aliases`; `upsertGlossaryTerm` keeps them on other edits (it used to rebuild the entry from term, definition and link only) and sets the show to format 0.2 for the first one. New helper `glossaryAliases()`. The reader preview links terms on the slide, like the viewer.
 

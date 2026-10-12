@@ -604,6 +604,57 @@ function embedEditor(store, slideId, block) {
       }),
       ' px',
     ]),
+    // Click-to-load (I-070, D-011): an external page waits for the reader's consent unless the author says otherwise.
+    h('div', { class: 'slipr-form-checkbox' }, [
+      h('label', {}, [
+        h('input', {
+          type: 'checkbox',
+          checked: block.load === 'auto',
+          onchange: (/** @type {Event} */ e) => update({ load: /** @type {HTMLInputElement} */ (e.target).checked ? 'auto' : undefined }, 'load'),
+        }),
+        ' Load straight away, without asking the reader',
+      ]),
+    ]),
+    h('span', { class: 'slipr-help' }, [
+      'Off (the default): a page from another site shows a Load button, so nothing is sent to that site until the reader agrees. Files in the show folder always load directly.',
+    ]),
+    embedFallbackEditor(store, slideId, block),
+  ]);
+}
+
+/**
+ * The fallback image of an embed (I-070): shown instead of the link card, in
+ * print and in thumbnails. Optional, with alt text and a Remove button.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function embedFallbackEditor(store, slideId, block) {
+  const current = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.fallback;
+  const update = (/** @type {any} */ fallback, /** @type {string} */ field) =>
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch: { fallback } }, { coalesceKey: `block-${field}-${block.id}` });
+  return h('div', { class: 'slipr-embed-fallback-editor' }, [
+    imageField({
+      label: 'Fallback image',
+      image: block.fallback,
+      resolveAsset: store.state.resolveAsset,
+      onFile: (file) => runImage(() => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' })),
+    }),
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm slipr-input-alt',
+      placeholder: 'Alt text: what the fallback image shows',
+      'aria-label': 'Fallback image: alt text',
+      value: block.fallback?.alt ?? '',
+      disabled: block.fallback?.src ? undefined : true,
+      oninput: (/** @type {Event} */ e) => {
+        if (current()?.src) update(imageValue(current(), { alt: /** @type {HTMLInputElement} */ (e.target).value }), 'fallback-alt');
+      },
+    }),
+    block.fallback?.src
+      ? h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', onclick: () => update(undefined, 'fallback') }, ['Remove fallback image'])
+      : h('span', { class: 'slipr-help' }, ['Optional: a picture of the page (e.g. a screenshot), shown in print, in thumbnails and before it loads.']),
   ]);
 }
 

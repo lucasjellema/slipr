@@ -107,7 +107,7 @@ On screens of 1400 px and wider, "My notes" docks beside the article. On smaller
 - **Tabs** for alternatives, such as code in several languages or *before / after*.
 - **Callouts** for tips, warnings and quotes.
 - **Mermaid diagrams**: flowcharts, sequence diagrams and workflows rendered client-side as responsive SVGs.
-- **Embedded live demos and videos.**
+- **Embedded live demos and videos.** A page from another site waits for your click on **Load** (the author can let it load straight away); nothing is sent to that site before you agree, and your choice holds for that site until you close the tab.
 - *(planned)* **The slide itself** can be enlarged, or stepped through build by build.
 
 ### Tailored information

@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-12: Shared foundation for rich embeds (I-070, D-011)
+- **Added** `shared/embeds/`: a registry (`index.js`) with one module per embed kind (`diagram.js`, `web.js`), click-to-load consent (`consent.js`) and shared styling (`embeds.css`, from `--slipr-*` tokens). `render.js` and `blocks.js` write an embed element with a static fallback inside; `hydrateEmbeds(root)` renders the live content and lazy-loads a kind's library only when it is used.
+- **Added** to show format 0.2: `fallback` (an image value) on diagram slot values, diagram blocks and embed blocks, and `load` (`"click"` default, or `"auto"`) on embed blocks. Validation: either in a 0.1 show is an error; fallback images get the usual alt-text and file checks and are included by `collectImagePaths()` (so the single-file export embeds them).
+- **Changed** the reader `embed` block: a page on another server is click-to-load by default (a link card with title, site, *Open in new tab* and a **Load** button), so nothing is requested before the reader agrees (D-010); consent is remembered per site until the tab closes. Files in the show folder still load directly.
+- **Changed** `shared/diagram.js` moved to `shared/embeds/diagram.js`; `renderDiagrams()` is now the generic `hydrateEmbeds()`. The diagram error box is `.slipr-embed-error` (in `embeds.css`, so audience mode and the editor style it too). The single-file export leaves out the libraries of embed kinds a show does not use (was: a Mermaid-only check).
+- **Changed** the demo show: the pipeline diagram has a fallback image, and "Tailored to every reader" has a deep-dive embed of a Wikipedia page (click-to-load). Spec `docs/specs/I-070-embed-foundation.md`; `docs/show-format.md`; D-011 (approves Mermaid, Cytoscape.js, Leaflet and PDF.js).
+
 ### 2026-10-12: Glossary terms clickable in slides (I-086, D-015)
 - **Added** `shared/glossary.js`: finds glossary terms and their aliases in text (whole words, case- and accent-insensitive, longest first, once per slide; tested in Node) and links them as `.slipr-term` buttons. `shared/render.js` uses it in reader mode, so terms on slides open their definition like `[[term]]`; audience mode is unchanged.
 - **Added** to show format 0.2: `aliases` on glossary terms. Validation: aliases in a 0.1 show are an error; a name used by two terms is a warning. Reader search finds terms by their aliases.
