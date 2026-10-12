@@ -501,18 +501,38 @@
         <h2>Glossary</h2>
         <p>The glossary explains the words your readers may not know. You write a term and its definition once; wherever you refer to the term, a reader can tap or hover it, or press <kbd>Enter</kbd> on it, to see the definition in a popup. In audience mode the same words are ordinary text, so the slides stay clean.</p>
 
-        <h3>Add and change terms</h3>
-        <ol>
-          <li>Click <strong>⚙ Show</strong> at the top of the slide list and go to <strong>Glossary</strong>. The number after it tells you how many terms the show has.</li>
-          <li>Click <strong>+ Add term</strong>. A term called <em>New term</em> appears with its name selected: type the word or phrase.</li>
-          <li>Write the <strong>Definition</strong> in Markdown. Keep it to a sentence or two: it appears in a small popup.</li>
-          <li>Optionally add a <strong>Link</strong> to a page with more information. Readers see it as <em>Learn more ↗</em> under the definition; only addresses starting with <code>https://</code> or <code>http://</code> are shown.</li>
-          <li>Optionally fill in <strong>Other names</strong>, separated by commas: plurals, abbreviations or synonyms under which the term appears on your slides, such as <code>AI, A.I.</code> for <em>artificial intelligence</em>.</li>
-        </ol>
-        <p>Changes are saved with the show and undone with <kbd>Ctrl</kbd>+<kbd>Z</kbd>, like everything else. A term can't be left without a name.</p>
+        <h3>The dedicated Glossary Editor</h3>
+        <p>Open the full-screen Glossary Editor by clicking <strong>📖 Glossary</strong> in the toolbar, or <strong>📖 Open Glossary Editor</strong> in <a href="#settings">Show settings</a>. Press <kbd>Esc</kbd> anytime to return to your slides.</p>
+        <ul>
+          <li><strong>Split-view layout:</strong> the left sidebar lists all glossary terms with real-time search, category filters (<em>All</em>, <em>In Use</em>, <em>Unused</em>, <em>No Def</em>), and sorting (<em>A → Z</em>, <em>Z → A</em>, <em>Most used</em>, <em>Least used</em>).</li>
+          <li><strong>Keyboard navigation:</strong> press <kbd>↑</kbd> and <kbd>↓</kbd> in the sidebar to move through terms; press <kbd>Ctrl</kbd>+<kbd>N</kbd> or <kbd>+</kbd> to create a new term.</li>
+        </ul>
 
-        <h3>The term's id</h3>
-        <p>Each term card shows an <strong>id</strong>: the short name text uses to refer to the term, such as <code>reveal-js</code>. The id is set when you add the term and <strong>never changes</strong>, so references keep working when you rename the term. Because every new term starts as <em>New term</em>, new ids look like <code>new-term</code>, <code>new-term-2</code>, and so on. That's fine: the insert toolbar picks the right id for you, and readers never see it.</p>
+        <h3>Deck-aware word completion</h3>
+        <p>When you add a new term or type a term name, Slipr scans your presentation (slides, titles, bullets, cards, speaker notes and reader blocks) for acronyms (like <code>API</code> or <code>CSS</code>), technical names (like <code>Reveal.js</code> or <code>WebSocket</code>), and recurring words. It suggests matching words in a dropdown as you type, complete with occurrence counts across your deck.</p>
+        <p>Click <strong>💡 Deck suggestions</strong> in the glossary header to open the suggestions drawer: it lists frequently occurring terms across your deck that don't have glossary definitions yet. Click <strong>+ Add</strong> on any suggestion to create a glossary entry in one click.</p>
+
+        <h3>Edit and manage terms</h3>
+        <ol>
+          <li><strong>Term Name:</strong> type the term. Autocomplete offers words found in your presentation.</li>
+          <li><strong>Stable Identifier (ID):</strong> the short handle used in Markdown (such as <code>[[reveal-js]]</code>). You can rename the ID and click <strong>Rename ID</strong>: Slipr automatically updates all <code>[[oldId]]</code> occurrences across the presentation!</li>
+          <li><strong>Other names (Aliases):</strong> comma-separated plurals, acronyms or abbreviations, such as <code>AI, A.I.</code> for <em>artificial intelligence</em>. Reader mode automatically links these phrases on your slides.</li>
+          <li><strong>External Link:</strong> optionally provide a web address (starting with <code>https://</code> or <code>http://</code>). Readers see a <em>Learn more ↗</em> link in the popup.</li>
+          <li><strong>Definition (Markdown):</strong> write the definition. The toolbar above the field helps insert links and terms. Below the field, a <strong>Reader Popup Preview</strong> displays exactly how readers will see the popup.</li>
+        </ol>
+
+        <h3>See where a term is used and jump to slides</h3>
+        <p>The <strong>Usage &amp; References</strong> panel displays exact reference counts across the presentation: both explicit <code>[[id]]</code> Markdown links and text mentions of the term or its aliases. Click <strong>Jump to slide →</strong> next to any reference to jump directly to that slide in the editor.</p>
+        <p>A term that isn't referenced anywhere in the presentation is flagged with ⚠️ <em>Unused</em> / <em>Orphaned</em>, with a quick button to delete it safely.</p>
+
+        <h3>Delete a term</h3>
+        <p>Click <strong>🗑 Delete term</strong>. A term that is not used is removed at once. For a term in use, the editor asks what to do with its references:</p>
+        <dl>
+          <dt>Delete, keep the words as plain text (unlink)</dt>
+          <dd>The references become ordinary text with the words readers saw. Usually what you want.</dd>
+          <dt>Delete, leave the references</dt>
+          <dd>The <code>[[id]]</code> references stay in the text, giving a warning until you define the term again.</dd>
+        </dl>
 
         <h3>Use a term in your text</h3>
         <ul>
@@ -520,8 +540,6 @@
           <li><strong>With your own words:</strong> select words first, then pick the term. They become <code>[[id|your words]]</code>: the reader sees your words, and the popup still explains the term. Use this for plurals or other word forms, such as <code>[[agent|agents]]</code>.</li>
           <li><strong>By hand:</strong> type <code>[[id]]</code> or <code>[[id|words]]</code> in any Markdown field, including slide text and speaker notes.</li>
         </ul>
-        <p>Renaming a term updates every <code>[[id]]</code> reference automatically, because they show the term's current name. References with your own words keep those words.</p>
-        <p>Definitions may refer to other terms; inside a popup those show as plain text.</p>
 
         <h3>Terms on your slides</h3>
         <p>You don't have to mark terms on the slides themselves. In reader mode, Slipr finds the glossary terms in a slide's titles, text, bullets and cards and makes the <strong>first</strong> one of each clickable, with the same popup. It also finds a term under its <strong>Other names</strong>.</p>
@@ -529,26 +547,12 @@
           <li>Whole words only, regardless of capitals and accents: <em>Template</em> and <em>template</em> both count, <em>templates</em> only if it is one of the other names.</li>
           <li>The longest term wins: with both <em>layout</em> and <em>layout picker</em> in the glossary, the words <em>layout picker</em> open the second.</li>
           <li>On the big screen (audience mode) the slides stay plain: no underlines, no popups.</li>
-          <li>A term split by formatting (<code>**layout** picker</code>) is not found as a whole; if two terms share a name, that name opens the first of them, so give every term its own names.</li>
         </ul>
-        <p>Check it in the preview with <strong>Reader</strong>, or with <strong>Read</strong> in the toolbar.</p>
-
-        <h3>See where a term is used</h3>
-        <p>Each term card says how often it is used (<em>used 4×</em>). To find the places, open <a href="#find">Find and replace</a> and search for the id, for example <code>[[reveal-js</code>.</p>
-
-        <h3>Delete a term</h3>
-        <p>Click the term's <strong>🗑</strong>. A term that is not used is removed at once. For a term in use the editor lists where it is used and asks what to do with those places:</p>
-        <dl>
-          <dt>Delete, keep the words as plain text</dt>
-          <dd>The references become ordinary text with the words readers saw. Usually what you want.</dd>
-          <dt>Delete, leave the references</dt>
-          <dd>The <code>[[id]]</code> references stay in the text, for example because you will add the term again. Until then readers see the id instead of a name, without a popup, and each reference gives a warning.</dd>
-        </dl>
 
         <h3>What readers get</h3>
         <ul>
           <li>Terms in reader text are marked; tapping, hovering or pressing <kbd>Enter</kbd> opens the popup with the name, the definition and the optional link.</li>
-          <li>Terms on the slides are marked the same way, once per slide (see <em>Terms on your slides</em>).</li>
+          <li>Terms on the slides are marked the same way, once per slide.</li>
           <li>Reader search also finds glossary terms, under their other names too, and their definitions.</li>
           <li>To try a popup yourself, click <strong>Read</strong> in the toolbar: it opens reader mode at the selected slide.</li>
         </ul>

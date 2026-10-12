@@ -14,6 +14,7 @@ import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.
 import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
 import { exportShow } from './export.js';
 import { mountShowGrid } from './ui/show-grid.js';
+import { mountGlossaryEditor } from './ui/glossary-editor.js';
 import { watchTheme } from './theme.js';
 import { mountToolbar } from './ui/toolbar.js';
 import { mountSlideList } from './ui/slide-list.js';
@@ -158,7 +159,10 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   const mainEl = /** @type {HTMLElement} */ (document.querySelector('.slipr-editor-main'));
   const grid = mountShowGrid(mainEl, store);
 
-  // 3b. Toolbar
+  // 3b. Dedicated Glossary Editor (I-088)
+  const glossary = mountGlossaryEditor(mainEl, store);
+
+  // 3c. Toolbar
   const toolbarEl = document.getElementById('slipr-editor-toolbar');
   if (toolbarEl) {
     mountToolbar(toolbarEl, store, {
@@ -167,6 +171,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
       onSave: () => run(() => save(store)),
       onExport: () => run(() => exportShow(store, showUrl)),
       onGrid: () => grid.toggle(),
+      onGlossary: () => glossary.toggle(),
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
       onFindReplace: () => openFindReplaceDialog(store),
@@ -182,7 +187,9 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   // 5. Center inspector (tabs: Slide, Reader, Settings)
   const inspectorEl = document.getElementById('slipr-editor-inspector');
   if (inspectorEl) {
-    mountInspector(inspectorEl, store);
+    mountInspector(inspectorEl, store, {
+      onGlossary: (termId) => glossary.open(termId),
+    });
   }
 
   // 6. Right viewport (live preview)
@@ -221,8 +228,9 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
  * Mount the center inspector tabs and containers.
  * @param {HTMLElement} container
  * @param {import('./store.js').EditorStore} store
+ * @param {{ onGlossary?: (termId?: string) => void }} [handlers]
  */
-function mountInspector(container, store) {
+function mountInspector(container, store, handlers = {}) {
   const header = h('div', { class: 'slipr-inspector-tabs' });
   const content = h('div', { class: 'slipr-inspector-content' });
   container.append(header, content);
@@ -233,7 +241,7 @@ function mountInspector(container, store) {
 
   mountSlideForm(slideContainer, store);
   mountReaderForm(readerContainer, store);
-  mountShowSettings(settingsContainer, store);
+  mountShowSettings(settingsContainer, store, handlers);
 
   function renderTabs() {
     header.innerHTML = '';

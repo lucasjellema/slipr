@@ -43,10 +43,11 @@ editor/
     ├── layout-choice.js  ✅ DOM-free: the slide in another layout, what a switch hides / brings back / still needs, sample content (E-004)
     ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
     ├── help.js           ✅ DOM-free: manual address and the section per inspector tab; openHelp() (E-016)
+    ├── glossary-model.js ✅ DOM-free: deck-aware word completion, candidates scanner, usage inspection and filtering (I-088)
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
     ├── slide-filter.js   ✅ DOM-free: "Go to slide" matching and list navigation keys (E-012)
-    ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025); extra images: overlayBox, newOverlayBox, resizedOverlayBox (I-083)
+    ├── actions.js        ✅ pure functions: (show, payload) → new show, with reference cleanup; find / replace across the show (I-025); extra images: overlayBox, newOverlayBox, resizedOverlayBox (I-083); renameGlossaryTerm (I-088)
     ├── dom.js            ✅ h() element builder, addStylesheet()
     ├── shortcuts.js      ✅ Ctrl+S, Ctrl+Z, Ctrl+Y, Ctrl+F / Ctrl+H, Ctrl+Enter, Ctrl+D, Alt+↑/↓, PageUp/PageDown, F5, F1
     ├── io/
@@ -56,8 +57,9 @@ editor/
     │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
     │   └── draft-store.js   (planned, I-020) IndexedDB drafts for crash recovery
     └── ui/
-        ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read, ? Help (a link, so no popup blocker)
+        ├── toolbar.js       ✅ title, dirty dot, undo, redo, find & replace, open, new, save, present, read, glossary, ? Help
         ├── show-grid.js     ✅ the show grid: all slides as thumbnails in chapter runs; select, drag, batch operations, chapter moves (I-081)
+        ├── glossary-editor.js ✅ dedicated Glossary Editor: split view, deck-aware word autocompletion, usage inspection, jump-to-slide, preview (I-088)
         ├── slide-list.js    ✅ items, selection, reorder (buttons, Alt+↑/↓, drag and drop), hide toggle, add, duplicate, delete; "Go to slide" filter and keyboard navigation (E-012, E-003)
         ├── slide-form.js    ✅ "Slide" tab: form generated from layout slot definitions, Layout button (opens the layout picker), notes, chapter, hidden
         ├── reader-form.js   ✅ "Reader" tab: summary, block list, profile (`for`) and depth per block, related slides, showSlide (E-008); block editors for every block type: text, details, callout, image, tabs, embed, slide-ref (I-036)

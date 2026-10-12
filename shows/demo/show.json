@@ -9,22 +9,45 @@
     "date": "2026-10-10",
     "language": "en",
     "description": "A tour of Slipr (SlidePresenter): how one show serves both a live audience and an individual reader. This demo exercises every feature of the show format.",
-    "tags": ["slipr", "demo"]
+    "tags": [
+      "slipr",
+      "demo"
+    ]
   },
-  "template": { "ref": "../../templates/default", "version": "^1.0" },
-  "settings": { "aspectRatio": "16:9", "transition": "fade", "slideNumbers": true, "agenda": true },
-
+  "template": {
+    "ref": "../../templates/default",
+    "version": "^1.0"
+  },
+  "settings": {
+    "aspectRatio": "16:9",
+    "transition": "fade",
+    "slideNumbers": true,
+    "agenda": true
+  },
   "chapters": [
-    { "id": "why", "title": "Why Slipr", "summary": "Decks are written for the room and fall flat when read alone." },
-    { "id": "how", "title": "How it works", "summary": "A show is data; a template is the looks; one renderer draws both modes." },
-    { "id": "next", "title": "What's next", "summary": "The roadmap from foundations to editor." }
+    {
+      "id": "why",
+      "title": "Why Slipr",
+      "summary": "Decks are written for the room and fall flat when read alone."
+    },
+    {
+      "id": "how",
+      "title": "How it works",
+      "summary": "A show is data; a template is the looks; one renderer draws both modes."
+    },
+    {
+      "id": "next",
+      "title": "What's next",
+      "summary": "The roadmap from foundations to editor."
+    }
   ],
-
   "glossary": {
     "reveal-js": {
       "term": "Reveal.js",
-      "aliases": ["Reveal"],
-      "definition": "Open-source framework for HTML presentations. Slipr uses it for **audience mode** only.",
+      "aliases": [
+        "Reveal"
+      ],
+      "definition": "Open-source framework for HTML presentations. Slipr uses it for **audience mode** only. ",
       "link": "https://revealjs.com"
     },
     "audience-layer": {
@@ -37,12 +60,16 @@
     },
     "template": {
       "term": "template",
-      "aliases": ["templates"],
+      "aliases": [
+        "templates"
+      ],
       "definition": "A style guide (colors, fonts, illustrations) plus a set of base slide layouts. Every show links to one."
     },
     "layout": {
       "term": "layout",
-      "aliases": ["layouts"],
+      "aliases": [
+        "layouts"
+      ],
       "definition": "A base slide format in a template, such as *title*, *bullets* or *two-column*. It defines named slots."
     },
     "slot": {
@@ -53,30 +80,57 @@
       "term": "show",
       "definition": "The collection of slides and reader notes that make up a Slipr project\n",
       "link": "https://nu.nl"
+    },
+    "json": {
+      "term": "JSON",
+      "definition": "JSON is JavaScript Object Notation, a compact dataformat."
     }
   },
-
   "profiles": [
-    { "id": "dev", "label": "Developer", "description": "Shows the technical details: formats, code and architecture." },
-    { "id": "mgr", "label": "Manager", "description": "Focuses on value, effort and trade-offs." }
+    {
+      "id": "dev",
+      "label": "Developer",
+      "description": "Shows the technical details: formats, code and architecture."
+    },
+    {
+      "id": "mgr",
+      "label": "Manager",
+      "description": "Focuses on value, effort and trade-offs."
+    }
   ],
-
   "paths": [
     {
       "id": "quick",
       "label": "5-minute overview",
       "description": "The essentials, nothing more.",
-      "slides": ["s-title", "s-problem", "s-two-modes", "s-architecture", "s-roadmap"]
+      "slides": [
+        "s-title",
+        "s-problem",
+        "s-two-modes",
+        "s-architecture",
+        "s-roadmap"
+      ]
     },
-    { "id": "full", "label": "The full story", "slides": "*" },
+    {
+      "id": "full",
+      "label": "The full story",
+      "slides": "*"
+    },
     {
       "id": "deep-dev",
       "label": "Under the hood",
       "description": "For developers who want to see how it is built.",
-      "slides": ["s-two-modes", "s-data-2", "s-architecture", "s-pipeline", "s-tailored", "s-backup-format", "s-further-reading"]
+      "slides": [
+        "s-two-modes",
+        "s-data-2",
+        "s-architecture",
+        "s-pipeline",
+        "s-tailored",
+        "s-backup-format",
+        "s-further-reading"
+      ]
     }
   ],
-
   "slides": [
     {
       "id": "s-title",
@@ -100,18 +154,21 @@
         ]
       }
     },
-
     {
       "id": "s-problem",
       "layout": "bullets",
       "chapter": "why",
-      "tags": ["motivation"],
+      "tags": [
+        "motivation"
+      ],
       "content": {
         "title": "Why another presentation tool?",
         "body": "- Slides are made for the **room**\n- Afterwards they are **read alone**\n  - without the speaker's story\n- Two documents drift apart"
       },
       "notes": "Ask the audience: who has ever received a deck afterwards that made no sense without the talk?",
-      "audience": { "fragments": "fade-up" },
+      "audience": {
+        "fragments": "fade-up"
+      },
       "reader": {
         "summary": "Decks are written for the room and fall flat when read alone.",
         "blocks": [
@@ -135,15 +192,16 @@
           {
             "id": "mgr-value",
             "type": "callout",
+            "for": [
+              "mgr"
+            ],
             "variant": "tip",
             "title": "The business case",
-            "for": ["mgr"],
             "md": "One source instead of a deck *plus* a whitepaper: less work, and the two can never contradict each other."
           }
         ]
       }
     },
-
     {
       "id": "s-two-modes",
       "layout": "two-column",
@@ -163,7 +221,10 @@
             "id": "picture",
             "type": "image",
             "depth": 1,
-            "image": { "src": "images/two-modes.svg", "alt": "A big screen in front of an audience, and a single reader at a laptop" },
+            "image": {
+              "src": "images/two-modes.svg",
+              "alt": "A big screen in front of an audience, and a single reader at a laptop"
+            },
             "caption": "Same source, very different experiences."
           },
           {
@@ -172,84 +233,138 @@
             "md": "The two modes are deliberately **separate applications**. Audience mode is a thin layer over [[reveal-js]]. Reader mode is built from scratch, because popups, tailored content and annotations need full control. See [the architecture](#s-architecture)."
           }
         ],
-        "related": ["s-tailored", "s-architecture"]
+        "related": [
+          "s-tailored",
+          "s-architecture"
+        ]
       }
     },
-
     {
       "id": "s-how",
       "layout": "section",
       "chapter": "how",
-      "content": { "kicker": "Chapter 2", "title": "How it works", "subtitle": "Data, templates and one renderer" },
-      "audience": { "transition": "slide" }
+      "content": {
+        "kicker": "Chapter 2",
+        "title": "How it works",
+        "subtitle": "Data, templates and one renderer"
+      },
+      "audience": {
+        "transition": "slide"
+      }
     },
-
     {
       "id": "s-data-1",
       "layout": "bullets",
       "chapter": "how",
       "content": {
         "title": "A show is just data",
-        "body": "- `show.json` + `images/`\n- Linked to a template"
+        "body": "- `show.json` + `images/`\n- Linked to a template\nJSON"
       },
       "notes": "Build-up: this slide morphs into the next one.",
-      "audience": { "autoAnimate": true },
-      "reader": { "hidden": true }
+      "audience": {
+        "autoAnimate": true
+      },
+      "reader": {
+        "hidden": true,
+        "summary": "A show is a  data file in [[JSON]] format",
+        "blocks": [
+          {
+            "id": "b-dxehdm",
+            "type": "text",
+            "md": "Let's talk about [[json]]"
+          }
+        ]
+      }
     },
-
     {
       "id": "s-data-2",
       "layout": "bullets",
       "chapter": "how",
-      "tags": ["format"],
+      "tags": [
+        "format"
+      ],
       "content": {
         "title": "A show is just data",
         "body": "- `show.json` + `images/`\n- Linked to a template\n- Slides name a **layout** and fill its **slots**\n- No styling in the show, ever"
       },
       "overlays": [
-        { "image": { "src": "images/json-badge.svg", "alt": "A JSON file: curly braces on a document", "style": "shadow", "opacity": 0.9 }, "x": 0.74, "y": 0.3, "w": 0.16, "h": 0.2844, "fragment": "fade-left" }
+        {
+          "image": {
+            "src": "images/json-badge.svg",
+            "alt": "A JSON file: curly braces on a document",
+            "style": "shadow",
+            "opacity": 0.9
+          },
+          "x": 0.74,
+          "y": 0.3,
+          "w": 0.16,
+          "h": 0.2844,
+          "fragment": "fade-left"
+        }
       ],
-      "audience": { "autoAnimate": true },
+      "audience": {
+        "autoAnimate": true
+      },
       "reader": {
         "summary": "Shows are plain JSON; the template owns the looks.",
         "blocks": [
           {
             "id": "idea",
             "type": "callout",
-            "variant": "info",
             "depth": 1,
+            "variant": "info",
             "md": "Swap the [[template]] and the whole show is restyled, without touching a single slide."
           },
           {
             "id": "mgr-why",
             "type": "text",
-            "for": ["mgr"],
+            "for": [
+              "mgr"
+            ],
             "md": "Because content and looks are separated, a house style is enforced automatically, and shows are easy to keep under version control."
           },
           {
             "id": "dev-code",
             "type": "tabs",
-            "for": ["dev"],
+            "for": [
+              "dev"
+            ],
             "depth": 3,
             "tabs": [
-              { "label": "show.json", "md": "```json\n{\n  \"id\": \"s-data-2\",\n  \"layout\": \"bullets\",\n  \"content\": {\n    \"title\": \"A show is just data\",\n    \"body\": \"- show.json + images/\"\n  }\n}\n```" },
-              { "label": "layout", "md": "```html\n<div class=\"slipr-layout slipr-layout--bullets\">\n  <h2 class=\"slipr-title\" data-slot=\"title\"></h2>\n  <ul class=\"slipr-body\" data-slot=\"body\"></ul>\n</div>\n```" },
-              { "label": "template.json", "md": "```json\n{ \"id\": \"bullets\",\n  \"slots\": [\n    { \"name\": \"title\", \"type\": \"text\", \"required\": true },\n    { \"name\": \"body\", \"type\": \"list\", \"maxItems\": 7 }\n  ] }\n```" }
+              {
+                "label": "show.json",
+                "md": "```json\n{\n  \"id\": \"s-data-2\",\n  \"layout\": \"bullets\",\n  \"content\": {\n    \"title\": \"A show is just data\",\n    \"body\": \"- show.json + images/\"\n  }\n}\n```"
+              },
+              {
+                "label": "layout",
+                "md": "```html\n<div class=\"slipr-layout slipr-layout--bullets\">\n  <h2 class=\"slipr-title\" data-slot=\"title\"></h2>\n  <ul class=\"slipr-body\" data-slot=\"body\"></ul>\n</div>\n```"
+              },
+              {
+                "label": "template.json",
+                "md": "```json\n{ \"id\": \"bullets\",\n  \"slots\": [\n    { \"name\": \"title\", \"type\": \"text\", \"required\": true },\n    { \"name\": \"body\", \"type\": \"list\", \"maxItems\": 7 }\n  ] }\n```"
+              }
             ]
           }
         ],
-        "related": ["s-backup-format"]
+        "related": [
+          "s-backup-format"
+        ]
       }
     },
-
     {
       "id": "s-architecture",
       "layout": "image-full",
       "chapter": "how",
-      "tags": ["architecture"],
+      "tags": [
+        "architecture"
+      ],
       "content": {
         "title": "Three components, one shared core",
-        "image": { "src": "images/architecture.svg", "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core", "fit": "contain" },
+        "image": {
+          "src": "images/architecture.svg",
+          "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core",
+          "fit": "contain"
+        },
         "caption": "The converter and editor produce shows; the viewer presents them."
       },
       "notes": "Point at each box. Mention the converter is Python, the rest is vanilla JS.",
@@ -260,42 +375,91 @@
             "id": "diagram",
             "type": "image",
             "depth": 1,
-            "image": { "src": "images/architecture.svg", "alt": "Slipr architecture diagram with clickable components", "style": "frame" },
+            "image": {
+              "src": "images/architecture.svg",
+              "alt": "Slipr architecture diagram with clickable components",
+              "style": "frame"
+            },
             "caption": "Click the markers to learn about each part.",
             "hotspots": [
-              { "x": 0.2875, "y": 0.367, "title": "Converter", "md": "Turns a `.pptx` into a show folder. Written in Python with `python-pptx`." },
-              { "x": 0.6125, "y": 0.367, "title": "Show folder", "md": "`show.json` plus `images/`. Plain files: easy to inspect, diff and back up." },
-              { "x": 0.6125, "y": 0.1, "title": "Editor", "md": "Browser app that edits both layers of a show, with a live preview." },
-              { "x": 0.9375, "y": 0.367, "title": "Viewer", "md": "Two apps behind one URL: audience mode (Reveal.js) and reader mode." },
-              { "x": 0.9375, "y": 0.733, "title": "Template", "md": "Style guide plus [[layout]]s. Owns every visual decision." },
-              { "x": 0.65, "y": 0.733, "title": "Shared core", "md": "Loading, validation and rendering, used by editor and viewer, so what you edit is what you present." }
+              {
+                "x": 0.2875,
+                "y": 0.367,
+                "title": "Converter",
+                "md": "Turns a `.pptx` into a show folder. Written in Python with `python-pptx`."
+              },
+              {
+                "x": 0.6125,
+                "y": 0.367,
+                "title": "Show folder",
+                "md": "`show.json` plus `images/`. Plain files: easy to inspect, diff and back up."
+              },
+              {
+                "x": 0.6125,
+                "y": 0.1,
+                "title": "Editor",
+                "md": "Browser app that edits both layers of a show, with a live preview."
+              },
+              {
+                "x": 0.9375,
+                "y": 0.367,
+                "title": "Viewer",
+                "md": "Two apps behind one URL: audience mode (Reveal.js) and reader mode."
+              },
+              {
+                "x": 0.9375,
+                "y": 0.733,
+                "title": "Template",
+                "md": "Style guide plus [[layout]]s. Owns every visual decision."
+              },
+              {
+                "x": 0.65,
+                "y": 0.733,
+                "title": "Shared core",
+                "md": "Loading, validation and rendering, used by editor and viewer, so what you edit is what you present."
+              }
             ]
           },
           {
             "id": "dev-tech",
             "type": "details",
-            "title": "Technology choices",
-            "for": ["dev"],
+            "for": [
+              "dev"
+            ],
             "depth": 3,
+            "title": "Technology choices",
             "md": "Vanilla HTML, CSS and ES modules: no build step and no framework. Third-party code is vendored so shows present offline. The JSON Schema in `shared/schema/` is the contract between the Python converter and the JavaScript apps."
           },
-          { "id": "more", "type": "slide-ref", "slide": "s-backup-format", "label": "See the format details", "depth": 3 }
+          {
+            "id": "more",
+            "type": "slide-ref",
+            "depth": 3,
+            "slide": "s-backup-format",
+            "label": "See the format details"
+          }
         ],
-        "related": ["s-pipeline"]
+        "related": [
+          "s-pipeline"
+        ]
       }
     },
-
     {
       "id": "s-pipeline",
       "layout": "diagram",
       "chapter": "how",
-      "tags": ["pipeline", "mermaid"],
+      "tags": [
+        "pipeline",
+        "mermaid"
+      ],
       "content": {
         "title": "Data flow from author to reader",
         "diagram": {
           "mermaid": "flowchart LR\n    subgraph Authoring[\"Authoring\"]\n        direction TB\n        P[\"PowerPoint .pptx\"]\n        E[\"Slipr Editor\"]\n    end\n    subgraph Storage[\"Show folder\"]\n        S[(\"show.json<br/>+ images/\")]\n    end\n    subgraph Presentation[\"Viewer\"]\n        direction TB\n        A[\"Audience Mode<br/>(Reveal.js)\"]\n        R[\"Reader Mode<br/>(interactive)\"]\n    end\n    P -->|\"slipr-convert\"| S\n    E <-->|\"File System Access\"| S\n    S -->|\"shared render.js\"| A\n    S -->|\"shared render.js\"| R",
           "caption": "One show folder powers both the audience slideshow and the interactive reader.",
-          "fallback": { "src": "images/architecture.svg", "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core" }
+          "fallback": {
+            "src": "images/architecture.svg",
+            "alt": "Slipr architecture: converter, show folder, editor, viewer, template and shared core"
+          }
         },
         "caption": "Rendered dynamically in the browser with vendored Mermaid."
       },
@@ -317,22 +481,30 @@
             "caption": "Presentation lifecycle from editing to delivery."
           }
         ],
-        "related": ["s-architecture"]
+        "related": [
+          "s-architecture"
+        ]
       }
     },
-
     {
       "id": "s-live-page",
       "layout": "web",
       "chapter": "how",
-      "tags": ["embed"],
+      "tags": [
+        "embed"
+      ],
       "content": {
         "title": "A live page on a slide",
         "page": {
           "url": "embeds/depth-dial.html",
           "title": "Interactive depth dial",
-          "allow": ["fullscreen"],
-          "fallback": { "src": "images/two-modes.svg", "alt": "Audience mode and reader mode side by side" }
+          "allow": [
+            "fullscreen"
+          ],
+          "fallback": {
+            "src": "images/two-modes.svg",
+            "alt": "Audience mode and reader mode side by side"
+          }
         },
         "caption": "Web pages can be live and clickable while presenting, or shown as a screenshot."
       },
@@ -347,15 +519,24 @@
         ]
       }
     },
-
     {
       "id": "s-pdf",
       "layout": "pdf",
       "chapter": "how",
-      "tags": ["embed", "pdf"],
+      "tags": [
+        "embed",
+        "pdf"
+      ],
       "content": {
         "title": "A PDF, page by page",
-        "document": { "pdf": "docs/slipr-in-four-pages.pdf", "title": "Slipr in four pages", "pages": [1, 4] },
+        "document": {
+          "pdf": "docs/slipr-in-four-pages.pdf",
+          "title": "Slipr in four pages",
+          "pages": [
+            1,
+            4
+          ]
+        },
         "caption": "Each click shows the next page."
       },
       "reader": {
@@ -376,17 +557,20 @@
         ]
       }
     },
-
     {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",
-      "tags": ["reader"],
+      "tags": [
+        "reader"
+      ],
       "content": {
         "title": "Tailored to every reader",
         "body": "- **Profiles**: content for who you are\n- **Depth**: overview, standard, deep dive\n- **Paths**: curated routes\n- Search, bookmarks and your own notes"
       },
-      "audience": { "fragments": true },
+      "audience": {
+        "fragments": true
+      },
       "reader": {
         "summary": "Profiles, depth and paths adapt the reader experience.",
         "blocks": [
@@ -399,16 +583,16 @@
           {
             "id": "dial",
             "type": "embed",
-            "title": "Interactive depth demo",
             "url": "embeds/depth-dial.html",
+            "title": "Interactive depth demo",
             "height": 260
           },
           {
             "id": "presentation-programs",
             "type": "embed",
             "depth": 3,
-            "title": "Presentation programs on Wikipedia",
             "url": "https://en.wikipedia.org/wiki/Presentation_program",
+            "title": "Presentation programs on Wikipedia",
             "height": 420
           },
           {
@@ -421,22 +605,25 @@
           {
             "id": "dev-personalize",
             "type": "details",
-            "title": "How filtering works",
-            "for": ["dev"],
+            "for": [
+              "dev"
+            ],
             "depth": 3,
+            "title": "How filtering works",
             "md": "A pure function takes the show and your preferences and returns the visible slides and blocks: path selection first, then `reader.hidden`, then `for` (profile) and `depth ≤ level`."
           }
         ]
       }
     },
-
     {
       "id": "s-next",
       "layout": "section",
       "chapter": "next",
-      "content": { "kicker": "Chapter 3", "title": "What's next" }
+      "content": {
+        "kicker": "Chapter 3",
+        "title": "What's next"
+      }
     },
-
     {
       "id": "s-roadmap",
       "layout": "two-column",
@@ -456,17 +643,26 @@
             "type": "text",
             "md": "Each phase ends with something you can run and look at. The viewer comes first because it *is* the product; until the editor exists, shows like this one are written by hand with schema-driven autocomplete."
           },
-          { "id": "back", "type": "slide-ref", "slide": "s-two-modes", "label": "Back to the two modes" }
+          {
+            "id": "back",
+            "type": "slide-ref",
+            "slide": "s-two-modes",
+            "label": "Back to the two modes"
+          }
         ],
-        "related": ["s-further-reading"]
+        "related": [
+          "s-further-reading"
+        ]
       }
     },
-
     {
       "id": "s-ai",
       "layout": "image-full",
       "chapter": "next",
-      "tags": ["ai", "ideas"],
+      "tags": [
+        "ai",
+        "ideas"
+      ],
       "content": {
         "title": "AI help, kept in its cage",
         "image": {
@@ -496,42 +692,55 @@
           {
             "id": "mgr-optin",
             "type": "text",
-            "for": ["mgr"],
+            "for": [
+              "mgr"
+            ],
             "md": "It is strictly opt-in: without an API key configured, Slipr works exactly as before and no data leaves the browser."
           },
           {
             "id": "dev-how",
             "type": "details",
-            "title": "How would it work?",
-            "for": ["dev"],
+            "for": [
+              "dev"
+            ],
             "depth": 3,
+            "title": "How would it work?",
             "md": "The show's text (slides, reader blocks, glossary) is the only context sent along with the question, and the answer cites the slide ids it used, so reader mode can link straight to them."
           }
         ],
-        "related": ["s-roadmap"]
+        "related": [
+          "s-roadmap"
+        ]
       }
     },
-
     {
       "id": "s-thanks",
       "layout": "title",
       "chapter": "next",
-      "content": { "title": "Thank you", "subtitle": "Questions?" },
+      "content": {
+        "title": "Thank you",
+        "subtitle": "Questions?"
+      },
       "notes": "Switch to reader mode live (press R) to show the difference.",
-      "reader": { "hidden": true }
+      "reader": {
+        "hidden": true
+      }
     },
-
     {
       "id": "s-backup-format",
       "layout": "bullets",
       "chapter": "next",
-      "tags": ["format"],
+      "tags": [
+        "format"
+      ],
       "content": {
         "title": "Backup: the show format",
         "body": "- `chapters`, `glossary`, `profiles`, `paths`\n- Per slide: `content` and `reader`\n- Reader blocks: text, details, callout, tabs, image, embed, slide-ref\n- Validated by a JSON Schema"
       },
       "notes": "Only if someone asks about the format.",
-      "audience": { "hidden": true },
+      "audience": {
+        "hidden": true
+      },
       "reader": {
         "summary": "The building blocks of show.json.",
         "blocks": [
@@ -543,7 +752,6 @@
         ]
       }
     },
-
     {
       "id": "s-further-reading",
       "layout": "bullets",
@@ -552,7 +760,9 @@
         "title": "Further reading",
         "body": "- Reveal.js documentation\n- W3C Web Annotation model"
       },
-      "audience": { "hidden": true },
+      "audience": {
+        "hidden": true
+      },
       "reader": {
         "showSlide": false,
         "summary": "Background material for the curious.",

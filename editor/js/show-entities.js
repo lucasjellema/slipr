@@ -117,29 +117,51 @@ function mapMarkdown(show, fn) {
  * other glossary definition, with the number of references there.
  * @param {any} show
  * @param {string} id
- * @returns {{ where: string, count: number }[]}
+ * @returns {{ where: string, count: number, slideId?: string, slideIndex?: number, termId?: string }[]}
  */
 export function glossaryReferences(show, id) {
-  /** @type {Map<string, number>} */
+  /** @type {Map<string, { where: string, count: number, slideId?: string, slideIndex?: number, termId?: string }>} */
   const counts = new Map();
   let where = '';
+  let currentSlideId = '';
+  let currentSlideIndex = -1;
+  let currentTermId = '';
+
   const count = (/** @type {string} */ text) => {
     for (const m of text.matchAll(GLOSSARY_REF)) {
-      if (m[1].trim() === id) counts.set(where, (counts.get(where) ?? 0) + 1);
+      if (m[1].trim() === id) {
+        const existing = counts.get(where);
+        if (existing) {
+          existing.count += 1;
+        } else {
+          counts.set(where, {
+            where,
+            count: 1,
+            ...(currentSlideId ? { slideId: currentSlideId, slideIndex: currentSlideIndex, slideNumber: currentSlideIndex + 1 } : {}),
+            ...(currentTermId ? { termId: currentTermId } : {}),
+          });
+        }
+      }
     }
     return text;
   };
   for (const [termId, term] of Object.entries(show.glossary ?? {})) {
     if (termId === id) continue;
     where = `Glossary: ${/** @type {any} */ (term)?.term ?? termId}`;
+    currentTermId = termId;
+    currentSlideId = '';
+    currentSlideIndex = -1;
     mapMarkdown({ glossary: { [termId]: term } }, count);
   }
   (show.slides ?? []).forEach((/** @type {any} */ slide, /** @type {number} */ i) => {
     const title = typeof slide.content?.title === 'string' && slide.content.title ? slide.content.title : slide.id;
     where = `Slide ${i + 1}: ${title}`;
+    currentSlideId = slide.id;
+    currentSlideIndex = i;
+    currentTermId = '';
     mapMarkdown({ slides: [slide] }, count);
   });
-  return [...counts].map(([w, c]) => ({ where: w, count: c }));
+  return [...counts.values()];
 }
 
 /**
@@ -153,6 +175,23 @@ export function glossaryReferences(show, id) {
 export function unlinkGlossary(show, id, term) {
   return mapMarkdown(show, (text) => text.replace(GLOSSARY_REF, (whole, refId, label) => (
     refId.trim() === id ? (label ?? term) : whole
+  )));
+}
+
+/**
+ * Rewrite references to a glossary term: `[[oldId]]` becomes `[[newId]]`,
+ * and `[[oldId|text]]` becomes `[[newId|text]]`.
+ * @param {any} show
+ * @param {string} oldId
+ * @param {string} newId
+ * @returns {any}
+ */
+export function renameGlossaryRef(show, oldId, newId) {
+  const from = typeof oldId === 'string' ? oldId.trim() : '';
+  const to = typeof newId === 'string' ? newId.trim() : '';
+  if (!from || !to || from === to) return show;
+  return mapMarkdown(show, (text) => text.replace(GLOSSARY_REF, (whole, refId, label) => (
+    refId.trim() === from ? (label !== undefined ? `[[${to}|${label}]]` : `[[${to}]]`) : whole
   )));
 }
 

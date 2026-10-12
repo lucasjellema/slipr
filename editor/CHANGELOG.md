@@ -4,6 +4,13 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Dedicated Glossary Editor with deck-aware completion (I-088)
+- **Added** a dedicated, full-screen Glossary Editor (`ui/glossary-editor.js`, `glossary-model.js`): split view with real-time search, filters (`All`, `In Use`, `Unused`, `No Def`), and sorts (`A → Z`, `Z → A`, `Most used`, `Least used`). Accessible via the toolbar (`📖 Glossary`), the Show Settings panel, and keyboard shortcut (`Esc` closes, `↑`/`↓` switches terms, `Ctrl+N` or `+` adds a new term).
+- **Added** deck-aware word completion: scans words, acronyms, CamelCase terms, and technical phrases across slides, cards, notes, and reader blocks to offer real-time autocompletion suggestions when typing term names, plus a **Deck suggestions** drawer that lists frequently occurring unglossaried terms with one-click addition.
+- **Added** term editing and inspection: term name, stable ID with renaming that automatically rewrites all `[[oldId]]` occurrences across the presentation (`renameGlossaryTerm`, `renameGlossaryRef`), aliases / other names (`I-086`), external link with preview, and Markdown definition with live reader-mode popup preview.
+- **Added** usage tracking and slide navigation: exact reference counts and list of slide references with one-click **Jump to slide →** navigation; orphaned term flagging with safe deletion (leaving references vs unlinking to plain text).
+- **Changed** Show settings: replaced the cramped inline glossary card list with an overview card showing term counts, reference stats, quick term pills, and a launcher button for the dedicated Glossary Editor.
+
 ### 2026-10-12: PDF slots and blocks (I-072)
 - **Added** a field editor for `pdf` slots and a **PDF Document** block type (`ui/pdf-fields.js`): file path or https address, **Choose PDF…** (copied into the show's `docs/` folder with a content hash, `addPdf()`, `pdfPath()`), title (taken from the file name when empty), pages (first and last), click-to-load for remote PDFs, and the fallback image (`fallbackImageField()`, now shared with web pages). `pdfValue()`, `pdfPagesPatch()`; `setSlot` and `setBlockType` raise a 0.1 show to 0.2; key order for PDF values follows the schema.
 

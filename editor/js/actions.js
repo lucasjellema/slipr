@@ -9,7 +9,7 @@
  * This module has NO DOM or browser dependencies and can be tested with Node.
  */
 
-import { unlinkGlossary } from './show-entities.js';
+import { renameGlossaryRef, unlinkGlossary } from './show-entities.js';
 
 /**
  * Generate a random short identifier.
@@ -917,6 +917,27 @@ export function deleteGlossaryTerm(show, { id, unlink = false }) {
   delete glossary[id];
   const next = { ...show, glossary };
   return unlink ? unlinkGlossary(next, id, term) : next;
+}
+
+/**
+ * Rename a glossary term's identifier: moves show.glossary[oldId] to
+ * show.glossary[newId] and rewrites all [[oldId]] or [[oldId|text]]
+ * references across the show to use newId.
+ * @param {any} show
+ * @param {{ oldId: string, newId: string }} payload
+ * @returns {any}
+ */
+export function renameGlossaryTerm(show, { oldId, newId }) {
+  const from = typeof oldId === 'string' ? oldId.trim() : '';
+  const to = typeof newId === 'string' ? newId.trim() : '';
+  if (!from || !to || from === to) return show;
+  const glossary = { ...(show.glossary ?? {}) };
+  if (!glossary[from]) return show;
+  const entry = glossary[from];
+  delete glossary[from];
+  glossary[to] = entry;
+  const next = { ...show, glossary };
+  return renameGlossaryRef(next, from, to);
 }
 
 /**
@@ -2001,6 +2022,7 @@ export const actions = {
   deleteChapter,
   upsertGlossaryTerm,
   deleteGlossaryTerm,
+  renameGlossaryTerm,
   moveShowItem,
   upsertProfile,
   deleteProfile,

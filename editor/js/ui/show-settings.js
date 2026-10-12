@@ -17,8 +17,9 @@ const TYPING_ACTIONS = new Set(['setMeta', 'setSettings', 'upsertChapter', 'upse
  * Mount the show settings panel into container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
+ * @param {{ onGlossary?: (termId?: string) => void }} [handlers]
  */
-export function mountShowSettings(container, store) {
+export function mountShowSettings(container, store, handlers = {}) {
   const root = h('div', { class: 'slipr-show-settings-panel' });
   container.append(root);
 
@@ -193,7 +194,7 @@ export function mountShowSettings(container, store) {
       settingsSection,
       chaptersSection(store, show),
       profilesSection(store, show),
-      glossarySection(store, show),
+      glossarySection(store, show, handlers),
       pathsSection(store, show)
     );
   }
@@ -392,70 +393,55 @@ function profilesSection(store, show) {
 /**
  * @param {import('../store.js').EditorStore} store
  * @param {any} show
+ * @param {{ onGlossary?: (termId?: string) => void }} [handlers]
  */
-function glossarySection(store, show) {
+function glossarySection(store, show, handlers = {}) {
   const entries = Object.entries(show.glossary && typeof show.glossary === 'object' ? show.glossary : {});
-  const items = entries.map(([id, entry]) => {
-    const term = /** @type {any} */ (entry);
+  const totalRefs = entries.reduce((sum, [id]) => {
     const refs = glossaryReferences(show, id);
-    const uses = refs.reduce((n, r) => n + r.count, 0);
-    /** @param {Record<string, any>} patch */
-    const update = (patch, /** @type {string} */ key) => {
-      const current = store.state.show?.glossary?.[id] ?? term;
-      store.dispatch('upsertGlossaryTerm', { id, term: current.term, aliases: current.aliases, definition: current.definition ?? '', link: current.link, ...patch }, { coalesceKey: `glossary-${key}-${id}` });
-    };
-    const definition = /** @type {HTMLTextAreaElement} */ (h('textarea', {
-      class: 'slipr-textarea slipr-textarea-sm',
-      placeholder: 'Definition (Markdown), shown in a popup in reader mode',
-      'aria-label': `Glossary "${term.term}": definition`,
-      oninput: (/** @type {Event} */ e) => update({ definition: /** @type {HTMLTextAreaElement} */ (e.target).value }, 'definition'),
-    }, [term.definition ?? '']));
-    return h('div', { class: 'slipr-entity-card' }, [
-      h('div', { class: 'slipr-entity-row' }, [
-        requiredInput({
-          value: term.term, label: `Glossary term "${id}"`, focusKey: `glossary:${id}`,
-          onValue: (value) => update({ term: value }, 'term'),
-        }),
-        itemTools(store, null, id, 0, 1, `glossary term "${term.term}"`, () => {
-          if (!uses) return store.dispatch('deleteGlossaryTerm', { id });
-          openConfirmDialog({
-            title: `Delete "${term.term}" from the glossary?`,
-            text: `It is used ${uses} time${uses === 1 ? '' : 's'}:`,
-            items: refs.map((r) => (r.count > 1 ? `${r.where} (${r.count}×)` : r.where)),
-            actions: [
-              { label: 'Delete, leave the references', run: () => store.dispatch('deleteGlossaryTerm', { id }) },
-              { label: 'Delete, keep the words as plain text', kind: 'danger', run: () => store.dispatch('deleteGlossaryTerm', { id, unlink: true }) },
-            ],
-          });
-        }),
-      ]),
-      // Other names (I-086): matched like the term in reader-mode slides, and found by search.
-      optionalInput({
-        value: Array.isArray(term.aliases) ? term.aliases.join(', ') : '',
-        label: `Glossary "${term.term}": other names`,
-        placeholder: 'Other names, comma-separated (optional): plurals, abbreviations',
-        onValue: (text) => update({ aliases: text ?? '' }, 'aliases'),
-      }),
-      markdownToolbar(definition, { show, slideId: '' }),
-      definition,
-      optionalInput({
-        value: term.link, label: `Glossary "${term.term}": link`, placeholder: 'Link for more information (optional)',
-        onValue: (link) => update({ link }, 'link'),
-      }),
-      h('span', { class: 'slipr-help' }, [`Write [[${id}]] (or [[${id}|other words]]) in Markdown · used ${uses}×`]),
-    ]);
+    return sum + refs.reduce((s, r) => s + r.count, 0);
+  }, 0);
+
+  const pills = entries.map(([id, entry]) => {
+    const term = /** @type {any} */ (entry);
+    return h(
+      'button',
+      {
+        type: 'button',
+        class: 'slipr-term-pill',
+        title: `Open "${term?.term ?? id}" in Glossary Editor`,
+        onclick: () => handlers.onGlossary?.(id),
+      },
+      [
+        h('span', { class: 'slipr-term-pill-name' }, [term?.term ?? id]),
+        h('code', { class: 'slipr-term-pill-id' }, [`[[${id}]]`]),
+      ]
+    );
   });
-  return entitySection(
-    `Glossary (${entries.length})`,
-    'Terms readers can look up: a [[term]] reference in Markdown shows the definition in a popup in reader mode. Insert them with the "[[ ]] Term…" toolbar.',
-    '+ Add term',
-    () => {
-      const id = uniqueId('New term', entries.map(([k]) => k), 'term');
-      store.dispatch('upsertGlossaryTerm', { id, term: 'New term', definition: '' });
-      focusNew(`glossary:${id}`);
-    },
-    items
-  );
+
+  return h('fieldset', { class: 'slipr-fieldset slipr-settings-glossary-section' }, [
+    h('legend', {}, [`Glossary (${entries.length})`]),
+    h('p', { class: 'slipr-help' }, [
+      'Terms readers can look up: a [[term]] reference in Markdown shows the definition in a popup in reader mode. Managed in the dedicated Glossary Editor.',
+    ]),
+    h('div', { class: 'slipr-settings-glossary-banner' }, [
+      h('div', { class: 'slipr-settings-glossary-stats' }, [
+        h('strong', {}, [`${entries.length} defined term${entries.length === 1 ? '' : 's'}`]),
+        h('span', { class: 'slipr-help' }, [` · ${totalRefs} reference${totalRefs === 1 ? '' : 's'} across the show`]),
+      ]),
+      h(
+        'button',
+        {
+          type: 'button',
+          class: 'slipr-btn slipr-btn-primary',
+          title: 'Open the full-page Glossary Editor (I-088)',
+          onclick: () => handlers.onGlossary?.(),
+        },
+        ['📖 Open Glossary Editor →']
+      ),
+    ]),
+    pills.length ? h('div', { class: 'slipr-settings-glossary-pills' }, pills) : null,
+  ]);
 }
 
 /**
