@@ -9,7 +9,7 @@ The viewer makes one show available in two very different ways:
 | Character | Linear, presenter-driven, with animations and visualizations | Interactive and explorative, tailored to the reader |
 | Feels like | PowerPoint / Keynote | An interactive article or a small learning site |
 
-> Status: **audience mode** and **reader mode** work, including personalisation, progress, bookmarks, search and annotations (roadmap Phases 1–3). Features not built yet are marked *(planned)*.
+> Status: **audience mode** and **reader mode** work, including personalisation, progress, bookmarks, search and annotations (roadmap Phases 1–3), plus Phase 6: single-file export, Mermaid diagrams, extra images and picture styles on slides, and glossary terms clickable on slides in reader mode. Features not built yet are marked *(planned)*.
 
 ## Opening a show
 
@@ -52,6 +52,7 @@ A show can be exported as **one HTML file** that contains the show, its template
 Built on Reveal.js. The aim is a polished, linear presentation.
 
 - **Animations**: bullets that build one by one (several fragment styles), slide transitions, and *auto-animate*, where matching elements morph smoothly from one slide to the next.
+- **Extra images and picture styles**: pictures placed anywhere on a slide by the author, which can appear one by one like bullets; pictures with a shadow, soft edges, rounded corners or a frame from the template, and a chosen opacity.
 - **Visualizations**: charts that build up on screen *(planned)*. Images and dynamic Mermaid SVG diagrams work today (flowcharts, sequence diagrams, architectures, etc.), rendered client-side with vendored Mermaid and scaled to fit the presentation canvas.
 - **High-level overviews**: with `settings.agenda: true`, an agenda slide is generated at the start of every chapter (after the title slide for the first chapter). A thin bar along the bottom shows chapter progress. `O` gives an overview of all slides.
 - **Presenter view** (`S`): notes, timer, clock, and next-slide preview in a separate window on your laptop screen. The browser must allow popups for `localhost`.

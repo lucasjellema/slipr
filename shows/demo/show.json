@@ -48,6 +48,11 @@
     "slot": {
       "term": "slot",
       "definition": "A named place in a layout that a slide fills with content, e.g. `title` or `body`."
+    },
+    "new-term": {
+      "term": "show",
+      "definition": "The collection of slides and reader notes that make up a Slipr project\n",
+      "link": "https://nu.nl"
     }
   },
 
@@ -90,7 +95,7 @@
             "id": "intro",
             "type": "text",
             "depth": 1,
-            "md": "Welcome! You are reading the **reader version** of a presentation. Hover or tap the underlined terms, open the panels, and use the controls to choose how deep you want to go."
+            "md": "Welcome! You are reading the **reader version** of a presentation. Hover or tap the underlined terms, open the [[template|panels]], and use the controls to choose how deep you want to go."
           }
         ]
       }

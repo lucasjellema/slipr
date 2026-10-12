@@ -29,7 +29,7 @@ editor/
 │   ├── editor.css        ✅
 │   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style, theme-contrast
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
     ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083)

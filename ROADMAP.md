@@ -109,6 +109,7 @@ Also done along the way: find & replace (I-025), the fixes E-010 to E-014, and t
 
 Pick from the *Next* section of the backlog. Likely candidates: PDF export, house-style template, single-file HTML export, PPTX import inside the editor, a publish script.
 
+0. ✅ Mermaid diagrams in `diagram` slots and reader blocks, rendered with the vendored Mermaid (done 2026-10-11). [I-073]
 1. ✅ Single-file HTML export: `npm run export -- <show folder>`, one file that presents offline, and an **Export…** button in the editor (done 2026-10-11). [I-054, I-085]
 2. ✅ Show grid: all slides as thumbnails grouped by chapter, to rearrange slides and chapters (done 2026-10-11). [I-081]
 3. ✅ Light and dark theme for the editor, with a lighter dark theme (done 2026-10-11). [I-082]

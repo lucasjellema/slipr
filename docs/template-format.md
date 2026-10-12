@@ -26,10 +26,10 @@ Every template folder is listed in **`templates/index.json`** (`{ "templates": [
 
 ```json
 {
-  "slipr": "0.1",
+  "slipr": "0.3",
   "id": "default",
   "name": "Slipr Default",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Clean, neutral template used for samples and tests.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -74,7 +74,10 @@ Every template folder is listed in **`templates/index.json`** (`{ "templates": [
     "Section Header": "section",
     "Two Content": "two-column",
     "Picture with Caption": "image-full"
-  }
+  },
+  "pictureStyles": [
+    { "id": "shadow", "label": "Shadow", "pptxEffect": "shadow" }
+  ]
 }
 ```
 

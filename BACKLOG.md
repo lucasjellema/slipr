@@ -17,10 +17,9 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084) and glossary terms in slides (I-086); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
-Phase 6 items 1–3 are done (I-054, I-085, I-081, I-082; see ROADMAP.md). Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
-
-**Handover notes (state on 2026-10-11, for the next session)**
+**Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
   - **E-017** (under *Ideas → Editor*): when deleting slides empties a reading route, should the route be removed or turned into "all slides"?
   - I-083 (extra images), I-084 (picture styles) and I-086 (glossary terms in slides) are done.
