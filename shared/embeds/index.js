@@ -180,9 +180,10 @@ export function fillEmbedElement(el, kind, value, ctx, options = {}) {
 export async function hydrateEmbeds(root, options = {}) {
   const target = root ?? (typeof document !== 'undefined' ? document : null);
   if (!target || typeof target.querySelectorAll !== 'function') return;
-  const elements = /** @type {HTMLElement[]} */ ([...target.querySelectorAll('[data-embed]:not([data-embed-state]):not([data-embed-static])')]);
-  if (!elements.length) return;
-  addEmbedStylesheet(elements[0].ownerDocument);
+  const all = /** @type {HTMLElement[]} */ ([...target.querySelectorAll('[data-embed]')]);
+  if (!all.length) return;
+  addEmbedStylesheet(all[0].ownerDocument); // static embeds need it too
+  const elements = all.filter((el) => el.dataset.embedState === undefined && el.dataset.embedStatic === undefined);
   await Promise.all(elements.map((el) => {
     const def = EMBED_KINDS[el.dataset.embed ?? ''];
     if (!def || (options.thumbnail && !def.thumbnail)) return null;

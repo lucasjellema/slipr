@@ -1992,3 +1992,31 @@ body.is-screen #slipr-editor-banners {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* ---------- Embedded web page options (I-071) ---------- */
+
+.slipr-web-allow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.slipr-web-allow legend {
+  padding: 0 4px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-web-allow .slipr-help {
+  flex-basis: 100%;
+}
+
+.slipr-embed-height label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}

@@ -560,7 +560,8 @@ function embedEditor(store, slideId, block) {
   const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
     ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
   /** @param {Record<string, any>} patch @param {string} field */
-  const write = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, { coalesceKey: `block-${field}-${block.id}` });
+  const write = (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch },
+    ['url', 'title', 'height', 'fallback-alt'].includes(field) ? { coalesceKey: `block-${field}-${block.id}` } : {});
   /** @type {import('./web-fields.js').WebFieldsOptions} */
   const options = {
     label: 'Embedded page',

@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Web pages (I-071)
+- **Added** web page slides: in audience mode the page is live and clickable (or the author's screenshot); in reader mode a page from another site waits for **Load**. Every loaded page keeps an "Open in new tab" link. Embedded pages in reader mode can scale with an aspect ratio, and may get extra permissions (full screen, dialogs, …) when the author allows them.
+
 ### 2026-10-12: Rich embeds foundation (I-070)
 - **Changed** audience and reader mode call `hydrateEmbeds()` (was `renderDiagrams()`). In reader mode, an embedded page from another site shows a link card and a **Load** button until the reader clicks it (unless the author chose `load: "auto"`); once loaded, other embeds from that site load directly until the tab closes. Diagrams and embeds can show the author's fallback image in print and when they fail.
 - **Removed** the diagram error styles from `reader/reader.css`: they are now shared (`shared/embeds/embeds.css`).

@@ -6,6 +6,12 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-12: Web pages on slides and in the reader (I-071)
+- **Added** to show format 0.2: slot type `web` (`url`, `title`, `allow?`, `present?`, `load?`, `fallback?`), and `allow` / `aspect` on the `embed` block. `allow` loosens the frame sandbox from an allow-list (`same-origin`, `fullscreen`, `modals`, `downloads`, `presentation`); `same-origin` applies to pages on other servers only. Validation: unsafe addresses are an error; `present: "static"` without a fallback and `same-origin` on a show file are warnings.
+- **Added** template slot type `web`, and a `web` layout in both templates (default 1.2.0, Conclusion 0.1.2).
+- **Changed** `shared/embeds/web.js`: audience mode shows a web slot live without a Load button, or the screenshot (`present: "static"`); reader frames take an aspect ratio or height; a loaded frame keeps an "Open in new tab" link. **Fixed** `hydrateEmbeds()` now adds `embeds.css` when a page has only static embeds.
+- **Changed** the demo (`s-live-page`) and the Conclusion demo (`s-web`, now format 0.2). The single-file export embeds local pages of web slots. Spec `docs/specs/I-071-website-embed.md`; D-011 refined; show and template format docs.
+
 ### 2026-10-12: Shared foundation for rich embeds (I-070, D-011)
 - **Added** `shared/embeds/`: a registry (`index.js`) with one module per embed kind (`diagram.js`, `web.js`), click-to-load consent (`consent.js`) and shared styling (`embeds.css`, from `--slipr-*` tokens). `render.js` and `blocks.js` write an embed element with a static fallback inside; `hydrateEmbeds(root)` renders the live content and lazy-loads a kind's library only when it is used.
 - **Added** to show format 0.2: `fallback` (an image value) on diagram slot values, diagram blocks and embed blocks, and `load` (`"click"` default, or `"auto"`) on embed blocks. Validation: either in a 0.1 show is an error; fallback images get the usual alt-text and file checks and are included by `collectImagePaths()` (so the single-file export embeds them).

@@ -131,12 +131,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
-- [ ] **I-071** [format/viewer] **Website embed**:
-  - Upgrade the reader `embed` block, and add a `web` slot for audience mode.
-  - Per-embed sandbox options (`allow-same-origin` only on explicit opt-in), an "Open in new tab" link, and an aspect ratio or height.
-  - Many sites refuse framing (`X-Frame-Options` / CSP `frame-ancestors`), and that can't be detected reliably, so always offer a link card as fallback.
-  - Optional screenshot image for offline presenting.
-  - Audience mode: live and clickable during the talk, or a static screenshot (author's choice) · in progress · claude
 - [ ] **I-072** [format/viewer] **PDF document**: a `pdf` slot and block with `src` (relative to show.json), `page` or page range, and optional `title`.
   - Reader mode: page navigation, zoom, and the PDF's text included in Slipr search (`search-index.js`, V-015). Either the browser's built-in viewer in an iframe (`#page=n`), or vendored **PDF.js** for consistent rendering. Decide in a spike.
   - Audience mode: show a chosen page as a slide, with fragments stepping through pages.
@@ -185,6 +179,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-071** [format/viewer] Website embed: `web` slot (show format 0.2) with a `web` layout in both templates (default 1.2.0, Conclusion 0.1.2); `allow` sandbox extras from an allow-list (`same-origin` for other servers only), `aspect` or height on the `embed` block, "Open in new tab" below loaded frames, link card / screenshot fallback; audience mode `present: "live"` (no Load button) or `"static"` (screenshot); editor fields for both (`ui/web-fields.js`). Spec: `docs/specs/I-071-website-embed.md` · done 2026-10-12 · claude
 - [x] **I-070** [format] Shared foundation for rich embeds (D-011): `shared/embeds/` registry with one module per kind (`diagram`, `web` for the reader `embed` block), static fallback inside every embed element (optional `fallback` image, show format 0.2), `hydrateEmbeds()` with lazy-loaded vendored libraries, click-to-load for other servers (per site per tab; `load: "auto"` set by the author in the editor), `embeds.css` from `--slipr-*` tokens; the single-file export drops unused libraries; approved libraries Mermaid, Cytoscape.js, Leaflet, PDF.js. Spec: `docs/specs/I-070-embed-foundation.md` · done 2026-10-12 · claude
 - [x] **I-086** [viewer/format] Glossary terms clickable in slides in reader mode (D-015): automatic linking of the first occurrence per slide (whole words, case- and accent-insensitive, longest first, also in plain text slots), pin mode keeps priority, audience mode unchanged; optional `aliases` per term (show format 0.2), in validation, reader search and the editor's Show settings (Other names). Spec: `docs/specs/I-086-glossary-in-slides.md` · done 2026-10-12 · claude
 - [x] **I-084** [format/editor/templates/converter] Picture styles (D-014): template format 0.3 `pictureStyles` (shadow, soft, rounded, frame in both templates), `style` and `opacity` on image values (show format 0.2), rendering via `shared/picture.js`, validation, a style picker with live previews and an opacity slider in every image field, and the converter mapping PowerPoint shadow / soft edges / rounded corners / outline and transparency. Spec: `docs/specs/I-084-picture-styles.md` · done 2026-10-11 · claude

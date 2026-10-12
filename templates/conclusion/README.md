@@ -18,6 +18,7 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 | `quote-image` | Quote over a photo | kicker, title, quote (≤ 170), image |
 | `section-wave` / `section-image` | Section divider (client case slide) | kicker (≤ 32), title, (image) |
 | `title-only` | Title with a free illustration or diagram | kicker, title, image (shown in full) |
+| `web` | Title with a live web page (or its screenshot) in the content area. Not in the PowerPoint template (I-071) | kicker, title, page (`web`) |
 | `columns-4` | Four white columns (Textbox 4x) | kicker, title, cards ≤ 4 × (title ≤ 18, text) |
 | `boxes-9` | Nine numbered boxes (Textbox 9x) | kicker, title, cards ≤ 9 × (title ≤ 24, text ≤ 210) |
 | `facts` | Key figures over a photo (Facts & figures); the right column is mirrored | kicker, title, cards ≤ 6 × (value ≤ 8, label ≤ 42, icon), image |

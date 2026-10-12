@@ -17,6 +17,7 @@ function validateVariant(mutate) {
 
 /** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases). */
 function withoutFormat02(s) {
+  s.slides = s.slides.filter((x) => x.layout !== 'web');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;

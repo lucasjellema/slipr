@@ -52,6 +52,7 @@ With `shows/demo`:
 
 13. `R` / `A` switch modes and keep the position.
 13a. A show folder: `viewer/?folder=<key>` opens it in both modes, with its images (keys come from the editor or "Open a show folder…"; in Claude's browser pane use an origin-private folder remembered via `shared/folder-handles.js`). An unknown key shows the "not known here" page.
+13c. Web page slides (I-071): demo `s-live-page` is live in audience mode (frame fills the slot, "Open in new tab ↗" below, `allow="fullscreen"`); Conclusion demo `s-web` shows its screenshot in audience mode and a card with **Load** in reader mode, also at phone width. Claude's browser pane blocks sub-frame loads (`ERR_BLOCKED_BY_CLIENT`), so check frame contents in a real browser.
 13b. Embeds (I-070): reader mode at depth *Deep dive*, slide "Tailored to every reader": the Wikipedia embed shows a card with site and **Load**; nothing from `wikipedia.org` appears in the network log before the click; after it the frame loads, and after a re-render (change the profile) it loads without asking. A new tab asks again. The local depth dial loads directly. Diagrams render in both modes.
 14. An invalid show (`shows/fixtures/broken/`) shows the error page. `viewer/` without parameters shows the help page, and a non-existent show shows the load-error page.
 15. The browser console is free of errors.

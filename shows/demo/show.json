@@ -322,6 +322,33 @@
     },
 
     {
+      "id": "s-live-page",
+      "layout": "web",
+      "chapter": "how",
+      "tags": ["embed"],
+      "content": {
+        "title": "A live page on a slide",
+        "page": {
+          "url": "embeds/depth-dial.html",
+          "title": "Interactive depth dial",
+          "allow": ["fullscreen"],
+          "fallback": { "src": "images/two-modes.svg", "alt": "Audience mode and reader mode side by side" }
+        },
+        "caption": "Web pages can be live and clickable while presenting, or shown as a screenshot."
+      },
+      "reader": {
+        "summary": "Slides can hold a live web page.",
+        "blocks": [
+          {
+            "id": "web-how",
+            "type": "text",
+            "md": "A **web page** slot shows a page from the show folder or the web. While presenting it is live, or the author's screenshot. In reader mode, a page from another site waits for your click on **Load**."
+          }
+        ]
+      }
+    },
+
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

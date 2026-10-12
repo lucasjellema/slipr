@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-12: Web page slots and page options (I-071)
+- **Added** a field editor for `web` slots (Slide tab): address, title, **While presenting** (live page / fallback image), click-to-load for reader mode, **Allow the page to…** (same origin, full screen, dialogs, downloads, presentation) and the fallback image (`ui/web-fields.js`, `addFallbackToSlot()`). The Embedded Page block uses the same fields, plus **Size** (fixed height or an aspect ratio). Choices re-render the form; typing coalesces. New helpers `webValue()`, `toggleAllow()`; `setSlot` raises a 0.1 show to 0.2 for a web page; key order for web values follows the schema.
+
 ### 2026-10-12: Click-to-load and fallback image for embedded pages (I-070)
 - **Added** to the Embedded Page block editor: **Load straight away, without asking the reader** (stored as `load: "auto"`; off by default, so a page from another site waits for a click) and an optional **fallback image** with alt text and a Remove button (choose, drop or paste; `addImageToBlock()` takes a `field`). `updateBlock` raises a 0.1 show to format 0.2 for either; changing the block type keeps them; `show.json` key order follows the schema.
 - **Changed** the preview and the show grid call `hydrateEmbeds()`; grid thumbnails show embedded pages as their link card (or fallback image) instead of loading them.

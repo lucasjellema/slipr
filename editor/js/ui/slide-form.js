@@ -19,6 +19,8 @@ import { parseTags } from '../show-entities.js';
 
 /** Actions the slide form dispatches while the user types. */
 const TYPING_ACTIONS = new Set(['setSlot', 'setNotes', 'setTags', 'updateOverlay']);
+/** Web page fields that are typed (I-071); the others are choices. */
+const TYPED_WEB_FIELDS = new Set(['url', 'title', 'fallback-alt']);
 
 /**
  * Mount the slide form into a container.
@@ -340,12 +342,13 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       read: readSlot,
       write: (patch, field) => {
         current = webValue(readSlot(), patch);
-        store.dispatch('setSlot', { slideId, slot: slotName, value: current }, { coalesceKey: `${coalesceKey}-${field}` });
+        // Typing coalesces (one undo step, no re-render); choices re-render the form.
+        store.dispatch('setSlot', { slideId, slot: slotName, value: current }, TYPED_WEB_FIELDS.has(field) ? { coalesceKey: `${coalesceKey}-${field}` } : {});
       },
       addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
       resolveAsset: store.state.resolveAsset,
     };
-    inputs = [h('div', { class: 'slipr-embed-editor' }, [...webAddressFields(options), ...(value ? webOptionFields(options) : [])])];
+    inputs = [h('div', { class: 'slipr-embed-editor' }, [...webAddressFields(options), ...webOptionFields(options)])];
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [

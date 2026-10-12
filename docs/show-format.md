@@ -124,7 +124,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `$schema` | string | no | Path to `shared/schema/show.schema.json`, for autocomplete in editors outside this repo's VS Code workspace |
-| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides, `style` / `opacity` on pictures, `aliases` on glossary terms and `fallback` / `load` on embeds; a show without them may stay 0.1. The editor and the converter write 0.2 only when a show uses them |
+| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides, `style` / `opacity` on pictures, `aliases` on glossary terms, `fallback` / `load` on embeds and web pages (`web` slots, `allow`, `aspect`, `present`); a show without them may stay 0.1. The editor and the converter write 0.2 only when a show uses them |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
 | `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json` (see *Template references* below). `version`: semver range |
@@ -195,7 +195,7 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `callout` | `variant` (`info` \| `tip` \| `warning` \| `quote`), `title?`, `md` | Highlighted box |
 | `tabs` | `tabs: [{ label, md }]` | Tabbed alternatives, e.g. code in several languages |
 | `image` | `image` (as slot value), `hotspots?: [{ x, y, title, md }]` (x/y as fraction 0–1) | Image with clickable hotspots that open popups |
-| `embed` | `url`, `title`, `height?`, `load?`, `fallback?` | Sandboxed iframe (live demo, video). A page on another server is **click-to-load** unless `load` is `"auto"` (0.2); see *Embeds* below |
+| `embed` | `url`, `title`, `height?`, `aspect?`, `allow?`, `load?`, `fallback?` | Sandboxed iframe (live demo, video). A page on another server is **click-to-load** unless `load` is `"auto"` (0.2); see *Embeds* below |
 | `slide-ref` | `slide`, `label?` | Link card to another slide |
 | `diagram` | `mermaid`, `caption?`, `fallback?` | Rendered SVG diagram from Mermaid source |
 
@@ -203,7 +203,7 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 
 ### Embeds (I-070, D-011)
 
-Content that needs a library or another server is an **embed**: today `diagram` (slot and block) and `embed` (block; a `web` slot follows in I-071). Embeds share two optional fields (format 0.2):
+Content that needs a library or another server is an **embed**: today `diagram` (slot and block) and web pages (`web` slot and `embed` block, I-071). Embeds share two optional fields (format 0.2):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -213,6 +213,22 @@ Content that needs a library or another server is an **embed**: today `diagram` 
 ```json
 { "id": "docs", "type": "embed", "title": "Reveal.js documentation", "url": "https://revealjs.com/", "height": 420,
   "fallback": { "src": "images/revealjs-screenshot.png", "alt": "The Reveal.js documentation home page" } }
+```
+
+#### Web pages (`web` slot, `embed` block; I-071, format 0.2)
+
+| Field | Where | Meaning |
+|---|---|---|
+| `url`, `title` | both | Required. An `https:` address, or a file relative to `show.json`. `javascript:`, `data:` and `vbscript:` addresses are an error |
+| `allow` | both | Extra permissions for the sandboxed frame, any of `"same-origin"`, `"fullscreen"`, `"modals"`, `"downloads"`, `"presentation"`. The frame always has `allow-scripts allow-forms allow-popups`. `same-origin` (the page keeps its own cookies and logins) applies to pages on other servers only; on a file in the show folder it is ignored with a warning, because such a page shares Slipr's origin and could reach the reader's notes |
+| `present` | slot | Audience mode: `"live"` (default) shows the page on the slide, clickable, without a Load button (the presenter's own laptop); `"static"` shows the `fallback` image and never contacts the page (offline presenting). Without a fallback image, `"static"` shows the link card (warning). Reader mode ignores `present` and uses `load` |
+| `aspect` | block | `"W:H"` (e.g. `"16:9"`): the frame scales with the column. Wins over `height` (default 400 px). In a slot the layout decides the size |
+
+Once a page is loaded, an *Open in new tab* link stays below the frame, for sites that refuse to be framed (`X-Frame-Options` / `frame-ancestors`; this can't be detected, so the frame then stays empty).
+
+```json
+"page": { "url": "https://example.com/dashboard", "title": "Live dashboard", "allow": ["fullscreen"],
+          "present": "static", "fallback": { "src": "images/dashboard.png", "alt": "Screenshot of the dashboard" } }
 ```
 
 ## Markdown subset
@@ -252,6 +268,7 @@ The template defines which slots a layout has and the type of each slot.
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
 | `diagram` | object | `{ "mermaid": "flowchart LR; A-->B", "caption": "...", "fallback": { "src": "images/flow.png", "alt": "..." } }` rendered as an SVG diagram; `fallback` (0.2) as for embeds |
+| `web` | object | (0.2) `{ "url": "https://…", "title": "...", "allow": [...], "present": "live" \| "static", "load": "click" \| "auto", "fallback": {...} }`: a web page on the slide, see *Web pages* above |
 
 ## Template references
 
@@ -267,11 +284,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, or an embed `fallback` / `load` in a 0.1 show.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` slot value in a 0.1 show; an unsafe web page address.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (I-083), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), and `fallback` / `load` on embeds (I-070, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (I-083), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), and the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

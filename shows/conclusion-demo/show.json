@@ -1,6 +1,6 @@
 {
   "$schema": "../../shared/schema/show.schema.json",
-  "slipr": "0.1",
+  "slipr": "0.2",
   "id": "conclusion-demo",
   "meta": {
     "title": "Slipr in Conclusion style",
@@ -130,6 +130,21 @@
         "kicker": "Overview",
         "title": "From PowerPoint to Slipr",
         "image": { "src": "images/diagram.svg", "alt": "Diagram: the converter turns a PowerPoint deck into a Slipr show, which the viewer presents to an audience or a reader", "fit": "contain" }
+      }
+    },
+    {
+      "id": "s-web",
+      "layout": "web",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Web page",
+        "title": "A website on a slide",
+        "page": {
+          "url": "https://en.wikipedia.org/wiki/Microsoft_PowerPoint",
+          "title": "Microsoft PowerPoint on Wikipedia",
+          "present": "static",
+          "fallback": { "src": "images/photo-16x9.svg", "alt": "Placeholder screenshot of the web page" }
+        }
       }
     },
     {

@@ -42,6 +42,7 @@ Step 7 (I-020) can't be run yet. For step 4 in Claude's browser pane, dispatch a
 8i. **Picture styles**: on an image slot, a card image, a reader image block and an extra image, the picker shows None plus the template's styles, each previewing this picture; choosing one styles the preview at once, and the opacity slider changes it on release; one Ctrl+Z each. A 0.1 show becomes 0.2 on the first style or opacity. In audience mode an extra image with an opacity and "appears on the next click" stays hidden until the click.
 8j. **Glossary**: Show settings → Glossary → **Other names** (`layouts, base layout`): stored as `aliases`, kept when the term or definition changes, removed when emptied; the reader preview links the term (and its other names) on the slide once.
 8k. **Embedded Page** (Reader tab): tick **Load straight away**: the reader preview loads the page without a Load button; untick: the card and Load button return. Add a fallback image (paste) with alt text: it replaces the card in the preview and the show grid; **Remove fallback image** removes it. A 0.1 show becomes 0.2 on either. One Ctrl+Z each.
+8l. **Web page slot** (Conclusion demo, slide "A website on a slide"): switch **While presenting** to live and back (the audience preview loads the frame / shows the screenshot), tick a permission (the frame gets it), change the Embedded Page block's **Size** to 16:9 (height disabled). One Ctrl+Z each; a new Web page slide in a 0.1 show makes it 0.2.
 9. The browser console is free of errors.
 
 ## Common pitfalls
