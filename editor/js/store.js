@@ -24,6 +24,8 @@ const DEFAULT_COALESCE_MS = 1000;
  * @property {((src: string, blob: Blob) => void)} [registerAsset]  Make a newly added image resolvable (E-006).
  * @property {((path: string) => string)} [resolveTemplateAsset]
  * @property {any} [folderHandle]
+ * @property {import('../../shared/zip.js').ZipSource | null} [zipSource]
+ * @property {Map<string, Blob>} [inMemoryAssets]
  * @property {string | null} selectedSlideId
  * @property {'slide' | 'reader' | 'settings'} activeTab
  * @property {'audience' | 'reader'} previewMode
@@ -95,6 +97,8 @@ export class EditorStore {
       registerAsset: context.registerAsset ?? (() => {}),
       resolveTemplateAsset: context.resolveTemplateAsset ?? ((path) => path),
       folderHandle: context.folderHandle ?? null,
+      zipSource: context.zipSource ?? null,
+      inMemoryAssets: context.inMemoryAssets ?? new Map(),
       selectedSlideId: initialShow?.slides?.[0]?.id ?? null,
       activeTab: 'slide',
       previewMode: 'audience',
@@ -345,6 +349,8 @@ export class EditorStore {
     this.state.registerAsset = showContext.registerAsset ?? (() => {});
     this.state.resolveTemplateAsset = showContext.resolveTemplateAsset ?? ((path) => path);
     this.state.folderHandle = folderHandle;
+    this.state.zipSource = showContext.zipSource ?? null;
+    this.state.inMemoryAssets = new Map();
     this.state.selectedSlideId = showContext.show?.slides?.[0]?.id ?? null;
     this.state.dirty = false;
     this.state.validation = validateShow(showContext.show, { template: showContext.template });

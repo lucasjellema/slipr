@@ -11,7 +11,7 @@ import { HELP_PAGE, helpUrl } from '../help.js';
  * Mount the editor toolbar into a container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
- * @param {{ onOpen?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onGrid?: () => void, onGlossary?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
+ * @param {{ onOpen?: () => void, onOpenZip?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onExportZip?: () => void, onGrid?: () => void, onGlossary?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
 export function mountToolbar(container, store, handlers = {}) {
   const root = h('header', { class: 'slipr-toolbar' });
@@ -78,6 +78,15 @@ export function mountToolbar(container, store, handlers = {}) {
         'button',
         {
           class: 'slipr-btn',
+          title: 'Open show from a zip archive (.zip or .slipr)',
+          onclick: () => handlers.onOpenZip?.(),
+        },
+        ['Open Zip…']
+      ),
+      h(
+        'button',
+        {
+          class: 'slipr-btn',
           title: 'New show from template',
           onclick: () => handlers.onNew?.(),
         },
@@ -100,6 +109,15 @@ export function mountToolbar(container, store, handlers = {}) {
           onclick: () => handlers.onExport?.(),
         },
         ['Export…']
+      ),
+      h(
+        'button',
+        {
+          class: 'slipr-btn',
+          title: 'Export show and referenced assets as a zip archive (.zip or .slipr)',
+          onclick: () => handlers.onExportZip?.(),
+        },
+        ['Export Zip…']
       ),
     ]);
 

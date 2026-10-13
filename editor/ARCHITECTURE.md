@@ -29,12 +29,13 @@ editor/
 │   ├── editor.css        ✅
 │   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style, theme-contrast
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style, theme-contrast, export-zip (I-092)
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
-    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083)
+    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083); in-memory assets for zip/cross-browser (I-092)
     ├── export.js         ✅ Export…: the open show as one offline HTML file via shared/export/single-file.js; files from the editor state, the show folder and the server (I-085)
-    ├── files.js          ✅ Open…, New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
+    ├── export-zip.js     ✅ Export Zip…: package open show, show.json, referenced images, data and docs as a .zip or .slipr archive using shared/zip.js (I-092)
+    ├── files.js          ✅ Open…, Open Zip… (I-092), New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
     ├── store.js          ✅ state, dispatch, subscribe, undo/redo history, typing coalescing, validation diagnostics, issuesForSlide()
     ├── slot-values.js    ✅ DOM-free: which editor a slot type gets, and the value shape each edit writes (E-010)
     ├── card-values.js    ✅ DOM-free: value shapes for cards (add, remove, move, set field), quote, code; length hints (I-035)

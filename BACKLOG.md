@@ -105,7 +105,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **E-020** [editor] Graph editor: graph slots and blocks (I-074) are read-only in the editor. Add a field editor: nodes (id, label, tags, Markdown, linked slide) and edges as rows, layout, the audience steps, a data file picker, caption and fallback image; the preview already draws the graph
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
-- [ ] **I-092** [editor/format] **Export a show to a zip file and import from an uploaded zip file in the editor**:
+- [x] **I-092** [editor/format] **Export a show to a zip file and import from an uploaded zip file in the editor**:
   - **Export to zip (`.zip` / `.slipr`)**:
     - An **Export to zip…** (or **Download zip**) action in the editor top bar / menu alongside HTML export (I-085).
     - Packages the current show in memory: `show.json`, referenced images (`images/`), data files (`data/`), and local documents (`docs/`), including any unsaved in-memory edits.
@@ -117,7 +117,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
     - Loads the unzipped show into the editor store and live preview with `blob:` object URLs for images and assets.
     - Saving: allows authoring and re-exporting as zip, or extracting/saving into a disk folder via `showDirectoryPicker()`.
     - Enables editing shows in browsers that lack the File System Access directory picker (Firefox, Safari).
-  - Pairs with **I-053** (`.slipr` single-file package format) and **I-087** (`?zip=<url>` viewer loader) · todo · —
+  - Pairs with **I-053** (`.slipr` single-file package format) and **I-087** (`?zip=<url>` viewer loader) · 2026-10-13 · ✓
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)

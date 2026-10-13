@@ -5,9 +5,14 @@
  * reloads the page with the new key.
  */
 import { rememberFolder } from '../../shared/folder-handles.js';
-import { createShowInFolder, ensurePermission, pickFolder, readShowJson, saveShow } from './io/fs-access.js';
+import { canOpenFolders, createShowInFolder, ensurePermission, pickFolder, readShowJson, saveShow, writeImage } from './io/fs-access.js';
 import { buildNewShow } from './io/new-show.js';
-import { openChooseDialog, openNewShowDialog, showBanner } from './ui/dialogs.js';
+import { openChooseDialog, openDialog, openNewShowDialog, showBanner } from './ui/dialogs.js';
+import { h, addStylesheet } from './dom.js';
+import { readZip, createZipSource } from '../../shared/zip.js';
+import { loadShowFromZip } from '../../shared/load.js';
+import { exportZip } from './export-zip.js';
+import { getDraftKey } from './io/draft-store.js';
 
 /** Set while the page navigates on purpose, so the unsaved-changes warning stays quiet. */
 let leaving = false;
@@ -104,6 +109,9 @@ export async function newShow(store) {
 export async function save(store) {
   const handle = store.state.folderHandle;
   if (!handle) {
+    if (store.state.zipSource) {
+      return askSaveZipOrFolder(store);
+    }
     askForShowFolder(store);
     return false;
   }
@@ -200,3 +208,287 @@ export function askForShowFolder(store) {
     },
   });
 }
+
+/**
+ * Pick a zip file (.zip or .slipr) using the File System Access API if available,
+ * or falling back to a hidden <input type="file"> element.
+ * @returns {Promise<File | null>}
+ */
+export async function pickZipFile() {
+  const picker = /** @type {any} */ (window).showOpenFilePicker;
+  if (typeof picker === 'function') {
+    try {
+      const [handle] = await picker({
+        types: [
+          {
+            description: 'Slipr show archives (.zip, .slipr)',
+            accept: {
+              'application/zip': ['.zip', '.slipr'],
+              'application/x-slipr': ['.slipr'],
+            },
+          },
+        ],
+      });
+      return await handle.getFile();
+    } catch (err) {
+      if (/** @type {any} */ (err)?.name === 'AbortError') return null;
+    }
+  }
+
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.zip,.slipr,application/zip,application/x-zip-compressed';
+    input.style.display = 'none';
+
+    let resolved = false;
+    const cleanup = () => {
+      input.remove();
+    };
+
+    input.addEventListener('change', () => {
+      if (resolved) return;
+      resolved = true;
+      const file = input.files?.[0] ?? null;
+      cleanup();
+      resolve(file);
+    });
+
+    window.addEventListener('focus', () => {
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          resolve(input.files?.[0] ?? null);
+        }
+      }, 500);
+    }, { once: true });
+
+    document.body.append(input);
+    input.click();
+  });
+}
+
+/**
+ * Prompt user when multiple presentations are found in the archive.
+ * @param {string} archiveName
+ * @param {string[]} candidateShows
+ * @returns {Promise<string | null>}
+ */
+export function chooseShowFromArchive(archiveName, candidateShows) {
+  return new Promise((resolve) => {
+    openDialog('Choose presentation in archive', (close) => {
+      const list = h('ul', { style: 'list-style: none; padding: 0; margin: 12px 0;' }, candidateShows.map((path) => {
+        const display = path ? path.replace(/\/$/, '') : '(root)';
+        return h('li', { style: 'margin-bottom: 8px;' }, [
+          h('button', {
+            type: 'button',
+            class: 'slipr-btn',
+            style: 'width: 100%; text-align: left; padding: 8px 12px;',
+            onclick: () => {
+              close();
+              resolve(path);
+            },
+          }, [display]),
+        ]);
+      }));
+
+      const form = h('div', { class: 'slipr-dialog-form' }, [
+        h('p', {}, [`The zip archive "${archiveName}" contains multiple presentations. Choose which one to open in the editor:`]),
+        list,
+        h('div', { class: 'slipr-dialog-actions' }, [
+          h('button', {
+            type: 'button',
+            class: 'slipr-btn',
+            onclick: () => {
+              close();
+              resolve(null);
+            },
+          }, ['Cancel']),
+        ]),
+      ]);
+
+      return [form];
+    });
+  });
+}
+
+/**
+ * Open a show from a user-uploaded zip file (.zip or .slipr) (I-092).
+ *
+ * @param {import('./store.js').EditorStore | undefined} store
+ * @param {{ file?: File, onStartEditor?: (ctx: any, source: any) => Promise<void> }} [options]
+ */
+export async function openZipFile(store, options = {}) {
+  if (!okToLeave(store)) return;
+  const pickedFile = options.file ?? (await pickZipFile());
+  if (!pickedFile) return;
+
+  const buffer = await pickedFile.arrayBuffer();
+  const entries = await readZip(buffer);
+
+  const allShowFiles = Array.from(entries.keys()).filter((name) => name === 'show.json' || name.endsWith('/show.json'));
+  if (allShowFiles.length === 0) {
+    throw new Error(`The zip archive "${pickedFile.name}" does not contain a show.json file.`);
+  }
+
+  let chosenPath = '';
+  const candidateShows = allShowFiles.map((f) => f === 'show.json' ? '' : f.slice(0, f.lastIndexOf('/') + 1));
+  if (candidateShows.length === 1) {
+    chosenPath = candidateShows[0];
+  } else if (!entries.has('show.json')) {
+    const picked = await chooseShowFromArchive(pickedFile.name, candidateShows);
+    if (picked === null) return; // user cancelled
+    chosenPath = picked;
+  }
+
+  const zipSource = createZipSource(entries, { name: pickedFile.name, path: chosenPath });
+  const ctx = await loadShowFromZip(zipSource);
+
+  if (store) {
+    // Editor is running: switch store context and load stylesheets
+    if (typeof document !== 'undefined') {
+      await addStylesheet(ctx.resolveTemplateAsset(ctx.template.theme ?? 'theme.css'));
+      if (ctx.template.reader) {
+        await addStylesheet(ctx.resolveTemplateAsset(ctx.template.reader));
+      }
+    }
+    store.loadContext(ctx);
+    store.state.zipSource = zipSource;
+    store.state.inMemoryAssets = new Map();
+    const draftKey = getDraftKey({ showId: ctx.show?.id });
+    // @ts-ignore
+    store.draftKey = draftKey;
+    // @ts-ignore
+    if (store.autosave?.setMeta) {
+      // @ts-ignore
+      store.autosave.setMeta({ showId: ctx.show?.id, folderKey: null, showUrl: null });
+    }
+    if (typeof history !== 'undefined' && typeof location !== 'undefined') {
+      history.replaceState(null, '', location.pathname);
+    }
+    if (typeof document !== 'undefined') {
+      showBanner(`Opened "${ctx.show?.meta?.title || pickedFile.name}" from zip archive.`, 'success', { timeout: 3500 });
+      for (const notice of ctx.notices) showBanner(notice, 'info');
+    }
+  } else if (options.onStartEditor) {
+    await options.onStartEditor(ctx, { zipSource });
+    if (typeof history !== 'undefined' && typeof location !== 'undefined') {
+      history.replaceState(null, '', location.pathname);
+    }
+    if (typeof document !== 'undefined') {
+      showBanner(`Opened "${ctx.show?.meta?.title || pickedFile.name}" from zip archive.`, 'success', { timeout: 3500 });
+    }
+  }
+}
+
+/**
+ * Save a show opened from a zip archive to a local folder.
+ * Extracts show.json and all assets to the chosen folder.
+ * @param {import('./store.js').EditorStore} store
+ * @returns {Promise<boolean>}
+ */
+export async function saveZipToFolder(store) {
+  const handle = await pickFolder();
+  if (!handle) return false;
+  if (!(await ensurePermission(handle))) {
+    showBanner(`No permission to write to the folder "${handle.name}".`, 'error');
+    return false;
+  }
+
+  showBanner(`Extracting show into "${handle.name}"…`, 'info', { timeout: 3000 });
+
+  // 1. Write show.json
+  await saveShow(handle, store.state.show);
+
+  // 2. Write original assets from zip source
+  const zipSource = store.state.zipSource;
+  if (zipSource && Array.isArray(zipSource.fileNames)) {
+    const prefix = zipSource.prefix ?? '';
+    for (const name of zipSource.fileNames) {
+      if (name.startsWith(prefix)) {
+        const rel = name.slice(prefix.length);
+        if (rel && rel !== 'show.json' && !rel.endsWith('/')) {
+          const bytes = zipSource.getBytes(rel);
+          if (bytes) {
+            await writeImage(handle, rel, new Blob([bytes]));
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Write in-memory assets
+  if (store.state.inMemoryAssets instanceof Map) {
+    for (const [relPath, blob] of store.state.inMemoryAssets) {
+      await writeImage(handle, relPath, blob);
+    }
+  }
+
+  store.setFolderHandle(handle);
+  store.markSaved(store.state.show);
+  const key = await rememberFolder(handle, { title: store.state.show?.meta?.title });
+  history.replaceState(null, '', `?folder=${encodeURIComponent(key)}`);
+  showBanner(`Saved and extracted to the folder "${handle.name}".`, 'success', { timeout: 3000 });
+  return true;
+}
+
+/**
+ * When Ctrl+S or Save is clicked on a show opened from a zip archive.
+ * @param {import('./store.js').EditorStore} store
+ * @returns {Promise<boolean>}
+ */
+export async function askSaveZipOrFolder(store) {
+  if (!canOpenFolders()) {
+    // Browsers without File System Access (Firefox/Safari): directly export to zip
+    const result = await exportZip(store);
+    if (result) {
+      store.markSaved(store.state.show);
+      return true;
+    }
+    return false;
+  }
+
+  return new Promise((resolve) => {
+    openDialog('Save show', (close) => [
+      h('p', {}, ['This show was opened from a zip archive. You can save it as an updated zip archive, or extract and save it to a folder on your computer.']),
+      h('div', { class: 'slipr-dialog-actions' }, [
+        h('button', { type: 'button', class: 'slipr-btn', onclick: close }, ['Cancel']),
+        h('button', {
+          type: 'button',
+          class: 'slipr-btn',
+          onclick: async () => {
+            close();
+            try {
+              const saved = await saveZipToFolder(store);
+              resolve(saved);
+            } catch (err) {
+              showBanner(`Not saved: ${err instanceof Error ? err.message : String(err)}`, 'error');
+              resolve(false);
+            }
+          },
+        }, ['Extract to folder…']),
+        h('button', {
+          type: 'button',
+          class: 'slipr-btn slipr-btn-primary',
+          onclick: async () => {
+            close();
+            try {
+              const res = await exportZip(store);
+              if (res) {
+                store.markSaved(store.state.show);
+                resolve(true);
+              } else {
+                resolve(false);
+              }
+            } catch (err) {
+              showBanner(`Not saved: ${err instanceof Error ? err.message : String(err)}`, 'error');
+              resolve(false);
+            }
+          },
+        }, ['Save as zip…']),
+      ]),
+    ]);
+  });
+}
+

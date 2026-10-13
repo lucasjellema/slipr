@@ -387,3 +387,198 @@ function isCrossOrigin(url) {
     return false;
   }
 }
+
+/**
+ * Precomputed CRC-32 table (IEEE 802.3 standard polynomial 0xEDB88320).
+ */
+const CRC_TABLE = new Uint32Array(256);
+for (let i = 0; i < 256; i++) {
+  let c = i;
+  for (let k = 0; k < 8; k++) {
+    c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+  }
+  CRC_TABLE[i] = c >>> 0;
+}
+
+/**
+ * Compute the IEEE 802.3 CRC-32 checksum of a byte array (I-092).
+ * @param {Uint8Array} bytes
+ * @returns {number} 32-bit unsigned integer
+ */
+export function crc32(bytes) {
+  let c = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) {
+    c = CRC_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+/**
+ * Format a Date object into MS-DOS time and date bitfields.
+ * @param {Date} [date]
+ * @returns {{ time: number, date: number }}
+ */
+function dosDateTime(date) {
+  const d = date instanceof Date && !isNaN(date.getTime()) ? date : new Date();
+  const year = Math.max(1980, d.getFullYear());
+  const time = (d.getHours() << 11) | (d.getMinutes() << 5) | (Math.floor(d.getSeconds() / 2));
+  const dateNum = ((year - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+  return { time: time & 0xffff, date: dateNum & 0xffff };
+}
+
+/**
+ * @typedef {object} ZipWriteOptions
+ * @property {boolean} [deflate=true]  Whether to compress entries with DEFLATE (deflate-raw).
+ * @property {Date} [date]             Timestamp for entries (defaults to current date).
+ */
+
+/**
+ * Create a zip archive in memory using standard Web APIs (I-092).
+ *
+ * Compresses entries using standard CompressionStream('deflate-raw') when beneficial.
+ * Supports UTF-8 filenames (EFS bit 11) and zero external runtime dependencies (D-001/D-002).
+ *
+ * @param {Map<string, Uint8Array | string | Blob | ArrayBuffer> | Record<string, Uint8Array | string | Blob | ArrayBuffer> | Array<[string, Uint8Array | string | Blob | ArrayBuffer]>} files
+ * @param {ZipWriteOptions} [options]
+ * @returns {Promise<Uint8Array>}
+ */
+export async function writeZip(files, options = {}) {
+  const fileEntries = files instanceof Map
+    ? Array.from(files.entries())
+    : Array.isArray(files)
+      ? files
+      : Object.entries(files);
+
+  const encoder = new TextEncoder();
+  const dos = dosDateTime(options.date);
+  /** @type {Array<{ nameBytes: Uint8Array, crc: number, method: number, compressed: Uint8Array, compressedSize: number, uncompressedSize: number }>} */
+  const entries = [];
+
+  for (const [rawName, rawContent] of fileEntries) {
+    let name = String(rawName).replaceAll('\\', '/');
+    if (name.startsWith('/')) name = name.slice(1);
+    if (!name) continue;
+
+    /** @type {Uint8Array} */
+    let uncompressed;
+    if (typeof rawContent === 'string') {
+      uncompressed = encoder.encode(rawContent);
+    } else if (rawContent instanceof Uint8Array) {
+      uncompressed = rawContent;
+    } else if (rawContent instanceof ArrayBuffer) {
+      uncompressed = new Uint8Array(rawContent);
+    } else if (rawContent && typeof rawContent.arrayBuffer === 'function') {
+      uncompressed = new Uint8Array(await rawContent.arrayBuffer());
+    } else {
+      uncompressed = encoder.encode(String(rawContent ?? ''));
+    }
+
+    const crc = crc32(uncompressed);
+    const uncompressedSize = uncompressed.length;
+    let compressed = uncompressed;
+    let method = 0;
+
+    if (options.deflate !== false && uncompressedSize > 0) {
+      try {
+        const stream = new Blob([uncompressed]).stream().pipeThrough(new CompressionStream('deflate-raw'));
+        const deflated = new Uint8Array(await new Response(stream).arrayBuffer());
+        if (deflated.length < uncompressedSize) {
+          compressed = deflated;
+          method = 8;
+        }
+      } catch {
+        compressed = uncompressed;
+        method = 0;
+      }
+    }
+
+    const nameBytes = encoder.encode(name);
+    entries.push({
+      nameBytes,
+      crc,
+      method,
+      compressed,
+      compressedSize: compressed.length,
+      uncompressedSize,
+    });
+  }
+
+  // Calculate total zip size: Local headers + data + Central directory headers + EOCD
+  let totalSize = 22;
+  for (const entry of entries) {
+    totalSize += 30 + entry.nameBytes.length + entry.compressedSize;
+    totalSize += 46 + entry.nameBytes.length;
+  }
+
+  const output = new Uint8Array(totalSize);
+  const view = new DataView(output.buffer, output.byteOffset, output.byteLength);
+
+  let localOffset = 0;
+  const localOffsets = [];
+
+  // Write local file headers and file data
+  for (const entry of entries) {
+    localOffsets.push(localOffset);
+
+    view.setUint32(localOffset, SIGNATURE_LOCAL_FILE, true);
+    view.setUint16(localOffset + 4, 20, true); // Version needed to extract (2.0)
+    view.setUint16(localOffset + 6, 0x0800, true); // Bit 11 = UTF-8 encoding
+    view.setUint16(localOffset + 8, entry.method, true);
+    view.setUint16(localOffset + 10, dos.time, true);
+    view.setUint16(localOffset + 12, dos.date, true);
+    view.setUint32(localOffset + 14, entry.crc, true);
+    view.setUint32(localOffset + 18, entry.compressedSize, true);
+    view.setUint32(localOffset + 22, entry.uncompressedSize, true);
+    view.setUint16(localOffset + 26, entry.nameBytes.length, true);
+    view.setUint16(localOffset + 28, 0, true); // Extra field length
+
+    output.set(entry.nameBytes, localOffset + 30);
+    output.set(entry.compressed, localOffset + 30 + entry.nameBytes.length);
+
+    localOffset += 30 + entry.nameBytes.length + entry.compressedSize;
+  }
+
+  const cdOffset = localOffset;
+  let cdPtr = cdOffset;
+
+  // Write central directory file headers
+  for (let i = 0; i < entries.length; i++) {
+    const entry = entries[i];
+    const fileHeaderOffset = localOffsets[i];
+
+    view.setUint32(cdPtr, SIGNATURE_CENTRAL_DIR, true);
+    view.setUint16(cdPtr + 4, 20, true); // Version made by
+    view.setUint16(cdPtr + 6, 20, true); // Version needed
+    view.setUint16(cdPtr + 8, 0x0800, true); // Bit 11 = UTF-8
+    view.setUint16(cdPtr + 10, entry.method, true);
+    view.setUint16(cdPtr + 12, dos.time, true);
+    view.setUint16(cdPtr + 14, dos.date, true);
+    view.setUint32(cdPtr + 16, entry.crc, true);
+    view.setUint32(cdPtr + 20, entry.compressedSize, true);
+    view.setUint32(cdPtr + 24, entry.uncompressedSize, true);
+    view.setUint16(cdPtr + 28, entry.nameBytes.length, true);
+    view.setUint16(cdPtr + 30, 0, true); // Extra field length
+    view.setUint16(cdPtr + 32, 0, true); // File comment length
+    view.setUint16(cdPtr + 34, 0, true); // Disk number start
+    view.setUint16(cdPtr + 36, 0, true); // Internal attributes
+    view.setUint32(cdPtr + 38, 0, true); // External attributes
+    view.setUint32(cdPtr + 42, fileHeaderOffset, true); // Relative offset of local header
+
+    output.set(entry.nameBytes, cdPtr + 46);
+    cdPtr += 46 + entry.nameBytes.length;
+  }
+
+  const cdSize = cdPtr - cdOffset;
+
+  // Write End of Central Directory Record (EOCD)
+  view.setUint32(cdPtr, SIGNATURE_EOCD, true);
+  view.setUint16(cdPtr + 4, 0, true); // Disk number
+  view.setUint16(cdPtr + 6, 0, true); // Start disk
+  view.setUint16(cdPtr + 8, entries.length, true); // CD records on this disk
+  view.setUint16(cdPtr + 10, entries.length, true); // Total CD records
+  view.setUint32(cdPtr + 12, cdSize, true); // CD size
+  view.setUint32(cdPtr + 16, cdOffset, true); // CD offset
+  view.setUint16(cdPtr + 20, 0, true); // Comment length
+
+  return output;
+}

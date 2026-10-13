@@ -60,10 +60,11 @@
       <section id="start">
         <h1>Getting started</h1>
         <p>The Slipr Editor creates and changes Slipr shows in the browser. You pick layouts, fill in fields, add images and write the reader layer; the preview shows the result exactly as the viewer will. You never have to edit JSON by hand.</p>
-        <p class="note"><strong>Browser:</strong> use <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>. Opening, creating and saving show folders, adding images, and presenting a show from a folder need the File System Access API, which only these browsers have. In other browsers you can look at a show opened by its address, but not save it.</p>
+        <p class="note"><strong>Browser:</strong> use <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong> to open, create and save show folders directly on disk (via the File System Access API). In <strong>all browsers</strong> (including Firefox and Safari), you can open, edit and export shows as portable <strong>zip archives</strong> (<code>.zip</code> or <code>.slipr</code>) completely offline in memory.</p>
         <p>Without a show, the editor opens on the <strong>start screen</strong>:</p>
         <ul>
-          <li><strong>Open show folder…</strong>: pick a folder that contains a <code>show.json</code>.</li>
+          <li><strong>Open show folder…</strong>: pick a folder that contains a <code>show.json</code> (Chrome/Edge).</li>
+          <li><strong>Open zip archive…</strong>: open a show from an uploaded <code>.zip</code> or <code>.slipr</code> archive. Works in all browsers.</li>
           <li><strong>New show…</strong>: start a show from a template in an empty folder.</li>
           <li><strong>Recent shows</strong>: the folders you opened before in this browser. One click reopens a show.</li>
           <li>The <strong>demo show</strong> link opens the example show that comes with Slipr. Use it to look around.</li>
@@ -750,6 +751,23 @@
           <dd>Part of the template is missing from Slipr's <code>templates/</code> folder. The file still opens, but may look different.</dd>
         </dl>
         <p>More in <a href="#trouble">Troubleshooting</a>. The same export is available as a command for the Slipr folder: <code>npm run export -- shows/&lt;name&gt;</code>.</p>
+
+        <h3>Export to zip archive (.zip / .slipr)</h3>
+        <p><strong>Export Zip…</strong> packages the current show as a standard zip archive (<code>.zip</code> or <code>.slipr</code>) containing <code>show.json</code>, all referenced images, data files and local documents, including any unsaved in-memory edits. Compression happens entirely in the browser using native Web Streams without any external tools.</p>
+        <ul>
+          <li><strong>Portable show package:</strong> easily share, back up or transfer your presentation without bundling the entire viewer code.</li>
+          <li><strong>Re-openable in the editor:</strong> anyone with the zip archive can open it with <strong>Open Zip…</strong> in the editor to continue editing.</li>
+          <li><strong>Direct presentation in viewer:</strong> the viewer can present zip files directly over the web via <code>?zip=&lt;url&gt;</code> (I-087).</li>
+        </ul>
+
+        <h3>Open a zip archive</h3>
+        <p>Click <strong>Open Zip…</strong> in the toolbar or <strong>Open zip archive…</strong> on the start screen. You can choose any <code>.zip</code> or <code>.slipr</code> file:</p>
+        <ul>
+          <li>The archive is decompressed client-side in memory without uploading to any server.</li>
+          <li>Works in all modern browsers, including Firefox and Safari where local directory pickers are unavailable.</li>
+          <li>If the archive contains multiple presentations (such as a multi-deck repository), the editor asks which presentation to open.</li>
+          <li>When you press <kbd>Ctrl</kbd>+<kbd>S</kbd> or click <strong>Save</strong> on an unzipped show, you can export it as an updated zip archive or extract and save it into a local folder on your computer.</li>
+        </ul>
       </section>
 
       <section id="undo">

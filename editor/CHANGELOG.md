@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Export and import zip archives (.zip / .slipr) in editor (I-092)
+- **Added** **Export to zip archive (`.zip` / `.slipr`)**: an **Export Zip…** action in the editor toolbar (`editor/js/export-zip.js`). Packages `show.json`, referenced images, data files, and local documents in memory (including unsaved edits). Compresses client-side using standard Web Streams (`CompressionStream('deflate-raw')`) via `shared/zip.js` with pure JS CRC-32 and UTF-8 filenames; triggers `showSaveFilePicker` (`.zip` / `.slipr`) or browser download.
+- **Added** **Import from uploaded zip archive**: an **Open zip archive…** button on the start screen and an **Open Zip…** button in the toolbar (`editor/js/files.js`). Decompresses client-side in memory without server upload; handles root shows, single-directory wrappers (e.g. GitHub archives), and prompts if multiple presentations are found.
+- **Added** cross-browser editing and in-memory asset support: enabled authoring, image drop/paste, and zip re-exporting in browsers lacking the File System Access directory picker (Firefox, Safari). Saving an unzipped show offers saving as zip or extracting/saving to a disk folder.
+- **Added** unit test suite `editor/test/export-zip.test.js` (5 tests) and extended `shared/test/zip.test.js` (22 tests).
+
 ### 2026-10-13: Crop pictures (I-090)
 - **Added** **Crop…** on every picture (image slot, card image, reader image, extra image): a dialog with a frame to drag and resize, shapes (free, like the picture, 1:1, 4:3, 3:2, 16:9, portrait), Left / Top / Width / Height in %, keyboard moves; one undo step. **Show the whole picture** removes the crop. Picture style previews show the crop (`ui/crop-dialog.js`, `js/crop-values.js`, tested).
 - **Changed** the hotspot editor shows a cropped picture cropped and maps clicks, drags and arrow keys to positions on the whole picture; a hotspot outside the crop has no marker and its row says so.

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { readZip, createZipSource, downloadZip, mimeType } from '../zip.js';
+import { readZip, createZipSource, downloadZip, mimeType, writeZip, crc32 } from '../zip.js';
 import { loadShowFromZip, LoadError } from '../load.js';
 import { repoRoot } from './helpers.js';
 
@@ -402,3 +402,89 @@ describe('loadShowFromZip: integration with loadShow (I-087)', () => {
     assert.ok(ctx.validation.warnings.some((w) => w.code === 'missing-file' && w.message.includes('nonexistent.png')));
   });
 });
+
+describe('Zip archive writer (I-092)', () => {
+  test('crc32 accurately computes checksums matching zlib', () => {
+    const testCases = [
+      new Uint8Array(0),
+      new TextEncoder().encode('hello'),
+      new TextEncoder().encode('The quick brown fox jumps over the lazy dog'),
+      new Uint8Array([0, 1, 2, 3, 255, 254, 253, 128, 64, 32]),
+    ];
+    for (const bytes of testCases) {
+      assert.equal(crc32(bytes), zlib.crc32(bytes));
+    }
+  });
+
+  test('writes uncompressed (STORE) zip files decodable by readZip', async () => {
+    const files = {
+      'hello.txt': 'Hello World!',
+      'data/number.bin': new Uint8Array([10, 20, 30, 40]),
+    };
+    const zipBytes = await writeZip(files, { deflate: false });
+    const entries = await readZip(zipBytes);
+
+    assert.equal(entries.size, 2);
+    assert.equal(new TextDecoder().decode(entries.get('hello.txt')), 'Hello World!');
+    assert.deepEqual(entries.get('data/number.bin'), new Uint8Array([10, 20, 30, 40]));
+  });
+
+  test('writes compressed (DEFLATE) zip files decodable by readZip', async () => {
+    const longText = 'Repeat text '.repeat(100);
+    const files = new Map([
+      ['doc.txt', longText],
+      ['empty.txt', ''],
+    ]);
+    const zipBytes = await writeZip(files, { deflate: true });
+    // Compressed size should be much smaller than raw uncompressed
+    assert.ok(zipBytes.length < longText.length);
+
+    const entries = await readZip(zipBytes);
+    assert.equal(entries.size, 2);
+    assert.equal(new TextDecoder().decode(entries.get('doc.txt')), longText);
+    assert.deepEqual(entries.get('empty.txt'), new Uint8Array(0));
+  });
+
+  test('handles Blob, ArrayBuffer, and UTF-8 filenames', async () => {
+    const files = [
+      ['docs/résumé.txt', new Blob(['Mon résumé avec accents et emojis 🚀'])],
+      ['images/buffer.dat', new Uint8Array([1, 2, 3]).buffer],
+    ];
+    const zipBytes = await writeZip(files);
+    const entries = await readZip(zipBytes);
+
+    assert.equal(entries.size, 2);
+    assert.equal(new TextDecoder().decode(entries.get('docs/résumé.txt')), 'Mon résumé avec accents et emojis 🚀');
+    assert.deepEqual(entries.get('images/buffer.dat'), new Uint8Array([1, 2, 3]));
+  });
+
+  test('round-trip with loadShowFromZip', async () => {
+    const showJson = {
+      slipr: '0.1',
+      id: 'round-trip-zip',
+      meta: { title: 'Round Trip Test', language: 'en' },
+      template: { ref: '/templates/default' },
+      slides: [
+        {
+          id: 's-1',
+          layout: 'title',
+          content: { title: 'Hello from Zip Writer' },
+        },
+      ],
+    };
+
+    const zipBytes = await writeZip({
+      'show.json': JSON.stringify(showJson, null, 2),
+      'images/icon.png': new Uint8Array([0x89, 0x50, 0x4e, 0x47]),
+    });
+
+    const entries = await readZip(zipBytes);
+    const source = createZipSource(entries, { name: 'round-trip.zip' });
+    const ctx = await loadShowFromZip(source, { appBase, fetch: fsFetch, createObjectURL });
+
+    assert.equal(ctx.show.id, 'round-trip-zip');
+    assert.equal(ctx.show.meta.title, 'Round Trip Test');
+    assert.equal(ctx.validation.ok, true);
+  });
+});
+

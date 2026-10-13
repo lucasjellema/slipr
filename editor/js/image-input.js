@@ -7,7 +7,7 @@
  * image; the copied file stays (images are never deleted automatically).
  */
 import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath } from './io/images.js';
-import { ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
+import { canOpenFolders, ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
@@ -83,24 +83,32 @@ export function pasteTargetSlot(template, slide) {
  */
 async function addImage(store, { slideId, file, fallbackName, read, write }) {
   const handle = store.state.folderHandle;
-  if (!handle) {
+  if (!handle && !store.state.zipSource && canOpenFolders()) {
     showBanner('To add images, Slipr needs to write to the show folder. Choose it, then add the image again.', 'info', { timeout: 6000 });
     askForShowFolder(store);
     return;
   }
   const type = imageType(file);
   if (!type) throw new Error(`"${file.name || 'This file'}" is not a supported image (PNG, JPEG, GIF, WebP, AVIF or SVG).`);
-  if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
+  if (handle && !(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
 
   const slideOf = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
   if (!slideOf()) return;
   const bytes = await file.arrayBuffer();
   const blob = file.type === type ? file : new Blob([bytes], { type });
   const newPath = await imagePath({ name: file.name, type, bytes }, fallbackName);
-  // The same image may already be in the folder under another name: reuse it.
-  const suffix = contentSuffix(newPath);
-  const path = (suffix && (await findImageBySuffix(handle, suffix))) || newPath;
-  if (path === newPath) await writeImage(handle, path, blob);
+
+  let path = newPath;
+  if (handle) {
+    // The same image may already be in the folder under another name: reuse it.
+    const suffix = contentSuffix(newPath);
+    path = (suffix && (await findImageBySuffix(handle, suffix))) || newPath;
+    if (path === newPath) await writeImage(handle, path, blob);
+  } else {
+    // In-memory show (e.g. from zip archive or browser without File System Access)
+    if (!store.state.inMemoryAssets) store.state.inMemoryAssets = new Map();
+    store.state.inMemoryAssets.set(path, blob);
+  }
   store.state.registerAsset?.(path, blob);
 
   const previous = read(slideOf());

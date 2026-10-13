@@ -18,9 +18,9 @@ import { serializeShow } from '../io/serialize.js';
  * Start screen: open a folder, create a show, reopen a recent folder.
  * @param {HTMLElement} container
  * @param {{ message?: string, recent: RecentFolder[], canOpenFolders: boolean,
- *   onOpen: () => void, onNew: () => void, onRecent: (key: string) => void }} options
+ *   onOpen: () => void, onOpenZip?: () => void, onNew: () => void, onRecent: (key: string) => void }} options
  */
-export function renderStartScreen(container, { message, recent, canOpenFolders, onOpen, onNew, onRecent }) {
+export function renderStartScreen(container, { message, recent, canOpenFolders, onOpen, onOpenZip, onNew, onRecent }) {
   container.replaceChildren(
     h('div', { class: 'slipr-screen-card' }, [
       h('h1', { class: 'slipr-screen-title' }, ['Slipr Editor']),
@@ -28,9 +28,13 @@ export function renderStartScreen(container, { message, recent, canOpenFolders, 
       canOpenFolders
         ? h('div', { class: 'slipr-screen-actions' }, [
             h('button', { class: 'slipr-btn slipr-btn-primary', onclick: onOpen }, ['Open show folder…']),
+            h('button', { class: 'slipr-btn', onclick: onOpenZip }, ['Open zip archive…']),
             h('button', { class: 'slipr-btn', onclick: onNew }, ['New show…']),
           ])
-        : h('p', { class: 'slipr-help' }, ['Opening and saving show folders needs Chrome or Edge.']),
+        : h('div', { class: 'slipr-screen-actions' }, [
+            h('button', { class: 'slipr-btn slipr-btn-primary', onclick: onOpenZip }, ['Open zip archive…']),
+            h('p', { class: 'slipr-help' }, ['Opening and saving local folders needs Chrome or Edge. You can open and export .zip and .slipr show archives in any browser.']),
+          ]),
       recent.length && canOpenFolders
         ? h('div', { class: 'slipr-screen-recent' }, [
             h('h2', { class: 'slipr-label' }, ['Recent shows']),

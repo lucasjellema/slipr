@@ -11,8 +11,9 @@ import { createStore } from './store.js';
 import { addStylesheet, h, isTextEntry } from './dom.js';
 import { addImageToSlot, imageFileFrom, pasteTargetSlot } from './image-input.js';
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
-import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, save } from './files.js';
+import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, openZipFile, save } from './files.js';
 import { exportShow } from './export.js';
+import { exportZip } from './export-zip.js';
 import { mountShowGrid } from './ui/show-grid.js';
 import { mountGlossaryEditor } from './ui/glossary-editor.js';
 import { watchTheme } from './theme.js';
@@ -124,6 +125,7 @@ async function showStartScreen(message) {
     canOpenFolders: canOpenFolders(),
     recent: folders.slice(0, 8),
     onOpen: () => run(() => openFolder()),
+    onOpenZip: () => run(() => openZipFile(undefined, { onStartEditor: (ctx, src) => startEditor(ctx, src) })),
     onNew: () => run(() => newShow()),
     onRecent: (key) => run(async () => {
       const record = await recallFolder(key);
@@ -135,9 +137,9 @@ async function showStartScreen(message) {
 /**
  * Mount the editor for a loaded show.
  * @param {import('../../shared/load.js').ShowContext} ctx
- * @param {{ showUrl?: string, folderHandle?: FileSystemDirectoryHandle }} source
+ * @param {{ showUrl?: string, folderHandle?: FileSystemDirectoryHandle, zipSource?: import('../../shared/zip.js').ZipSource | null }} source
  */
-async function startEditor(ctx, { showUrl, folderHandle }) {
+async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
   hideScreen();
 
   // 1. Template stylesheets (theme.css and reader.css)
@@ -147,7 +149,7 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   }
 
   // 2. Store
-  const store = createStore(ctx.show, { ...ctx, folderHandle: folderHandle ?? null });
+  const store = createStore(ctx.show, { ...ctx, folderHandle: folderHandle ?? null, zipSource: zipSource ?? null });
   guardUnsavedChanges(store);
   for (const notice of ctx.notices) showBanner(notice, 'info');
 
@@ -168,9 +170,11 @@ async function startEditor(ctx, { showUrl, folderHandle }) {
   if (toolbarEl) {
     mountToolbar(toolbarEl, store, {
       onOpen: () => run(() => openFolder(store)),
+      onOpenZip: () => run(() => openZipFile(store)),
       onNew: () => run(() => newShow(store)),
       onSave: () => run(() => save(store)),
       onExport: () => run(() => exportShow(store, showUrl)),
+      onExportZip: () => run(() => exportZip(store)),
       onGrid: () => grid.toggle(),
       onGlossary: () => glossary.toggle(),
       onPresent: () => present('audience'),
