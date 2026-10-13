@@ -342,7 +342,16 @@ http://localhost:8080/viewer/?zip=https://example.com/repo-main.zip&amp;path=sho
         <p>The viewer downloads the zip file client-side, showing download progress, and decompresses it entirely in memory using standard browser streams (keeping Slipr fully offline once loaded, with zero backend servers needed). Images and assets become in-memory blob URLs.</p>
         <p><strong>GitHub compatibility:</strong> Zip files from GitHub (where files are enclosed in a top-level folder such as <code>repo-main/show.json</code>) are auto-detected automatically. For repositories with multiple presentations, specify which one to present with the <code>&amp;path=</code> parameter.</p>
 
+        <h3>Importing local zip archives (.zip / .slipr)</h3>
+        <p>You can open a local <code>.zip</code> or <code>.slipr</code> presentation archive from your computer directly in the viewer without running a server or uploading any files:</p>
+        <ul>
+          <li><strong>File chooser:</strong> Click <strong>Open zip archive…</strong> on the viewer start page to choose a presentation archive from your disk. Works in all modern browsers (Chrome, Edge, Firefox, Safari).</li>
+          <li><strong>Drag and drop:</strong> Drag and drop any <code>.zip</code> or <code>.slipr</code> file directly onto the viewer start page.</li>
+        </ul>
+        <p>The archive is decompressed in memory using browser Web Streams. The presentation is remembered in browser storage under <code>viewer/?archive=&lt;key&gt;</code>, enabling seamless mode switching (<kbd>A</kbd> / <kbd>R</kbd>) between Audience and Reader mode, page reloads, and deep links. If the archive contains multiple shows, a choice list lets you choose which one to present.</p>
+
         <h3>Single-file HTML exports (offline presenting)</h3>
+
         <p>Shows can be compiled into a single, self-contained offline HTML file using the Slipr Editor's <strong>Export…</strong> button or the CLI:</p>
         <pre><code>npm run export -- shows/demo</code></pre>
         <p>The resulting <code>exports/demo.html</code> contains the entire presentation, template styles, fonts, images, diagrams, and runtime bundled together. It requires zero backend servers, zero installations, and presents seamlessly offline when double-clicked on any computer.</p>

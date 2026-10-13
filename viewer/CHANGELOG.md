@@ -4,7 +4,14 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Import local zip archives (.zip / .slipr)
+- **Added** **Open zip archive…** button and drag-and-drop zone on viewer start page: import presentations directly from disk in any browser (Chrome, Edge, Firefox, Safari) without server uploads or installations.
+- **Added** `viewer/?archive=<key>` parameter backed by IndexedDB (`slipr-archives`) via `shared/archive-handles.js`. Enables seamless mode switching (<kbd>A</kbd> / <kbd>R</kbd>) between Audience and Reader mode, page reloads, and deep links for local presentations.
+- **Added** multi-show archive detection: when an uploaded zip contains multiple presentations, a selection view prompts the user to choose which show to view.
+- **Added** recent archives list on the viewer start page for quick access to previously opened local presentations.
+
 ### 2026-10-13: Present from a zip URL (I-087)
+
 - **Added** `?zip=<url>` parameter: downloads a zipped Slipr presentation via `fetch()` with live progress bar, decompresses client-side in memory with standard Web Streams `DecompressionStream('deflate-raw')` without external dependencies or backend, and presents in audience or reader mode.
 - **Added** GitHub compatibility: archives with single top-level directory wrappers (e.g. `repo-main/show.json`) are auto-detected; optional `&path=` allows selecting a specific show in repositories with multiple presentations.
 - **Added** clear diagnostic feedback for CORS restrictions, missing files, and 404s.

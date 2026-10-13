@@ -6,7 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Import local presentation archives in viewer
+- **Added** `shared/archive-handles.js`: client-side presentation archive storage in IndexedDB (`slipr-archives`) with in-memory fallback for private and test modes.
+- **Added** `shared/zip.js` shared `pickZipFile()` function for picking `.zip` and `.slipr` files across editor and viewer.
+- **Added** Viewer local zip import: **Open zip archive…** and drag-and-drop support on the start screen; client-side decompression, multi-show selection, and persistence under `?archive=<key>` for seamless mode switching (<kbd>A</kbd> / <kbd>R</kbd>).
+
 ### 2026-10-13: Export to zip and import from zip in editor (I-092)
+
 - **Added** `writeZip()` and `crc32()` in `shared/zip.js`: in-memory zip archive writer using Web Streams `CompressionStream('deflate-raw')` with pure JS IEEE 802.3 CRC-32 and UTF-8 filenames, zero npm runtime dependencies (D-001, D-002).
 - **Added** `editor/js/export-zip.js`: **Export Zip…** packages `show.json`, referenced images, data files, and local documents into `.zip` or `.slipr` archives directly client-side.
 - **Added** `openZipFile()` in `editor/js/files.js`: **Open zip archive…** on start screen and **Open Zip…** in toolbar. Decompresses archives in memory without server upload; handles root shows, single-directory wrappers, and prompts for multi-presentation archives.

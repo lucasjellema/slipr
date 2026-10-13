@@ -69,12 +69,14 @@ viewer/test/
 ## Start-up (`main.js`)
 
 0. A single-file export (I-054; `globalThis.SLIPR_BUNDLE` is defined by the exported page before any module runs) → `loadShow()` with the bundle's `fetch` for the bundled `show.json`, template and layouts; `resolveAsset` and `resolveTemplateAsset` are wrapped so show and template files become object URLs (`SLIPR_BUNDLE.url`). `addStylesheet` (`js/dom.js`) maps virtual URLs the same way, so module-relative stylesheets (`audience.css`, `reader.css`, Reveal's CSS) load from the file too. URL parameters (`mode`, `profile`, `depth`, `path`) and hashes work as usual. How the file is packed: `docs/specs/I-054-single-file-export.md`.
-1. No `show`, `folder` or `zip` parameter → help page with links to the demo, and "Open a show folder…" where the File System Access API exists (it remembers the folder and reloads as `?folder=<key>`).
+1. No `show`, `folder`, `zip`, or `archive` parameter → help page with **Open zip archive…**, drag-and-drop zone, list of recent archives in this browser, and **Open a show folder…** (where File System Access exists).
 2. `?zip=<url>` → downloads the zip archive client-side (`downloadZip()` in `shared/zip.js`) with progress updates, decompresses in memory using standard browser streams (`readZip()`), adapts files into an in-memory source with `blob:` URLs (`createZipSource()`), and loads via `loadShowFromZip()` (I-087). Handles GitHub archive single-directory wrappers and subdirectories via optional `&path=`.
-3. `?folder=<key>` → the handle comes from `shared/folder-handles.js` and the show from `loadShowFromFolder()` (D-012). An unknown key shows the load-error page. Without read permission, an access page asks for it from a click (`showAccessPage()`). Loader notices (template resolved by name) go to the console.
-4. `loadShow()`, `loadShowFromFolder()`, or `loadShowFromZip()` → a `LoadError` (not found, invalid JSON, server unreachable, CORS restriction) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.
-5. Validation errors → validation-error page listing each issue with its path. Warnings go to the console (collapsed group) and never block a show.
-6. Set `document.title` and `lang`, load the template's `theme.css`, then dynamically `import()` the mode module, so Reveal.js is only fetched in audience mode.
+3. `?archive=<key>` → a local `.zip` or `.slipr` archive remembered in browser storage (`shared/archive-handles.js`, IndexedDB `slipr-archives`). Recalls the archive buffer, decompresses with `readZip()`, adapts via `createZipSource()`, and presents with `loadShowFromZip()`. When an archive contains multiple presentations, prompts with `showArchiveChoice()`. Mode switching (`A` / `R`) preserves `?archive=<key>` across the session.
+4. `?folder=<key>` → the handle comes from `shared/folder-handles.js` and the show from `loadShowFromFolder()` (D-012). An unknown key shows the load-error page. Without read permission, an access page asks for it from a click (`showAccessPage()`). Loader notices (template resolved by name) go to the console.
+5. `loadShow()`, `loadShowFromFolder()`, or `loadShowFromZip()` → a `LoadError` (not found, invalid JSON, server unreachable, CORS restriction) shows the load-error page. The "start the dev server" hint is only shown when the server could not be reached at all.
+6. Validation errors → validation-error page listing each issue with its path. Warnings go to the console (collapsed group) and never block a show.
+7. Set `document.title` and `lang`, load the template's `theme.css`, then dynamically `import()` the mode module, so Reveal.js is only fetched in audience mode.
+
 
 ## Audience mode
 

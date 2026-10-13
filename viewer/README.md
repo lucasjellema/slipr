@@ -26,17 +26,21 @@ A show folder anywhere on your computer opens with **Open a show folder…** on 
 
 A zipped show archive can also be loaded directly from any web server or GitHub release using `viewer/?zip=https://example.com/show.zip` (I-087). The archive is downloaded client-side and decompressed in memory. Single-directory wrappers (e.g. GitHub archives `repo-main/show.json`) are auto-detected; for archives with multiple shows, specify which one with `&path=`.
 
+A local `.zip` or `.slipr` presentation archive can be opened directly from disk using **Open zip archive…** on the start page, or by dragging and dropping the archive file onto the viewer start page. The archive is decompressed in memory and remembered in browser storage as `viewer/?archive=<key>`, preserving seamless mode switching (`A` / `R`), reloads, and slide deep links across browsers (Chrome, Edge, Firefox, Safari).
+
 | URL parameter | Meaning |
 |---|---|
 | `show` | Path or URL to `show.json` |
 | `folder` | Instead of `show`: a show folder remembered in this browser (D-012) |
-| `zip` | Instead of `show` / `folder`: URL to a zipped show archive (I-087) |
-| `path` | When loading a `zip`: subfolder inside the archive. In reader mode: preselect a path, e.g. `path=quick` |
+| `archive` | Instead of `show`: a local zip/slipr archive remembered in this browser |
+| `zip` | Instead of `show` / `folder` / `archive`: URL to a zipped show archive (I-087) |
+| `path` | When loading an `archive` or `zip`: subfolder inside the archive. In reader mode: preselect a path, e.g. `path=quick` |
 | `mode` | `audience` (default) or `reader` |
 | `profile` | Reader mode: preselect a profile, e.g. `profile=dev` |
 | `depth` | Reader mode: detail level `1` essentials, `2` standard (default), `3` deep dive |
 | `#/5` or `#/s-architecture` | Audience mode: go to slide 5 (0-based) or to the slide with that id. `#/s-problem/2` also selects a build step |
 | `#s-05` / `#s-05/b3` | Reader mode: go to a slide, or to a block within it |
+
 
 Profile, path and depth in the URL let you send a tailored link, for example "the manager's 5-minute version".
 

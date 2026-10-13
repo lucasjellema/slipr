@@ -582,3 +582,68 @@ export async function writeZip(files, options = {}) {
 
   return output;
 }
+
+/**
+ * Pick a zip file (.zip or .slipr) using the File System Access API if available,
+ * or falling back to a hidden <input type="file"> element.
+ * Safe to import in non-browser environments (returns null if window/document is undefined).
+ *
+ * @returns {Promise<File | null>}
+ */
+export async function pickZipFile() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return null;
+
+  const picker = /** @type {any} */ (window).showOpenFilePicker;
+  if (typeof picker === 'function') {
+    try {
+      const [handle] = await picker({
+        types: [
+          {
+            description: 'Slipr show archives (.zip, .slipr)',
+            accept: {
+              'application/zip': ['.zip', '.slipr'],
+              'application/x-slipr': ['.slipr'],
+            },
+          },
+        ],
+      });
+      return await handle.getFile();
+    } catch (err) {
+      if (/** @type {any} */ (err)?.name === 'AbortError') return null;
+    }
+  }
+
+  return new Promise((resolve) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.zip,.slipr,application/zip,application/x-zip-compressed';
+    input.style.display = 'none';
+
+    let resolved = false;
+    const cleanup = () => {
+      input.remove();
+    };
+
+    input.addEventListener('change', () => {
+      if (resolved) return;
+      resolved = true;
+      const file = input.files?.[0] ?? null;
+      cleanup();
+      resolve(file);
+    });
+
+    window.addEventListener('focus', () => {
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          cleanup();
+          resolve(input.files?.[0] ?? null);
+        }
+      }, 500);
+    }, { once: true });
+
+    document.body.append(input);
+    input.click();
+  });
+}
+

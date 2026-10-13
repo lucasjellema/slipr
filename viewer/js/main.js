@@ -6,16 +6,18 @@
  */
 import { loadShow, loadShowFromFolder, loadShowFromZip, LoadError } from '../../shared/load.js';
 import { createFolderSource } from '../../shared/folder-source.js';
-import { downloadZip, readZip, createZipSource } from '../../shared/zip.js';
+import { downloadZip, readZip, createZipSource, pickZipFile } from '../../shared/zip.js';
 import { recallFolder, rememberFolder } from '../../shared/folder-handles.js';
+import { listArchives, recallArchive, rememberArchive } from '../../shared/archive-handles.js';
 import { addStylesheet } from './dom.js';
-import { showAccessPage, showHelp, showLoadError, showProgress, showValidationErrors } from './error-view.js';
+import { showAccessPage, showArchiveChoice, showHelp, showLoadError, showProgress, showValidationErrors } from './error-view.js';
 
 const app = /** @type {HTMLElement} */ (document.getElementById('app'));
 const params = new URLSearchParams(location.search);
 const showParam = params.get('show');
 const folderParam = params.get('folder');
 const zipParam = params.get('zip');
+const archiveParam = params.get('archive');
 const pathParam = params.get('path');
 const mode = params.get('mode') === 'reader' ? 'reader' : 'audience';
 
@@ -43,16 +45,28 @@ async function main() {
     await openZipShow(zipParam, pathParam);
     return;
   }
+  if (archiveParam) {
+    await openArchiveShow(archiveParam, pathParam);
+    return;
+  }
   if (folderParam) {
     await openFolderShow(folderParam);
     return;
   }
   if (!showParam) {
-    showHelp(app, { onOpenFolder: 'showDirectoryPicker' in window ? pickFolder : undefined });
+    setupWindowDragDrop();
+    const recentArchives = await listArchives();
+    showHelp(app, {
+      onOpenFolder: 'showDirectoryPicker' in window ? pickFolder : undefined,
+      onOpenZip: () => importZipFile(),
+      onDropZip: (file) => importZipFile(file),
+      recentArchives,
+    });
     return;
   }
   await present(() => loadShow(showParam));
 }
+
 
 /**
  * Load and present a show from a zip file URL (I-087).
@@ -97,9 +111,142 @@ async function openZipShow(zipUrl, showPath) {
     throw err;
   }
 
+  await loadAndPresentArchive(entries, zipUrl, showPath);
+}
+
+/**
+ * Load and present a show from a remembered local archive (IndexedDB).
+ * @param {string} key
+ * @param {string | null} [showPath]
+ */
+async function openArchiveShow(key, showPath) {
+  const record = await recallArchive(key);
+  if (!record) {
+    showLoadError(app, {
+      title: 'This presentation archive is not known here',
+      message: 'Archive links only work in the browser where the zip file was opened. Open the zip file again on the viewer start page.',
+    });
+    return;
+  }
+
+  showProgress(app, { title: 'Extracting presentation…', percent: null });
+
+  let entries;
+  try {
+    const bytes = record.data instanceof Blob ? await record.data.arrayBuffer() : record.data;
+    entries = await readZip(bytes);
+  } catch (err) {
+    if (err instanceof LoadError) {
+      showLoadError(app, { title: 'The zip file could not be read', message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  const allShowFiles = Array.from(entries.keys()).filter((name) => name === 'show.json' || name.endsWith('/show.json'));
+  const candidateShows = allShowFiles.map((f) => f === 'show.json' ? '' : f.slice(0, f.lastIndexOf('/') + 1));
+  if (!showPath && candidateShows.length > 1 && !entries.has('show.json')) {
+    showArchiveChoice(app, {
+      name: record.name,
+      candidateShows,
+      onSelect: async (p) => {
+        const url = new URL(location.href);
+        if (p) url.searchParams.set('path', p.replace(/\/$/, ''));
+        else url.searchParams.delete('path');
+        history.replaceState(null, '', url.href);
+        await loadAndPresentArchive(entries, record.name, p);
+      },
+    });
+    return;
+  }
+
+  await loadAndPresentArchive(entries, record.name, showPath);
+}
+
+/**
+ * Import a presentation from a local zip file (user selected or dropped).
+ * @param {File} [pickedFile]
+ */
+async function importZipFile(pickedFile) {
+  const file = pickedFile ?? (await pickZipFile());
+  if (!file) return;
+
+  showProgress(app, { title: 'Reading presentation archive…', percent: null });
+
+  let buffer;
+  try {
+    buffer = await file.arrayBuffer();
+  } catch (err) {
+    showLoadError(app, { title: 'The file could not be read', message: err instanceof Error ? err.message : String(err) });
+    return;
+  }
+
+  showProgress(app, { title: 'Extracting presentation…', percent: null });
+
+  let entries;
+  try {
+    entries = await readZip(buffer);
+  } catch (err) {
+    if (err instanceof LoadError) {
+      showLoadError(app, { title: 'The zip file could not be read', message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  const allShowFiles = Array.from(entries.keys()).filter((name) => name === 'show.json' || name.endsWith('/show.json'));
+  if (allShowFiles.length === 0) {
+    showLoadError(app, {
+      title: 'No show in this archive',
+      message: `The archive "${file.name}" has no show.json. Open a valid Slipr presentation archive.`,
+    });
+    return;
+  }
+
+  let title;
+  const rootOrFirst = entries.get('show.json') || entries.get(allShowFiles[0]);
+  if (rootOrFirst) {
+    try {
+      title = JSON.parse(new TextDecoder().decode(rootOrFirst))?.meta?.title;
+    } catch {
+      // ignore JSON parse errors here
+    }
+  }
+
+  const key = await rememberArchive(buffer, { name: file.name, title });
+
+  const candidateShows = allShowFiles.map((f) => f === 'show.json' ? '' : f.slice(0, f.lastIndexOf('/') + 1));
+  if (candidateShows.length > 1 && !entries.has('show.json')) {
+    showArchiveChoice(app, {
+      name: file.name,
+      candidateShows,
+      onSelect: async (p) => {
+        const url = new URL(location.href);
+        url.search = `?archive=${encodeURIComponent(key)}${p ? `&path=${encodeURIComponent(p.replace(/\/$/, ''))}` : ''}${mode === 'reader' ? '&mode=reader' : ''}`;
+        history.replaceState(null, '', url.href);
+        await loadAndPresentArchive(entries, file.name, p);
+      },
+    });
+    return;
+  }
+
+  const chosenPath = candidateShows.length === 1 ? candidateShows[0] : '';
+  const url = new URL(location.href);
+  url.search = `?archive=${encodeURIComponent(key)}${chosenPath ? `&path=${encodeURIComponent(chosenPath.replace(/\/$/, ''))}` : ''}${mode === 'reader' ? '&mode=reader' : ''}`;
+  history.replaceState(null, '', url.href);
+  await loadAndPresentArchive(entries, file.name, chosenPath);
+}
+
+/**
+ * Adapt decompressed zip entries and present the show.
+ * @param {Map<string, Uint8Array>} entries
+ * @param {string} name
+ * @param {string | null | undefined} showPath
+ */
+async function loadAndPresentArchive(entries, name, showPath) {
   let source;
   try {
-    source = createZipSource(entries, { name: zipUrl, path: showPath ?? undefined });
+    source = createZipSource(entries, { name, path: showPath ?? undefined });
   } catch (err) {
     if (err instanceof LoadError) {
       showLoadError(app, { title: 'Could not open show from zip', message: err.message });
@@ -110,6 +257,43 @@ async function openZipShow(zipUrl, showPath) {
 
   await present(() => loadShowFromZip(source));
 }
+
+let windowDragDropConfigured = false;
+function setupWindowDragDrop() {
+  if (windowDragDropConfigured || typeof window === 'undefined') return;
+  windowDragDropConfigured = true;
+
+  window.addEventListener('dragover', (e) => {
+    if (document.querySelector('.slipr-page')) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+      const dropZone = document.querySelector('.slipr-drop-zone');
+      dropZone?.classList.add('is-dragover');
+    }
+  });
+
+  window.addEventListener('dragleave', (e) => {
+    if (!e.relatedTarget) {
+      const dropZone = document.querySelector('.slipr-drop-zone');
+      dropZone?.classList.remove('is-dragover');
+    }
+  });
+
+  window.addEventListener('drop', (e) => {
+    if (document.querySelector('.slipr-page')) {
+      const dropZone = document.querySelector('.slipr-drop-zone');
+      dropZone?.classList.remove('is-dragover');
+      const file = e.dataTransfer?.files?.[0];
+      if (file && (file.name.endsWith('.zip') || file.name.endsWith('.slipr') || file.type.includes('zip'))) {
+        e.preventDefault();
+        importZipFile(file).catch((err) => {
+          showLoadError(app, { title: 'The zip file could not be opened', message: err instanceof Error ? err.message : String(err) });
+        });
+      }
+    }
+  });
+}
+
 
 /**
  * @param {number} bytes

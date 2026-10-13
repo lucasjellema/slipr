@@ -209,65 +209,8 @@ export function askForShowFolder(store) {
   });
 }
 
-/**
- * Pick a zip file (.zip or .slipr) using the File System Access API if available,
- * or falling back to a hidden <input type="file"> element.
- * @returns {Promise<File | null>}
- */
-export async function pickZipFile() {
-  const picker = /** @type {any} */ (window).showOpenFilePicker;
-  if (typeof picker === 'function') {
-    try {
-      const [handle] = await picker({
-        types: [
-          {
-            description: 'Slipr show archives (.zip, .slipr)',
-            accept: {
-              'application/zip': ['.zip', '.slipr'],
-              'application/x-slipr': ['.slipr'],
-            },
-          },
-        ],
-      });
-      return await handle.getFile();
-    } catch (err) {
-      if (/** @type {any} */ (err)?.name === 'AbortError') return null;
-    }
-  }
+export { pickZipFile } from '../../shared/zip.js';
 
-  return new Promise((resolve) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.zip,.slipr,application/zip,application/x-zip-compressed';
-    input.style.display = 'none';
-
-    let resolved = false;
-    const cleanup = () => {
-      input.remove();
-    };
-
-    input.addEventListener('change', () => {
-      if (resolved) return;
-      resolved = true;
-      const file = input.files?.[0] ?? null;
-      cleanup();
-      resolve(file);
-    });
-
-    window.addEventListener('focus', () => {
-      setTimeout(() => {
-        if (!resolved) {
-          resolved = true;
-          cleanup();
-          resolve(input.files?.[0] ?? null);
-        }
-      }, 500);
-    }, { once: true });
-
-    document.body.append(input);
-    input.click();
-  });
-}
 
 /**
  * Prompt user when multiple presentations are found in the archive.
