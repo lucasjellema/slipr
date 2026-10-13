@@ -66,6 +66,13 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), code with line-by-line highlighting, KaTeX. Mermaid diagrams moved to I-073
 - [ ] **I-008** [viewer] Jump to slide by number or title search (`G`)
 - [ ] **I-009** [viewer] Zoomable "map" overview: chapters as clusters, zoom into a chapter (Prezi-like)
+- [ ] **I-091** [viewer/format/editor] **Morph transition for images between slides** (like PowerPoint's Morph): when the same picture appears on two consecutive slides, it moves and changes smoothly from one to the next: position and size, `focus`, zoom and cropping (I-090), opacity and picture style where possible.
+  - Builds on Reveal.js **auto-animate** (`audience.autoAnimate`, already in the format), which morphs elements with the same `data-id` but only animates position, size and a few CSS properties, not the visible part of an image.
+  - **Matching**: by default the same image file in the same slot or as the same extra image; optionally an explicit `morphId` on an image value (or overlay) to pair different slots or layouts. Decide with Lucas whether matching is automatic or opt-in.
+  - **Rendering crop and focus so they can animate**: e.g. the picture inside a clipping frame, positioned with transforms, so Reveal (or a small Slipr step after Reveal's `autoanimate` event) can tween frame size, image offset and scale together; `object-position` / `object-fit` changes do not animate well.
+  - Text elements (I-089) and other slots could follow the same matching later.
+  - Reader mode is unaffected (no transitions). Respect `prefers-reduced-motion` (jump instead of morph).
+  - Depends on I-090 for cropping; a spike first: what auto-animate already does with matching `data-id`s on images, and what needs custom tweening · todo · —
 
 ### Reader mode
 - [ ] **I-010** [viewer] **Follow the presenter**: during a live talk, readers' devices follow the presenter's current slide, while still allowing them to dive deeper
@@ -88,7 +95,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
 - [ ] **I-024** [editor] Keyboard-first editing shortcuts
-- [ ] **I-026** [editor] Image handling: resize/compress to WebP, crop, focal point
+- [ ] **I-026** [editor] Image handling: resize/compress to WebP, focal point (cropping: I-090)
 - [ ] **I-027** [editor] AI assist (Claude API): draft slides from an outline, tighten bullets, write alt text, **generate a reader layer from speaker notes**, suggest glossary terms
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
 - [ ] **I-029** [editor] Slide library: reuse slides across shows
@@ -112,6 +119,12 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-051** [templates] Auto-generated style-guide page: all layouts, blocks, colors and fonts of a template
 - [ ] **I-052** [templates] Generate `styleguide` JSON from `theme.css` (or vice versa)
 - [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder)
+- [ ] **I-090** [format/editor/viewer/converter] **Image cropping**: define which part of a picture is shown, without editing the file.
+  - **Format** (an option on the image value, so it works for image slots, card images, reader image blocks, hotspot images and extra images): a `crop` rectangle as fractions of the original picture (`x`, `y`, `w`, `h`, 0–1), next to the existing `fit` and `focus`. To decide with Lucas: crop only, or also `zoom` + `focus` as a lighter alternative; how `crop` combines with `fit: cover` (crop first, then cover); whether hotspot positions follow the crop.
+  - **Rendering** (`shared/render.js`, `shared/blocks.js`, `shared/picture.js`): show only the cropped part, scaled into the frame; the file stays whole (no lossy re-encoding), so the crop can be changed later. Alt text still describes what is shown.
+  - **Editor**: a crop dialog on any image field (drag a rectangle with handles, keep the aspect ratio of the slot or free, numeric fields, reset), a live preview, one undo step. Replaces the "crop" part of I-026.
+  - **Converter**: PowerPoint's picture crop (`a:srcRect` l/t/r/b) becomes `crop`, so converted pictures look like the original.
+  - Validation: a crop outside the picture or with no size is a warning; show format 0.2 (optional field) · todo · —
 - [ ] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**:
   - A user specifies the location of a zipped Slipr presentation (e.g. on GitHub releases, a raw zipball URL, or any web server) in a URL parameter: `viewer/?zip=https://example.com/show.zip` (or `?zip=...&mode=reader`).
   - The viewer downloads the zip file client-side via `fetch()`, displaying download progress.
