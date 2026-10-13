@@ -65,13 +65,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), code with line-by-line highlighting, KaTeX. Mermaid diagrams moved to I-073
 - [ ] **I-008** [viewer] Jump to slide by number or title search (`G`)
 - [ ] **I-009** [viewer] Zoomable "map" overview: chapters as clusters, zoom into a chapter (Prezi-like)
-- [ ] **I-098** [viewer] **Grid overview in audience mode** (Esc / `O`): replace Reveal's overview, which lays all slides out in one horizontal row that gets very long in a big show, with a **grid** of slide thumbnails that fits the screen.
-  - **Layout**: rows of thumbnails wrapping to the window width (columns depend on the screen and the number of slides), in show order; optionally a break or label per chapter, like the editor's show grid (I-081). Backup slides at the end with their dashed outline; the current slide highlighted; agenda slides included as they are presented.
-  - **Hover**: the **row under the mouse is enlarged somewhat** (e.g. 1.25–1.4×, with a short eased transition), the other rows give way, so the slides you are looking at become readable without zooming the whole grid. The single slide under the pointer may be highlighted a bit more.
-  - **Use**: click a thumbnail (or Enter) to go to that slide and close the grid; Esc or `O` closes it and returns to where you were. Keyboard: arrow keys move through the grid (up / down a row), and the focused slide's row is enlarged like on hover. Touch: tap to go, the grid scrolls when it does not fit.
-  - **Rendering**: thumbnails from `shared/render.js` (as in the editor's grid), or scaled clones of the Reveal slides; keep it fast for 100+ slides (render lazily, `content-visibility`). Embeds show their static fallback in the grid.
-  - Reduced motion: no enlarging animation (enlarge without transition, or only highlight). Keep Reveal's own overview available as a fallback setting only if the grid proves problematic.
-  - Related: I-008 (jump to slide), I-009 (zoomable map) · todo · —
 
 ### Reader mode
 - [ ] **I-010** [viewer] **Follow the presenter**: during a live talk, readers' devices follow the presenter's current slide, while still allowing them to dive deeper
@@ -175,6 +168,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-098** [viewer] Grid overview in audience mode (`Esc` / `O`): thumbnails wrapping to the window, grouped by chapter, the row under the mouse or keyboard focus enlarged 1.25 × while the others make room; click / Enter goes to the slide at its start, arrow keys move, Esc returns; replaces Reveal's single-row overview (`viewer/audience/grid-overview.js`) · done 2026-10-13 · claude
 - [x] **I-003** [viewer] Laser pointer (`L`), spotlight (`K`) and pen (`D`; `X` erases) in audience mode: own vanilla module `viewer/audience/presenter-tools.js` (Lucas: no third-party plugin), drawings per slide until a reload, template accent color, touch-safe, `Esc` turns tools off · done 2026-10-13 · claude
 - [x] **I-091** [viewer/format/editor] Morph transition for pictures between auto-animate slides: a Slipr `autoAnimateMatcher` (`viewer/audience/morph.js`) pairs pictures by `morphId`, file or slot and animates width / height (no distortion), crop, focus, opacity and radius; `morphId` on image values (show format 0.2); editor **Morph name** field; reduced motion turns it off; demo slide `s-ai-detail`. Spec (with the Reveal spike): `docs/specs/I-091-image-morph.md` · done 2026-10-13 · claude
 - [x] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**: client-side download via `fetch()` with live progress bar; in-memory decompression via Web Streams `DecompressionStream('deflate-raw')` keeping D-001/D-002 (zero build step, zero backend); adapts unzipped files into an in-memory source with `blob:` object URLs; GitHub archive auto-detection (single-directory wrapper) and optional `&path=` resolution for multi-show repos; audience and reader mode presentation (`&mode=reader`) with deep link and personal annotation preservation; clear diagnostics for CORS restrictions, missing files, and 404s · done 2026-10-13 · gemini

@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Grid overview (I-098)
+- **Changed** `Esc` / `O` in audience mode open `audience/grid-overview.js` instead of Reveal's overview (`overview: false`): a grid of thumbnails that wraps to the window (2–8 columns), grouped by chapter with backup slides last. The row under the mouse, or with the keyboard focus, grows to the full width (1.25 ×) while the others make room. Click, tap or `Enter` goes to the slide at its start; arrow keys, `Home` and `End` move; `Esc` or `O` returns. Thumbnails are copies of the presented slides with every step shown and embeds as their static fallback, made as they scroll into view. Esc still closes Reveal's help first; presenter tools turn off.
+
 ### 2026-10-13: Laser pointer, spotlight and pen (I-003)
 - **Added** `audience/presenter-tools.js`: `L` laser pointer, `K` spotlight (the slide dims around the pointer), `D` pen (mouse, pen or touch; strokes in fractions of the slide, kept per slide until a reload, in the template's accent color; `X` erases the slide's drawing). One tool at a time; `Esc` turns it off before Reveal's overview. The overview and pause turn tools off. Listed in Reveal's `?` help and the viewer manual. `L` and `K` replace Reveal's vim-style navigation keys.
 

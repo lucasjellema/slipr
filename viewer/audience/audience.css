@@ -425,3 +425,63 @@ body[data-slipr-tool="laser"], body[data-slipr-tool="laser"] * { cursor: none !i
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
+
+/* ---------- Slide overview: a grid instead of one long row (I-098) ---------- */
+.slipr-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  background: #0E1116;
+  color: #C9D1D9;
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  text-align: left;
+}
+.reveal.slipr-grid-open .controls,
+.reveal.slipr-grid-open .slide-number,
+.reveal.slipr-grid-open .slipr-chapter-bar,
+.reveal.slipr-grid-open .slipr-remote-btn { display: none; }
+.slipr-grid-head { padding: 14px 28px 4px; font-size: 14px; color: #8B949E; }
+.slipr-grid-body { flex: 1; overflow: auto; padding: 4px 28px 40px; }
+.slipr-grid-chapter { margin: 18px 0 2px; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; color: #E6EDF3; text-transform: none; }
+.slipr-grid-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 12px 0;
+}
+/* Thumbnails take 80 % of a row's share; the enlarged row the full share (1.25 ×). */
+.slipr-grid-cell {
+  --share: calc((100% - (var(--slipr-grid-cols, 4) - 1) * 16px) / var(--slipr-grid-cols, 4));
+  position: relative;
+  flex: 0 0 calc(var(--share) * 0.8);
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: #FFFFFF;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
+  transition: flex-basis 0.22s ease, box-shadow 0.22s ease;
+}
+.slipr-grid-row.is-enlarged .slipr-grid-cell { flex-basis: var(--share); }
+.slipr-grid-cell:hover { box-shadow: 0 0 0 3px #8B949E, 0 4px 16px rgb(0 0 0 / 0.5); }
+.slipr-grid-cell.is-current { box-shadow: 0 0 0 4px var(--slipr-color-accent, #F2A900), 0 4px 16px rgb(0 0 0 / 0.5); }
+.slipr-grid-cell:focus-visible { outline: 3px solid #E6EDF3; outline-offset: 3px; }
+.slipr-grid-cell.is-backup { outline: 3px dashed rgb(242 169 0 / 0.7); outline-offset: -3px; }
+.slipr-grid-frame { display: block; width: 100%; min-height: 3em; }
+.slipr-grid-frame > .slipr-slide { width: 100%; pointer-events: none; }
+.slipr-grid-number {
+  position: absolute;
+  left: 6px;
+  bottom: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgb(14 17 22 / 0.75);
+  color: #E6EDF3;
+  font: 600 12px/1.4 system-ui, sans-serif;
+}
+@media (prefers-reduced-motion: reduce) {
+  .slipr-grid-cell { transition: none; }
+}
