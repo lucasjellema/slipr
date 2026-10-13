@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Graphs (I-074)
+- **Added** graph slides and blocks. Audience mode builds a graph up step by step (reveal nodes, or zoom in on one). Reader mode: drag to pan, + / − / Fit, click a node or pick it from the list to see its text, neighbours and slide, filter by tag. Reader search finds node labels and text.
+
 ### 2026-10-13: Text elements on slides (I-089)
 - **Added** text elements on slides in both modes (drawn by `shared/render.js`), appearing one by one in audience mode like extra images. Reader search finds their text, and glossary terms in them open their definition.
 

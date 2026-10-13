@@ -16,6 +16,7 @@
 import { checkSchema } from './schema-check.js';
 import { foldText } from './glossary.js';
 import { pdfEntries } from './embeds/pdf.js';
+import { isGraph } from './embeds/graph.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
 
@@ -73,6 +74,7 @@ export function validateShow(show, options = {}) {
     checkImages(slide, at, options.imageExists, errors, warnings, options.template, show.slipr);
     checkOverlays(slide, at, show.slipr, errors, warnings);
     checkEmbeds(slide, at, show.slipr, errors, warnings, options.imageExists);
+    checkGraphs(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -221,6 +223,8 @@ export function collectImagePaths(show) {
       if (isImage(overlay?.image)) found.push(overlay.image.src);
     }
     for (const [image] of embedFallbacks(slide, '')) found.push(image.src);
+    // Graph data files (I-074): checked, embedded and opened like images.
+    for (const { value } of graphEntries(slide, '')) if (typeof value.data === 'string') found.push(value.data);
     // PDF files in the show folder (I-072): checked, embedded and opened like images.
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
@@ -530,6 +534,66 @@ function checkOverlays(slide, at, version, errors, warnings) {
 }
 
 /**
+ * The graphs of a slide (I-074): slot values and graph blocks, with their path.
+ * @param {any} slide @param {string} at
+ * @returns {{ value: any, path: string, block: boolean }[]}
+ */
+function graphEntries(slide, at) {
+  /** @type {{ value: any, path: string, block: boolean }[]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isGraph(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type === 'graph' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
+  });
+  return found;
+}
+
+/**
+ * Graphs (I-074): format 0.2; unique node ids; edges, steps and node slides
+ * that point somewhere; the data file exists (with a file check).
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
+ * @param {Set<string>} slideIds
+ */
+function checkGraphs(slide, at, version, errors, warnings, fileExists, slideIds) {
+  for (const { value, path, block } of graphEntries(slide, at)) {
+    if (version === '0.1') {
+      errors.push({ path, code: 'format-version', message: `a graph ${block ? 'block' : 'slot'} needs show format 0.2: set "slipr" to "0.2"` });
+    }
+    if (typeof value.data === 'string' && fileExists && !fileExists(value.data)) {
+      warnings.push({ path: `${path}.data`, code: 'missing-file', message: `graph data file "${value.data}" not found` });
+    }
+    const ids = new Set();
+    arrayOf(value.nodes).forEach((n, k) => {
+      if (!isObject(n) || typeof n.id !== 'string') return;
+      if (ids.has(n.id)) warnings.push({ path: `${path}.nodes[${k}].id`, code: 'duplicate-node', message: `node "${n.id}" is listed twice; the first one is used` });
+      ids.add(n.id);
+      if (typeof n.slide === 'string' && !slideIds.has(n.slide)) {
+        warnings.push({ path: `${path}.nodes[${k}].slide`, code: 'unknown-slide', message: `unknown slide "${n.slide}"` });
+      }
+    });
+    // With a data file the nodes are only known when it is read: check references against inline nodes only.
+    if (typeof value.data === 'string') continue;
+    arrayOf(value.edges).forEach((e, k) => {
+      for (const end of ['from', 'to']) {
+        if (isObject(e) && typeof e[end] === 'string' && !ids.has(e[end])) {
+          warnings.push({ path: `${path}.edges[${k}].${end}`, code: 'unknown-node', message: `unknown node "${e[end]}": the link is not drawn` });
+        }
+      }
+    });
+    arrayOf(value.steps).forEach((step, k) => {
+      const named = [...arrayOf(step?.show), ...(typeof step?.focus === 'string' ? [step.focus] : [])];
+      for (const id of named) {
+        if (typeof id === 'string' && !ids.has(id)) warnings.push({ path: `${path}.steps[${k}]`, code: 'unknown-node', message: `unknown node "${id}"` });
+      }
+    });
+  }
+}
+
+/**
  * Call fn for every Markdown-bearing string in the show.
  * @param {any} show
  * @param {(text: string, path: string) => void} fn
@@ -552,6 +616,9 @@ function forEachMarkdown(show, fn) {
     }
     visit(slide?.notes, `${at}.notes`);
     arrayOf(slide?.overlays).forEach((o, j) => visit(o?.text, `${at}.overlays[${j}].text`));
+    for (const { value, path } of graphEntries(slide, at)) {
+      arrayOf(value.nodes).forEach((n, k) => visit(n?.md, `${path}.nodes[${k}].md`));
+    }
     arrayOf(slide?.reader?.blocks).forEach((block, j) => {
       const bat = `${at}.reader.blocks[${j}]`;
       visit(block?.md, `${bat}.md`);
@@ -597,6 +664,7 @@ function matchesSlotType(value, type) {
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
     case 'web': return isObject(value) && typeof value.url === 'string';
     case 'pdf': return isObject(value) && typeof value.pdf === 'string';
+    case 'graph': return isGraph(value);
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -615,6 +683,7 @@ function slotTypeLabel(type) {
     diagram: 'a diagram object { "mermaid": ... }',
     web: 'a web page object { "url": ..., "title": ... }',
     pdf: 'a PDF object { "pdf": ..., "title": ... }',
+    graph: 'a graph object { "nodes": [...], "edges": [...] } or { "data": "data/....json" }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

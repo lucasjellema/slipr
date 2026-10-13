@@ -15,9 +15,10 @@ function validateVariant(mutate) {
   return validateShow(show, { template });
 }
 
-/** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases). */
+/** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases, embeds, graphs). */
 function withoutFormat02(s) {
-  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf');
+  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph');
+  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
@@ -402,8 +403,8 @@ describe('robustness', () => {
 });
 
 describe('helpers', () => {
-  test('collectImagePaths lists unique image sources and local PDFs', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
+  test('collectImagePaths lists unique image sources, local PDFs and graph data files', () => {
+    assert.deepEqual(collectImagePaths(demo).sort(), ['data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {

@@ -231,12 +231,13 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `slide-ref` | `slide`, `label?` | Link card to another slide |
 | `diagram` | `mermaid`, `caption?`, `fallback?` | Rendered SVG diagram from Mermaid source |
 | `pdf` | `pdf`, `title`, `page?`, `pages?`, `load?`, `fallback?` | (0.2) A PDF document with page navigation, zoom and searchable text; see *PDF documents* below |
+| `graph` | `nodes` and / or `data`, `edges?`, `layout?`, `title?`, `caption?`, `fallback?` | (0.2) A graph to explore: pan, zoom, select a node, filter by tag; see *Graphs* below |
 
 *Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
 
 ### Embeds (I-070, D-011)
 
-Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071) and PDF documents (`pdf` slot and block, I-072). Embeds share two optional fields (format 0.2):
+Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071), PDF documents (`pdf` slot and block, I-072) and graphs (`graph` slot and block, I-074). Embeds share two optional fields (format 0.2):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -263,6 +264,34 @@ Without `page` or `pages`: page 1 on a slide, the whole document in a reader blo
 ```json
 "document": { "pdf": "docs/annual-report.pdf", "title": "Annual report 2026", "pages": [4, 7] }
 ```
+
+#### Graphs (`graph` slot and block; I-074, format 0.2)
+
+A network of nodes and links, laid out automatically and drawn with the vendored Cytoscape.js (D-011), loaded only when a show has a graph. Spec: `docs/specs/I-074-graph.md`.
+
+```json
+"graph": {
+  "nodes": [
+    { "id": "show", "label": "show.json", "tags": ["format"], "md": "One file per show.", "slide": "s-data-1" },
+    { "id": "template", "label": "Template", "tags": ["template"] }
+  ],
+  "edges": [{ "from": "show", "to": "template", "label": "names" }],
+  "layout": "cose",
+  "steps": [{ "show": ["template"] }, { "focus": "show" }]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `nodes` | `id` (required, unique), `label` (default: the id), `tags`, `md` (shown when a reader selects the node), `slide` (the node links to that slide) |
+| `edges` | `from`, `to` (node ids, required), `label` |
+| `data` | Instead of, or besides, inline `nodes` / `edges`: a `.json` file in the show folder with `{ "nodes": [...], "edges": [...] }` (the file's entries come first). Checked, exported and opened from folders like images |
+| `layout` | `cose` (default, force-directed), `breadthfirst`, `concentric`, `circle`, `grid` |
+| `steps` | Slots in audience mode only: one per click, after the slide's own fragments. `{ "show": [ids] }` reveals nodes (hidden until then; a link appears once both ends show), `{ "focus": id }` zooms to a node and its neighbours and fades the rest. Going back works |
+| `caption` | Below the graph, when the layout has no caption slot of its own |
+| `fallback` | As for every embed. Without it, the static content is a list of the nodes and their links (also what screen readers get) |
+
+The graph block also has `title` (and `id`, `type: "graph"`, `for`, `depth`); it has no `steps`. **Colors come from the template** (no colors in the show): a node's first tag picks `--slipr-graph-1` … `6` in order of first use. **Reader mode**: drag to pan, **+ / − / Fit**, click or tap a node (or choose it in the **Node…** list) to highlight its neighbours and show its text and **Go to slide**; the tag buttons are the legend and filter the nodes; Esc clears. Reader search finds node labels and text (inline graphs).
 
 #### Web pages (`web` slot, `embed` block; I-071, format 0.2)
 
@@ -318,6 +347,7 @@ The template defines which slots a layout has and the type of each slot.
 | `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
 | `diagram` | object | `{ "mermaid": "flowchart LR; A-->B", "caption": "...", "fallback": { "src": "images/flow.png", "alt": "..." } }` rendered as an SVG diagram; `fallback` (0.2) as for embeds |
 | `pdf` | object | (0.2) `{ "pdf": "docs/report.pdf", "title": "...", "page": 3 }` or `"pages": [3, 7]`: a PDF on the slide, see *PDF documents* above |
+| `graph` | object | (0.2) `{ "nodes": [...], "edges": [...], "steps": [...] }` or `{ "data": "data/graph.json" }`: a graph, see *Graphs* above |
 | `web` | object | (0.2) `{ "url": "https://…", "title": "...", "allow": [...], "present": "live" \| "static", "load": "click" \| "auto", "fallback": {...} }`: a web page on the slide, see *Web pages* above |
 
 ## Template references
@@ -334,11 +364,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` slot value or `pdf` block in a 0.1 show; an unsafe web page or PDF address.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `graph` slot value or `pdf` / `graph` block in a 0.1 show; an unsafe web page or PDF address; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), and the `pdf` slot and block types (I-072, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), and the `graph` slot and block types (I-074, 2026-10-13). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

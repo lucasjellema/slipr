@@ -25,6 +25,17 @@ const keysOf = (node) => Object.keys(node?.properties ?? {});
 
 const image = { keys: keysOf(defs.image) };
 
+/** A graph value or block (I-074): its keys, and those of nodes, edges and steps. @param {any} def @returns {Shape} */
+const graph = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    nodes: { items: { keys: keysOf(defs.graphNode) } },
+    edges: { items: { keys: keysOf(defs.graphEdge) } },
+    steps: { items: { keys: ['show', 'focus'] } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -34,6 +45,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
   if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
+  if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
   if ('kind' in value) return { keys: keysOf(defs.chart) };
   if ('text' in value) return { keys: keysOf(defs.quote) };
   return {};
@@ -43,6 +55,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
 const block = /** @type {(value: any) => Shape} */ ((value) => {
   const name = 'block' + String(value?.type ?? '').split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');
   const def = defs[name];
+  if (value?.type === 'graph') return graph(def);
   return {
     keys: keysOf(def),
     fields: {

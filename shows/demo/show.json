@@ -508,6 +508,153 @@
       }
     },
     {
+      "id": "s-concepts",
+      "layout": "graph",
+      "chapter": "how",
+      "tags": [
+        "format",
+        "architecture"
+      ],
+      "content": {
+        "title": "How the pieces connect",
+        "graph": {
+          "nodes": [
+            {
+              "id": "show",
+              "label": "show.json",
+              "tags": [
+                "format"
+              ],
+              "md": "One file per show: the slides, their **reader layer**, the glossary and the reading routes.",
+              "slide": "s-data-1"
+            },
+            {
+              "id": "slide",
+              "label": "Slide",
+              "tags": [
+                "format"
+              ],
+              "md": "Names a layout and fills its slots; may carry a reader layer."
+            },
+            {
+              "id": "template",
+              "label": "Template",
+              "tags": [
+                "template"
+              ],
+              "md": "Owns every visual decision: theme, fonts, layouts."
+            },
+            {
+              "id": "layout",
+              "label": "Layout",
+              "tags": [
+                "template"
+              ],
+              "md": "An HTML fragment with named slots."
+            },
+            {
+              "id": "renderer",
+              "label": "Shared renderer",
+              "tags": [
+                "viewer"
+              ],
+              "md": "One renderer for the editor and both viewer modes.",
+              "slide": "s-architecture"
+            },
+            {
+              "id": "audience",
+              "label": "Audience mode",
+              "tags": [
+                "viewer"
+              ],
+              "md": "A linear Reveal.js slideshow for the room.",
+              "slide": "s-two-modes"
+            },
+            {
+              "id": "reader",
+              "label": "Reader mode",
+              "tags": [
+                "viewer"
+              ],
+              "md": "An interactive reading app, tailored by profile and depth.",
+              "slide": "s-tailored"
+            }
+          ],
+          "edges": [
+            {
+              "from": "show",
+              "to": "slide",
+              "label": "holds"
+            },
+            {
+              "from": "show",
+              "to": "template",
+              "label": "names"
+            },
+            {
+              "from": "template",
+              "to": "layout",
+              "label": "provides"
+            },
+            {
+              "from": "slide",
+              "to": "layout",
+              "label": "uses"
+            },
+            {
+              "from": "renderer",
+              "to": "show",
+              "label": "reads"
+            },
+            {
+              "from": "renderer",
+              "to": "template",
+              "label": "applies"
+            },
+            {
+              "from": "audience",
+              "to": "renderer"
+            },
+            {
+              "from": "reader",
+              "to": "renderer"
+            }
+          ],
+          "layout": "cose",
+          "steps": [
+            {
+              "show": [
+                "template",
+                "layout"
+              ]
+            },
+            {
+              "show": [
+                "renderer",
+                "audience",
+                "reader"
+              ]
+            },
+            {
+              "focus": "renderer"
+            }
+          ]
+        },
+        "caption": "Built up step by step in audience mode; in reader mode, click a node."
+      },
+      "notes": "Three clicks: the template side, then the viewer side, then zoom in on the shared renderer.",
+      "reader": {
+        "summary": "A show, its template and one renderer for every mode.",
+        "blocks": [
+          {
+            "id": "concepts-intro",
+            "type": "text",
+            "md": "Pan the graph, zoom with **+** and **−**, and click a node (or pick it from the list) to read about it and jump to its slide. The tag buttons filter the nodes."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-live-page",
       "layout": "web",
       "chapter": "how",
@@ -827,6 +974,15 @@
             "id": "spec",
             "type": "text",
             "md": "The full specification lives in `docs/show-format.md` in the Slipr repository. Every [[slot]] value and reader block type is described there, with validation rules."
+          },
+          {
+            "id": "format-graph",
+            "type": "graph",
+            "depth": 2,
+            "title": "The show format at a glance",
+            "data": "data/show-format.json",
+            "layout": "breadthfirst",
+            "caption": "From data/show-format.json: the parts of show.json and how they refer to each other."
           }
         ]
       }

@@ -83,6 +83,21 @@ export function imageValue(previous, change) {
 }
 
 /**
+ * A graph's read-only summary (I-074: graphs are edited in show.json for now).
+ * @param {any} value
+ * @returns {string}
+ */
+export function graphSummary(value) {
+  const n = Array.isArray(value?.nodes) ? value.nodes.length : 0;
+  const e = Array.isArray(value?.edges) ? value.edges.length : 0;
+  const s = Array.isArray(value?.steps) ? value.steps.length : 0;
+  const parts = [`Graph: ${n} node${n === 1 ? '' : 's'}, ${e} link${e === 1 ? '' : 's'}`];
+  if (typeof value?.data === 'string') parts.push(`data from ${value.data}`);
+  if (s) parts.push(`${s} step${s === 1 ? '' : 's'}`);
+  return `${parts.join(', ')}. Edit it in show.json.`;
+}
+
+/**
  * Short read-only summary of a slot value that has no editor yet.
  * @param {string | undefined} slotType
  * @param {any} value
@@ -96,6 +111,7 @@ export function describeValue(slotType, value) {
   if (slotType === 'quote' && typeof value?.text === 'string') {
     return value.source ? `“${value.text}” (${value.source})` : `“${value.text}”`;
   }
+  if (slotType === 'graph' && value && typeof value === 'object') return graphSummary(value);
   if (slotType === 'code' && typeof value?.code === 'string') {
     const lines = value.code.split('\n').length;
     return `${value.language ?? 'code'}, ${lines} line${lines === 1 ? '' : 's'}`;

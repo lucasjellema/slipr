@@ -1,0 +1,28 @@
+{
+  "nodes": [
+    { "id": "show", "label": "show.json", "tags": ["show"], "md": "The whole show: `meta`, `template`, `settings` and the lists below." },
+    { "id": "chapters", "label": "chapters", "tags": ["show"], "md": "The agenda; slides name their chapter." },
+    { "id": "glossary", "label": "glossary", "tags": ["show"], "md": "Terms with definitions and other names; linked in reader mode." },
+    { "id": "profiles", "label": "profiles", "tags": ["show"], "md": "Who reads: blocks can be aimed at a profile with `for`." },
+    { "id": "paths", "label": "paths", "tags": ["show"], "md": "Reading routes: an ordered list of slide ids." },
+    { "id": "slides", "label": "slides", "tags": ["slide"], "md": "Each slide names a layout and fills its slots.", "slide": "s-data-1" },
+    { "id": "content", "label": "content", "tags": ["slide"], "md": "The audience layer: slot name → value." },
+    { "id": "overlays", "label": "overlays", "tags": ["slide"], "md": "Extra images and text elements placed freely on the slide." },
+    { "id": "reader", "label": "reader", "tags": ["slide"], "md": "The reader layer: summary, blocks and related slides.", "slide": "s-tailored" },
+    { "id": "blocks", "label": "blocks", "tags": ["reader"], "md": "Text, panels, tabs, hotspots, embeds, PDFs, diagrams and graphs." }
+  ],
+  "edges": [
+    { "from": "show", "to": "chapters" },
+    { "from": "show", "to": "glossary" },
+    { "from": "show", "to": "profiles" },
+    { "from": "show", "to": "paths" },
+    { "from": "show", "to": "slides" },
+    { "from": "slides", "to": "content" },
+    { "from": "slides", "to": "overlays" },
+    { "from": "slides", "to": "reader" },
+    { "from": "reader", "to": "blocks" },
+    { "from": "slides", "to": "chapters", "label": "chapter" },
+    { "from": "blocks", "to": "profiles", "label": "for" },
+    { "from": "paths", "to": "slides", "label": "lists" }
+  ]
+}

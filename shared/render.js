@@ -274,6 +274,18 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       else fillEmbedElement(el, 'pdf', value, ctx, { mode: /** @type {any} */ (options.mode) });
       break;
 
+    case 'graph': {
+      // A graph (I-074): node list now, the drawing from hydrateEmbeds().
+      fillEmbedElement(el, 'graph', value, ctx, { mode: /** @type {any} */ (options.mode) });
+      if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
+        const figcaption = doc.createElement('figcaption');
+        figcaption.className = 'slipr-caption';
+        figcaption.textContent = value.caption;
+        el.parentElement?.append(figcaption);
+      }
+      break;
+    }
+
     default: // chart: planned slot type
       el.innerHTML = `<p class="slipr-placeholder">[${escape(type)}: not supported yet]</p>`;
   }

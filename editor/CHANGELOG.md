@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Graphs, read-only (I-074)
+- **Added** graph slots and blocks show a summary ("Graph: 7 nodes, 8 links, 3 steps") and are edited in show.json for now; the preview draws them. Saving keeps the key order of graphs, nodes, edges and steps.
+
 ### 2026-10-13: Collapsible rows for extra images and text elements
 - **Changed** each row in **Extra images and text** is collapsed by default to one line (number, thumbnail or text, tools); its header (▸) expands the settings. A new overlay and the one selected on the preview open by themselves; the state survives re-renders and follows ▲ / ▼ and delete (`isOverlayExpanded()` and friends in `ui/overlay-editor.js`).
 

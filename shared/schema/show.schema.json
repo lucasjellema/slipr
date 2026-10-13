@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays (extra images and text elements), picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays (extra images and text elements), graph slots and blocks, picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -191,6 +191,7 @@
         { "$ref": "#/$defs/diagram" },
         { "$ref": "#/$defs/web" },
         { "$ref": "#/$defs/pdf" },
+        { "$ref": "#/$defs/graph" },
         { "$ref": "#/$defs/cards" }
       ]
     },
@@ -346,6 +347,58 @@
       "description": "(0.2) Extra sandbox permissions for an embedded page (I-071). same-origin applies to pages on other servers only.",
       "items": { "enum": ["same-origin", "fullscreen", "modals", "downloads", "presentation"] }
     },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "(0.2) A graph of nodes and edges, drawn with Cytoscape.js (I-074). Needs nodes or a data file.",
+      "anyOf": [{ "required": ["nodes"] }, { "required": ["data"] }],
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "description": "The nodes: id (unique), label, tags (the first picks a template color), md (shown when selected), slide (a link to that slide).",
+          "items": { "$ref": "#/$defs/graphNode" }
+        },
+        "edges": { "type": "array", "items": { "$ref": "#/$defs/graphEdge" } },
+        "data": { "type": "string", "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!/).+\\.json$", "description": "A JSON file in the show folder with { nodes, edges }; inline entries come after the file's." },
+        "layout": { "enum": ["cose", "breadthfirst", "concentric", "circle", "grid"], "description": "Automatic placement; default cose (force-directed)." },
+        "steps": {
+          "type": "array",
+          "description": "Audience mode, slots only: one per click; show more nodes, or focus one with its neighbours.",
+          "items": { "$ref": "#/$defs/graphStep" }
+        },
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when rendering fails (I-070)." }
+      }
+    },
+    "graphNode": {
+      "type": "object",
+      "required": ["id"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" },
+        "tags": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "md": { "$ref": "#/$defs/markdown" },
+        "slide": { "type": "string", "minLength": 1 }
+      }
+    },
+    "graphEdge": {
+      "type": "object",
+      "required": ["from", "to"],
+      "additionalProperties": false,
+      "properties": {
+        "from": { "type": "string", "minLength": 1 },
+        "to": { "type": "string", "minLength": 1 },
+        "label": { "type": "string" }
+      }
+    },
+    "graphStep": {
+      "description": "Show more nodes, or focus one node (zoom to it and its neighbours).",
+      "anyOf": [
+        { "type": "object", "required": ["show"], "additionalProperties": false, "properties": { "show": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } } } },
+        { "type": "object", "required": ["focus"], "additionalProperties": false, "properties": { "focus": { "type": "string", "minLength": 1 } } }
+      ]
+    },
     "diagram": {
       "type": "object",
       "required": ["mermaid"],
@@ -399,7 +452,8 @@
         { "$ref": "#/$defs/blockEmbed" },
         { "$ref": "#/$defs/blockSlideRef" },
         { "$ref": "#/$defs/blockDiagram" },
-        { "$ref": "#/$defs/blockPdf" }
+        { "$ref": "#/$defs/blockPdf" },
+        { "$ref": "#/$defs/blockGraph" }
       ]
     },
     "for": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "description": "Profile ids that see this block; absent = everyone." },
@@ -523,6 +577,30 @@
         "mermaid": { "type": "string", "minLength": 1 },
         "caption": { "type": "string" },
         "fallback": { "$ref": "#/$defs/image", "description": "(0.2) Static image shown for print, thumbnails and when rendering fails (I-070)." }
+      }
+    },
+    "blockGraph": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "description": "(0.2) A graph in the reader layer (I-074): pan, zoom, select a node, filter by tag.",
+      "anyOf": [{ "required": ["nodes"] }, { "required": ["data"] }],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "const": "graph" },
+        "for": { "$ref": "#/$defs/for" },
+        "depth": { "$ref": "#/$defs/depth" },
+        "title": { "type": "string" },
+        "nodes": {
+          "type": "array",
+          "description": "The nodes: id (unique), label, tags (the first picks a template color), md (shown when selected), slide (a link to that slide).",
+          "items": { "$ref": "#/$defs/graphNode" }
+        },
+        "edges": { "type": "array", "items": { "$ref": "#/$defs/graphEdge" } },
+        "data": { "type": "string", "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!/).+\\.json$", "description": "A JSON file in the show folder with { nodes, edges }; inline entries come after the file's." },
+        "layout": { "enum": ["cose", "breadthfirst", "concentric", "circle", "grid"], "description": "Automatic placement; default cose (force-directed)." },
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when rendering fails (I-070)." }
       }
     },
     "blockPdf": {

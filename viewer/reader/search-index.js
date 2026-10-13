@@ -29,6 +29,15 @@ import { slideTitle } from '../../shared/render.js';
  */
 
 /**
+ * The searchable text of a graph (I-074): node labels and their Markdown as plain text.
+ * @param {any} value
+ */
+function graphText(value) {
+  if (!Array.isArray(value?.nodes)) return '';
+  return value.nodes.map((/** @type {any} */ n) => [n?.label ?? n?.id, n?.md ? markdownToText(n.md) : ''].filter(Boolean).join(' ')).join('\n');
+}
+
+/**
  * @param {any} show
  * @returns {SearchDoc[]}
  */
@@ -48,7 +57,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v)].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     // Text elements on the slide (I-089) are slide content too.
@@ -65,8 +74,8 @@ export function buildSearchIndex(show) {
       const labels = [block.title, block.caption, block.label,
         ...(block.tabs ?? []).map((/** @type {any} */ t) => t.label),
         ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.title),
-        block.image?.alt].filter(Boolean).join(' · ');
-      const body = [block.md, block.mermaid, ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
+        block.image?.alt, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.label ?? n?.id)].filter(Boolean).join(' · ');
+      const body = [block.md, block.mermaid, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.md), ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
         .filter(Boolean).map(text).join('\n');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,

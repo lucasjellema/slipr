@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * Rich embeds (I-070, D-011): the shared foundation for content that needs a
- * library or another server (diagrams today; web pages, PDFs, graphs and maps
+ * library or another server: diagrams, web pages, PDFs and graphs (maps
  * next). Every kind is available as an audience slot type and a reader block
  * type, and has one module `shared/embeds/<kind>.js`:
  *
@@ -40,6 +40,7 @@ import { escape } from '../markdown.js';
 import { pictureAttributes } from '../picture.js';
 import { grantConsent, hasConsent } from './consent.js';
 import * as diagram from './diagram.js';
+import * as graph from './graph.js';
 import * as pdf from './pdf.js';
 import * as web from './web.js';
 
@@ -61,12 +62,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf };
+export const EMBED_KINDS = { diagram, web, pdf, graph };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -98,6 +99,7 @@ export function usedEmbedKinds(show) {
       if (diagram.isDiagram(value)) kinds.add('diagram');
       if (web.isWeb(value)) kinds.add('web');
       if (pdf.isPdf(value)) kinds.add('pdf');
+      if (graph.isGraph(value)) kinds.add('graph');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);

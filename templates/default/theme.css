@@ -34,6 +34,14 @@
   --slipr-size-body: 2.2cqw;
   --slipr-size-small: 1.2cqw;
   --slipr-radius: 0.6cqw;
+
+  /* Graph node colors, by tag (I-074) */
+  --slipr-graph-1: #1F3A5F;
+  --slipr-graph-2: #F2A900;
+  --slipr-graph-3: #2A9D8F;
+  --slipr-graph-4: #7B5EA7;
+  --slipr-graph-5: #C8553D;
+  --slipr-graph-6: #5B6573;
 }
 
 /* ---------- Slide frame ---------- */
@@ -259,6 +267,12 @@
 .slipr-figure--pdf { align-items: stretch; }
 .slipr-pdf { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
 
+/* ---------- Layout: graph (I-074) ---------- */
+
+.slipr-layout--graph { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--graph { align-items: stretch; }
+.slipr-graph { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
 /* ---------- Reader mode: reflow on narrow screens ----------
  * Below ~640px the slide stops being a scaled 16:9 picture and becomes
  * ordinary flowing content with rem-based type.
@@ -288,6 +302,7 @@
   .slipr-mode-reader .slipr-image { max-height: 60vh; }
   .slipr-mode-reader .slipr-web { flex: none; height: 70vh; font-size: 0.9rem; }
   .slipr-mode-reader .slipr-pdf { flex: none; height: 70vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-graph { flex: none; height: 60vh; font-size: 0.9rem; }
 }
 
 /* ---------- Picture styles (template format 0.3, D-014, I-084) ----------

@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "default",
   "name": "Slipr Default",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "Clean, neutral template used for samples and tests. Uses system fonts, so it needs no font files.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -114,6 +114,17 @@
       "file": "layouts/pdf.html",
       "slots": [
         { "name": "document", "type": "pdf", "label": "PDF document", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
+    },
+    {
+      "id": "graph",
+      "name": "Graph",
+      "description": "A network of nodes and links (built up step by step in audience mode), with optional title and caption.",
+      "file": "layouts/graph.html",
+      "slots": [
+        { "name": "graph", "type": "graph", "label": "Graph", "required": true },
         { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
         { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
       ]

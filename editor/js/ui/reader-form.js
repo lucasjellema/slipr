@@ -7,7 +7,7 @@
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
 import { pictureStyleControls } from './picture-style.js';
 import { addImageToBlock } from '../image-input.js';
-import { imageValue } from '../slot-values.js';
+import { graphSummary, imageValue } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
 import { hotspotEditor } from './hotspot-editor.js';
 import { markdownToolbar } from './markdown-toolbar.js';
@@ -391,6 +391,7 @@ function describeBlock(block) {
   if (block.type === 'embed') return `${block.title || 'Embedded page'}: ${block.url || '(no URL yet)'}`;
   if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
   if (block.type === 'pdf') return `${block.title || 'PDF document'}: ${block.pdf || '(no file yet)'}`;
+  if (block.type === 'graph') return `${block.title ? `${block.title}. ` : ''}${graphSummary(block)}`;
   return block.type;
 }
 

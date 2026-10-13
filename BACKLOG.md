@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -96,6 +96,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-017** [editor] Bug: deleting slides can leave a reading route with no slides, which the schema rejects (`paths[].slides` needs at least one). Seen while building the show grid's multi-delete. Ask what to do (remove the empty route, or keep it as "all slides"), then fix in `deleteSlide` with a test
 - [ ] **E-018** [editor] Bug: **Save overwrites changes made to `show.json` on disk** since the editor opened it. The editor writes its in-memory show without checking the file, so newer work from elsewhere (another editor window, a Claude session, a git pull) is silently lost. Happened twice on 2026-10-11/12 with `shows/demo/show.json`: an editor window still holding older content saved over committed changes (I-084 styles, I-086 aliases) and brought back deleted test images. Fix: remember the file's `lastModified` (and content hash) when opening and after each save; before saving, read the file again, and if it changed, don't overwrite silently. Offer **Reload from disk** (discarding the in-memory edits), **Save anyway** (overwrite), or **Cancel**; ideally also notice the change when the window regains focus. Same check for Present / Read (they save first) · todo · —
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
+- [ ] **E-020** [editor] Graph editor: graph slots and blocks (I-074) are read-only in the editor. Add a field editor: nodes (id, label, tags, Markdown, linked slide) and edges as rows, layout, the audience steps, a data file picker, caption and fallback image; the preview already draws the graph
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
 
 ### Converter
@@ -125,11 +126,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
-- [ ] **I-074** [format/viewer] **Cytoscape graph visualization**: a `graph` slot and block, with nodes and edges inline in show.json or in a `data/*.json` file. Each node has an `id`, `label` and optional `md` / `slide` / `tags`. Also a layout (`cose`, `breadthfirst`, `concentric`, …) and styles mapped from template tokens.
-  - Vendored **Cytoscape.js**.
-  - Reader mode: pan and zoom, click a node → popover with its Markdown or a jump to its slide, highlight neighbours, filter by tag.
-  - Audience mode: a fixed viewport, with fragments that reveal nodes or focus on them in turn.
-  - The same component can power I-017 (concept map of the show's own slides) · todo · —
 - [ ] **I-075** [format/viewer] **Interactive map (Leaflet)**: a `map` slot and block with `center`, `zoom`, `markers` (`lat`, `lng`, `title`, `md`, optional `slide`), optional GeoJSON layers (relative file) and a tile source.
   - Vendored **Leaflet**.
   - Reader mode: pan and zoom, with marker popups as Slipr popovers.
@@ -169,6 +165,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-074** [format/viewer] Graphs with vendored **Cytoscape.js 3.34.3** (D-011 refined): `graph` slot and block (show format 0.2) with inline `nodes` / `edges` or a `data/*.json` file, `layout`, and audience `steps` that reveal nodes or focus one; node colors from the template by tag (`--slipr-graph-*`); reader pan, zoom, node panel with "Go to slide", tag filter, keyboard node list; static node list as fallback and for screen readers; `graph` layouts in both templates (default 1.4.0, Conclusion 0.1.5); demo slide and data-file block; export; editor read-only (E-020). Spec: `docs/specs/I-074-graph.md` · done 2026-10-13 · claude
 - [x] **I-089** [format/editor/viewer/converter] Text elements on slides (D-016): overlays with `text` (inline Markdown) and a free `style` (font, size, bold / italic / underline / uppercase, alignment, colors, fill opacity, border, radius, text outline, padding) in show format 0.2; `shared/text-style.js`; rendered in both modes (reader search, glossary terms); editor **+ Add text** with palette-first style controls, free resize and keyboard moves on the preview; the converter turns badges, callouts and leftover text boxes into text elements with their look (theme colors resolved). Spec: `docs/specs/I-089-text-elements.md` · done 2026-10-13 · claude
 - [x] **V-019** [viewer] User manual inside the viewer: `viewer/help.html` (comprehensive offline guide for audience and reader experiences, phone remote control pairing, mobile ergonomics, Wi-Fi hotspot setup with Windows Defender Firewall Private profile and Node.js rule fixes, interactive blocks, popups, personal annotations, full-text search, keyboard and clicker cheatsheet, and troubleshooting; light and dark themes, offline-first), opened via `?` / `F1` in both modes, top-bar Help button in Reader mode, pairing dialog tip, and viewer start screen · done 2026-10-13 · claude
 - [x] **I-002** [viewer/tools] Phone as remote control: next/previous tactile buttons and swipe navigation, live speaker notes with font scaling, upcoming slide peek, presentation timer, haptic feedback and wake lock, zero-dependency local WebSocket relay (RFC 6455 over Node.js http) with LAN IP discovery, and instant QR-code pairing modal · done 2026-10-12 · claude
