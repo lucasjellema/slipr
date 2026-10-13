@@ -25,6 +25,8 @@ export function showHelp(app, { onOpenFolder } = {}) {
     h('h1', {}, ['Slipr Viewer']),
     h('p', {}, ['Tell the viewer which show to open with the ', h('code', {}, ['show']), ' parameter:']),
     h('p', {}, [h('code', {}, [`viewer/?show=${DEMO}`])]),
+    h('p', {}, ['Or open a presentation directly from a zip file URL with the ', h('code', {}, ['zip']), ' parameter:']),
+    h('p', {}, [h('code', {}, [`viewer/?zip=https://example.com/show.zip`])]),
     openFolder,
     h('h2', {}, ['Try it']),
     h('ul', {}, [
@@ -34,6 +36,28 @@ export function showHelp(app, { onOpenFolder } = {}) {
     ]),
     h('h2', {}, ['Documentation']),
     h('p', {}, [h('a', { href: 'help.html' }, ['User manual (help.html)']), ' — complete guide for Audience & Reader modes, phone remote setup, keyboard shortcuts, and troubleshooting.']),
+  ]));
+}
+
+/**
+ * Display download or extraction progress.
+ * @param {HTMLElement} app
+ * @param {{ title: string, percent: number | null, detail?: string }} progress
+ */
+export function showProgress(app, { title, percent, detail }) {
+  document.title = 'Slipr: Loading…';
+  const bar = percent !== null
+    ? h('div', { class: 'slipr-progress-bar', role: 'progressbar', 'aria-valuenow': String(percent), 'aria-valuemin': '0', 'aria-valuemax': '100' }, [
+        h('div', { class: 'slipr-progress-fill', style: `width: ${percent}%` }),
+      ])
+    : h('div', { class: 'slipr-progress-bar slipr-progress-bar--indeterminate' }, [
+        h('div', { class: 'slipr-progress-fill' }),
+      ]);
+
+  app.replaceChildren(h('article', { class: 'slipr-page', role: 'status' }, [
+    h('h1', {}, [title]),
+    bar,
+    detail ? h('p', { class: 'slipr-hint', style: 'margin-top: 0.75rem;' }, [detail]) : null,
   ]));
 }
 
@@ -70,10 +94,24 @@ export function showAccessPage(app, { name, onGrant }) {
  */
 export function showLoadError(app, problem) {
   document.title = 'Slipr: show could not be loaded';
+  const paragraphs = problem.message.split('\n\n').filter(Boolean);
+  const elements = paragraphs.map((p) => {
+    if (p.includes('\n  - ') || p.includes('\n• ')) {
+      const lines = p.split('\n');
+      const intro = lines[0];
+      const items = lines.slice(1).filter((l) => l.trim().length > 0);
+      return h('div', {}, [
+        h('p', {}, [intro]),
+        h('ul', {}, items.map((it) => h('li', {}, [it.replace(/^(\s*[-•]\s*)/, '')]))),
+      ]);
+    }
+    return h('p', {}, [p]);
+  });
+
   app.replaceChildren(h('article', { class: 'slipr-page slipr-page--error', role: 'alert' }, [
     h('h1', {}, [problem.title]),
-    h('p', {}, [problem.message]),
-    problem.serverHint && h('p', { class: 'slipr-hint' }, ['Start the dev server from the Slipr folder with ', h('code', {}, ['npm run serve']), ' and open the viewer via ', h('code', {}, ['http://localhost:8080/viewer/']), '.']),
+    ...elements,
+    problem.serverHint ? h('p', { class: 'slipr-hint' }, ['Start the dev server from the Slipr folder with ', h('code', {}, ['npm run serve']), ' and open the viewer via ', h('code', {}, ['http://localhost:8080/viewer/']), '.']) : null,
   ]));
 }
 

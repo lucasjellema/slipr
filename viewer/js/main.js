@@ -4,16 +4,19 @@
  *   ?show=<path to show.json>  or  ?folder=<key>  (a show folder remembered in this browser, D-012)
  *   &mode=audience|reader      (default audience)
  */
-import { loadShow, loadShowFromFolder, LoadError } from '../../shared/load.js';
+import { loadShow, loadShowFromFolder, loadShowFromZip, LoadError } from '../../shared/load.js';
 import { createFolderSource } from '../../shared/folder-source.js';
+import { downloadZip, readZip, createZipSource } from '../../shared/zip.js';
 import { recallFolder, rememberFolder } from '../../shared/folder-handles.js';
 import { addStylesheet } from './dom.js';
-import { showAccessPage, showHelp, showLoadError, showValidationErrors } from './error-view.js';
+import { showAccessPage, showHelp, showLoadError, showProgress, showValidationErrors } from './error-view.js';
 
 const app = /** @type {HTMLElement} */ (document.getElementById('app'));
 const params = new URLSearchParams(location.search);
 const showParam = params.get('show');
 const folderParam = params.get('folder');
+const zipParam = params.get('zip');
+const pathParam = params.get('path');
 const mode = params.get('mode') === 'reader' ? 'reader' : 'audience';
 
 main().catch((err) => {
@@ -36,6 +39,10 @@ async function main() {
     });
     return;
   }
+  if (zipParam) {
+    await openZipShow(zipParam, pathParam);
+    return;
+  }
   if (folderParam) {
     await openFolderShow(folderParam);
     return;
@@ -45,6 +52,73 @@ async function main() {
     return;
   }
   await present(() => loadShow(showParam));
+}
+
+/**
+ * Load and present a show from a zip file URL (I-087).
+ * @param {string} zipUrl
+ * @param {string | null} [showPath]
+ */
+async function openZipShow(zipUrl, showPath) {
+  showProgress(app, { title: 'Downloading presentation…', percent: null });
+
+  let bytes;
+  try {
+    bytes = await downloadZip(zipUrl, {
+      onProgress: ({ loaded, total, percent }) => {
+        const detail = total
+          ? `${formatBytes(loaded)} / ${formatBytes(total)} (${percent}%)`
+          : `${formatBytes(loaded)} downloaded`;
+        showProgress(app, {
+          title: 'Downloading presentation…',
+          percent,
+          detail,
+        });
+      },
+    });
+  } catch (err) {
+    if (err instanceof LoadError) {
+      showLoadError(app, { title: 'The presentation zip could not be downloaded', message: err.message, url: err.url });
+      return;
+    }
+    throw err;
+  }
+
+  showProgress(app, { title: 'Extracting presentation…', percent: null });
+
+  let entries;
+  try {
+    entries = await readZip(bytes);
+  } catch (err) {
+    if (err instanceof LoadError) {
+      showLoadError(app, { title: 'The zip file could not be read', message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  let source;
+  try {
+    source = createZipSource(entries, { name: zipUrl, path: showPath ?? undefined });
+  } catch (err) {
+    if (err instanceof LoadError) {
+      showLoadError(app, { title: 'Could not open show from zip', message: err.message });
+      return;
+    }
+    throw err;
+  }
+
+  await present(() => loadShowFromZip(source));
+}
+
+/**
+ * @param {number} bytes
+ * @returns {string}
+ */
+function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 /**

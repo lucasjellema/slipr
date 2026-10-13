@@ -329,6 +329,19 @@ http://localhost:8080/viewer/?show=../shows/demo/show.json&amp;mode=reader&amp;p
         <h3>Local show folders (File System Access API)</h3>
         <p>On Chrome and Edge, open <code>viewer/</code> without parameters and click <strong>Open a show folder…</strong> to pick a show folder from your disk. Slipr loads the show directly without uploading your files to any external server. The folder is remembered in your browser under <code>viewer/?folder=&lt;key&gt;</code>.</p>
 
+        <h3>Zipped presentations (?zip=&lt;url&gt;)</h3>
+        <p>Load and present a zipped Slipr presentation directly from any web server or GitHub release via a URL parameter:</p>
+        <pre><code># Load and present from a zip archive
+http://localhost:8080/viewer/?zip=https://example.com/show.zip
+
+# Open directly in Reader mode
+http://localhost:8080/viewer/?zip=https://example.com/show.zip&amp;mode=reader
+
+# GitHub archive or multi-show repository
+http://localhost:8080/viewer/?zip=https://example.com/repo-main.zip&amp;path=shows/intro</code></pre>
+        <p>The viewer downloads the zip file client-side, showing download progress, and decompresses it entirely in memory using standard browser streams (keeping Slipr fully offline once loaded, with zero backend servers needed). Images and assets become in-memory blob URLs.</p>
+        <p><strong>GitHub compatibility:</strong> Zip files from GitHub (where files are enclosed in a top-level folder such as <code>repo-main/show.json</code>) are auto-detected automatically. For repositories with multiple presentations, specify which one to present with the <code>&amp;path=</code> parameter.</p>
+
         <h3>Single-file HTML exports (offline presenting)</h3>
         <p>Shows can be compiled into a single, self-contained offline HTML file using the Slipr Editor's <strong>Export…</strong> button or the CLI:</p>
         <pre><code>npm run export -- shows/demo</code></pre>
@@ -395,6 +408,14 @@ http://localhost:8080/viewer/?show=../shows/demo/show.json&amp;mode=reader&amp;p
 
         <h3>Validation errors on show.json</h3>
         <p>If a show fails to open, the viewer displays a structured diagnostic report detailing schema violations, missing assets, or invalid layout references. Open the show in the <strong>Slipr Editor</strong> (<code>editor/</code>) to visually inspect and correct invalid slots or missing files without editing raw JSON.</p>
+
+        <h3>Zip download failure or CORS restrictions</h3>
+        <p>When loading a presentation from a remote zip URL (<code>?zip=&lt;url&gt;</code>), browsers block cross-origin HTTP requests unless the server responds with <code>Access-Control-Allow-Origin</code> headers (CORS).</p>
+        <ul>
+          <li><strong>GitHub:</strong> Raw archive links from GitHub may restrict cross-origin requests. Host the zip file on <strong>GitHub Pages</strong> or a CORS-enabled static file host.</li>
+          <li><strong>Custom servers:</strong> Ensure your web server includes the <code>Access-Control-Allow-Origin: *</code> header for zip assets.</li>
+          <li><strong>Local fallback:</strong> If you cannot enable CORS on the remote host, download the zip file to your computer, extract it, and click <strong>Open a show folder…</strong> on the viewer start page to present completely offline without restrictions.</li>
+        </ul>
       </section>
 
     </main>

@@ -24,13 +24,16 @@ http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader     reade
 
 A show folder anywhere on your computer opens with **Open a show folder…** on the viewer's start page (`viewer/` without parameters; Chrome or Edge). The viewer remembers the folder in this browser and reopens it as `viewer/?folder=<key>`. The editor's **Present** and **Read** use the same kind of link. After a browser restart, one click on **Allow access** lets the viewer read the folder again.
 
+A zipped show archive can also be loaded directly from any web server or GitHub release using `viewer/?zip=https://example.com/show.zip` (I-087). The archive is downloaded client-side and decompressed in memory. Single-directory wrappers (e.g. GitHub archives `repo-main/show.json`) are auto-detected; for archives with multiple shows, specify which one with `&path=`.
+
 | URL parameter | Meaning |
 |---|---|
+| `show` | Path or URL to `show.json` |
 | `folder` | Instead of `show`: a show folder remembered in this browser (D-012) |
-| `show` | Path or URL to `show.json` (required) |
+| `zip` | Instead of `show` / `folder`: URL to a zipped show archive (I-087) |
+| `path` | When loading a `zip`: subfolder inside the archive. In reader mode: preselect a path, e.g. `path=quick` |
 | `mode` | `audience` (default) or `reader` |
 | `profile` | Reader mode: preselect a profile, e.g. `profile=dev` |
-| `path` | Reader mode: preselect a path, e.g. `path=quick` |
 | `depth` | Reader mode: detail level `1` essentials, `2` standard (default), `3` deep dive |
 | `#/5` or `#/s-architecture` | Audience mode: go to slide 5 (0-based) or to the slide with that id. `#/s-problem/2` also selects a build step |
 | `#s-05` / `#s-05/b3` | Reader mode: go to a slide, or to a block within it |

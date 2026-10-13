@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Present from a zip URL (I-087)
+- **Added** `shared/zip.js`: client-side decompressor using Web Streams `DecompressionStream('deflate-raw')` without build steps or runtime npm packages (D-001, D-002). `readZip()` extracts STORE and DEFLATE archives in memory; `downloadZip()` streams downloads with live progress callbacks; `createZipSource()` adapts files into an in-memory `FolderSource` with `blob:` object URLs, with auto-detection for GitHub single-wrapper directory archives (e.g. `repo-main/show.json`) and optional `&path=` resolution for repositories with multiple presentations.
+- **Added** `loadShowFromZip()` in `shared/load.js`.
+- **Added** viewer support for `viewer/?zip=<url>`: downloads and decompresses client-side, showing progress bar, and presents in audience or reader mode with clear diagnostics for CORS restrictions, missing files, or 404s.
+
 ### 2026-10-13: Image cropping (I-090)
 - **Added** to show format 0.2: `crop` (`{ x, y, w, h }`, fractions of the picture) on every image value; schema `$defs/imageCrop`. Validation: a 0.1 show with a crop is an error; a crop outside the picture or without size, and a hotspot outside its picture's crop, are warnings.
 - **Added** `shared/crop.js`: crop helpers (tested) and `applyCropFallback()`, which draws cropped pictures on a canvas in browsers without `object-view-box` (called by `renderSlide()` and `hydrateEmbeds()`). `shared/picture.js` adds `object-view-box` and `data-crop` to every picture; reader image blocks place hotspots relative to the crop.

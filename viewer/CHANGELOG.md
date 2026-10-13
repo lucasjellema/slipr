@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Present from a zip URL (I-087)
+- **Added** `?zip=<url>` parameter: downloads a zipped Slipr presentation via `fetch()` with live progress bar, decompresses client-side in memory with standard Web Streams `DecompressionStream('deflate-raw')` without external dependencies or backend, and presents in audience or reader mode.
+- **Added** GitHub compatibility: archives with single top-level directory wrappers (e.g. `repo-main/show.json`) are auto-detected; optional `&path=` allows selecting a specific show in repositories with multiple presentations.
+- **Added** clear diagnostic feedback for CORS restrictions, missing files, and 404s.
+
 ### 2026-10-13: Cropped pictures (I-090)
 - **Added** pictures show their crop in both modes (with a canvas fallback in browsers without `object-view-box`); hotspots stay on their spot of a cropped picture.
 

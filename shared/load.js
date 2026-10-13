@@ -155,6 +155,54 @@ export async function loadShowFromFolder(source, options = {}) {
 }
 
 /**
+ * Load a show from a zip source (I-087).
+ * @param {import('./zip.js').ZipSource} source
+ * @param {FolderLoadOptions} [options]
+ * @returns {Promise<ShowContext>}
+ */
+export async function loadShowFromZip(source, options = {}) {
+  const doFetch = options.fetch ?? globalThis.fetch.bind(globalThis);
+  const baseHref = globalThis.location?.href ?? 'http://localhost:8080/viewer/';
+  const appBase = new URL(options.appBase ?? new URL('../', baseHref));
+  const createObjectURL = options.createObjectURL ?? ((blob) => URL.createObjectURL(blob));
+  const showHref = new URL(`slipr-zip:///${encodeURIComponent(source.name)}/${source.prefix}show.json`);
+
+  const text = await source.readText('show.json');
+  if (text === null) {
+    throw new LoadError(`The zip archive "${source.name}" has no show.json in "${source.prefix}".`, { kind: 'fetch', url: showHref.href, status: 404 });
+  }
+  const show = parseJson(text, `show.json in the zip archive "${source.name}"`, showHref.href);
+  const { href: templateHref, notice } = resolveFolderTemplate(templateRef(show, showHref.href), appBase);
+  const { template, layouts } = await loadTemplate(templateHref, doFetch);
+
+  /** @type {Map<string, string>} */
+  const blobUrls = new Map();
+  await Promise.all(collectImagePaths(show).map(async (src) => {
+    const path = normalizePath(src);
+    const file = path ? await source.readFile(path) : null;
+    if (file) blobUrls.set(src, createObjectURL(file));
+  }));
+  // URLs and paths outside the folder can't be checked here; don't warn about them.
+  const imageExists = (/** @type {string} */ src) => blobUrls.has(src) || normalizePath(src) === null;
+
+  return {
+    show,
+    template,
+    showUrl: showHref,
+    templateUrl: templateHref,
+    layouts,
+    validation: validateAll(show, template, imageExists),
+    resolveAsset: (src) => blobUrls.get(src) ?? src,
+    resolveTemplateAsset: (path) => new URL(path, templateHref).href,
+    registerAsset: (src, blob) => {
+      if (!blobUrls.has(src)) blobUrls.set(src, createObjectURL(blob));
+    },
+    notices: notice ? [notice] : [],
+    folder: source,
+  };
+}
+
+/**
  * Where the template of a show loaded from a folder lives (D-012). A URL is used
  * as is. A ref that leaves the folder (`../../templates/default`, or the
  * root-relative `/templates/default` that new shows get) resolves by its last
