@@ -6,6 +6,7 @@
  */
 import Reveal from '../../vendor/reveal.js-6.0.2/dist/reveal.mjs';
 import { morphMatcher, prefersReducedMotion } from './morph.js';
+import { mountPresenterTools } from './presenter-tools.js';
 import RevealNotes from '../../vendor/reveal.js-6.0.2/dist/plugin/notes.mjs';
 import RevealZoom from '../../vendor/reveal.js-6.0.2/dist/plugin/zoom.mjs';
 import RevealSearch from '../../vendor/reveal.js-6.0.2/dist/plugin/search.mjs';
@@ -82,6 +83,8 @@ export async function startAudience(app, ctx) {
     plugins: [RevealNotes, RevealZoom, RevealSearch],
   });
   await deck.initialize();
+  // Laser pointer (L), spotlight (K) and pen (D) for the presenter (I-003).
+  mountPresenterTools(deck);
   // Embeds render in the background (I-070, I-072): a large PDF or a slow page
   // must not hold up the show; until then each shows its static fallback.
   hydrateEmbeds(slidesEl).catch((err) => console.warn('Slipr: embeds failed:', err));

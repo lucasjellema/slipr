@@ -391,3 +391,37 @@ body.slipr-audience { background: #0E1116; }
   0%, 100% { opacity: 0.4; transform: scale(0.9); }
   50% { opacity: 1; transform: scale(1.1); }
 }
+
+/* ---------- Presenter tools: laser, spotlight, pen (I-003) ---------- */
+.slipr-tools {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.slipr-tools-canvas { position: absolute; touch-action: none; }
+.slipr-tools[data-tool="pen"] .slipr-tools-canvas { pointer-events: auto; cursor: crosshair; }
+.slipr-tools-laser {
+  display: none;
+  position: absolute;
+  left: -8px;
+  top: -8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--slipr-laser-color, #E63232);
+  box-shadow: 0 0 6px 3px color-mix(in srgb, var(--slipr-laser-color, #E63232) 60%, transparent), 0 0 18px 8px color-mix(in srgb, var(--slipr-laser-color, #E63232) 30%, transparent);
+}
+.slipr-tools[data-tool="laser"] .slipr-tools-laser { display: block; }
+body[data-slipr-tool="laser"], body[data-slipr-tool="laser"] * { cursor: none !important; }
+.slipr-tools-spotlight {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle 16vmin at var(--x, 50%) var(--y, 50%), transparent 96%, rgb(0 0 0 / 0.72) 100%);
+}
+.slipr-tools[data-tool="spotlight"] .slipr-tools-spotlight { display: block; }
+.slipr-tools-status {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}

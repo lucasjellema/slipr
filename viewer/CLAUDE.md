@@ -34,6 +34,7 @@ With `shows/demo`:
 2. Auto-animate slides morph; from "AI help, kept in its cage" to the next slide the photo zooms into the robot without stretching (I-091; in Claude's pane check the generated `[data-auto-animate-target]` stylesheet instead: an `object-view-box` transition, no `scale`). The agenda slide shows the chapters.
 3. `S` opens the presenter view with notes and the next slide (needs popups allowed; Claude's built-in browser pane blocks popups, so test this in a normal browser).
 4. The backup slides come after "Thank you", are not counted in the slide number, and have a dashed outline in the overview (`O`).
+4b. Presenter tools (I-003): `L` shows a laser dot that follows the mouse, `K` a spotlight, `D` the pen: draw on a slide, go to the next and back (the drawing is back), `X` erases it, `Esc` turns the tool off without opening the overview (a second `Esc` opens it). In Claude's pane the window can be 0 × 0 while hidden: set a size with `resize_window` first.
 4a. The chapter bar along the bottom fills as you advance. `#/s-architecture` deep-links to that slide.
 
 **Reader**

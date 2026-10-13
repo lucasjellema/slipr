@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Laser pointer, spotlight and pen (I-003)
+- **Added** `audience/presenter-tools.js`: `L` laser pointer, `K` spotlight (the slide dims around the pointer), `D` pen (mouse, pen or touch; strokes in fractions of the slide, kept per slide until a reload, in the template's accent color; `X` erases the slide's drawing). One tool at a time; `Esc` turns it off before Reveal's overview. The overview and pause turn tools off. Listed in Reveal's `?` help and the viewer manual. `L` and `K` replace Reveal's vim-style navigation keys.
+
 ### 2026-10-13: Morph transitions for pictures (I-091)
 - **Added** `audience/morph.js`: Reveal's `autoAnimateMatcher` for Slipr. Pictures pair by `morphId`, then by file (also when cropped by the canvas fallback), then by slot, and morph by width and height (no distorting scale) together with their crop, focus, opacity and corner radius, measured on screen so a picture can move between a slot and an extra image. Other pairs stay Reveal's. With `prefers-reduced-motion`, auto-animate is off.
 

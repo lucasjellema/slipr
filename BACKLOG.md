@@ -60,7 +60,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ### Audience mode
 - [ ] **I-001** [viewer] Presenter view extras: per-slide time budget, "behind schedule" indicator
-- [ ] **I-003** [viewer] Laser pointer, spotlight, on-slide drawing (Reveal plugins)
 - [ ] **I-004** [viewer] QR code slot/overlay that links the audience to the reader version of the show, optionally at the current slide
 - [ ] **I-006** [viewer] Kiosk mode: auto-advance and loop, for screens at events
 - [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), code with line-by-line highlighting, KaTeX. Mermaid diagrams moved to I-073
@@ -169,6 +168,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-003** [viewer] Laser pointer (`L`), spotlight (`K`) and pen (`D`; `X` erases) in audience mode: own vanilla module `viewer/audience/presenter-tools.js` (Lucas: no third-party plugin), drawings per slide until a reload, template accent color, touch-safe, `Esc` turns tools off · done 2026-10-13 · claude
 - [x] **I-091** [viewer/format/editor] Morph transition for pictures between auto-animate slides: a Slipr `autoAnimateMatcher` (`viewer/audience/morph.js`) pairs pictures by `morphId`, file or slot and animates width / height (no distortion), crop, focus, opacity and radius; `morphId` on image values (show format 0.2); editor **Morph name** field; reduced motion turns it off; demo slide `s-ai-detail`. Spec (with the Reveal spike): `docs/specs/I-091-image-morph.md` · done 2026-10-13 · claude
 - [x] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**: client-side download via `fetch()` with live progress bar; in-memory decompression via Web Streams `DecompressionStream('deflate-raw')` keeping D-001/D-002 (zero build step, zero backend); adapts unzipped files into an in-memory source with `blob:` object URLs; GitHub archive auto-detection (single-directory wrapper) and optional `&path=` resolution for multi-show repos; audience and reader mode presentation (`&mode=reader`) with deep link and personal annotation preservation; clear diagnostics for CORS restrictions, missing files, and 404s · done 2026-10-13 · gemini
 - [x] **I-090** [format/editor/viewer/converter] Image cropping: `crop` (`{ x, y, w, h }`, fractions of the picture) on every image value (show format 0.2); rendered with `object-view-box` and a canvas fallback (`shared/crop.js`); hotspots stay positions on the whole picture (hidden and flagged outside the crop); editor **Crop…** dialog with shapes, numbers and keyboard, hotspot editor maps to the crop; converter keeps PowerPoint's picture crop. Spec: `docs/specs/I-090-image-cropping.md` · done 2026-10-13 · claude
