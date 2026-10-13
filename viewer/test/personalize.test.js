@@ -78,7 +78,7 @@ describe('nearestVisibleSlide', () => {
   const model = personalize(demo);
   test('visible slide: itself', () => assert.equal(nearestVisibleSlide(demo, model, 's-how'), 's-how'));
   test('hidden slide: the previous visible one', () => assert.equal(nearestVisibleSlide(demo, model, 's-data-1'), 's-how'));
-  test('hidden last-ish slide: previous visible', () => assert.equal(nearestVisibleSlide(demo, model, 's-thanks'), 's-ai'));
+  test('hidden last-ish slide: previous visible', () => assert.equal(nearestVisibleSlide(demo, model, 's-thanks'), 's-ai-detail'));
   test('unknown or missing id: first slide', () => {
     assert.equal(nearestVisibleSlide(demo, model, 'nope'), 's-title');
     assert.equal(nearestVisibleSlide(demo, model, null), 's-title');

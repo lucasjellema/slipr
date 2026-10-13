@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), image cropping (I-090), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), image cropping (I-090), picture morphs (I-091), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -66,13 +66,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-007** [format] Visualization slot types: `chart` (data → animated SVG), code with line-by-line highlighting, KaTeX. Mermaid diagrams moved to I-073
 - [ ] **I-008** [viewer] Jump to slide by number or title search (`G`)
 - [ ] **I-009** [viewer] Zoomable "map" overview: chapters as clusters, zoom into a chapter (Prezi-like)
-- [ ] **I-091** [viewer/format/editor] **Morph transition for images between slides** (like PowerPoint's Morph): when the same picture appears on two consecutive slides, it moves and changes smoothly from one to the next: position and size, `focus`, zoom and cropping (I-090), opacity and picture style where possible.
-  - Builds on Reveal.js **auto-animate** (`audience.autoAnimate`, already in the format), which morphs elements with the same `data-id` but only animates position, size and a few CSS properties, not the visible part of an image.
-  - **Matching**: by default the same image file in the same slot or as the same extra image; optionally an explicit `morphId` on an image value (or overlay) to pair different slots or layouts. Decide with Lucas whether matching is automatic or opt-in.
-  - **Rendering crop and focus so they can animate**: e.g. the picture inside a clipping frame, positioned with transforms, so Reveal (or a small Slipr step after Reveal's `autoanimate` event) can tween frame size, image offset and scale together; `object-position` / `object-fit` changes do not animate well.
-  - Text elements (I-089) and other slots could follow the same matching later.
-  - Reader mode is unaffected (no transitions). Respect `prefers-reduced-motion` (jump instead of morph).
-  - Depends on I-090 for cropping; a spike first: what auto-animate already does with matching `data-id`s on images, and what needs custom tweening · todo · —
 
 ### Reader mode
 - [ ] **I-010** [viewer] **Follow the presenter**: during a live talk, readers' devices follow the presenter's current slide, while still allowing them to dive deeper
@@ -176,6 +169,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-091** [viewer/format/editor] Morph transition for pictures between auto-animate slides: a Slipr `autoAnimateMatcher` (`viewer/audience/morph.js`) pairs pictures by `morphId`, file or slot and animates width / height (no distortion), crop, focus, opacity and radius; `morphId` on image values (show format 0.2); editor **Morph name** field; reduced motion turns it off; demo slide `s-ai-detail`. Spec (with the Reveal spike): `docs/specs/I-091-image-morph.md` · done 2026-10-13 · claude
 - [x] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**: client-side download via `fetch()` with live progress bar; in-memory decompression via Web Streams `DecompressionStream('deflate-raw')` keeping D-001/D-002 (zero build step, zero backend); adapts unzipped files into an in-memory source with `blob:` object URLs; GitHub archive auto-detection (single-directory wrapper) and optional `&path=` resolution for multi-show repos; audience and reader mode presentation (`&mode=reader`) with deep link and personal annotation preservation; clear diagnostics for CORS restrictions, missing files, and 404s · done 2026-10-13 · gemini
 - [x] **I-090** [format/editor/viewer/converter] Image cropping: `crop` (`{ x, y, w, h }`, fractions of the picture) on every image value (show format 0.2); rendered with `object-view-box` and a canvas fallback (`shared/crop.js`); hotspots stay positions on the whole picture (hidden and flagged outside the crop); editor **Crop…** dialog with shapes, numbers and keyboard, hotspot editor maps to the crop; converter keeps PowerPoint's picture crop. Spec: `docs/specs/I-090-image-cropping.md` · done 2026-10-13 · claude
 - [x] **I-074** [format/viewer] Graphs with vendored **Cytoscape.js 3.34.3** (D-011 refined): `graph` slot and block (show format 0.2) with inline `nodes` / `edges` or a `data/*.json` file, `layout`, and audience `steps` that reveal nodes or focus one; node colors from the template by tag (`--slipr-graph-*`); reader pan, zoom, node panel with "Go to slide", tag filter, keyboard node list; static node list as fallback and for screen readers; `graph` layouts in both templates (default 1.4.0, Conclusion 0.1.5); demo slide and data-file block; export; editor read-only (E-020). Spec: `docs/specs/I-074-graph.md` · done 2026-10-13 · claude

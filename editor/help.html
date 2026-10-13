@@ -267,7 +267,7 @@
           <dt>Chapter</dt><dd>Puts the slide in a chapter, for the agenda and the reader contents. Create chapters in <a href="#settings">Show settings</a>.</dd>
           <dt>Tags</dt><dd>Comma-separated topics, used by reader search and "related" suggestions.</dd>
           <dt>Build step by step</dt><dd>Shows bullets and cards one at a time, optionally with an effect such as <em>fade-up</em>. Off: everything at once.</dd>
-          <dt>Auto-animate</dt><dd>Morphs matching fields from and to neighbouring slides that also have auto-animate on: a title that moves, a list that grows.</dd>
+          <dt>Auto-animate</dt><dd>Morphs matching fields from and to neighbouring slides that also have auto-animate on: a title that moves, a list that grows. The same picture on both slides <strong>morphs</strong>: it moves and resizes, and its crop, focus and opacity change smoothly, so you can zoom into a detail by <a href="#crop">cropping</a> the picture tighter on the next slide. Two different pictures morph when they have the same <a href="#morph">morph name</a>.</dd>
           <dt>Transition into this slide</dt><dd>Overrides the show's transition for this slide only.</dd>
           <dt>Hide from audience mode</dt><dd>The same as <strong>◉</strong> in the slide list: a reader-only slide.</dd>
         </dl>
@@ -397,6 +397,9 @@
           <li><a href="#hotspots">Hotspots</a> stay on their spot of the picture. A hotspot outside the crop is not shown; its row in the hotspot editor says so.</li>
           <li>Pictures converted from PowerPoint keep their PowerPoint crop.</li>
         </ul>
+
+        <h3 id="morph">Morph name</h3>
+        <p>When two slides in a row both have <strong>Auto-animate</strong> on (Slide tab, audience options), the same picture on both slides morphs from one into the other while presenting: it moves, resizes, and its crop and focus change smoothly. That works by itself for the same picture file. Give two <em>different</em> pictures the same <strong>Morph name</strong> (for example a photo and a close-up of it) to make them morph into each other. Letters, digits, <code>-</code> and <code>_</code>; leave it empty otherwise. People who turned off animations in their system settings see a normal slide change.</p>
 
         <h3>Good to know</h3>
         <ul>

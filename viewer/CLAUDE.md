@@ -31,7 +31,7 @@ With `shows/demo`:
 
 **Audience**
 1. Opens on slide 1. Arrows and PageUp/PageDown navigate. Fragments build one by one.
-2. Auto-animate slides morph. The agenda slide shows the chapters.
+2. Auto-animate slides morph; from "AI help, kept in its cage" to the next slide the photo zooms into the robot without stretching (I-091; in Claude's pane check the generated `[data-auto-animate-target]` stylesheet instead: an `object-view-box` transition, no `scale`). The agenda slide shows the chapters.
 3. `S` opens the presenter view with notes and the next slide (needs popups allowed; Claude's built-in browser pane blocks popups, so test this in a normal browser).
 4. The backup slides come after "Thank you", are not counted in the slide number, and have a dashed outline in the overview (`O`).
 4a. The chapter bar along the bottom fills as you advance. `#/s-architecture` deep-links to that slide.

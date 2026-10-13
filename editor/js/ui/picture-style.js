@@ -12,6 +12,7 @@
 import { h } from '../dom.js';
 import { openCropDialog } from './crop-dialog.js';
 import { pictureStyle } from '../../../shared/picture.js';
+import { cleanMorphId } from '../slot-values.js';
 
 /**
  * @param {{ label: string, image: any, styles: { id: string, label: string, description?: string }[],
@@ -88,6 +89,21 @@ export function pictureStyleControls({ label, image, styles, resolveAsset, onCha
         onclick: () => openCropDialog({ src, alt: image.alt, crop: image.crop, onApply: (crop) => onChange({ crop }) }),
       }, [viewBox ? 'Crop… (cropped)' : 'Crop…']),
       viewBox ? h('button', { type: 'button', class: 'slipr-link-btn', onclick: () => onChange({ crop: undefined }) }, ['Show the whole picture']) : null,
+    ]),
+    h('label', { class: 'slipr-picture-morph-row', title: 'Pictures with the same morph name on two auto-animate slides morph into each other, even when they are different files. The same file morphs without a name.' }, [
+      h('span', { class: 'slipr-label' }, ['Morph name']),
+      h('input', {
+        type: 'text', class: 'slipr-input slipr-input-sm', value: image.morphId ?? '',
+        placeholder: 'optional, e.g. robot',
+        'aria-label': `${label}: morph name`,
+        // Cleaned as you type; stored when you leave the field (or press Enter).
+        oninput: (/** @type {Event} */ e) => {
+          const input = /** @type {HTMLInputElement} */ (e.target);
+          const clean = input.value.replace(/\s/g, '-').replace(/[^A-Za-z0-9_-]/g, '');
+          if (clean !== input.value) input.value = clean;
+        },
+        onchange: (/** @type {Event} */ e) => onChange({ morphId: cleanMorphId(/** @type {HTMLInputElement} */ (e.target).value) }),
+      }),
     ]),
   ]);
 }

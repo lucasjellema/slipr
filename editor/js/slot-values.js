@@ -83,6 +83,17 @@ export function imageValue(previous, change) {
 }
 
 /**
+ * A morph name (I-091) as typed, cleaned to what the format allows: spaces
+ * become "-", other characters are dropped, at most 60. Empty: undefined.
+ * @param {string} text
+ * @returns {string | undefined}
+ */
+export function cleanMorphId(text) {
+  const s = String(text ?? '').trim().replace(/\s+/g, '-').replace(/[^A-Za-z0-9_-]/g, '').replace(/^[-_]+/, '').slice(0, 60);
+  return s || undefined;
+}
+
+/**
  * A graph's read-only summary (I-074: graphs are edited in show.json for now).
  * @param {any} value
  * @returns {string}

@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Morph name (I-091)
+- **Added** a **Morph name** field under every picture, next to Crop… (cleaned to letters, digits, `-` and `_`; empty removes it), to pair two different pictures for the morph between auto-animate slides.
+
 ### 2026-10-13: Export and import zip archives (.zip / .slipr) in editor (I-092)
 - **Added** **Export to zip archive (`.zip` / `.slipr`)**: an **Export Zip…** action in the editor toolbar (`editor/js/export-zip.js`). Packages `show.json`, referenced images, data files, and local documents in memory (including unsaved edits). Compresses client-side using standard Web Streams (`CompressionStream('deflate-raw')`) via `shared/zip.js` with pure JS CRC-32 and UTF-8 filenames; triggers `showSaveFilePicker` (`.zip` / `.slipr`) or browser download.
 - **Added** **Import from uploaded zip archive**: an **Open zip archive…** button on the start screen and an **Open Zip…** button in the toolbar (`editor/js/files.js`). Decompresses client-side in memory without server upload; handles root shows, single-directory wrappers (e.g. GitHub archives), and prompts if multiple presentations are found.

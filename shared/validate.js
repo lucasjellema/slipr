@@ -388,6 +388,9 @@ function checkImages(slide, at, imageExists, errors, warnings, template, version
     if (imageExists && !imageExists(image.src)) {
       warnings.push({ path, code: 'missing-file', message: `image file "${image.src}" not found` });
     }
+    if (image.morphId !== undefined && version === '0.1') {
+      errors.push({ path: `${path}.morphId`, code: 'format-version', message: 'a morph name needs show format 0.2: set "slipr" to "0.2"' });
+    }
     // Crop (I-090): show format 0.2, inside the picture, with a size.
     if (image.crop !== undefined) {
       if (version === '0.1') errors.push({ path: `${path}.crop`, code: 'format-version', message: 'a crop needs show format 0.2: set "slipr" to "0.2"' });
@@ -397,6 +400,15 @@ function checkImages(slide, at, imageExists, errors, warnings, template, version
         else if (c.x + c.w > 1 + OVERLAY_TOLERANCE || c.y + c.h > 1 + OVERLAY_TOLERANCE) warnings.push({ path: `${path}.crop`, code: 'crop-outside', message: 'the crop sticks out of the picture' });
       }
     }
+  }
+  // A morph name (I-091) pairs one picture per slide.
+  /** @type {Map<string, string>} */
+  const morphNames = new Map();
+  for (const [image, path] of images) {
+    if (typeof image.morphId !== 'string') continue;
+    if (morphNames.has(image.morphId)) {
+      warnings.push({ path: `${path}.morphId`, code: 'duplicate-morph-id', message: `morph name "${image.morphId}" is also used by ${morphNames.get(image.morphId)}: only one of them can morph` });
+    } else morphNames.set(image.morphId, path);
   }
   // Hotspots are positions on the whole picture: with a crop, some may not be shown.
   arrayOf(slide.reader?.blocks).forEach((block, j) => {

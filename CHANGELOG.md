@@ -6,6 +6,10 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Pictures morph between slides (I-091)
+- **Added** to show format 0.2: `morphId` on image values (a name that pairs two pictures between auto-animate slides). Validation: an error in a 0.1 show; the same name twice on one slide is a warning. `shared/picture.js` writes `data-morph-id`.
+- **Changed** the demo: "AI help, kept in its cage" and a new detail slide (`s-ai-detail`) have auto-animate on, so the photo zooms into the robot. Spec `docs/specs/I-091-image-morph.md` (with the Reveal.js spike).
+
 ### 2026-10-13: Import local presentation archives in viewer
 - **Added** `shared/archive-handles.js`: client-side presentation archive storage in IndexedDB (`slipr-archives`) with in-memory fallback for private and test modes.
 - **Added** `shared/zip.js` shared `pickZipFile()` function for picking `.zip` and `.slipr` files across editor and viewer.

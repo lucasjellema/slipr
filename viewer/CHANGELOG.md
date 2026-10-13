@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Morph transitions for pictures (I-091)
+- **Added** `audience/morph.js`: Reveal's `autoAnimateMatcher` for Slipr. Pictures pair by `morphId`, then by file (also when cropped by the canvas fallback), then by slot, and morph by width and height (no distorting scale) together with their crop, focus, opacity and corner radius, measured on screen so a picture can move between a slot and an extra image. Other pairs stay Reveal's. With `prefers-reduced-motion`, auto-animate is off.
+
 ### 2026-10-13: Import local zip archives (.zip / .slipr)
 - **Added** **Open zip archive…** button and drag-and-drop zone on viewer start page: import presentations directly from disk in any browser (Chrome, Edge, Firefox, Safari) without server uploads or installations.
 - **Added** `viewer/?archive=<key>` parameter backed by IndexedDB (`slipr-archives`) via `shared/archive-handles.js`. Enables seamless mode switching (<kbd>A</kbd> / <kbd>R</kbd>) between Audience and Reader mode, page reloads, and deep links for local presentations.

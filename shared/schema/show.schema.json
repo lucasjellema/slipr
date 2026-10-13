@@ -278,7 +278,8 @@
         "focus": { "type": "string", "description": "CSS object-position, e.g. center or 30% 50%." },
         "style": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "(0.2) Id of one of the template's picture styles (D-014)." },
         "opacity": { "type": "number", "minimum": 0, "maximum": 1, "description": "(0.2) Opacity of the picture, 0-1; absent means 1." },
-        "crop": { "$ref": "#/$defs/imageCrop" }
+        "crop": { "$ref": "#/$defs/imageCrop" },
+        "morphId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9_-]{0,59}$", "description": "(0.2) Pairs this picture with the picture of the same name on the next or previous auto-animate slide, so it morphs (I-091)." }
       }
     },
     "imageCrop": {

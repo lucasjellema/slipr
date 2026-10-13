@@ -132,3 +132,14 @@ describe('graph summary (I-074)', () => {
     assert.equal(graphSummary({ data: 'data/g.json', nodes: [{ id: 'a' }, { id: 'b' }], edges: [{ from: 'a', to: 'b' }] }), 'Graph from data/g.json, plus 2 nodes, 1 link');
   });
 });
+
+describe('morph names (I-091)', () => {
+  test('cleaned to the allowed characters; empty is no name', async () => {
+    const { cleanMorphId } = await import('../js/slot-values.js');
+    assert.equal(cleanMorphId(' Robot detail '), 'Robot-detail');
+    assert.equal(cleanMorphId('a/b#c'), 'abc');
+    assert.equal(cleanMorphId('--x'), 'x');
+    assert.equal(cleanMorphId('   '), undefined);
+    assert.equal(cleanMorphId('x'.repeat(80)).length, 60);
+  });
+});

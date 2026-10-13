@@ -905,6 +905,9 @@
         }
       ],
       "notes": "Idea, not built yet. Emphasise: opt-in, and it never invents content beyond the show.",
+      "audience": {
+        "autoAnimate": true
+      },
       "reader": {
         "summary": "A future assistant that helps readers and authors, but only within the show's content.",
         "blocks": [
@@ -943,6 +946,37 @@
         "related": [
           "s-roadmap"
         ]
+      }
+    },
+    {
+      "id": "s-ai-detail",
+      "layout": "image-full",
+      "chapter": "next",
+      "tags": [
+        "ai",
+        "ideas"
+      ],
+      "content": {
+        "title": "AI help, kept in its cage",
+        "image": {
+          "src": "images/caged-agent.jpg",
+          "alt": "Illustration of a humanoid robot standing inside a birdcage, surrounded by floating documents and streams of data",
+          "fit": "contain",
+          "crop": {
+            "x": 0.36,
+            "y": 0.22,
+            "w": 0.28,
+            "h": 0.4
+          }
+        },
+        "caption": "Up close: it only knows what the show tells it"
+      },
+      "notes": "The same picture, zoomed in: the photo morphs from the previous slide (auto-animate on both slides).",
+      "audience": {
+        "autoAnimate": true
+      },
+      "reader": {
+        "summary": "A closer look at the assistant: it answers from the show only."
       }
     },
     {

@@ -5,6 +5,7 @@
  * Reveal attributes, and starts Reveal.
  */
 import Reveal from '../../vendor/reveal.js-6.0.2/dist/reveal.mjs';
+import { morphMatcher, prefersReducedMotion } from './morph.js';
 import RevealNotes from '../../vendor/reveal.js-6.0.2/dist/plugin/notes.mjs';
 import RevealZoom from '../../vendor/reveal.js-6.0.2/dist/plugin/zoom.mjs';
 import RevealSearch from '../../vendor/reveal.js-6.0.2/dist/plugin/search.mjs';
@@ -75,6 +76,9 @@ export async function startAudience(app, ctx) {
     transition: show.settings?.transition ?? 'fade',
     backgroundTransition: 'fade',
     autoAnimateDuration: 0.7,
+    // Pictures morph smoothly between auto-animate slides (I-091); none with reduced motion.
+    autoAnimate: !prefersReducedMotion(),
+    autoAnimateMatcher: morphMatcher,
     plugins: [RevealNotes, RevealZoom, RevealSearch],
   });
   await deck.initialize();
