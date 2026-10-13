@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Selecting on the preview shows the settings
+- **Added** selecting an extra image or text element on the preview (click, or Tab to it) highlights its row in the Slide tab and scrolls the whole row into view, so its fields are ready to edit; keyboard focus stays on the preview. No animation with reduced motion (`revealOverlayRow()` in `ui/overlay-editor.js`).
+
 ### 2026-10-13: Text elements on slides (I-089, D-016)
 - **Added** the Slide tab section **Extra images and text** (was *Extra images*): **+ Add text** places a text element in the middle of the slide and selects its text. A text row has the text (inline Markdown) and its look (`ui/text-style-controls.js`): font and size (the template's first), bold / italic / underline / uppercase, alignment, text color and fill from the template's palette or a color picker, fill opacity, and folded away border, corners, padding and text outline.
 - **Added** text boxes on the audience preview: moved like extra images, resized freely (Shift keeps the ratio), Alt+Left / Right width and Alt+Up / Down height, and double-click or Enter (when selected) jumps to the text.

@@ -1875,6 +1875,13 @@ body.is-screen #slipr-editor-banners {
   border: 1px solid var(--slipr-editor-border);
   border-radius: 6px;
   background: var(--slipr-editor-surface);
+  scroll-margin-top: 8px;
+}
+
+/* The row of the overlay selected on the preview (same color as its box there). */
+.slipr-overlay-row.is-selected {
+  border-color: var(--slipr-editor-warning);
+  box-shadow: 0 0 0 1px var(--slipr-editor-warning);
 }
 
 .slipr-overlay-row-head {

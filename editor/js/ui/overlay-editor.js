@@ -68,8 +68,32 @@ export function focusOverlayText(index, options = {}) {
   }, 50);
 }
 
+/**
+ * Mark the selected overlay's row in the Slide tab and scroll it into view,
+ * so its fields are ready to edit (keyboard focus stays on the preview). Does
+ * nothing when the Slide tab is not shown.
+ * @param {number} index  -1: none selected.
+ */
+export function revealOverlayRow(index) {
+  for (const row of document.querySelectorAll('.slipr-overlay-row.is-selected')) row.classList.remove('is-selected');
+  if (index < 0) return;
+  const row = /** @type {HTMLElement | null} */ (document.querySelector(`.slipr-overlay-row[data-overlay-index="${index}"]`));
+  if (!row) return;
+  row.classList.add('is-selected');
+  // Scroll only when part of the row is out of sight, then bring its head to the top.
+  let pane = row.parentElement;
+  while (pane && !(pane.scrollHeight > pane.clientHeight && /auto|scroll/.test(getComputedStyle(pane).overflowY))) pane = pane.parentElement;
+  const view = pane ? pane.getBoundingClientRect() : { top: 0, bottom: window.innerHeight };
+  const rect = row.getBoundingClientRect();
+  if (rect.top < view.top || rect.bottom > view.bottom) {
+    // No animation for reduced motion, or in a hidden page (where it would not run at all).
+    const instant = document.hidden || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    row.scrollIntoView({ block: 'start', behavior: instant ? 'auto' : 'smooth' });
+  }
+}
+
 /** @param {number} n */
-const pct = (n) => `${Math.round(n * 100000) / 1000}%`;
+const pct =(n) => `${Math.round(n * 100000) / 1000}%`;
 
 /**
  * @param {HTMLElement} slideEl   The rendered slide (audience mode).
@@ -124,6 +148,7 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
     selectOverlay(index < 0 ? null : slideId, index);
     draw();
     if (index >= 0) boxes[index]?.focus({ preventScroll: true });
+    revealOverlayRow(index);
   }
 
   // ---------------------------------------------------------------- pointer

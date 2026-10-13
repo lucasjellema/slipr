@@ -10,7 +10,7 @@
 import { h } from '../dom.js';
 import { addImageToOverlay, addOverlayImage } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
-import { selectOverlay, showOverlaySelected, focusOverlayText } from './overlay-editor.js';
+import { selectOverlay, selectedOverlay, showOverlaySelected, focusOverlayText } from './overlay-editor.js';
 import { pictureStyleControls } from './picture-style.js';
 import { textStyleControls } from './text-style-controls.js';
 import { imageValue } from '../slot-values.js';
@@ -110,7 +110,7 @@ export function buildOverlaySection(slide, store) {
     const fragment = o.fragment === true ? 'true' : typeof o.fragment === 'string' ? o.fragment : '';
     const isText = typeof o.text === 'string';
     const what = `${isText ? 'text' : 'image'} ${i + 1}`;
-    return h('li', { class: `slipr-overlay-row ${isText ? 'is-text' : ''}` }, [
+    return h('li', { class: `slipr-overlay-row ${isText ? 'is-text' : ''} ${selectedOverlay(slideId) === i ? 'is-selected' : ''}`, 'data-overlay-index': String(i) }, [
       h('div', { class: 'slipr-overlay-row-head' }, [
         h('span', { class: 'slipr-overlay-row-title' }, [`${isText ? 'Text' : 'Image'} ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
         h('div', { class: 'slipr-overlay-row-tools' }, [
