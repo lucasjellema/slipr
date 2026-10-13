@@ -267,7 +267,7 @@ Without `page` or `pages`: page 1 on a slide, the whole document in a reader blo
 
 #### Graphs (`graph` slot and block; I-074, format 0.2)
 
-A network of nodes and links, laid out automatically and drawn with the vendored Cytoscape.js (D-011), loaded only when a show has a graph. Spec: `docs/specs/I-074-graph.md`.
+A network of nodes and links, laid out automatically and drawn with the vendored Cytoscape.js (D-011), loaded only when a show has a graph. Spec: `docs/specs/I-074-graph.md`. For authors, the editor manual explains it step by step (`editor/help.html#graphs`).
 
 ```json
 "graph": {

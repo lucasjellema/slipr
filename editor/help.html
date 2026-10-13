@@ -41,6 +41,7 @@
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
+        <li><a href="#graphs">Graphs</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
         <li><a href="#glossary">Glossary</a></li>
@@ -254,6 +255,7 @@
           <dt>Cards</dt><dd>Layouts with repeated items (columns, numbered boxes, key figures, image cards, people) get one group of fields per card. A counter such as <code>7 / 18</code> shows how much room a field has and turns yellow when the text is too long. Move cards with <strong>▲</strong> / <strong>▼</strong>, remove one with <strong>🗑</strong>, and add one with <strong>+ Add card</strong>, up to the number the layout has room for.</dd>
           <dt>Diagram</dt><dd>A Mermaid diagram definition (plain text) with an optional caption. Rendered directly in the browser as an interactive SVG on slides using the <strong>Diagram</strong> layout. See <a href="#diagrams">Diagrams (Mermaid)</a>.</dd>
           <dt>Web page</dt><dd>On the <strong>Web page</strong> layout: the address (https, or a file in the show folder) and a title. <strong>While presenting</strong>: <em>show the live page</em> (clickable on the slide, no Load button) or <em>show the fallback image</em> (a screenshot; nothing is loaded, good for offline talks). In reader mode a page from another site waits for the reader's <strong>Load</strong> unless you tick <strong>In reader mode, load straight away</strong>. <strong>Allow the page to…</strong> gives extra permissions; see <a href="#reader-tab">Embedded Page</a>.</dd>
+          <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links. The editor shows a summary and draws the graph in the preview; you write the graph itself in <code>show.json</code>. See <a href="#graphs">Graphs</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
         <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
@@ -415,6 +417,7 @@
             <tr><td><strong>PDF Document</strong></td><td>A PDF with page buttons and zoom; its text turns up in search</td><td><strong>Choose PDF…</strong> (or a path / https address), a title, optional pages (one, or a range readers can page through), a fallback image</td></tr>
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
+            <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>Written in <code>show.json</code> for now (see <a href="#graphs">Graphs</a>); the editor shows a summary</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
@@ -492,6 +495,53 @@
           <dt>Clear syntax errors</dt>
           <dd>If your Mermaid definition has a typo, Slipr highlights the error with a friendly badge and the exact line number rather than breaking the slide.</dd>
         </dl>
+      </section>
+
+      <section id="graphs">
+        <h2>Graphs</h2>
+        <p>A <strong>graph</strong> shows how things relate: parts of a system, ideas, people, steps. You list the <strong>nodes</strong> (the boxes) and the <strong>links</strong> between them; Slipr places them by itself. While presenting, a graph can grow click by click; readers can explore it: drag it, zoom, click a node to read about it and jump to its slide, and filter by tag.</p>
+        <p class="tip"><strong>For now you write a graph in <code>show.json</code></strong> (open it in a text editor such as VS Code; it suggests the field names as you type). The editor shows a summary such as <em>Graph: 7 nodes, 8 links, 3 steps</em> and draws the graph in the preview. Save in the editor first, and reload the show after editing the file by hand.</p>
+
+        <h3>A graph on a slide</h3>
+        <p>Add a slide with the <strong>Graph</strong> layout, save, and fill its <code>graph</code> slot in <code>show.json</code>:</p>
+        <pre><code>"graph": {
+  "nodes": [
+    { "id": "show", "label": "show.json", "tags": ["format"],
+      "md": "One file per show.", "slide": "s-data-1" },
+    { "id": "template", "label": "Template", "tags": ["template"] },
+    { "id": "viewer", "label": "Viewer", "tags": ["viewer"] }
+  ],
+  "edges": [
+    { "from": "show", "to": "template", "label": "names" },
+    { "from": "viewer", "to": "show", "label": "reads" }
+  ],
+  "steps": [
+    { "show": ["viewer"] },
+    { "focus": "show" }
+  ]
+}</code></pre>
+
+        <h3>The fields</h3>
+        <dl>
+          <dt><code>nodes</code></dt><dd>One entry per box. <code>id</code> is required and must be unique (links and steps use it). <code>label</code> is the text on the box (default: the id). <code>tags</code> group nodes: the first tag picks the color. <code>md</code> is the text a reader sees after clicking the node (<a href="#markdown">Markdown</a>). <code>slide</code> is a slide id: the node gets a <strong>Go to slide</strong> link.</dd>
+          <dt><code>edges</code></dt><dd>The links: <code>from</code> and <code>to</code> (node ids; the arrow points to <code>to</code>), and an optional <code>label</code> on the line.</dd>
+          <dt><code>layout</code></dt><dd>How the nodes are placed: <code>cose</code> (the default: related nodes pull together), <code>breadthfirst</code> (a tree, top down, good for hierarchies and flows), <code>concentric</code>, <code>circle</code> or <code>grid</code>.</dd>
+          <dt><code>steps</code></dt><dd>Only on a slide, while presenting: one step per click, after the slide's own builds. <code>{ "show": ["id", …] }</code> brings in those nodes (they are hidden until then; a link appears once both its ends are there). <code>{ "focus": "id" }</code> zooms in on a node and its neighbours and dims the rest; the next <code>show</code> step zooms out again. Nodes no step names are there from the start. Going back a click undoes a step.</dd>
+          <dt><code>data</code></dt><dd>For a large graph: put the nodes and edges in their own file in the show folder, for example <code>data/team.json</code> containing <code>{ "nodes": [...], "edges": [...] }</code>, and write <code>"data": "data/team.json"</code> instead of (or as well as) <code>nodes</code> and <code>edges</code>. The file travels with <a href="#export">Export as one file</a>.</dd>
+          <dt><code>caption</code></dt><dd>A line below the graph. The default template's Graph layout also has its own <strong>Caption</strong> field in the Slide tab.</dd>
+          <dt><code>fallback</code></dt><dd>An optional picture (<code>{ "src": "images/graph.png", "alt": "…" }</code>) for print and slide thumbnails. Without one, Slipr shows the nodes and links as a list, which is also what screen readers get.</dd>
+        </dl>
+
+        <h3>A graph in the reader layer</h3>
+        <p>A graph can also be a reader block, under a slide in reader mode. Add it to the slide's <code>reader.blocks</code> in <code>show.json</code>, with an <code>id</code>, <code>"type": "graph"</code> and an optional <code>title</code>, plus the same fields as above except <code>steps</code>. Like any block it can have <code>for</code> (profiles) and <code>depth</code>:</p>
+        <pre><code>{ "id": "team-map", "type": "graph", "depth": 2, "title": "Who works with whom",
+  "data": "data/team.json", "layout": "breadthfirst" }</code></pre>
+
+        <h3>Colors</h3>
+        <p>You don't choose colors: the template does. Every tag gets the next color of the template's graph palette, in the order the tags first appear; nodes without a tag get the first color. In reader mode the tags appear as colored buttons that explain the colors and hide or show those nodes.</p>
+
+        <h3>Checks</h3>
+        <p>Mistakes show up under the preview (see <a href="#preview">Live preview and problems</a>). Warnings: a node id used twice, a link or step that names a node that doesn't exist, a <code>slide</code> that doesn't exist and a <code>data</code> file that isn't there. Errors: a graph without nodes or data, a node without an id and <code>steps</code> on a reader block. The demo show has two examples: the slide <em>How the pieces connect</em> and the block on <em>Backup: the show format</em> (from <code>data/show-format.json</code>).</p>
       </section>
 
       <section id="markdown">

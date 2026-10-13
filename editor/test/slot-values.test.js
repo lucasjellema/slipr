@@ -123,3 +123,12 @@ test('imageValue: fit can be set and cleared (E-015)', () => {
   assert.deepEqual(imageValue(img, { fit: 'contain' }), { src: 'images/a.png', alt: 'A', fit: 'contain' });
   assert.deepEqual(imageValue({ ...img, fit: 'cover' }, { fit: undefined }), img);
 });
+
+describe('graph summary (I-074)', () => {
+  test('counts inline nodes, links and steps; names a data file', async () => {
+    const { graphSummary } = await import('../js/slot-values.js');
+    assert.equal(graphSummary({ nodes: [{ id: 'a' }], edges: [], steps: [{ show: ['a'] }, { focus: 'a' }] }), 'Graph: 1 node, 0 links, 2 steps');
+    assert.equal(graphSummary({ data: 'data/g.json' }), 'Graph from data/g.json');
+    assert.equal(graphSummary({ data: 'data/g.json', nodes: [{ id: 'a' }, { id: 'b' }], edges: [{ from: 'a', to: 'b' }] }), 'Graph from data/g.json, plus 2 nodes, 1 link');
+  });
+});

@@ -14,6 +14,9 @@ export const HELP_SECTIONS = Object.freeze({
   settings: 'settings',
 });
 
+/** Manual section on writing graphs in show.json (I-074): linked from read-only graph fields. */
+export const GRAPH_HELP = `${HELP_PAGE}#graphs`;
+
 /**
  * Address of the manual, at the section for the given inspector tab.
  * @param {string | null} [activeTab]  'slide', 'reader' or 'settings'; anything else opens the start.

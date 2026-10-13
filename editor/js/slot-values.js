@@ -91,10 +91,12 @@ export function graphSummary(value) {
   const n = Array.isArray(value?.nodes) ? value.nodes.length : 0;
   const e = Array.isArray(value?.edges) ? value.edges.length : 0;
   const s = Array.isArray(value?.steps) ? value.steps.length : 0;
-  const parts = [`Graph: ${n} node${n === 1 ? '' : 's'}, ${e} link${e === 1 ? '' : 's'}`];
-  if (typeof value?.data === 'string') parts.push(`data from ${value.data}`);
+  const counts = `${n} node${n === 1 ? '' : 's'}, ${e} link${e === 1 ? '' : 's'}`;
+  const parts = typeof value?.data === 'string'
+    ? [`Graph from ${value.data}`, ...(n || e ? [`plus ${counts}`] : [])]
+    : [`Graph: ${counts}`];
   if (s) parts.push(`${s} step${s === 1 ? '' : 's'}`);
-  return `${parts.join(', ')}. Edit it in show.json.`;
+  return parts.join(', ');
 }
 
 /**

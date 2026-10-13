@@ -5,6 +5,7 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+import { GRAPH_HELP } from '../help.js';
 import { pictureStyleControls } from './picture-style.js';
 import { addImageToBlock } from '../image-input.js';
 import { graphSummary, imageValue } from '../slot-values.js';
@@ -261,7 +262,9 @@ export function mountReaderForm(container, store) {
         // An unknown block type: read-only, so its shape is never broken.
         bodyEl.append(
           h('div', { class: 'slipr-readonly' }, [describeBlock(block)]),
-          h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
+          block.type === 'graph'
+            ? h('span', { class: 'slipr-help' }, ['Graphs are written in show.json for now: ', h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a graph']), '.'])
+            : h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
         );
       } else {
         // Default text markdown editor

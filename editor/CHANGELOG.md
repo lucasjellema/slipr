@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: How to write a graph (I-074)
+- **Added** the manual section **Graphs** (`help.html#graphs`): a slide example, every field, steps, data files, reader blocks, colors and the checks. Graph slots and blocks link to it (`GRAPH_HELP` in `js/help.js`), and the summary names a data file instead of counting 0 nodes.
+
 ### 2026-10-13: Graphs, read-only (I-074)
 - **Added** graph slots and blocks show a summary ("Graph: 7 nodes, 8 links, 3 steps") and are edited in show.json for now; the preview draws them. Saving keeps the key order of graphs, nodes, edges and steps.
 

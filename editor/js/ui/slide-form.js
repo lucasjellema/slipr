@@ -5,6 +5,7 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
+import { GRAPH_HELP } from '../help.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
@@ -390,7 +391,10 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     ? `This ${slotDef.type ?? ''} slot can't be edited here yet. Edit show.json directly.`.replace('  ', ' ')
     : helpText;
 
-  const helpEl = help ? h('span', { class: 'slipr-help' }, [help]) : null;
+  const helpEl = kind === 'readonly' && slotDef.type === 'graph'
+    ? h('span', { class: 'slipr-help' }, ['Graphs are written in show.json for now: ',
+        h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a graph']), '.'])
+    : help ? h('span', { class: 'slipr-help' }, [help]) : null;
   // A cards slot is a group of card editors: its help goes above them.
   if (kind === 'cards') {
     return h('section', { class: 'slipr-form-group slipr-cards-group' }, [labelEl, helpEl, ...inputs]);
