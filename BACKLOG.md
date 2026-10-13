@@ -56,14 +56,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 ## Ideas: suggested features
 
 ### Viewer
-- [ ] **V-019** [viewer] **User manual inside the viewer (`viewer/help.html`)**: a dedicated, offline-capable comprehensive user guide for audience and reader experiences:
-  - **The Slipr Concept**: one show file (`show.json`), two delivery experiences — linear audience presentation and interactive self-paced reader.
-  - **Audience mode**: presenter controls (keyboard, clicker, touch), build animations/fragments, chapter bar and agenda slides, speaker window (`S`), overview grid (`O` / `Esc`), zoom (`Alt+Click`), blackout pause (`B` / `.`), and phone remote control (`P` / 📱 icon with QR code pairing, tactile touch zones, live speaker notes, timer, haptics, and hotspot workaround). Continuing in Reader mode (`R`).
-  - **Reader mode**: tailoring panel (profiles, depth levels 1–3, reading paths), interactive blocks (cards, tabs, image hotspots, web embeds, PDF viewer with zoom/page navigation, Mermaid diagrams), popups & glossary terms (`[[term]]` with popovers and jump), annotations (highlights, slide notes, pin notes on objects, bookmarks `M`), notes export/import (Markdown & JSON), and full-text search (`/` or `Ctrl+K`) across slides, blocks, glossary, alt texts and embedded PDF pages. Returning to Audience mode (`A`).
-  - **Opening & sharing shows**: URL parameters (`?show=`, `?folder=`, `?mode=`, `?profile=`, `?depth=`, `?path=`), opening local show folders via File System Access API, and presenting offline from single-file HTML exports (`exports/*.html`).
-  - **Cheatsheet & ergonomics**: complete keyboard shortcut reference for both modes, presentation clicker mapping, mobile touch/swipe gestures.
-  - **Troubleshooting**: dev server hosting (`npm run serve`), relay setup (`npm run remote`), guest Wi-Fi client isolation, folder permissions, and schema errors.
-  - **Access**: opened from **? Help** on the viewer start page, top bar button in Reader mode, and keyboard shortcut `?` / `F1`; supports light/dark themes, offline reading, and phone-width responsive layout (matching `editor/help.html`) · todo · —
+*(empty: promote items from below or add ideas)*
 
 ### Audience mode
 - [ ] **I-001** [viewer] Presenter view extras: per-slide time budget, "behind schedule" indicator
@@ -177,6 +170,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 ## Done
 
 - [x] **I-089** [format/editor/viewer/converter] Text elements on slides (D-016): overlays with `text` (inline Markdown) and a free `style` (font, size, bold / italic / underline / uppercase, alignment, colors, fill opacity, border, radius, text outline, padding) in show format 0.2; `shared/text-style.js`; rendered in both modes (reader search, glossary terms); editor **+ Add text** with palette-first style controls, free resize and keyboard moves on the preview; the converter turns badges, callouts and leftover text boxes into text elements with their look (theme colors resolved). Spec: `docs/specs/I-089-text-elements.md` · done 2026-10-13 · claude
+- [x] **V-019** [viewer] User manual inside the viewer: `viewer/help.html` (comprehensive offline guide for audience and reader experiences, phone remote control pairing, mobile ergonomics, Wi-Fi hotspot setup with Windows Defender Firewall Private profile and Node.js rule fixes, interactive blocks, popups, personal annotations, full-text search, keyboard and clicker cheatsheet, and troubleshooting; light and dark themes, offline-first), opened via `?` / `F1` in both modes, top-bar Help button in Reader mode, pairing dialog tip, and viewer start screen · done 2026-10-13 · claude
 - [x] **I-002** [viewer/tools] Phone as remote control: next/previous tactile buttons and swipe navigation, live speaker notes with font scaling, upcoming slide peek, presentation timer, haptic feedback and wake lock, zero-dependency local WebSocket relay (RFC 6455 over Node.js http) with LAN IP discovery, and instant QR-code pairing modal · done 2026-10-12 · claude
 - [x] **I-020** [editor] Autosave draft to IndexedDB with crash recovery: automatic persistence to IndexedDB every 5 s while dirty, flush on tab hide/close, recovery dialog on open with relative timestamps, undoable restoreDraft action, banner fallback, and cleanup on clean save · done 2026-10-12 · claude
 - [x] **I-088** [editor] Dedicated Glossary Editor with deck-aware word completion: split view, search, filters, sorting, real-time deck word autocompletion and unglossaried suggestions drawer, ID rename with show-wide reference rewriting, live Markdown preview, and slide jump navigation · done 2026-10-12 · claude
