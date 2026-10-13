@@ -55,9 +55,18 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Ideas: suggested features
 
+### Viewer
+- [ ] **V-019** [viewer] **User manual inside the viewer (`viewer/help.html`)**: a dedicated, offline-capable comprehensive user guide for audience and reader experiences:
+  - **The Slipr Concept**: one show file (`show.json`), two delivery experiences — linear audience presentation and interactive self-paced reader.
+  - **Audience mode**: presenter controls (keyboard, clicker, touch), build animations/fragments, chapter bar and agenda slides, speaker window (`S`), overview grid (`O` / `Esc`), zoom (`Alt+Click`), blackout pause (`B` / `.`), and phone remote control (`P` / 📱 icon with QR code pairing, tactile touch zones, live speaker notes, timer, haptics, and hotspot workaround). Continuing in Reader mode (`R`).
+  - **Reader mode**: tailoring panel (profiles, depth levels 1–3, reading paths), interactive blocks (cards, tabs, image hotspots, web embeds, PDF viewer with zoom/page navigation, Mermaid diagrams), popups & glossary terms (`[[term]]` with popovers and jump), annotations (highlights, slide notes, pin notes on objects, bookmarks `M`), notes export/import (Markdown & JSON), and full-text search (`/` or `Ctrl+K`) across slides, blocks, glossary, alt texts and embedded PDF pages. Returning to Audience mode (`A`).
+  - **Opening & sharing shows**: URL parameters (`?show=`, `?folder=`, `?mode=`, `?profile=`, `?depth=`, `?path=`), opening local show folders via File System Access API, and presenting offline from single-file HTML exports (`exports/*.html`).
+  - **Cheatsheet & ergonomics**: complete keyboard shortcut reference for both modes, presentation clicker mapping, mobile touch/swipe gestures.
+  - **Troubleshooting**: dev server hosting (`npm run serve`), relay setup (`npm run remote`), guest Wi-Fi client isolation, folder permissions, and schema errors.
+  - **Access**: opened from **? Help** on the viewer start page, top bar button in Reader mode, and keyboard shortcut `?` / `F1`; supports light/dark themes, offline reading, and phone-width responsive layout (matching `editor/help.html`) · todo · —
+
 ### Audience mode
 - [ ] **I-001** [viewer] Presenter view extras: per-slide time budget, "behind schedule" indicator
-- [ ] **I-002** [viewer] Phone as remote control: next/previous plus notes on your phone (local WebSocket relay)
 - [ ] **I-003** [viewer] Laser pointer, spotlight, on-slide drawing (Reveal plugins)
 - [ ] **I-004** [viewer] QR code slot/overlay that links the audience to the reader version of the show, optionally at the current slide
 - [ ] **I-006** [viewer] Kiosk mode: auto-advance and loop, for screens at events
@@ -178,6 +187,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-002** [viewer/tools] Phone as remote control: next/previous tactile buttons and swipe navigation, live speaker notes with font scaling, upcoming slide peek, presentation timer, haptic feedback and wake lock, zero-dependency local WebSocket relay (RFC 6455 over Node.js http) with LAN IP discovery, and instant QR-code pairing modal · done 2026-10-12 · claude
 - [x] **I-020** [editor] Autosave draft to IndexedDB with crash recovery: automatic persistence to IndexedDB every 5 s while dirty, flush on tab hide/close, recovery dialog on open with relative timestamps, undoable restoreDraft action, banner fallback, and cleanup on clean save · done 2026-10-12 · claude
 - [x] **I-088** [editor] Dedicated Glossary Editor with deck-aware word completion: split view, search, filters, sorting, real-time deck word autocompletion and unglossaried suggestions drawer, ID rename with show-wide reference rewriting, live Markdown preview, and slide jump navigation · done 2026-10-12 · claude
 - [x] **I-072** [format/viewer] PDF document: spike chose vendored **PDF.js 4.10.38** (D-011 refined); `pdf` slot and block (show format 0.2) with `page` or `pages: [first, last]`, files from the show folder or https (click-to-load); audience mode fits the page and steps through a range on clicks; reader blocks with page navigation, zoom and screen-reader text; PDF text in reader search (on first use, results open at the page); `pdf` layouts in both templates (default 1.3.0, Conclusion 0.1.3); editor fields with **Choose PDF…** (copied to `docs/`); works in the single-file export. Spec: `docs/specs/I-072-pdf-document.md` · done 2026-10-12 · claude

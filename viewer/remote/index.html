@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0E1116">
+  <meta name="color-scheme" content="dark">
+  <title>Slipr Remote</title>
+  <link rel="stylesheet" href="css/remote.css">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <!-- Sticky Reconnection Banner -->
+  <div id="reconnect-banner" class="reconnect-banner">
+    <span id="reconnect-text">Disconnected. Reconnecting…</span>
+  </div>
+
+  <!-- Fallback Screen: When opened directly without ?session= -->
+  <div id="no-session-card" class="no-session-card" style="display: none;">
+    <h2>📱 Slipr Remote</h2>
+    <p>Scan the QR code on your presentation screen (press <strong>P</strong> on the laptop), or enter your session details below:</p>
+    <form id="manual-pair-form" class="manual-pair-form">
+      <input id="input-session" class="pair-input" type="text" placeholder="Session code (e.g. s-abc123)" required autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <input id="input-token" class="pair-input" type="text" placeholder="Pairing token (optional)" autocomplete="off" autocorrect="off" autocapitalize="off" />
+      <button type="submit" class="btn-pair">Connect to Slideshow</button>
+    </form>
+  </div>
+
+  <!-- Main Remote Viewport -->
+  <main id="remote-app">
+    <!-- Top Bar: Status, Timer, Text Size -->
+    <header class="remote-header">
+      <div id="status-badge" class="status-badge is-waiting">
+        <span class="status-dot"></span>
+        <span id="status-label">Connecting…</span>
+      </div>
+
+      <div id="timer-box" class="timer-box" title="Tap to pause/resume timer">00:00</div>
+
+      <div class="font-controls">
+        <button id="btn-font-minus" class="font-btn" aria-label="Decrease notes text size">A−</button>
+        <button id="btn-font-plus" class="font-btn" aria-label="Increase notes text size">A+</button>
+      </div>
+    </header>
+
+    <!-- Slide Overview Header -->
+    <section class="slide-overview">
+      <div class="overview-meta">
+        <span id="slide-index">Slide 1 of 1</span>
+      </div>
+      <h1 id="slide-title" class="slide-title">Waiting for slideshow…</h1>
+      <div id="next-title" class="up-next-peek">Up next: —</div>
+    </section>
+
+    <!-- Scrollable Presenter Notes -->
+    <article id="notes-content" class="notes-container">
+      <div class="notes-empty">Waiting for presenter notes…</div>
+    </article>
+
+    <!-- Quick Utilities Bar -->
+    <section class="quick-toolbar">
+      <button id="btn-blackout" class="tool-btn" aria-label="Toggle blackout pause">⏸ Pause</button>
+      <span class="tool-btn" style="opacity: 0.6; pointer-events: none;">Swipe ◄ ► to navigate</span>
+    </section>
+
+    <!-- Tactile Touch Zones -->
+    <footer class="touch-controls">
+      <button id="btn-prev" class="nav-btn btn-prev" aria-label="Previous Slide">
+        <span>◀</span> Prev
+      </button>
+      <button id="btn-next" class="nav-btn btn-next" aria-label="Next Slide">
+        Next <span>▶</span>
+      </button>
+    </footer>
+  </main>
+</body>
+</html>

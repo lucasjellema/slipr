@@ -122,3 +122,272 @@ body.slipr-audience { background: #0E1116; }
 
 /* Backup slides are marked subtly in the overview. */
 .reveal.overview .slipr-backup { outline: 6px dashed rgb(242 169 0 / 0.7); outline-offset: -6px; }
+
+/* ---------- Phone remote button & pairing dialog (I-002) ---------- */
+
+.slipr-remote-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(14, 17, 22, 0.7);
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.25;
+  transition: opacity 0.25s ease, background 0.25s ease, transform 0.15s ease;
+  backdrop-filter: blur(4px);
+  padding: 0;
+}
+.slipr-remote-btn:hover,
+.slipr-remote-btn.is-active,
+.slipr-remote-btn.is-connected {
+  opacity: 0.95;
+}
+.slipr-remote-btn:hover {
+  transform: scale(1.08);
+  background: rgba(14, 17, 22, 0.9);
+}
+.slipr-remote-btn-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+.slipr-remote-btn-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: transparent;
+  transition: background 0.3s ease;
+}
+.slipr-remote-btn.is-connected .slipr-remote-btn-badge {
+  background: #10B981;
+  box-shadow: 0 0 6px #10B981;
+}
+.reveal.overview .slipr-remote-btn { display: none; }
+
+.slipr-remote-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.slipr-remote-backdrop.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slipr-remote-modal {
+  position: relative;
+  background: #161B22;
+  border: 1px solid #30363D;
+  border-radius: 14px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+  padding: 28px 24px 24px;
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  color: #E6EDF3;
+  text-align: center;
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+  transform: scale(0.95);
+  transition: transform 0.25s ease;
+  box-sizing: border-box;
+}
+.slipr-remote-backdrop.is-open .slipr-remote-modal {
+  transform: scale(1);
+}
+
+.slipr-remote-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: transparent;
+  border: none;
+  color: #8B949E;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+.slipr-remote-close:hover {
+  color: #F0F6FC;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.slipr-remote-title {
+  margin: 0 0 6px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #F0F6FC;
+}
+
+.slipr-remote-subtitle {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #8B949E;
+}
+
+.slipr-remote-qr-box {
+  background: #FFFFFF;
+  padding: 12px;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+.slipr-remote-qr-box svg {
+  display: block;
+  width: 190px;
+  height: 190px;
+}
+
+.slipr-remote-url-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.slipr-remote-url-input {
+  flex: 1;
+  background: #0D1117;
+  border: 1px solid #30363D;
+  border-radius: 6px;
+  color: #7EE787;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  padding: 8px 10px;
+  outline: none;
+  min-width: 0;
+}
+.slipr-remote-copy-btn {
+  background: #238636;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.slipr-remote-copy-btn:hover {
+  background: #2EA043;
+}
+
+.slipr-remote-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: #21262D;
+}
+.slipr-remote-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8B949E;
+}
+.slipr-remote-status.is-waiting .slipr-remote-status-dot {
+  background: #D29922;
+  animation: slipr-pulse 1.6s infinite ease-in-out;
+}
+.slipr-remote-status.is-connected .slipr-remote-status-dot {
+  background: #2EA043;
+  box-shadow: 0 0 6px #2EA043;
+}
+.slipr-remote-status.is-connected {
+  color: #7EE787;
+  background: rgba(46, 160, 67, 0.15);
+}
+
+.slipr-remote-offline-banner {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgba(248, 81, 73, 0.1);
+  border: 1px solid rgba(248, 81, 73, 0.3);
+  color: #F85149;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+.slipr-remote-offline-banner code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  display: inline-block;
+  margin: 4px 0;
+}
+.slipr-remote-offline-sub {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #8B949E;
+}
+
+.slipr-remote-tip {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #8B949E;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+.slipr-remote-tip summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #C9D1D9;
+  user-select: none;
+}
+.slipr-remote-tip p {
+  margin: 6px 0 0;
+  line-height: 1.4;
+  color: #8B949E;
+}
+.slipr-remote-tip p strong {
+  color: #F0F6FC;
+}
+
+.slipr-remote-meta-row {
+  margin-top: 8px;
+  font-size: 11px;
+  color: #8B949E;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.slipr-remote-meta-code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: #C9D1D9;
+}
+
+@keyframes slipr-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}

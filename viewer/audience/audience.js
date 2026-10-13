@@ -91,6 +91,27 @@ export async function startAudience(app, ctx) {
     location.href = readerUrl(section?.dataset.slideId);
   });
 
+  // P: phone remote pairing dialog (I-002)
+  deck.addKeyBinding({ keyCode: 80, key: 'P', description: 'Phone remote' }, async () => {
+    const { toggleRemoteSync } = await import('./remote-sync.js');
+    toggleRemoteSync(deck, ctx, revealEl);
+  });
+
+  // Optional corner button to open phone remote pairing
+  const remoteBtn = h('button', {
+    class: 'slipr-remote-btn',
+    title: 'Phone remote control (P)',
+    'aria-label': 'Phone remote control',
+  }, [
+    h('span', { class: 'slipr-remote-btn-icon' }, ['📱']),
+    h('span', { class: 'slipr-remote-btn-badge' }),
+  ]);
+  remoteBtn.onclick = async () => {
+    const { toggleRemoteSync } = await import('./remote-sync.js');
+    toggleRemoteSync(deck, ctx, revealEl);
+  };
+  revealEl.append(remoteBtn);
+
   if (show.chapters?.length) createChapterBar(deck, ctx, revealEl);
   return deck;
 }

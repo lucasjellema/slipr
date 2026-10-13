@@ -28,7 +28,7 @@ export function showHelp(app, { onOpenFolder } = {}) {
     openFolder,
     h('h2', {}, ['Try it']),
     h('ul', {}, [
-      h('li', {}, [h('a', { href: demoLink }, ['Demo show, audience mode']), ' (press S for speaker notes, O for the overview)']),
+      h('li', {}, [h('a', { href: demoLink }, ['Demo show, audience mode']), ' (press S for speaker notes, P for phone remote, O for the overview)']),
       h('li', {}, [h('a', { href: `${demoLink}&mode=reader` }, ['Demo show, reader mode'])]),
       h('li', {}, [h('a', { href: `?show=${encodeURIComponent('../shows/fixtures/broken/show.json')}` }, ['An invalid show']), ' (shows the error page)']),
     ]),

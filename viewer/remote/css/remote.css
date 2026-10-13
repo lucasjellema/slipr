@@ -1,0 +1,359 @@
+/* High-contrast mobile remote stylesheet (I-002: Phone as Remote Control) */
+
+:root {
+  --bg-color: #0E1116;
+  --surface-color: #161B22;
+  --surface-border: #30363D;
+  --text-primary: #F0F6FC;
+  --text-muted: #8B949E;
+  --accent-color: #F2A900;
+  --accent-hover: #FFAF00;
+  --green-color: #2EA043;
+  --red-color: #F85149;
+  --notes-font-size: 18px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#remote-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  height: 100dvh; /* dynamic mobile viewport height */
+  padding-top: env(safe-area-inset-top, 0);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-left: env(safe-area-inset-left, 0);
+  padding-right: env(safe-area-inset-right, 0);
+}
+
+/* ---------- Top Bar / Header ---------- */
+
+.remote-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background-color: var(--surface-color);
+  border-bottom: 1px solid var(--surface-border);
+  gap: 8px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+.status-badge.is-connected {
+  background-color: rgba(46, 160, 67, 0.2);
+  color: #7EE787;
+}
+.status-badge.is-waiting {
+  background-color: rgba(210, 153, 34, 0.2);
+  color: #E3B341;
+}
+.status-badge.is-offline {
+  background-color: rgba(248, 81, 73, 0.2);
+  color: #FFA198;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.timer-box {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.font-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.font-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--surface-border);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+.font-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* ---------- Slide Overview Card ---------- */
+
+.slide-overview {
+  flex: none;
+  padding: 12px 14px;
+  background: var(--surface-color);
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.overview-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent-color);
+}
+
+.slide-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #FFFFFF;
+  margin-bottom: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.up-next-peek {
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.up-next-peek strong {
+  color: #C9D1D9;
+}
+
+/* ---------- Notes Container ---------- */
+
+.notes-container {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px 14px;
+  user-select: text;
+  -webkit-user-select: text;
+  line-height: 1.55;
+  font-size: var(--notes-font-size);
+  color: #E6EDF3;
+}
+
+.notes-container p {
+  margin-bottom: 12px;
+}
+
+.notes-container ul, .notes-container ol {
+  margin-left: 20px;
+  margin-bottom: 12px;
+}
+
+.notes-container li {
+  margin-bottom: 6px;
+}
+
+.notes-empty {
+  color: var(--text-muted);
+  font-style: italic;
+  font-size: 15px;
+  text-align: center;
+  margin-top: 24px;
+}
+
+/* ---------- Control Toolbar (Blackout / Goto) ---------- */
+
+.quick-toolbar {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
+  background: rgba(14, 17, 22, 0.9);
+  border-top: 1px solid var(--surface-border);
+}
+
+.tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+}
+.tool-btn:active {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+.tool-btn.is-paused {
+  color: var(--red-color);
+  font-weight: 700;
+}
+
+/* ---------- Bottom Touch Zones ---------- */
+
+.touch-controls {
+  flex: none;
+  display: flex;
+  gap: 10px;
+  padding: 10px 14px 14px;
+  background: var(--surface-color);
+  border-top: 1px solid var(--surface-border);
+}
+
+.nav-btn {
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.08s ease, filter 0.08s ease;
+  height: 82px; /* Very generous touch zone for handheld thumbs */
+}
+
+.nav-btn:active {
+  transform: scale(0.97);
+  filter: brightness(1.2);
+}
+
+.btn-prev {
+  flex: 35;
+  background: #21262D;
+  border: 1px solid #363B42;
+  color: #C9D1D9;
+}
+.btn-prev:active {
+  background: #30363D;
+}
+
+.btn-next {
+  flex: 65;
+  background: var(--accent-color);
+  color: #0E1116;
+  box-shadow: 0 4px 14px rgba(242, 169, 0, 0.3);
+}
+.btn-next:active {
+  background: var(--accent-hover);
+}
+
+/* ---------- Disconnected / Reconnect Banner ---------- */
+
+.reconnect-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: var(--red-color);
+  color: #FFFFFF;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  padding: 8px 12px;
+  z-index: 100;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  display: none;
+}
+.reconnect-banner.is-visible {
+  display: block;
+}
+
+/* ---------- No Session Screen ---------- */
+
+.no-session-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 32px 24px;
+  text-align: center;
+}
+.no-session-card h2 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: var(--accent-color);
+}
+.no-session-card p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+.manual-pair-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.pair-input {
+  background: var(--surface-color);
+  border: 1px solid var(--surface-border);
+  color: var(--text-primary);
+  border-radius: 8px;
+  font-size: 15px;
+  padding: 12px 14px;
+  outline: none;
+  font-family: inherit;
+}
+.pair-input:focus {
+  border-color: var(--accent-color);
+}
+
+.btn-pair {
+  background: var(--accent-color);
+  color: #0E1116;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  padding: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.btn-pair:active {
+  background: var(--accent-hover);
+}
+
