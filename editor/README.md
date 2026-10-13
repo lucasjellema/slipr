@@ -2,7 +2,7 @@
 
 The **Slipr Editor** is a browser application for creating and editing Slipr shows. You never have to touch JSON by hand: you pick layouts, fill in content fields, add images, write the interactive reader layer, and see the result immediately in a live preview rendered exactly as the viewer displays it.
 
-> **Status:** Phase 5 (Editor MVP) done (2026-10-11): every part of a show can be made and changed in the editor. Since then (Phase 6): the show grid, Export…, a light / dark theme, extra images placed freely on a slide, picture styles and opacity, other names for glossary terms, the dedicated glossary editor, and draft autosave with crash recovery (I-020). See [CHANGELOG.md](CHANGELOG.md) for what changed when.
+> **Status:** Phase 5 (Editor MVP) done (2026-10-11): every part of a show can be made and changed in the editor. Since then (Phase 6): the show grid, Export…, a light / dark theme, extra images and text elements placed freely on a slide, picture styles and opacity, other names for glossary terms, the dedicated glossary editor, and draft autosave with crash recovery (I-020). See [CHANGELOG.md](CHANGELOG.md) for what changed when.
 
 ## User manual
 
@@ -30,6 +30,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code, cards and diagrams (Mermaid); notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |
 | Images | Choose, drop or paste; copied into `images/` once; alt text | [Images](help.html#images) |
 | Extra images | Put more pictures on a slide, anywhere: move and resize them on the preview, let them appear one by one | [Extra images](help.html#extra-images) |
+| Text elements | Put a badge, label or callout anywhere on a slide, with its own font, size, colors, fill and border (the template's first) | [Text elements](help.html#text-elements) |
 | Picture styles | Shadow, soft edges, rounded corners or a frame from the template, and an opacity, on any picture | [Picture styles](help.html#picture-styles) |
 | Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links, diagrams) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
 | Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |

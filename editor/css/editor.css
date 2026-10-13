@@ -1899,6 +1899,123 @@ body.is-screen #slipr-editor-banners {
   margin: 0;
 }
 
+.slipr-overlay-add-text {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
+/* ---------- Text elements (I-089) ---------- */
+
+/* A text box on the preview: the dashed frame also shows boxes without a fill. */
+.slipr-overlay-box.is-text { cursor: move; }
+
+.slipr-overlay-text-input {
+  min-height: 3em;
+  resize: vertical;
+}
+
+.slipr-text-style {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-text-style-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px 8px;
+}
+
+.slipr-text-style-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.slipr-text-style-field .slipr-select {
+  max-width: 13em;
+}
+
+.slipr-text-style-number .slipr-input {
+  width: 5.5em;
+}
+
+.slipr-text-style-toggle.is-bold { font-weight: 700; }
+.slipr-text-style-toggle.is-italic { font-style: italic; }
+.slipr-text-style-toggle.is-underline { text-decoration: underline; }
+
+.slipr-text-style-choice {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.slipr-text-style .slipr-item-btn.is-selected {
+  background: color-mix(in srgb, var(--slipr-editor-accent) 25%, transparent);
+  outline: 1px solid var(--slipr-editor-accent);
+  color: var(--slipr-editor-text-strong);
+}
+
+.slipr-text-style-color {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.slipr-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.slipr-swatch {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* "None": a crossed-out box. */
+.slipr-swatch.is-none {
+  background: linear-gradient(to top right, transparent calc(50% - 1px), var(--slipr-editor-danger) calc(50% - 1px), var(--slipr-editor-danger) calc(50% + 1px), transparent calc(50% + 1px));
+}
+
+.slipr-swatch.is-selected {
+  outline: 2px solid var(--slipr-editor-warning);
+  outline-offset: 1px;
+}
+
+.slipr-swatch:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent);
+  outline-offset: 1px;
+}
+
+.slipr-color-input {
+  width: 30px;
+  height: 24px;
+  padding: 0 2px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 4px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.slipr-text-style-more > summary {
+  cursor: pointer;
+  color: var(--slipr-editor-text-muted);
+  margin-bottom: 4px;
+}
+
+.slipr-text-style-more[open] {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 /* ---------- Picture style and opacity (I-084) ---------- */
 
 .slipr-picture-style {

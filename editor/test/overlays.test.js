@@ -130,3 +130,37 @@ describe('extra images: resizing by a corner (I-083)', () => {
     assert.equal(r.h, OVERLAY_MIN_SIZE);
   });
 });
+
+describe('text elements: actions (I-089)', () => {
+  test('a text element is added with a cleaned style, makes the show 0.2, and is valid', () => {
+    const show = oldShow();
+    const next = addOverlay(show, { slideId: 's-problem', overlay: { text: 'New', style: { bold: true, font: 'body', color: 'red', size: 'title' }, x: 0.1, y: 0.1, w: 0.2, h: 0.1 } });
+    assert.equal(next.slipr, '0.2');
+    assert.deepEqual(slideOf(next).overlays, [{ text: 'New', style: { size: 'title', bold: true }, x: 0.1, y: 0.1, w: 0.2, h: 0.1 }]);
+    assert.deepEqual(validateShow(next, { template }).errors, []);
+  });
+
+  test('an empty text is allowed (the author is still typing); no image and no text is not', () => {
+    const show = oldShow();
+    assert.equal(slideOf(addOverlay(show, { slideId: 's-problem', overlay: { text: '' } })).overlays[0].text, '');
+    assert.equal(addOverlay(show, { slideId: 's-problem', overlay: { x: 0.1 } }), show);
+  });
+
+  test('updateOverlay changes the text and replaces the style; an emptied style is removed', () => {
+    let show = addOverlay(oldShow(), { slideId: 's-problem', overlay: { text: 'A', style: { bold: true } } });
+    show = updateOverlay(show, { slideId: 's-problem', index: 0, patch: { text: 'B', style: { italic: true, background: '#fff', backgroundOpacity: 0.5 } } });
+    assert.deepEqual(slideOf(show).overlays[0].style, { italic: true, background: '#fff', backgroundOpacity: 0.5 });
+    assert.equal(slideOf(show).overlays[0].text, 'B');
+    show = updateOverlay(show, { slideId: 's-problem', index: 0, patch: { style: { italic: false } } });
+    assert.equal('style' in slideOf(show).overlays[0], false);
+    assert.equal('image' in slideOf(show).overlays[0], false);
+  });
+
+  test('a text element is moved and resized like an image, and keeps its text', () => {
+    let show = addOverlay(oldShow(), { slideId: 's-problem', overlay: { text: 'A' } });
+    show = updateOverlay(show, { slideId: 's-problem', index: 0, patch: { x: 0.95, w: 0.2 } });
+    const o = slideOf(show).overlays[0];
+    assert.equal(o.x + o.w <= 1, true);
+    assert.equal(o.text, 'A');
+  });
+});

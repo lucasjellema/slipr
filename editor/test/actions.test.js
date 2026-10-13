@@ -274,6 +274,15 @@ describe('editor actions: global search and replace (I-025)', () => {
     assert.ok(match.snippet.includes('[Slipr]'), 'snippet must bracket the matched text');
   });
 
+  test('find and replace include the text of text elements (I-089)', () => {
+    const found = actions.findMatches(demo, { query: 'no styling' });
+    assert.ok(found.matches.some((m) => m.location === 'Text element 2' && m.slideId === 's-data-2'));
+    const replaced = actions.replaceSlideText(demo, { slideId: 's-data-2', find: 'no styling', replaceWith: 'no fuss' });
+    assert.equal(replaced.slides.find((s) => s.id === 's-data-2').overlays[1].text, 'Plain [[json]], no fuss');
+    const all = actions.replaceAllText(demo, { find: 'Plain [[json]]', replaceWith: 'Just JSON' });
+    assert.match(all.slides.find((s) => s.id === 's-data-2').overlays[1].text, /^Just JSON/);
+  });
+
   test('findMatches respects matchCase and matchWholeWord', () => {
     const ci = actions.findMatches(demo, { query: 'slipr', matchCase: false });
     const cs = actions.findMatches(demo, { query: 'slipr', matchCase: true });

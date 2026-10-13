@@ -10,6 +10,7 @@
  */
 
 import { renameGlossaryRef, unlinkGlossary } from './show-entities.js';
+import { cleanTextStyle } from '../../shared/text-style.js';
 
 /**
  * Generate a random short identifier.
@@ -1256,6 +1257,18 @@ export function findMatches(show, { query, matchCase = false, matchWholeWord = f
         }
       }
 
+      // Text elements (I-089)
+      (Array.isArray(slide.overlays) ? slide.overlays : []).forEach((/** @type {any} */ o, /** @type {number} */ j) => {
+        if (typeof o?.text !== 'string') return;
+        total += scanString(o.text, regex, {
+          slideId: slide.id,
+          slideIndex: sNum,
+          slideTitle: sTitle,
+          location: `Text element ${j + 1}`,
+          field: `overlays.${j}.text`,
+        }, matches);
+      });
+
       // Speaker notes
       if (typeof slide.notes === 'string') {
         total += scanString(slide.notes, regex, {
@@ -1439,6 +1452,20 @@ function replaceInSlide(slide, regex, replacement) {
     if (contentChanged) {
       updatedSlide = { ...updatedSlide, content: nextContent };
     }
+  }
+
+  // Text elements (I-089)
+  if (Array.isArray(updatedSlide.overlays)) {
+    let overlaysChanged = false;
+    const nextOverlays = updatedSlide.overlays.map((/** @type {any} */ o) => {
+      if (typeof o?.text !== 'string') return o;
+      const res = replaceInString(o.text, regex, replacement);
+      if (res.replaced === 0) return o;
+      count += res.replaced;
+      overlaysChanged = true;
+      return { ...o, text: res.text };
+    });
+    if (overlaysChanged) updatedSlide = { ...updatedSlide, overlays: nextOverlays };
   }
 
   // Speaker notes
@@ -1923,33 +1950,54 @@ function mapOverlays(show, slideId, fn) {
   return { ...show, slipr: show.slipr === '0.1' || !show.slipr ? '0.2' : show.slipr, slides };
 }
 
+/** Where a new text element goes (I-089): centred, 40 % × 12 % of the canvas. */
+export const NEW_TEXT_BOX = Object.freeze({ x: 0.3, y: 0.44, w: 0.4, h: 0.12 });
+
 /**
- * Add an extra image to a slide, in front of the others.
- * @param {any} show
- * @param {{ slideId: string, overlay: { image: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
+ * An overlay in its stored shape: an extra image (`image`) or a text element
+ * (`text` and a cleaned `style`, D-016), its box, and `fragment`.
+ * @param {any} o
  * @returns {any}
  */
-export function addOverlay(show, { slideId, overlay }) {
-  if (!overlay?.image?.src) return show;
-  const { image, fragment, ...box } = overlay;
-  const item = { image, ...overlayBox(box), ...(fragment ? { fragment } : {}) };
-  return mapOverlays(show, slideId, (list) => [...list, item]);
+function overlayValue(o) {
+  /** @type {Record<string, any>} */
+  const out = {};
+  if (typeof o.text === 'string') {
+    out.text = o.text;
+    const style = cleanTextStyle(o.style);
+    if (style) out.style = style;
+  } else {
+    out.image = o.image;
+  }
+  Object.assign(out, overlayBox(o));
+  if (o.fragment) out.fragment = o.fragment;
+  return out;
 }
 
 /**
- * Change an extra image: its box (kept inside the canvas), image or
- * `fragment` (undefined or false removes it).
+ * Add an extra image or a text element to a slide, in front of the others.
  * @param {any} show
- * @param {{ slideId: string, index: number, patch: { image?: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
+ * @param {{ slideId: string, overlay: { image?: any, text?: string, style?: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
+ * @returns {any}
+ */
+export function addOverlay(show, { slideId, overlay }) {
+  if (!overlay?.image?.src && typeof overlay?.text !== 'string') return show;
+  return mapOverlays(show, slideId, (list) => [...list, overlayValue(overlay)]);
+}
+
+/**
+ * Change an extra image or a text element: its box (kept inside the canvas),
+ * image, text, style (replaced as a whole, then cleaned) or `fragment`
+ * (undefined or false removes it).
+ * @param {any} show
+ * @param {{ slideId: string, index: number, patch: { image?: any, text?: string, style?: any, x?: number, y?: number, w?: number, h?: number, fragment?: any } }} payload
  * @returns {any}
  */
 export function updateOverlay(show, { slideId, index, patch }) {
   return mapOverlays(show, slideId, (list) => {
     const current = list[index];
     if (!current) return list;
-    const merged = { ...current, ...patch };
-    const next = { image: merged.image, ...overlayBox(merged) };
-    if (merged.fragment) next.fragment = merged.fragment;
+    const next = overlayValue({ ...current, ...patch });
     if (JSON.stringify(next) === JSON.stringify(current)) return list;
     return list.map((o, i) => (i === index ? next : o));
   });

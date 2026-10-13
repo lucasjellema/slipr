@@ -1,11 +1,15 @@
 // @ts-check
 /**
- * Move and resize a slide's extra images on the audience preview (I-083).
+ * Move and resize a slide's extra images (I-083) and text elements (I-089) on
+ * the audience preview.
  *
  * A layer of boxes, one per overlay, sits on the preview canvas. Click a box
- * to select it; drag it to move; drag a corner handle to resize (keeping the
- * aspect ratio, unless Shift is held). Keyboard: arrow keys move (Shift:
- * larger steps), Alt+arrows resize, Delete removes, Esc deselects. A drag
+ * to select it; drag it to move; drag a corner handle to resize (an image
+ * keeps its aspect ratio unless Shift is held; a text box resizes freely
+ * unless Shift is held). Keyboard: arrow keys move (Shift: larger steps),
+ * Alt+arrows resize (an image keeps its ratio; for a text box Alt+Left/Right
+ * change the width, Alt+Up/Down the height), Delete removes, Esc deselects.
+ * Double-click a text box to edit its text in the Slide tab. A drag
  * moves the box locally and stores the result on release, so it is one undo
  * step; a burst of key presses is one step too (coalesced).
  *
@@ -49,6 +53,21 @@ export function selectedOverlay(slideId) {
   return selection.slideId === slideId ? selection.index : -1;
 }
 
+/**
+ * Focus a text element's text area in the Slide tab once the form has
+ * re-rendered (after adding one, or a double-click on the preview).
+ * @param {number} index @param {{ select?: boolean }} [options]
+ */
+export function focusOverlayText(index, options = {}) {
+  setTimeout(() => {
+    const area = /** @type {HTMLTextAreaElement | null} */ (document.getElementById(`slipr-overlay-text-${index}`));
+    if (!area) return;
+    area.focus({ preventScroll: true });
+    area.scrollIntoView({ block: 'nearest' });
+    if (options.select) area.select();
+  }, 50);
+}
+
 /** @param {number} n */
 const pct = (n) => `${Math.round(n * 100000) / 1000}%`;
 
@@ -83,13 +102,15 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
     const selected = selectedOverlay(slideId);
     boxes = overlays.map((/** @type {any} */ o, /** @type {number} */ i) => {
       const isSelected = i === selected;
+      const isText = typeof o.text === 'string';
+      const name = isText ? `Text element ${i + 1}${o.text.trim() ? `: ${o.text.trim().slice(0, 60)}` : ''}` : `Extra image ${i + 1}${o.image?.alt ? `: ${o.image.alt}` : ''}`;
       const box = h('div', {
-        class: `slipr-overlay-box ${isSelected ? 'is-selected' : ''}`,
+        class: `slipr-overlay-box ${isText ? 'is-text' : ''} ${isSelected ? 'is-selected' : ''}`,
         tabindex: '0',
         role: 'button',
         'aria-pressed': isSelected ? 'true' : 'false',
-        'aria-label': `Extra image ${i + 1}${o.image?.alt ? `: ${o.image.alt}` : ''}. Drag or arrow keys to move, a corner or Alt+arrows to resize, Delete to remove.`,
-        title: o.image?.alt || `Extra image ${i + 1}`,
+        'aria-label': `${name}. Drag or arrow keys to move, a corner or Alt+arrows to resize, Delete to remove${isText ? ', double-click to edit the text' : ''}.`,
+        title: isText ? `Text element ${i + 1}: double-click to edit` : o.image?.alt || `Extra image ${i + 1}`,
         'data-index': String(i),
       }, isSelected ? ['nw', 'ne', 'sw', 'se'].map((corner) => h('span', { class: `slipr-overlay-handle is-${corner}`, 'data-corner': corner, 'aria-hidden': 'true' })) : []);
       place(box, o);
@@ -133,7 +154,9 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
       const dy = p.y - p0.y;
       if (!moved && Math.abs(dx) < 0.003 && Math.abs(dy) < 0.003) return;
       moved = true;
-      current = corner ? resizedOverlayBox(start, corner, dx, dy, !ev.shiftKey) : overlayBox({ ...start, x: start.x + dx, y: start.y + dy });
+      // Images keep their ratio unless Shift is held; text boxes the other way round.
+      const keepAspect = typeof overlays[index]?.text === 'string' ? ev.shiftKey : !ev.shiftKey;
+      current = corner ? resizedOverlayBox(start, corner, dx, dy, keepAspect) : overlayBox({ ...start, x: start.x + dx, y: start.y + dy });
       place(el, current);
     };
     const onUp = () => {
@@ -169,7 +192,11 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
       if (selectedOverlay(slideId) !== index) selectOverlay(slideId, index);
       const [dx, dy] = arrows[/** @type {keyof typeof arrows} */ (e.key)];
       const step = e.shiftKey ? 0.05 : 0.01;
-      if (e.altKey) {
+      if (e.altKey && typeof o.text === 'string') {
+        // A text box: Left / Right change the width, Up / Down the height.
+        if (dx) update(index, { w: Math.max(OVERLAY_MIN_SIZE, o.w + dx * step) }, 'resize');
+        else update(index, { h: Math.max(OVERLAY_MIN_SIZE, o.h + dy * step) }, 'resize');
+      } else if (e.altKey) {
         // Right / Up grow, Left / Down shrink, keeping the aspect ratio.
         const grow = dx > 0 || dy < 0 ? 1 : -1;
         const w = Math.max(OVERLAY_MIN_SIZE, o.w + grow * step);
@@ -185,10 +212,22 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
       done();
       select(-1);
       boxEl.blur();
+    } else if (e.key === 'Enter' && typeof o.text === 'string' && selectedOverlay(slideId) === index) {
+      // The keyboard way to a double-click: edit the selected text.
+      done();
+      store.setActiveTab('slide');
+      focusOverlayText(index, { select: true });
     } else if (e.key === 'Enter' || e.key === ' ') {
       done();
       select(index);
     }
+  });
+  layer.addEventListener('dblclick', (e) => {
+    const boxEl = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-overlay-box');
+    if (!(boxEl instanceof HTMLElement) || !boxEl.classList.contains('is-text')) return;
+    e.preventDefault();
+    store.setActiveTab('slide');
+    focusOverlayText(Number(boxEl.dataset.index), { select: true });
   });
   layer.addEventListener('focusin', (e) => {
     const boxEl = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-overlay-box');

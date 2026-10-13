@@ -36,6 +36,7 @@
         <li><a href="#slide-tab">Slide tab</a></li>
         <li><a href="#images">Images</a></li>
         <li><a href="#extra-images">Extra images</a></li>
+        <li><a href="#text-elements">Text elements</a></li>
         <li><a href="#picture-styles">Picture styles</a></li>
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
@@ -289,7 +290,7 @@
 
         <h3>Add one</h3>
         <ol>
-          <li>Select the slide. In the <strong>Slide</strong> tab, find <strong>Extra images</strong> (under the layout's fields).</li>
+          <li>Select the slide. In the <strong>Slide</strong> tab, find <strong>Extra images and text</strong> (under the layout's fields).</li>
           <li>Drop an image on <strong>Add an extra image</strong>, paste one (<kbd>Ctrl</kbd>+<kbd>V</kbd> while it has focus, or <strong>Paste</strong>), or click <strong>Choose…</strong>.</li>
           <li>Write the <strong>alt text</strong> in the dialog, as for any <a href="#images">image</a>.</li>
         </ol>
@@ -323,6 +324,41 @@
           <li>Extra images are included in <a href="#export">Export as one file</a>, and show in the <a href="#grid">show grid</a>'s thumbnails.</li>
           <li>A show with extra images is saved in show format 0.2. That happens by itself; older versions of Slipr cannot open it.</li>
           <li>Converting a PowerPoint deck: pictures that fit none of the layout's image places become extra images at the same place as in PowerPoint.</li>
+        </ul>
+      </section>
+
+      <section id="text-elements">
+        <h2>Text elements</h2>
+        <p>A <strong>text element</strong> is a piece of text you place anywhere on the slide, in front of the layout: a badge (<em>New</em>), a label on a photo, a callout next to a chart, a pill with a date. You choose its place and size like an <a href="#extra-images">extra image</a>, and you set its look yourself: font, size, colors, a fill, a border, rounded corners.</p>
+        <p class="tip"><strong>Tip:</strong> the colors offered first are the template's own, and the fonts and sizes are the template's unless you pick others. Stay with those and your text elements keep the show's house style.</p>
+
+        <h3>Add one</h3>
+        <ol>
+          <li>Select the slide. In the <strong>Slide</strong> tab, under <strong>Extra images and text</strong>, click <strong>+ Add text</strong>.</li>
+          <li>A box with the word <em>Text</em> appears in the middle of the slide, selected on the preview. Its text is selected in the <strong>Text</strong> field: just type.</li>
+        </ol>
+        <p>The text may use <a href="#markdown">Markdown</a> within a line: <code>**bold**</code>, <code>*italic*</code>, <code>`code`</code>, links and <code>[[glossary-id]]</code>. <kbd>Enter</kbd> starts a new line. Lists and headings are not available here.</p>
+
+        <h3>Move, resize and edit it on the preview</h3>
+        <p>It works as for <a href="#extra-images">extra images</a>, with two differences: a text box resizes <strong>freely</strong> (hold <kbd>Shift</kbd> to keep its proportions), and with the keyboard <kbd>Alt</kbd>+<kbd>←</kbd> / <kbd>→</kbd> change its width and <kbd>Alt</kbd>+<kbd>↑</kbd> / <kbd>↓</kbd> its height. <strong>Double-click</strong> a text box, or press <kbd>Enter</kbd> on a selected one, to jump to its text in the Slide tab.</p>
+        <p>The box is the area of the fill and the border. Text that doesn't fit is still shown, outside the box: make the box larger, or the text smaller.</p>
+
+        <h3>Its look</h3>
+        <dl>
+          <dt>Font</dt><dd>The template's <em>body</em>, <em>heading</em> or <em>code</em> font, or a system or serif font.</dd>
+          <dt>Size</dt><dd>The template's size for <em>small</em> text, <em>body</em> text, a <em>subtitle</em>, a <em>title</em> or a <em>hero</em> title; or <em>Custom…</em>, a percentage of the slide width (2 is about body text).</dd>
+          <dt>B, I, U, AA</dt><dd>Bold, italic, underline, uppercase. Then the alignment: left, center, right, and top, middle, bottom inside the box.</dd>
+          <dt>Text color, Fill</dt><dd>Click a swatch from the template, or the last box for any other color. The crossed-out swatch means the template's text color, or no fill. <strong>Fill opacity</strong> makes the fill see-through, not the text.</dd>
+          <dt>Border, outline and padding</dt><dd>A border (width, solid, dashed or dotted, its color), <strong>Corners</strong> to round them (a large value makes a pill), <strong>Padding</strong> between the edge and the text, and a <strong>Text outline</strong>: a thin halo around the letters, so text stays readable on a photo. All in percentages of the slide width.</dd>
+          <dt>In audience mode</dt><dd>As for extra images: from the start, or on the next click (with an effect).</dd>
+        </dl>
+        <p>Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>. <a href="#find">Find &amp; Replace</a> also finds and replaces text in text elements.</p>
+
+        <h3>In reader mode and elsewhere</h3>
+        <ul>
+          <li>Readers see the text in place, can find it with search, and glossary terms in it open their definition. A slide with text elements stays a picture on a phone, like one with extra images.</li>
+          <li>Text elements are saved in show format 0.2, like extra images.</li>
+          <li>Converting a PowerPoint deck: text boxes that fit none of the layout's places become text elements at the same place, with their font size, colors, fill and border.</li>
         </ul>
       </section>
 
@@ -687,6 +723,7 @@
             <tr><td><kbd>F5</kbd></td><td>Save and present from the current slide</td></tr>
             <tr><td><kbd>F1</kbd></td><td>This manual, at the section for the current tab</td></tr>
             <tr><td>On a selected extra image</td><td>See <a href="#extra-images">Extra images</a>: arrows, <kbd>Shift</kbd>+arrows, <kbd>Alt</kbd>+arrows, <kbd>Delete</kbd>, <kbd>Esc</kbd></td></tr>
+            <tr><td>On a selected text element</td><td>See <a href="#text-elements">Text elements</a>: as an extra image, and <kbd>Enter</kbd> edits its text</td></tr>
             <tr><td>In the show grid</td><td>See <a href="#grid">Show grid</a>: arrows, <kbd>Shift</kbd>/<kbd>Ctrl</kbd>+arrows, <kbd>Space</kbd>, <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd>, <kbd>Ctrl</kbd>+<kbd>D</kbd>, <kbd>Delete</kbd>, <kbd>Enter</kbd>, <kbd>Esc</kbd></td></tr>
           </tbody>
         </table>

@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Text elements on slides (I-089, D-016)
+- **Added** the Slide tab section **Extra images and text** (was *Extra images*): **+ Add text** places a text element in the middle of the slide and selects its text. A text row has the text (inline Markdown) and its look (`ui/text-style-controls.js`): font and size (the template's first), bold / italic / underline / uppercase, alignment, text color and fill from the template's palette or a color picker, fill opacity, and folded away border, corners, padding and text outline.
+- **Added** text boxes on the audience preview: moved like extra images, resized freely (Shift keeps the ratio), Alt+Left / Right width and Alt+Up / Down height, and double-click or Enter (when selected) jumps to the text.
+- **Added** actions: `addOverlay` / `updateOverlay` take text elements and clean their style (`cleanTextStyle`); find & replace include their text. The manual has a *Text elements* section.
+
 ### 2026-10-12: Autosave draft to IndexedDB with crash recovery (I-020)
 - **Added** draft storage module (`io/draft-store.js`): persists unsaved show drafts into IndexedDB (`slipr-drafts`, object store `drafts`), falling back to `localStorage` or in-memory storage. Keyed stably by folder key (`folder:<key>`), show URL (`url:<url>`), or show ID (`id:<id>`).
 - **Added** automatic background autosaving (`startAutosave`): checks dirty status every 5 seconds and persists modified shows without redundant serialization. Flushes immediately upon `visibilitychange` (tab hidden), `pagehide`, and `beforeunload`.

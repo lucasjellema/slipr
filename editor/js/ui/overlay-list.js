@@ -1,16 +1,20 @@
 // @ts-check
 /**
- * The Slide tab's "Extra images" section (I-083): images placed freely on the
- * slide, in front of the layout. One row per image (picture, alt text, appear
- * one by one, stacking order, remove) and a drop zone to add one. Placing and
- * sizing happens on the audience preview (ui/overlay-editor.js).
+ * The Slide tab's "Extra images and text" section: images (I-083) and text
+ * elements (I-089) placed freely on the slide, in front of the layout. One row
+ * per overlay (picture and alt text, or text and its look; appear one by one,
+ * stacking order, remove), a drop zone to add an image and a button to add a
+ * text. Placing and sizing happens on the audience preview
+ * (ui/overlay-editor.js).
  */
 import { h } from '../dom.js';
 import { addImageToOverlay, addOverlayImage } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
-import { selectOverlay, showOverlaySelected } from './overlay-editor.js';
+import { selectOverlay, showOverlaySelected, focusOverlayText } from './overlay-editor.js';
 import { pictureStyleControls } from './picture-style.js';
+import { textStyleControls } from './text-style-controls.js';
 import { imageValue } from '../slot-values.js';
+import { NEW_TEXT_BOX } from '../actions.js';
 
 const EFFECTS = ['fade-in', 'fade-up', 'fade-down', 'fade-left', 'fade-right', 'fade-in-then-semi-out', 'semi-fade-out', 'grow', 'shrink'];
 
@@ -26,66 +30,101 @@ export function buildOverlaySection(slide, store) {
   const overlays = Array.isArray(slide.overlays) ? slide.overlays : [];
   const slideId = slide.id;
   const resolveAsset = store.state.resolveAsset;
+  const palette = store.state.template?.styleguide?.colors ?? {};
   const toPreview = () => {
     if (store.state.previewMode !== 'audience') store.setPreviewMode('audience');
   };
 
+  /** The picture, alt text and picture style of an extra image. @param {any} o @param {number} i */
+  const imageFields = (o, i) => [
+    imageField({
+      label: `Extra image ${i + 1}`,
+      image: o.image,
+      resolveAsset,
+      onFile: (file) => runImage(() => addImageToOverlay(store, { slideId, index: i, file })),
+    }),
+    h('label', { class: 'slipr-label', for: `slipr-overlay-alt-${i}` }, ['Alt text']),
+    h('input', {
+      id: `slipr-overlay-alt-${i}`,
+      type: 'text',
+      class: 'slipr-input',
+      value: o.image?.alt ?? '',
+      placeholder: 'What the image shows',
+      oninput: (/** @type {Event} */ e) => {
+        const alt = /** @type {HTMLInputElement} */ (e.target).value;
+        store.dispatch('updateOverlay', { slideId, index: i, patch: { image: { ...o.image, alt } } }, { coalesceKey: `overlay-alt-${slideId}-${i}` });
+      },
+    }),
+    pictureStyleControls({
+      label: `Extra image ${i + 1}`,
+      image: o.image,
+      styles: store.state.template?.pictureStyles ?? [],
+      resolveAsset,
+      onChange: (patch) => store.dispatch('updateOverlay', { slideId, index: i, patch: { image: imageValue(o.image, patch) } }),
+    }),
+  ];
+
+  /** The text and the look of a text element (D-016). @param {any} o @param {number} i */
+  const textFields = (o, i) => [
+    h('label', { class: 'slipr-label', for: `slipr-overlay-text-${i}` }, ['Text']),
+    h('textarea', {
+      id: `slipr-overlay-text-${i}`,
+      class: 'slipr-textarea slipr-overlay-text-input',
+      rows: '2',
+      placeholder: 'The text; **bold**, *italic*, [[glossary-id]]; Enter starts a new line',
+      oninput: (/** @type {Event} */ e) => {
+        const text = /** @type {HTMLTextAreaElement} */ (e.target).value;
+        store.dispatch('updateOverlay', { slideId, index: i, patch: { text } }, { coalesceKey: `overlay-text-${slideId}-${i}` });
+      },
+    }, [o.text]),
+    textStyleControls({
+      id: `slipr-overlay-style-${i}`,
+      label: `Text ${i + 1}`,
+      style: o.style,
+      palette,
+      onChange: (patch) => {
+        // The latest style: several changes can come before the form re-renders.
+        const live = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.overlays?.[i];
+        store.dispatch('updateOverlay', { slideId, index: i, patch: { style: { ...(live?.style ?? {}), ...patch } } });
+      },
+    }),
+  ];
+
   const rows = overlays.map((/** @type {any} */ o, /** @type {number} */ i) => {
     const fragment = o.fragment === true ? 'true' : typeof o.fragment === 'string' ? o.fragment : '';
-    return h('li', { class: 'slipr-overlay-row' }, [
+    const isText = typeof o.text === 'string';
+    const what = `${isText ? 'text' : 'image'} ${i + 1}`;
+    return h('li', { class: `slipr-overlay-row ${isText ? 'is-text' : ''}` }, [
       h('div', { class: 'slipr-overlay-row-head' }, [
-        h('span', { class: 'slipr-overlay-row-title' }, [`Image ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
+        h('span', { class: 'slipr-overlay-row-title' }, [`${isText ? 'Text' : 'Image'} ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
         h('span', { class: 'slipr-help', title: 'Position and size on the slide. Change them on the preview.' }, [
           `at ${pct(o.x)}, ${pct(o.y)} · ${pct(o.w)} × ${pct(o.h)}`,
         ]),
         h('div', { class: 'slipr-overlay-row-tools' }, [
           h('button', {
             type: 'button', class: 'slipr-item-btn', title: 'Select it on the preview, to move and resize it',
-            'aria-label': `Select image ${i + 1} on the preview`,
+            'aria-label': `Select ${what} on the preview`,
             onclick: () => { toPreview(); showOverlaySelected(slideId, i); queueFocus(); },
           }, ['⌖']),
           h('button', {
-            type: 'button', class: 'slipr-item-btn', title: 'Bring forward', 'aria-label': `Bring image ${i + 1} forward`,
+            type: 'button', class: 'slipr-item-btn', title: 'Bring forward', 'aria-label': `Bring ${what} forward`,
             disabled: i === overlays.length - 1 ? true : undefined,
             onclick: () => store.dispatch('moveOverlay', { slideId, index: i, toIndex: i + 1 }),
           }, ['▲']),
           h('button', {
-            type: 'button', class: 'slipr-item-btn', title: 'Send backward', 'aria-label': `Send image ${i + 1} backward`,
+            type: 'button', class: 'slipr-item-btn', title: 'Send backward', 'aria-label': `Send ${what} backward`,
             disabled: i === 0 ? true : undefined,
             onclick: () => store.dispatch('moveOverlay', { slideId, index: i, toIndex: i - 1 }),
           }, ['▼']),
           h('button', {
-            type: 'button', class: 'slipr-item-btn slipr-item-btn-danger', title: 'Remove this image from the slide (the file stays)',
-            'aria-label': `Remove image ${i + 1}`,
+            type: 'button', class: 'slipr-item-btn slipr-item-btn-danger',
+            title: isText ? 'Remove this text from the slide' : 'Remove this image from the slide (the file stays)',
+            'aria-label': `Remove ${what}`,
             onclick: () => { selectOverlay(null); store.dispatch('deleteOverlay', { slideId, index: i }); },
           }, ['🗑']),
         ]),
       ]),
-      imageField({
-        label: `Extra image ${i + 1}`,
-        image: o.image,
-        resolveAsset,
-        onFile: (file) => runImage(() => addImageToOverlay(store, { slideId, index: i, file })),
-      }),
-      h('label', { class: 'slipr-label', for: `slipr-overlay-alt-${i}` }, ['Alt text']),
-      h('input', {
-        id: `slipr-overlay-alt-${i}`,
-        type: 'text',
-        class: 'slipr-input',
-        value: o.image?.alt ?? '',
-        placeholder: 'What the image shows',
-        oninput: (/** @type {Event} */ e) => {
-          const alt = /** @type {HTMLInputElement} */ (e.target).value;
-          store.dispatch('updateOverlay', { slideId, index: i, patch: { image: { ...o.image, alt } } }, { coalesceKey: `overlay-alt-${slideId}-${i}` });
-        },
-      }),
-      pictureStyleControls({
-        label: `Extra image ${i + 1}`,
-        image: o.image,
-        styles: store.state.template?.pictureStyles ?? [],
-        resolveAsset,
-        onChange: (patch) => store.dispatch('updateOverlay', { slideId, index: i, patch: { image: imageValue(o.image, patch) } }),
-      }),
+      ...(isText ? textFields(o, i) : imageFields(o, i)),
       h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
       h('select', {
         id: `slipr-overlay-fragment-${i}`,
@@ -103,9 +142,9 @@ export function buildOverlaySection(slide, store) {
   });
 
   return h('fieldset', { class: 'slipr-fieldset slipr-overlays-form' }, [
-    h('legend', {}, [`Extra images${overlays.length ? ` (${overlays.length})` : ''}`]),
+    h('legend', {}, [`Extra images and text${overlays.length ? ` (${overlays.length})` : ''}`]),
     h('p', { class: 'slipr-help' }, [
-      'Images placed freely on the slide, in front of the layout. Move and resize them on the preview (Audience): drag, or a corner to resize; arrow keys move, Alt+arrows resize.',
+      'Images and texts placed freely on the slide, in front of the layout. Move and resize them on the preview (Audience): drag, or a corner to resize; arrow keys move, Alt+arrows resize.',
     ]),
     overlays.length ? h('ol', { class: 'slipr-overlay-list' }, rows) : null,
     imageField({
@@ -120,6 +159,18 @@ export function buildOverlaySection(slide, store) {
         }
       }),
     }),
+    h('button', {
+      type: 'button',
+      class: 'slipr-btn slipr-btn-sm slipr-overlay-add-text',
+      title: 'Add a text element: a badge, a label or a callout, placed freely on the slide',
+      onclick: () => {
+        const index = overlays.length;
+        selectOverlay(slideId, index);
+        store.dispatch('addOverlay', { slideId, overlay: { text: 'Text', ...NEW_TEXT_BOX } });
+        toPreview();
+        focusOverlayText(index, { select: true });
+      },
+    }, ['+ Add text']),
   ]);
 }
 
