@@ -19,15 +19,32 @@ export function showHelp(app, { onOpenFolder, onOpenZip, onDropZip, recentArchiv
   document.title = 'Slipr Viewer';
   const demoLink = `?show=${encodeURIComponent(DEMO)}`;
 
-  let openZip = null;
+  const openButtons = [];
   if (onOpenZip) {
     const zipButton = h('button', { type: 'button', class: 'slipr-page-button' }, ['Open zip archive…']);
     zipButton.addEventListener('click', () => {
       onOpenZip().catch((err) => showLoadError(app, { title: 'The zip file could not be opened', message: err instanceof Error ? err.message : String(err) }));
     });
+    openButtons.push(zipButton);
+  }
+
+  if (onOpenFolder) {
+    const folderButton = h('button', { type: 'button', class: 'slipr-page-button slipr-page-button--secondary' }, ['Open a show folder…']);
+    folderButton.addEventListener('click', () => {
+      onOpenFolder().catch((err) => showLoadError(app, { title: 'The folder could not be opened', message: err instanceof Error ? err.message : String(err) }));
+    });
+    openButtons.push(folderButton);
+  }
+
+  let openSection = null;
+  if (openButtons.length > 0) {
     const zone = h('div', { class: 'slipr-drop-zone' }, [
-      h('p', { style: 'margin: 0 0 0.5rem;' }, [zipButton]),
-      h('p', { class: 'slipr-hint', style: 'margin: 0;' }, ['Open a .zip or .slipr file from your computer, or drag & drop it here']),
+      h('div', { style: 'display: flex; gap: 0.75rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 0.6rem;' }, openButtons),
+      h('p', { class: 'slipr-hint', style: 'margin: 0;' }, [
+        onOpenFolder
+          ? 'Open a show folder or .zip / .slipr archive from this computer, or drag & drop a zip file here'
+          : 'Open a .zip or .slipr archive from this computer, or drag & drop it here',
+      ]),
     ]);
 
     if (onDropZip) {
@@ -49,16 +66,7 @@ export function showHelp(app, { onOpenFolder, onOpenZip, onDropZip, recentArchiv
       });
     }
 
-    openZip = zone;
-  }
-
-  let openFolder = null;
-  if (onOpenFolder) {
-    const button = h('button', { type: 'button', class: 'slipr-page-button slipr-page-button--secondary' }, ['Open a show folder…']);
-    button.addEventListener('click', () => {
-      onOpenFolder().catch((err) => showLoadError(app, { title: 'The folder could not be opened', message: err instanceof Error ? err.message : String(err) }));
-    });
-    openFolder = h('p', {}, [button, ' Open a show folder directly from this computer (Chrome or Edge).']);
+    openSection = zone;
   }
 
   let recentList = null;
@@ -69,16 +77,16 @@ export function showHelp(app, { onOpenFolder, onOpenZip, onDropZip, recentArchiv
       return h('li', {}, [link]);
     });
     recentList = h('div', {}, [
-      h('h2', {}, ['Recent archives']),
+      h('h2', {}, ['Recent archives in this browser']),
       h('ul', { class: 'slipr-archive-list' }, items),
     ]);
   }
 
   app.replaceChildren(h('article', { class: 'slipr-page' }, [
     h('h1', {}, ['Slipr Viewer']),
-    openZip,
-    openFolder,
+    openSection,
     recentList,
+
     h('h2', {}, ['Open by URL parameter']),
     h('p', {}, ['Tell the viewer which show to open with the ', h('code', {}, ['show']), ' parameter:']),
     h('p', {}, [h('code', {}, [`viewer/?show=${DEMO}`])]),

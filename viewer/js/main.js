@@ -21,7 +21,10 @@ const archiveParam = params.get('archive');
 const pathParam = params.get('path');
 const mode = params.get('mode') === 'reader' ? 'reader' : 'audience';
 
+let windowDragDropConfigured = false;
+
 main().catch((err) => {
+
   console.error(err);
   showLoadError(app, { title: 'Something went wrong', message: err instanceof Error ? err.message : String(err) });
 });
@@ -258,7 +261,6 @@ async function loadAndPresentArchive(entries, name, showPath) {
   await present(() => loadShowFromZip(source));
 }
 
-let windowDragDropConfigured = false;
 function setupWindowDragDrop() {
   if (windowDragDropConfigured || typeof window === 'undefined') return;
   windowDragDropConfigured = true;
