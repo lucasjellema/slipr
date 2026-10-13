@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Text elements on slides (I-089)
+- **Added** text elements on slides in both modes (drawn by `shared/render.js`), appearing one by one in audience mode like extra images. Reader search finds their text, and glossary terms in them open their definition.
+
 ### 2026-10-12: PDF documents (I-072)
 - **Added** PDF slides (one page, or a range stepped through by clicks) and PDF blocks in reader mode (previous / next within the range, zoom, "Open PDF ↗", the page's text for screen readers). Reader search finds text in the PDFs on first use ("Reading the PDFs in this show…") and opens a result at its page (`pdfSearchDocs()`, `prepare` in `search.js`).
 - **Changed** audience mode shows the deck at once and renders embeds in the background.

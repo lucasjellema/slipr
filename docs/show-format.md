@@ -124,7 +124,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `$schema` | string | no | Path to `shared/schema/show.schema.json`, for autocomplete in editors outside this repo's VS Code workspace |
-| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides, `style` / `opacity` on pictures, `aliases` on glossary terms, `fallback` / `load` on embeds and web pages (`web` slots, `allow`, `aspect`, `present`); a show without them may stay 0.1. The editor and the converter write 0.2 only when a show uses them |
+| `slipr` | string | yes | Format version of this file: `"0.2"` (current) or `"0.1"`. 0.2 adds `overlays` on slides (extra images and text elements), `style` / `opacity` on pictures, `aliases` on glossary terms, `fallback` / `load` on embeds and web pages (`web` slots, `allow`, `aspect`, `present`); a show without them may stay 0.1. The editor and the converter write 0.2 only when a show uses them |
 | `id` | string | yes | Stable identifier (kebab-case), used in URLs and as the key for the reader's personal data |
 | `meta` | object | yes | `title` (required), `subtitle`, `author`, `date` (ISO), `language` (BCP-47), `description`, `tags[]` |
 | `template` | object | yes | `ref`: path or URL to the template folder, relative to `show.json` (see *Template references* below). `version`: semver range |
@@ -144,7 +144,7 @@ On top of the slides, show-level structures power the reader experience: **chapt
 | `chapter` | string | no | ID of a chapter |
 | `tags` | string[] | no | Topics, used for reader filtering, search facets and "related" suggestions |
 | `content` | object | yes | **Audience layer.** Slot name → slot value (see slot types). Unknown slots produce a warning |
-| `overlays` | array | no | **Extra images** placed freely on the slide, in front of the layout (format 0.2, D-013). See *Extra images* below |
+| `overlays` | array | no | **Extra images** and **text elements** placed freely on the slide, in front of the layout (format 0.2, D-013, D-016). See *Extra images* and *Text elements* below |
 | `notes` | string | no | Speaker notes (Markdown). Presenter view only, unless the reader opts to see them |
 | `audience` | object | no | Audience-mode options: `hidden` (backup slide), `fragments` (bool or `"fade-up"` etc.), `autoAnimate` (bool: Reveal auto-animate to the next slide), `transition`, `background` |
 | `reader` | object | no | **Reader layer** (see below) |
@@ -171,6 +171,38 @@ Besides the layout's own image slots, a slide can carry extra images that the au
 - Overlays with `fragment` appear after the slide's own fragments (bullets, cards), in array order.
 - They scale with the slide. In reader mode a slide with overlays keeps its picture layout on narrow screens instead of reflowing (see `docs/template-format.md`).
 - A 0.1 show with overlays is an error. An overlay that sticks out of the canvas (more than 0.5 %) is a warning.
+
+### Text elements (`slide.overlays` with `text`, format 0.2)
+
+An overlay with `text` instead of `image` is a **text element**: a badge, a label on a photo, a callout, a pill (I-089). It is placed like an extra image (`x`, `y`, `w`, `h`, `fragment`, the same stacking and order of appearance), and its look is set on the element itself: the accepted exception of D-016. Spec: `docs/specs/I-089-text-elements.md`.
+
+```json
+{
+  "text": "**New** in 2026",
+  "style": { "font": "heading", "size": 1.6, "bold": true, "uppercase": true, "align": "center", "valign": "middle",
+             "color": "#FFFFFF", "background": "#BC448C", "backgroundOpacity": 0.9, "radius": 2, "padding": 0.6 },
+  "x": 0.8, "y": 0.06, "w": 0.14, "h": 0.07
+}
+```
+
+`text` is inline Markdown (bold, italic, code, links, `[[glossary]]`, `^[popup]`); a `\n` starts a new line. An overlay has either `image` or `text`, never both. All `style` fields are optional; lengths are percentages of the slide width (1 = 1 %), so the element scales with the slide.
+
+| `style` field | Values | Default |
+|---|---|---|
+| `font` | `heading`, `body` (the template's fonts), `mono` (its code font), `system`, `serif` (platform fonts) | `body` |
+| `size` | a number 0.5–20, or `small`, `body`, `subtitle`, `title`, `hero` (the template's sizes) | `body` |
+| `bold`, `italic`, `underline`, `uppercase` | boolean | false |
+| `align` / `valign` | `left` `center` `right` / `top` `middle` `bottom` | `left` / `top` |
+| `color` | `#rgb` or `#rrggbb` | the template's text color |
+| `background`, `backgroundOpacity` | a color; 0–1 (fades the fill only) | none; 1 |
+| `borderWidth` (0–5), `borderStyle` (`solid` `dashed` `dotted`), `borderColor` | box border | none; `solid`; the text color |
+| `radius` | 0–50: rounded corners, pills | 0 |
+| `outlineWidth` (0–2), `outlineColor` | a halo around the letters, for text over photos | none; white |
+| `padding` | 0–10 | 0 |
+
+- Text that does not fit the box is still shown; make the box larger.
+- Reader search finds the text; in reader mode glossary terms in it are linked (D-015).
+- A text element in a 0.1 show is an error. An empty text is a warning, and so is one that sticks out of the canvas.
 
 ### Reader layer (`slide.reader`)
 
@@ -302,11 +334,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` slot value or `pdf` block in a 0.1 show; an unsafe web page or PDF address.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image that sticks out of the slide, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style` or `opacity`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` slot value or `pdf` block in a 0.1 show; an unsafe web page or PDF address.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (I-083), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), and the `pdf` slot and block types (I-072, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), and the `pdf` slot and block types (I-072, 2026-10-12). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

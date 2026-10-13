@@ -278,6 +278,44 @@ describe('extra images (overlays, format 0.2, I-083)', () => {
   });
 });
 
+describe('text elements (overlays with text, format 0.2, I-089)', () => {
+  const textOverlay = (extra = {}) => ({ text: '**New** in 2026', style: { font: 'heading', size: 1.6, bold: true, color: '#FFFFFF', background: '#BC448C', backgroundOpacity: 0.9, radius: 2 }, x: 0.7, y: 0.1, w: 0.2, h: 0.08, ...extra });
+  const withText = (extra, version = '0.2') => validateVariant((s) => {
+    s.slipr = version;
+    s.slides[1].overlays = [textOverlay(extra)];
+  });
+
+  test('a 0.2 show with a styled text element is valid without warnings', () => {
+    const result = withText({ fragment: true });
+    assert.deepEqual(result.errors, []);
+    assert.deepEqual(result.warnings, []);
+  });
+
+  test('a text element in a 0.1 show is an error', () => {
+    assert.ok(codes(withText({}, '0.1').errors).includes('format-version'));
+  });
+
+  test('an overlay has either an image or a text, not both or neither', () => {
+    assert.equal(withText({ image: { src: 'images/two-modes.svg', alt: 'x' } }).ok, false);
+    assert.equal(withText({ text: undefined, style: undefined }).ok, false);
+    assert.equal(validateVariant((s) => { s.slides[1].overlays = [{ image: { src: 'images/two-modes.svg', alt: 'x' }, style: {}, x: 0, y: 0, w: 0.1, h: 0.1 }]; }).ok, false, 'no text style on an image');
+  });
+
+  test('style values are checked', () => {
+    for (const bad of [{ font: 'comic' }, { size: 50 }, { size: 'huge' }, { color: 'red' }, { color: '#12345' }, { backgroundOpacity: 2 }, { borderStyle: 'groove' }, { align: 'justify' }, { shadow: true }]) {
+      assert.equal(withText({ style: bad }).ok, false, JSON.stringify(bad));
+    }
+    assert.equal(withText({ style: { size: 'title', valign: 'middle', borderWidth: 0.2, borderStyle: 'dashed', borderColor: '#000', outlineWidth: 0.1, outlineColor: '#fff', padding: 1 } }).ok, true);
+  });
+
+  test('empty text, outside the canvas and unknown glossary ids: warnings', () => {
+    assert.ok(codes(withText({ text: '  ' }).warnings).includes('empty-text'));
+    const outside = withText({ x: 0.9 }).warnings.find((w) => w.code === 'outside-canvas');
+    assert.match(outside?.message ?? '', /text element/);
+    assert.ok(withText({ text: 'See [[no-such-term]]' }).warnings.some((w) => w.path === 'slides[1].overlays[0].text'));
+  });
+});
+
 describe('picture styles and opacity (D-014, I-084)', () => {
   const imageSlide = (s) => s.slides.find((x) => x.id === 's-architecture');
 

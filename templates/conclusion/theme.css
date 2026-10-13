@@ -82,6 +82,13 @@
   --cnc-size-quote: calc(24 * var(--cnc-pt));
   --cnc-size-intro: calc(28 * var(--cnc-pt));
   --cnc-size-small: calc(12 * var(--cnc-pt));
+
+  /* Named sizes for text elements on slides (I-089) */
+  --slipr-size-small: var(--cnc-size-small);
+  --slipr-size-body: var(--cnc-size-body);
+  --slipr-size-subtitle: var(--cnc-size-subheading);
+  --slipr-size-title: var(--cnc-size-title);
+  --slipr-size-title-hero: var(--cnc-size-hero);
 }
 
 /* ---------- slide frame ---------- */

@@ -51,12 +51,14 @@ export function buildSearchIndex(show) {
       if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title].filter(Boolean).join(' ');
       return '';
     }).join('\n');
+    // Text elements on the slide (I-089) are slide content too.
+    const overlayText = (slide.overlays ?? []).map((/** @type {any} */ o) => (typeof o?.text === 'string' ? text(o.text) : '')).filter(Boolean).join('\n');
     docs.push({
       kind: 'slide', slideId: slide.id, blockId: null, title, order: order++,
       fields: [
         { name: 'title', text: title, weight: 5 },
         { name: 'summary', text: slide.reader?.summary ?? '', weight: 3 },
-        { name: 'content', text: content, weight: 2 },
+        { name: 'content', text: overlayText ? `${content}\n${overlayText}` : content, weight: 2 },
       ],
     });
     for (const block of slide.reader?.blocks ?? []) {

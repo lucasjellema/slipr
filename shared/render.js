@@ -8,11 +8,14 @@
  *   <div class="slipr-slide slipr-mode-…" data-layout data-aspect data-slide-id>
  *     <div class="slipr-canvas">
  *       …filled layout fragment…
- *       <div class="slipr-overlays"> <img class="slipr-overlay"> … </div>   (extra images, D-013)
+ *       <div class="slipr-overlays">   (extra images D-013, text elements D-016)
+ *         <div class="slipr-overlay"> <img> </div>
+ *         <div class="slipr-overlay slipr-overlay--text"> <div class="slipr-overlay-text">…</div> </div>
+ *       </div>
  *     </div>
  *   </div>
  *
- * A reader-mode slide with extra images gets the mode class
+ * A reader-mode slide with overlays gets the mode class
  * `slipr-mode-reader-fixed` instead of `slipr-mode-reader`, so the templates'
  * narrow-screen reflow rules leave it a picture (I-083).
  *
@@ -22,6 +25,7 @@
  */
 import { markdown, markdownInline, markdownListItems, escape } from './markdown.js';
 import { applyPictureStyle } from './picture.js';
+import { textStyleDeclarations } from './text-style.js';
 import { linkGlossaryTerms } from './glossary.js';
 import { embedKindForSlot, fillEmbedElement } from './embeds/index.js';
 import { isBlockedUrl } from './embeds/web.js';
@@ -80,34 +84,41 @@ export function renderSlide(slide, ctx, options = {}) {
     }
     fillSlot(/** @type {HTMLElement} */ (el), def.type, value, ctx, mdOptions, doc, { mode, def });
   }
-  if (overlays.length) canvas.append(renderOverlays(overlays, ctx, doc, mode));
+  if (overlays.length) canvas.append(renderOverlays(overlays, ctx, doc, mode, mdOptions));
   // Reader mode: glossary terms in the slide's text open their definition (I-086).
   if (mode === 'reader') linkGlossaryTerms(canvas, ctx.show.glossary);
+  // The overlay layer lets clicks through; links, terms and popups in text elements take them.
+  for (const el of canvas.querySelectorAll('.slipr-overlay--text :is(a, button, [tabindex])')) {
+    /** @type {HTMLElement} */ (el).style.pointerEvents = 'auto';
+  }
   return root;
 }
 
 /**
- * The layer of extra images (D-013, I-083): absolutely positioned in front of
- * the layout, as fractions of the canvas. Positioning is inline so every
- * template supports it; values are clamped numbers, never raw strings.
+ * The layer of extra images (D-013, I-083) and text elements (D-016, I-089):
+ * absolutely positioned in front of the layout, as fractions of the canvas.
+ * Positioning is inline so every template supports it; values are clamped
+ * numbers or checked values (shared/text-style.js), never raw strings.
  * @param {any[]} overlays
  * @param {import('./load.js').ShowContext} ctx
  * @param {Document} doc
  * @param {string} mode
+ * @param {import('./markdown.js').MarkdownOptions} md
  * @returns {HTMLElement}
  */
-function renderOverlays(overlays, ctx, doc, mode) {
+function renderOverlays(overlays, ctx, doc, mode, md) {
   const layer = doc.createElement('div');
   layer.className = 'slipr-overlays';
   Object.assign(layer.style, { position: 'absolute', inset: '0', zIndex: '10', pointerEvents: 'none' });
   overlays.forEach((overlay, i) => {
+    const isText = typeof overlay?.text === 'string';
     const src = overlay?.image?.src;
-    if (typeof src !== 'string' || !src) return;
-    // The box (position, fragment) and the picture (style, opacity) are separate
-    // elements: a picture's inline opacity would otherwise beat Reveal's
-    // fragment opacity, and the image would show before its click.
+    if (!isText && (typeof src !== 'string' || !src)) return;
+    // The box (position, fragment) and its content (picture style, opacity)
+    // are separate elements: a picture's inline opacity would otherwise beat
+    // Reveal's fragment opacity, and the image would show before its click.
     const box = doc.createElement('div');
-    box.className = 'slipr-overlay';
+    box.className = isText ? 'slipr-overlay slipr-overlay--text' : 'slipr-overlay';
     box.dataset.overlay = String(i);
     Object.assign(box.style, {
       position: 'absolute',
@@ -116,6 +127,11 @@ function renderOverlays(overlays, ctx, doc, mode) {
       width: percent(overlay.w),
       height: percent(overlay.h),
     });
+    if (isText) {
+      fillTextOverlay(box, overlay, doc, md);
+      layer.append(box);
+      return;
+    }
     const img = doc.createElement('img');
     img.src = ctx.resolveAsset(src);
     img.alt = overlay.image.alt ?? '';
@@ -134,6 +150,27 @@ function renderOverlays(overlays, ctx, doc, mode) {
     layer.append(box);
   });
   return layer;
+}
+
+/**
+ * A text element (I-089): inline Markdown per line, in a flex column so it can
+ * be aligned vertically. The look comes from shared/text-style.js.
+ * @param {HTMLElement} box @param {any} overlay @param {Document} doc
+ * @param {import('./markdown.js').MarkdownOptions} md
+ */
+function fillTextOverlay(box, overlay, doc, md) {
+  Object.assign(box.style, {
+    display: 'flex',
+    flexDirection: 'column',
+    boxSizing: 'border-box',
+    lineHeight: '1.2',
+    overflowWrap: 'break-word',
+  });
+  for (const [property, value] of textStyleDeclarations(overlay.style)) box.style.setProperty(property, value);
+  const text = doc.createElement('div');
+  text.className = 'slipr-overlay-text';
+  text.innerHTML = String(overlay.text).split(/\r?\n/).map((line) => markdownInline(line, md)).join('<br>');
+  box.append(text);
 }
 
 /** A fraction 0–1 as a CSS percentage, clamped. @param {unknown} n */

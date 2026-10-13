@@ -100,12 +100,14 @@ The renderer wraps each fragment in a fixed structure:
 <div class="slipr-slide slipr-mode-audience" data-layout="bullets" data-aspect="16:9">  <!-- CSS inline-size container -->
   <div class="slipr-canvas">                                                          <!-- the 16:9 (or 4:3) box -->
     …layout fragment…
-    <div class="slipr-overlays">…</div>   <!-- only when the slide has extra images (show format 0.2) -->
+    <div class="slipr-overlays">…</div>   <!-- only when the slide has extra images or text elements (show format 0.2) -->
   </div>
 </div>
 ```
 
 **Extra images** (`slide.overlays`, D-013, I-083) are drawn by the renderer in a layer appended to `.slipr-canvas`: `.slipr-overlays` > `div.slipr-overlay[data-overlay="i"] > img`, positioned **inline** (absolute, in percentages of the canvas, `z-index: 10`, in front of the layout). Templates need no CSS for them and must not position them; they may style `.slipr-overlay` otherwise (for example in print). Keep `.slipr-canvas` `position: relative` (it is the containing block).
+
+**Text elements** (overlays with `text`, D-016, I-089) are `div.slipr-overlay.slipr-overlay--text > div.slipr-overlay-text` in the same layer, with their look inline (it comes from the show). They use the template's fonts through `--slipr-font-heading`, `--slipr-font-body` and `--slipr-font-code`, its text color by inheritance, and its type sizes through **`--slipr-size-small`, `--slipr-size-body`, `--slipr-size-subtitle`, `--slipr-size-title` and `--slipr-size-title-hero`** (in `cqw`; a template without them falls back to the default template's sizes). Define these on `:root` or `.slipr-slide` so a text element in the size "title" matches the template's titles. The editor offers the colors of `styleguide.colors` as swatches.
 
 Templates size everything inside the slide in **container query units** (`cqw` = 1 % of the slide width). The same CSS then works on the 1920×1080 Reveal.js canvas, in reader mode's slide frame, and in editor thumbnails. Reader mode can reflow a layout on narrow screens with `@container (max-width: …)` rules on `.slipr-mode-reader` descendants (see `templates/default/theme.css`).
 
@@ -133,7 +135,7 @@ Renderer rules:
 - An element whose optional slot is **empty** gets the attribute `data-empty` so CSS can hide it or reflow around it.
 - Relative URLs inside a fragment (logos, illustrations) are resolved against the layout file.
 - The renderer adds the mode class `slipr-mode-audience` or `slipr-mode-reader` to the root, so layouts can adapt. For example, a two-column layout stacks into one column in reader mode on narrow screens.
-- A slide with extra images gets `slipr-mode-reader-fixed` instead of `slipr-mode-reader` in reader mode. It stays a scaled picture on narrow screens (Lucas, 2026-10-11), because freely placed images have no place in a reflowed layout. Templates need nothing for this: their `.slipr-mode-reader` reflow rules simply do not apply. Do not style `.slipr-mode-reader-fixed` to reflow.
+- A slide with extra images or text elements gets `slipr-mode-reader-fixed` instead of `slipr-mode-reader` in reader mode. It stays a scaled picture on narrow screens (Lucas, 2026-10-11), because freely placed images have no place in a reflowed layout. Templates need nothing for this: their `.slipr-mode-reader` reflow rules simply do not apply. Do not style `.slipr-mode-reader-fixed` to reflow.
 
 ### Cards slots (since 0.2)
 
@@ -194,7 +196,7 @@ The template also owns the look of reader mode. A template may ship a `reader.cs
 
 The reader app's own `reader.css` handles only the structure (columns, TOC, margin, toolbar) and uses the template's `--slipr-*` variables, so a template restyles both modes consistently.
 
-Layouts can adapt to reader mode with `.slipr-mode-reader` selectors. In particular they define how the layout reflows on narrow screens instead of being scaled down. Slides with extra images are rendered with `slipr-mode-reader-fixed` and keep their picture layout (see above).
+Layouts can adapt to reader mode with `.slipr-mode-reader` selectors. In particular they define how the layout reflows on narrow screens instead of being scaled down. Slides with extra images or text elements are rendered with `slipr-mode-reader-fixed` and keep their picture layout (see above).
 
 ## Picture styles (`pictureStyles`, since 0.3)
 

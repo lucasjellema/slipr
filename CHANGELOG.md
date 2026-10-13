@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Text elements on slides (I-089, D-016)
+- **Added** to show format 0.2: text elements, overlays with `text` (inline Markdown) and an optional `style` (font, size, bold / italic / underline / uppercase, alignment, colors, fill opacity, border, radius, text outline, padding; lengths in percentages of the slide width). An overlay has either `image` or `text`. Schema `$defs/textStyle` and `$defs/hexColor`; validation: a 0.1 show with one is an error, an empty text or one outside the canvas is a warning, glossary ids in the text are checked.
+- **Added** `shared/text-style.js` (DOM-free, tested): turns a style into checked CSS declarations and cleans a style for storage. `shared/render.js` draws text elements in the overlay layer; links and glossary terms in them stay clickable.
+- **Changed** the Conclusion template (0.1.4) defines `--slipr-size-*` from its own type sizes, for text elements in a named size. The demo slide "A show is just data" has a text element. Spec `docs/specs/I-089-text-elements.md`; D-016; show and template format docs.
+
 ### 2026-10-12: PDF documents (I-072)
 - **Added** `vendor/pdfjs-4.10.38/` (PDF.js, Apache-2.0, from npm `pdfjs-dist@4.10.38`, integrity checked; only `build/pdf.min.mjs`, the worker, `cmaps/`, `standard_fonts/`, see its `VENDORED.md`). `.gitattributes` marks `.pfb` and `.bcmap` as binary.
 - **Added** to show format 0.2: the `pdf` slot type and `pdf` block (`pdf`, `title`, `page?`, `pages?: [first, last]`, `load?`, `fallback?`). Validation: unsafe addresses are an error; a missing local file, `page` with `pages`, and a reversed range are warnings. Template slot type `pdf`, and a `pdf` layout in both templates (default 1.3.0, Conclusion 0.1.3).

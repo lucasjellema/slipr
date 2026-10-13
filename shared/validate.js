@@ -503,7 +503,8 @@ function checkEmbeds(slide, at, version, errors, warnings, fileExists) {
 }
 
 /**
- * Extra images (D-013, I-083): only in format 0.2, and inside the canvas.
+ * Extra images (D-013, I-083) and text elements (D-016, I-089): only in format
+ * 0.2, and inside the canvas.
  * @param {any} slide @param {string} at @param {unknown} version
  * @param {Issue[]} errors @param {Issue[]} warnings
  */
@@ -511,14 +512,19 @@ function checkOverlays(slide, at, version, errors, warnings) {
   const overlays = arrayOf(slide.overlays);
   if (!overlays.length) return;
   if (version === '0.1') {
-    errors.push({ path: `${at}.overlays`, code: 'format-version', message: 'extra images (overlays) need show format 0.2: set "slipr" to "0.2"' });
+    errors.push({ path: `${at}.overlays`, code: 'format-version', message: 'extra images and text elements (overlays) need show format 0.2: set "slipr" to "0.2"' });
   }
   overlays.forEach((o, j) => {
-    if (!isObject(o) || ![o.x, o.y, o.w, o.h].every((n) => typeof n === 'number')) return;
+    if (!isObject(o)) return;
+    const what = typeof o.text === 'string' ? 'text element' : 'extra image';
+    if (typeof o.text === 'string' && !o.text.trim()) {
+      warnings.push({ path: `${at}.overlays[${j}].text`, code: 'empty-text', message: 'text element has no text' });
+    }
+    if (![o.x, o.y, o.w, o.h].every((n) => typeof n === 'number')) return;
     if (o.w <= 0 || o.h <= 0) {
-      warnings.push({ path: `${at}.overlays[${j}]`, code: 'empty-overlay', message: 'extra image has no size' });
+      warnings.push({ path: `${at}.overlays[${j}]`, code: 'empty-overlay', message: `${what} has no size` });
     } else if (o.x + o.w > 1 + OVERLAY_TOLERANCE || o.y + o.h > 1 + OVERLAY_TOLERANCE) {
-      warnings.push({ path: `${at}.overlays[${j}]`, code: 'outside-canvas', message: 'extra image sticks out of the slide' });
+      warnings.push({ path: `${at}.overlays[${j}]`, code: 'outside-canvas', message: `${what} sticks out of the slide` });
     }
   });
 }
@@ -545,6 +551,7 @@ function forEachMarkdown(show, fn) {
       visit(value, `${at}.content.${name}`);
     }
     visit(slide?.notes, `${at}.notes`);
+    arrayOf(slide?.overlays).forEach((o, j) => visit(o?.text, `${at}.overlays[${j}].text`));
     arrayOf(slide?.reader?.blocks).forEach((block, j) => {
       const bat = `${at}.reader.blocks[${j}]`;
       visit(block?.md, `${bat}.md`);

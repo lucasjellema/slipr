@@ -114,7 +114,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
     - **Outlining & borders**: box border (width, style, color, corner radius for badges/pills/chips) and text outline / halo (stroke width and color) for high contrast over photos and colored backgrounds.
     - **Padding**: configurable internal padding around the text.
   - **Audience & reader modes**: rendered in front of the layout in `.slipr-overlays`; optional step-by-step appearance (`fragment` with Reveal effects); included in reader search index and accessible screen reader text.
-  - **PPTX converter**: maps non-placeholder PowerPoint text boxes, callouts, and floating badges directly into text overlays, preserving original positions and styles instead of losing them · todo · —
+  - **PPTX converter**: maps non-placeholder PowerPoint text boxes, callouts, and floating badges directly into text overlays, preserving original positions and styles instead of losing them. Spec: `docs/specs/I-089-text-elements.md` (D-016) · in progress · claude
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)

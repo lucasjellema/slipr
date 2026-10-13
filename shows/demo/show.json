@@ -300,6 +300,27 @@
           "w": 0.16,
           "h": 0.2844,
           "fragment": "fade-left"
+        },
+        {
+          "text": "Plain [[json]], no styling",
+          "style": {
+            "font": "heading",
+            "size": "small",
+            "bold": true,
+            "uppercase": true,
+            "align": "center",
+            "valign": "middle",
+            "color": "#FFFFFF",
+            "background": "#1F3A5F",
+            "backgroundOpacity": 0.92,
+            "radius": 3,
+            "padding": 0.5
+          },
+          "x": 0.7,
+          "y": 0.62,
+          "w": 0.24,
+          "h": 0.07,
+          "fragment": "fade-up"
         }
       ],
       "audience": {

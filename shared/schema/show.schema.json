@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays, picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays (extra images and text elements), picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -167,7 +167,7 @@
         },
         "overlays": {
           "type": "array",
-          "description": "Extra images placed freely on the slide, in front of the layout (format 0.2, D-013). Later ones are in front.",
+          "description": "Extra images (D-013) and text elements (D-016) placed freely on the slide, in front of the layout (format 0.2). Later ones are in front.",
           "items": { "$ref": "#/$defs/overlay" }
         },
         "notes": { "$ref": "#/$defs/markdown" },
@@ -210,11 +210,17 @@
     },
     "overlay": {
       "type": "object",
-      "required": ["image", "x", "y", "w", "h"],
+      "required": ["x", "y", "w", "h"],
       "additionalProperties": false,
-      "description": "An extra image on a slide. Position and size are fractions of the slide canvas.",
+      "description": "An extra image (D-013) or a text element (D-016) on a slide: either `image` or `text`. Position and size are fractions of the slide canvas.",
+      "anyOf": [
+        { "required": ["image"], "properties": { "text": false, "style": false } },
+        { "required": ["text"], "properties": { "image": false } }
+      ],
       "properties": {
         "image": { "$ref": "#/$defs/image" },
+        "text": { "type": "string", "description": "A text element (I-089): inline Markdown, lines separated by \\n." },
+        "style": { "$ref": "#/$defs/textStyle" },
         "x": { "type": "number", "minimum": 0, "maximum": 1, "description": "Left edge, fraction of the canvas width." },
         "y": { "type": "number", "minimum": 0, "maximum": 1, "description": "Top edge, fraction of the canvas height." },
         "w": { "type": "number", "minimum": 0, "maximum": 1, "description": "Width, fraction of the canvas width." },
@@ -228,6 +234,38 @@
         }
       }
     },
+    "textStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "The look of a text element (D-016, I-089). Lengths are percentages of the slide width. Absent = the template's look for slide text.",
+      "properties": {
+        "font": { "enum": ["heading", "body", "system", "serif", "mono"], "description": "The template's heading / body / code (mono) font, or a platform font." },
+        "size": {
+          "description": "Font size: a percentage of the slide width, or the template's size for a kind of text.",
+          "anyOf": [
+            { "type": "number", "minimum": 0.5, "maximum": 20 },
+            { "enum": ["small", "body", "subtitle", "title", "hero"] }
+          ]
+        },
+        "bold": { "type": "boolean" },
+        "italic": { "type": "boolean" },
+        "underline": { "type": "boolean" },
+        "uppercase": { "type": "boolean" },
+        "align": { "enum": ["left", "center", "right"] },
+        "valign": { "enum": ["top", "middle", "bottom"] },
+        "color": { "$ref": "#/$defs/hexColor" },
+        "background": { "$ref": "#/$defs/hexColor" },
+        "backgroundOpacity": { "type": "number", "minimum": 0, "maximum": 1 },
+        "borderWidth": { "type": "number", "minimum": 0, "maximum": 5 },
+        "borderStyle": { "enum": ["solid", "dashed", "dotted"] },
+        "borderColor": { "$ref": "#/$defs/hexColor" },
+        "radius": { "type": "number", "minimum": 0, "maximum": 50 },
+        "outlineWidth": { "type": "number", "minimum": 0, "maximum": 2 },
+        "outlineColor": { "$ref": "#/$defs/hexColor" },
+        "padding": { "type": "number", "minimum": 0, "maximum": 10 }
+      }
+    },
+    "hexColor": { "type": "string", "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$", "description": "A color as #rgb or #rrggbb." },
     "image": {
       "type": "object",
       "required": ["src"],
