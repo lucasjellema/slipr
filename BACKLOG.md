@@ -105,6 +105,19 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **E-020** [editor] Graph editor: graph slots and blocks (I-074) are read-only in the editor. Add a field editor: nodes (id, label, tags, Markdown, linked slide) and edges as rows, layout, the audience steps, a data file picker, caption and fallback image; the preview already draws the graph
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
+- [ ] **I-092** [editor/format] **Export a show to a zip file and import from an uploaded zip file in the editor**:
+  - **Export to zip (`.zip` / `.slipr`)**:
+    - An **Export to zip…** (or **Download zip**) action in the editor top bar / menu alongside HTML export (I-085).
+    - Packages the current show in memory: `show.json`, referenced images (`images/`), data files (`data/`), and local documents (`docs/`), including any unsaved in-memory edits.
+    - Compresses client-side using standard Web Streams (`CompressionStream('deflate-raw')`) or a lightweight zip writer (complementing `shared/zip.js`), triggering a browser download or file save dialog (`.zip` or `.slipr`).
+  - **Import from uploaded zip file**:
+    - An **Open zip archive…** button on the editor start screen and File menu (via `<input type="file" accept=".zip,.slipr">`).
+    - Uses `shared/zip.js` (`readZip()` and `createZipSource()` from I-087) to decompress client-side in memory without uploading to any server (D-001/D-002/D-010).
+    - Handles direct root shows, single-directory wrappers (e.g. GitHub archive downloads `repo-main/show.json`), and prompts if multiple shows are found in the archive.
+    - Loads the unzipped show into the editor store and live preview with `blob:` object URLs for images and assets.
+    - Saving: allows authoring and re-exporting as zip, or extracting/saving into a disk folder via `showDirectoryPicker()`.
+    - Enables editing shows in browsers that lack the File System Access directory picker (Firefox, Safari).
+  - Pairs with **I-053** (`.slipr` single-file package format) and **I-087** (`?zip=<url>` viewer loader) · todo · —
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -118,7 +131,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-050** [templates] House-style template based on your organization's style guide
 - [ ] **I-051** [templates] Auto-generated style-guide page: all layouts, blocks, colors and fonts of a template
 - [ ] **I-052** [templates] Generate `styleguide` JSON from `theme.css` (or vice versa)
-- [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder)
+- [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder) · see also **I-092** for editor export & import
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
