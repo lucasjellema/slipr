@@ -158,6 +158,34 @@
       }
     },
     {
+      "id": "s-graph",
+      "layout": "graph",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Graph",
+        "title": "How a show comes together",
+        "graph": {
+          "nodes": [
+            { "id": "deck", "label": "PowerPoint deck", "tags": ["source"] },
+            { "id": "converter", "label": "Converter", "tags": ["tools"] },
+            { "id": "show", "label": "show.json", "tags": ["show"], "md": "One file: slides, reader layer, glossary." },
+            { "id": "editor", "label": "Editor", "tags": ["tools"] },
+            { "id": "template", "label": "Conclusion template", "tags": ["show"] },
+            { "id": "viewer", "label": "Viewer", "tags": ["tools"], "slide": "s-web" }
+          ],
+          "edges": [
+            { "from": "deck", "to": "converter" },
+            { "from": "converter", "to": "show", "label": "writes" },
+            { "from": "editor", "to": "show", "label": "edits" },
+            { "from": "show", "to": "template", "label": "names" },
+            { "from": "viewer", "to": "show", "label": "presents" }
+          ],
+          "layout": "breadthfirst",
+          "steps": [{ "show": ["editor"] }, { "show": ["viewer"] }, { "focus": "show" }]
+        }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",
