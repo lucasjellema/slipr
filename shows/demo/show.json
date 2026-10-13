@@ -875,7 +875,13 @@
         "image": {
           "src": "images/caged-agent.jpg",
           "alt": "Illustration of a humanoid robot standing inside a birdcage, surrounded by floating documents and streams of data",
-          "fit": "contain"
+          "fit": "contain",
+          "crop": {
+            "x": 0.12,
+            "y": 0.06,
+            "w": 0.76,
+            "h": 0.76
+          }
         },
         "caption": "An assistant that answers only from the show's own content"
       },

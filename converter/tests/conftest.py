@@ -176,6 +176,7 @@ def build_sample_deck() -> bytes:
     # …and a second picture that fits no image slot: an extra image at its place (I-083)
     logo = s6.shapes.add_picture(io.BytesIO(png((30, 160, 60))), Inches(7.5), Inches(5.5), Inches(2), Inches(1.5))
     set_alt(logo, "Company logo")
+    logo.crop_left, logo.crop_right, logo.crop_top = 0.1, 0.2, 0.25  # → crop x 0.1, w 0.7, y 0.25, h 0.75 (I-090)
 
     # 7. A table (not converted)
     s7 = prs.slides.add_slide(layout(prs, "Title Only"))

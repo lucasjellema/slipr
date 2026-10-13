@@ -423,6 +423,10 @@ def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
         result.remarks.append(f"picture {n}: the template has no picture style for {', '.join(ref.effects)}")
     if ref.opacity is not None:
         value["opacity"] = ref.opacity
+    # PowerPoint's picture crop → the shown part (I-090).
+    if ref.crop is not None:
+        x, y, w, h = ref.crop
+        value["crop"] = {"x": x, "y": y, "w": w, "h": h}
     return value
 
 

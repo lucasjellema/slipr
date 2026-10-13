@@ -60,6 +60,7 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Speaker notes | `notes` (and optionally a reader block) | ✅ |
 | Bullet build animations | `audience.fragments: true` | ✅ |
 | Picture shadow, soft edges, rounded corners, outline; transparency | the template's matching **picture style** (`pptxEffect`); `opacity` | ✅ |
+| Picture crop | the image's `crop` (the shown part), so the picture looks the same | ✅ |
 | Presentation title / author / date, slide size | `meta`, `settings.aspectRatio` (16:9 or 4:3) | ✅ |
 | Pictures that don't fit the chosen layout | **extra images** on the slide (`overlays`, show format 0.2) at their PowerPoint position and size | ✅ |
 | Text boxes and shapes with a fill or outline (badges, pills, callouts); text boxes that don't fit the chosen layout | **text elements** on the slide (`overlays` with `text`, show format 0.2) at their place, with font (the template's heading / body font when it matches), size, capitals, alignment, text color, fill and its transparency, outline, rounded corners and inner margin (theme colors resolved) | ✅ |

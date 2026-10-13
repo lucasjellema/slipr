@@ -2,20 +2,22 @@
 /**
  * Picture style and opacity for an image (D-014, I-084): a row of buttons,
  * "None" plus one per picture style of the template, each showing this
- * picture in that style; and an opacity slider. Used by image slots, card
- * images, reader image blocks and extra images.
+ * picture in that style; an opacity slider; and Crop… (I-090). Used by image
+ * slots, card images, reader image blocks and extra images.
  *
  * The template's theme.css is loaded in the editor page, and its
  * `.slipr-picture-<id>` classes are not scoped to slides, so the previews
  * show the real styles.
  */
 import { h } from '../dom.js';
+import { openCropDialog } from './crop-dialog.js';
+import { pictureStyle } from '../../../shared/picture.js';
 
 /**
  * @param {{ label: string, image: any, styles: { id: string, label: string, description?: string }[],
  *   resolveAsset?: (src: string) => string,
- *   onChange: (patch: { style?: string | undefined, opacity?: number | undefined }) => void }} options
- *   `onChange` gets `undefined` for "no style" and for 100 % opacity, so the key is removed.
+ *   onChange: (patch: { style?: string | undefined, opacity?: number | undefined, crop?: any }) => void }} options
+ *   `onChange` gets `undefined` for "no style", for 100 % opacity and for the whole picture, so the key is removed.
  * @returns {HTMLElement | null}  Nothing until the image has a picture.
  */
 export function pictureStyleControls({ label, image, styles, resolveAsset, onChange }) {
@@ -24,6 +26,9 @@ export function pictureStyleControls({ label, image, styles, resolveAsset, onCha
   const current = typeof image.style === 'string' ? image.style : '';
   const known = styles.some((s) => s.id === current);
   const percent = Math.round((typeof image.opacity === 'number' ? image.opacity : 1) * 100);
+  // The previews show the crop too.
+  const { viewBox } = pictureStyle(image);
+  const cropped = viewBox ? `object-view-box:${viewBox}` : undefined;
 
   /** @param {string} id @param {string} text @param {string} [title] */
   const option = (id, text, title) => h('button', {
@@ -34,7 +39,7 @@ export function pictureStyleControls({ label, image, styles, resolveAsset, onCha
     onclick: () => { if (id !== current) onChange({ style: id || undefined }); },
   }, [
     h('span', { class: 'slipr-picture-option-frame' }, [
-      h('img', { src, alt: '', class: id ? `slipr-picture-${id}` : '', draggable: 'false' }),
+      h('img', { src, alt: '', class: id ? `slipr-picture-${id}` : '', draggable: 'false', style: cropped }),
     ]),
     h('span', { class: 'slipr-picture-option-label' }, [text]),
   ]);
@@ -74,6 +79,15 @@ export function pictureStyleControls({ label, image, styles, resolveAsset, onCha
       h('span', { class: 'slipr-label' }, ['Opacity']),
       slider,
       readout,
+    ]),
+    h('div', { class: 'slipr-picture-crop-row' }, [
+      h('button', {
+        type: 'button', class: 'slipr-btn slipr-btn-sm',
+        'aria-label': `${label}: crop`,
+        title: 'Show only part of the picture (the file is not changed)',
+        onclick: () => openCropDialog({ src, alt: image.alt, crop: image.crop, onApply: (crop) => onChange({ crop }) }),
+      }, [viewBox ? 'Crop… (cropped)' : 'Crop…']),
+      viewBox ? h('button', { type: 'button', class: 'slipr-link-btn', onclick: () => onChange({ crop: undefined }) }, ['Show the whole picture']) : null,
     ]),
   ]);
 }

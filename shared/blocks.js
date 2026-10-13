@@ -13,6 +13,7 @@
  */
 import { markdown, escape } from './markdown.js';
 import { pictureAttributes } from './picture.js';
+import { isShown, normalCrop, toShown } from './crop.js';
 import { slideTitle } from './render.js';
 import { embedHtml } from './embeds/index.js';
 import { isBlockedUrl } from './embeds/web.js';
@@ -89,8 +90,11 @@ export function renderBlock(block, slideId, ctx) {
     case 'image': {
       const image = block.image ?? {};
       const spots = (Array.isArray(block.hotspots) ? block.hotspots : []).map((/** @type {any} */ spot, /** @type {number} */ i) => {
-        const left = pct(spot.x);
-        const top = pct(spot.y);
+        // Hotspots are positions on the whole picture; a cropped picture shows part of it (I-090).
+        const at = toShown(spot, image.crop);
+        if (normalCrop(image.crop) && !isShown(at)) return '';
+        const left = pct(at.x);
+        const top = pct(at.y);
         return `<button type="button" class="slipr-hotspot" style="left:${left}%;top:${top}%" data-hotspot="${i}"`
           + ` aria-label="${escape(spot.title)}">${i + 1}</button>`
           + `<span class="slipr-hotspot-content" data-hotspot="${i}" hidden><span class="slipr-popover-title">${escape(spot.title)}</span>${md(spot.md)}</span>`;

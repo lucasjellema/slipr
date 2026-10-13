@@ -17,6 +17,7 @@ import { checkSchema } from './schema-check.js';
 import { foldText } from './glossary.js';
 import { pdfEntries } from './embeds/pdf.js';
 import { isGraph } from './embeds/graph.js';
+import { isShown, normalCrop, toShown } from './crop.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
 
@@ -387,7 +388,25 @@ function checkImages(slide, at, imageExists, errors, warnings, template, version
     if (imageExists && !imageExists(image.src)) {
       warnings.push({ path, code: 'missing-file', message: `image file "${image.src}" not found` });
     }
+    // Crop (I-090): show format 0.2, inside the picture, with a size.
+    if (image.crop !== undefined) {
+      if (version === '0.1') errors.push({ path: `${path}.crop`, code: 'format-version', message: 'a crop needs show format 0.2: set "slipr" to "0.2"' });
+      const c = image.crop;
+      if (isObject(c) && [c.x, c.y, c.w, c.h].every((n) => typeof n === 'number')) {
+        if (c.w <= 0 || c.h <= 0) warnings.push({ path: `${path}.crop`, code: 'empty-crop', message: 'the crop has no size: the whole picture is shown' });
+        else if (c.x + c.w > 1 + OVERLAY_TOLERANCE || c.y + c.h > 1 + OVERLAY_TOLERANCE) warnings.push({ path: `${path}.crop`, code: 'crop-outside', message: 'the crop sticks out of the picture' });
+      }
+    }
   }
+  // Hotspots are positions on the whole picture: with a crop, some may not be shown.
+  arrayOf(slide.reader?.blocks).forEach((block, j) => {
+    if (block?.type !== 'image' || !isImage(block.image) || !normalCrop(block.image.crop)) return;
+    arrayOf(block.hotspots).forEach((spot, k) => {
+      if (isObject(spot) && typeof spot.x === 'number' && typeof spot.y === 'number' && !isShown(toShown(spot, block.image.crop))) {
+        warnings.push({ path: `${at}.reader.blocks[${j}].hotspots[${k}]`, code: 'hotspot-outside-crop', message: `hotspot "${spot.title}" is outside the crop and is not shown` });
+      }
+    });
+  });
 }
 
 /**

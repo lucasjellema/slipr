@@ -23,7 +23,7 @@ const defs = /** @type {Record<string, any>} */ (showSchema.$defs);
 /** @param {any} node @returns {string[]} */
 const keysOf = (node) => Object.keys(node?.properties ?? {});
 
-const image = { keys: keysOf(defs.image) };
+const image = { keys: keysOf(defs.image), fields: { crop: { keys: keysOf(defs.imageCrop) } } };
 
 /** A graph value or block (I-074): its keys, and those of nodes, edges and steps. @param {any} def @returns {Shape} */
 const graph = (def) => ({

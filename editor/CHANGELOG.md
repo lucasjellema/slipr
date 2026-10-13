@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Crop pictures (I-090)
+- **Added** **Crop…** on every picture (image slot, card image, reader image, extra image): a dialog with a frame to drag and resize, shapes (free, like the picture, 1:1, 4:3, 3:2, 16:9, portrait), Left / Top / Width / Height in %, keyboard moves; one undo step. **Show the whole picture** removes the crop. Picture style previews show the crop (`ui/crop-dialog.js`, `js/crop-values.js`, tested).
+- **Changed** the hotspot editor shows a cropped picture cropped and maps clicks, drags and arrow keys to positions on the whole picture; a hotspot outside the crop has no marker and its row says so.
+
 ### 2026-10-13: How to write a graph (I-074)
 - **Added** the manual section **Graphs** (`help.html#graphs`): a slide example, every field, steps, data files, reader blocks, colors and the checks. Graph slots and blocks link to it (`GRAPH_HELP` in `js/help.js`), and the summary names a data file instead of counting 0 nodes.
 

@@ -15,13 +15,15 @@ function validateVariant(mutate) {
   return validateShow(show, { template });
 }
 
-/** Remove every show-format 0.2 feature (overlays, picture style / opacity, glossary aliases, embeds, graphs). */
+/** Remove every show-format 0.2 feature (overlays, picture style / opacity / crop, glossary aliases, embeds, graphs). */
 function withoutFormat02(s) {
   s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph');
   for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
+  for (const slide of s.slides) for (const value of Object.values(slide.content ?? {})) if (value && typeof value === 'object') delete value.crop;
+  for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) delete block.image.crop;
   for (const slide of s.slides) for (const value of Object.values(slide.content ?? {})) if (value && typeof value === 'object') delete value.fallback;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) { delete block.fallback; delete block.load; }
 }

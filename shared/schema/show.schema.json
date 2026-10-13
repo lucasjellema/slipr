@@ -277,7 +277,20 @@
         "fit": { "enum": ["contain", "cover"] },
         "focus": { "type": "string", "description": "CSS object-position, e.g. center or 30% 50%." },
         "style": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$", "description": "(0.2) Id of one of the template's picture styles (D-014)." },
-        "opacity": { "type": "number", "minimum": 0, "maximum": 1, "description": "(0.2) Opacity of the picture, 0-1; absent means 1." }
+        "opacity": { "type": "number", "minimum": 0, "maximum": 1, "description": "(0.2) Opacity of the picture, 0-1; absent means 1." },
+        "crop": { "$ref": "#/$defs/imageCrop" }
+      }
+    },
+    "imageCrop": {
+      "type": "object",
+      "required": ["x", "y", "w", "h"],
+      "additionalProperties": false,
+      "description": "(0.2) The part of the picture that is shown (I-090), as fractions of the picture. Hotspots stay positions on the whole picture.",
+      "properties": {
+        "x": { "type": "number", "minimum": 0, "maximum": 1, "description": "Left edge, fraction of the picture's width." },
+        "y": { "type": "number", "minimum": 0, "maximum": 1, "description": "Top edge, fraction of the picture's height." },
+        "w": { "type": "number", "minimum": 0, "maximum": 1, "description": "Width, fraction of the picture's width." },
+        "h": { "type": "number", "minimum": 0, "maximum": 1, "description": "Height, fraction of the picture's height." }
       }
     },
     "code": {

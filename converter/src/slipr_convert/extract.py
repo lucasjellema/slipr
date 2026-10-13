@@ -94,7 +94,7 @@ def _extract_shape(shape, model: SlideModel) -> None:
         model.images.append(ImageRef(
             blob=blob, ext=ext, sha1=sha1, alt=reader.alt_text(shape),
             top=top, left=left, width=int(shape.width or 0), height=int(shape.height or 0), idx=idx,
-            effects=effects, opacity=opacity,
+            effects=effects, opacity=opacity, crop=_crop_of(shape),
         ))
         return
 
@@ -125,6 +125,21 @@ def _extract_shape(shape, model: SlideModel) -> None:
         model.bodies.append(TextBody(markdown=markdown, is_list=markdown.lstrip().startswith("- "),
                                      placeholder=placeholder, top=top, left=left, idx=idx,
                                      width=int(shape.width or 0), height=int(shape.height or 0), look=look))
+
+
+def _crop_of(shape) -> tuple[float, float, float, float] | None:
+    """The shown part of a cropped picture as (x, y, w, h), fractions of the
+    picture, or None when it is not cropped. Negative crops (a picture
+    "cropped outwards" in PowerPoint) count as 0."""
+    try:
+        left, top, right, bottom = (max(0.0, float(getattr(shape, f"crop_{side}") or 0.0))
+                                    for side in ("left", "top", "right", "bottom"))
+    except (AttributeError, TypeError, ValueError):
+        return None
+    w, h = 1.0 - left - right, 1.0 - top - bottom
+    if w <= 0.01 or h <= 0.01 or (left < 0.0005 and top < 0.0005 and right < 0.0005 and bottom < 0.0005):
+        return None
+    return round(left, 4), round(top, 4), round(w, 4), round(h, 4)
 
 
 def _image_of(shape):

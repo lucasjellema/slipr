@@ -26,6 +26,7 @@
 import { markdown, markdownInline, markdownListItems, escape } from './markdown.js';
 import { applyPictureStyle } from './picture.js';
 import { textStyleDeclarations } from './text-style.js';
+import { applyCropFallback } from './crop.js';
 import { linkGlossaryTerms } from './glossary.js';
 import { embedKindForSlot, fillEmbedElement } from './embeds/index.js';
 import { isBlockedUrl } from './embeds/web.js';
@@ -91,6 +92,8 @@ export function renderSlide(slide, ctx, options = {}) {
   for (const el of canvas.querySelectorAll('.slipr-overlay--text :is(a, button, [tabindex])')) {
     /** @type {HTMLElement} */ (el).style.pointerEvents = 'auto';
   }
+  // Cropped pictures in browsers without object-view-box (I-090).
+  applyCropFallback(canvas);
   return root;
 }
 

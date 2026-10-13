@@ -82,7 +82,8 @@ def test_blank_slide_text_box_and_picture_without_alt(converted):
 def test_picture_without_a_slot_becomes_an_extra_image(converted):
     s = slide(converted, 6)
     # 7.5 x 5.5 in, 2 x 1.5 in on python-pptx's 13.333 x 7.5 in (16:9) slide
-    assert s["overlays"] == [{"image": {"src": "images/slide06-2.png", "alt": "Company logo"}, "x": 0.5625, "y": 0.7333, "w": 0.15, "h": 0.2}]
+    assert s["overlays"] == [{"image": {"src": "images/slide06-2.png", "alt": "Company logo", "crop": {"x": 0.1, "y": 0.25, "w": 0.7, "h": 0.75}},
+                              "x": 0.5625, "y": 0.7333, "w": 0.15, "h": 0.2}]
     assert list(s).index("overlays") == list(s).index("content") + 1
     assert "reader" not in s, "nothing moved to the reader layer"
     assert converted.report.slides[5].placed == ["picture 2"]

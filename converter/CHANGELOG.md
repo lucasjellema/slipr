@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Picture crop (I-090)
+- **Added** PowerPoint's picture crop (`crop_left` / `top` / `right` / `bottom`) becomes the image's `crop` (negative crops count as 0); a show with a cropped picture is format 0.2. `ImageRef.crop`. The sample deck's logo is cropped.
+
 ### 2026-10-13: Text boxes and shapes → text elements (I-089, D-016)
 - **Added** `reader.text_look()`: a text box's or shape's fill (solid, or a gradient's first color) and its transparency, outline (width, dash, color), rounded-rectangle radius (ellipses become pills), anchor, inset, first paragraph's alignment, and the runs' size, typeface, color, capitals and underline. Theme colors (`schemeClr`, style references, lumMod / lumOff / shade / tint / alpha) are resolved from the master's theme. `TextLook` in `model.py`; `TextBody` gets `width`, `height` and `look`.
 - **Added** the mapping: text boxes and shapes with a fill or line become text elements at their place (they need no slot); plain text boxes that don't fit the layout become text elements instead of reader blocks. Fonts map to the template's heading / body font first (theme fonts, or a name matching `styleguide.fonts`), else mono or serif, else the body font; sizes and lengths become percentages of the slide width. Text elements are in front of extra images. The report lists them as "Placed as a text element".

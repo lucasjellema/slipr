@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Cropped pictures (I-090)
+- **Added** pictures show their crop in both modes (with a canvas fallback in browsers without `object-view-box`); hotspots stay on their spot of a cropped picture.
+
 ### 2026-10-13: Graphs (I-074)
 - **Added** graph slides and blocks. Audience mode builds a graph up step by step (reveal nodes, or zoom in on one). Reader mode: drag to pan, + / − / Fit, click a node or pick it from the list to see its text, neighbours and slide, filter by tag. Reader search finds node labels and text.
 

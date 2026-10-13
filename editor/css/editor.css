@@ -38,6 +38,7 @@
   --slipr-editor-accent-2-hover: #6B44B8;
   --slipr-editor-preview-bg: #1C2128;
   --slipr-editor-shadow: rgb(0 0 0 / 0.45);
+  --slipr-editor-scrim: rgb(0 0 0 / 0.6); /* dims the cut-away part in the crop dialog */
   --slipr-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --slipr-font-mono: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
 }
@@ -71,6 +72,7 @@
   --slipr-editor-accent-2-hover: #6639BA;
   --slipr-editor-preview-bg: #D8DEE4;
   --slipr-editor-shadow: rgb(31 35 40 / 0.18);
+  --slipr-editor-scrim: rgb(0 0 0 / 0.5);
 }
 
 * {
@@ -2158,6 +2160,58 @@ body.is-screen #slipr-editor-banners {
   max-height: 100%;
   object-fit: contain;
 }
+
+.slipr-picture-crop-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ---------- Crop dialog (I-090) ---------- */
+
+.slipr-crop-form { gap: 10px; }
+
+.slipr-crop-stage {
+  position: relative;
+  align-self: center;
+  max-width: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+
+.slipr-crop-image {
+  display: block;
+  max-width: 100%;
+  max-height: 60vh;
+}
+
+.slipr-crop-box {
+  position: absolute;
+  box-sizing: border-box;
+  border: 2px solid var(--slipr-editor-warning);
+  box-shadow: 0 0 0 100vmax var(--slipr-editor-scrim);
+  cursor: move;
+  touch-action: none;
+}
+
+.slipr-crop-box:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent);
+  outline-offset: 2px;
+}
+
+.slipr-crop-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--slipr-editor-on-color);
+  border-radius: 2px;
+  background: var(--slipr-editor-warning);
+}
+
+.slipr-crop-handle.is-nw { left: -8px; top: -8px; cursor: nwse-resize; }
+.slipr-crop-handle.is-ne { right: -8px; top: -8px; cursor: nesw-resize; }
+.slipr-crop-handle.is-sw { left: -8px; bottom: -8px; cursor: nesw-resize; }
+.slipr-crop-handle.is-se { right: -8px; bottom: -8px; cursor: nwse-resize; }
 
 .slipr-picture-opacity-row {
   display: flex;

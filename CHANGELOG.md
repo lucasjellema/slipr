@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Image cropping (I-090)
+- **Added** to show format 0.2: `crop` (`{ x, y, w, h }`, fractions of the picture) on every image value; schema `$defs/imageCrop`. Validation: a 0.1 show with a crop is an error; a crop outside the picture or without size, and a hotspot outside its picture's crop, are warnings.
+- **Added** `shared/crop.js`: crop helpers (tested) and `applyCropFallback()`, which draws cropped pictures on a canvas in browsers without `object-view-box` (called by `renderSlide()` and `hydrateEmbeds()`). `shared/picture.js` adds `object-view-box` and `data-crop` to every picture; reader image blocks place hotspots relative to the crop.
+- **Changed** the demo photo on "AI help, kept in its cage" is cropped. Spec `docs/specs/I-090-image-cropping.md`; show and template format docs.
+
 ### 2026-10-13: Graphs (I-074, D-011 refined)
 - **Added** `vendor/cytoscape-3.34.3/` (Cytoscape.js, MIT, from npm `cytoscape@3.34.3`, integrity checked; only `dist/cytoscape.esm.min.mjs`, see its `VENDORED.md`).
 - **Added** to show format 0.2: the `graph` slot and block types (`nodes`, `edges`, `data` file, `layout`, `steps` for slots, `caption`, `fallback`; blocks also `title`). Validation: a 0.1 show, no nodes or data, a bad `data` address and `steps` on a block are errors; duplicate nodes, unknown nodes in edges or steps, unknown node slides and a missing data file are warnings; node Markdown is checked. Data files join `collectImagePaths()`. Template slot type `graph`.

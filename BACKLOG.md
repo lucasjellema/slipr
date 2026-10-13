@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), image cropping (I-090), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -119,12 +119,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-051** [templates] Auto-generated style-guide page: all layouts, blocks, colors and fonts of a template
 - [ ] **I-052** [templates] Generate `styleguide` JSON from `theme.css` (or vice versa)
 - [ ] **I-053** [format] `.slipr` single-file package (zip of the show folder)
-- [ ] **I-090** [format/editor/viewer/converter] **Image cropping**: define which part of a picture is shown, without editing the file.
-  - **Format** (an option on the image value, so it works for image slots, card images, reader image blocks, hotspot images and extra images): a `crop` rectangle as fractions of the original picture (`x`, `y`, `w`, `h`, 0–1), next to the existing `fit` and `focus`. To decide with Lucas: crop only, or also `zoom` + `focus` as a lighter alternative; how `crop` combines with `fit: cover` (crop first, then cover); whether hotspot positions follow the crop.
-  - **Rendering** (`shared/render.js`, `shared/blocks.js`, `shared/picture.js`): show only the cropped part, scaled into the frame; the file stays whole (no lossy re-encoding), so the crop can be changed later. Alt text still describes what is shown.
-  - **Editor**: a crop dialog on any image field (drag a rectangle with handles, keep the aspect ratio of the slot or free, numeric fields, reset), a live preview, one undo step. Replaces the "crop" part of I-026.
-  - **Converter**: PowerPoint's picture crop (`a:srcRect` l/t/r/b) becomes `crop`, so converted pictures look like the original.
-  - Validation: a crop outside the picture or with no size is a warning; show format 0.2 (optional field) · todo · —
 - [ ] **I-087** [viewer/shared] **Load and present a show from a zip-file URL (`?zip=<url>`)**:
   - A user specifies the location of a zipped Slipr presentation (e.g. on GitHub releases, a raw zipball URL, or any web server) in a URL parameter: `viewer/?zip=https://example.com/show.zip` (or `?zip=...&mode=reader`).
   - The viewer downloads the zip file client-side via `fetch()`, displaying download progress.
@@ -178,6 +172,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-090** [format/editor/viewer/converter] Image cropping: `crop` (`{ x, y, w, h }`, fractions of the picture) on every image value (show format 0.2); rendered with `object-view-box` and a canvas fallback (`shared/crop.js`); hotspots stay positions on the whole picture (hidden and flagged outside the crop); editor **Crop…** dialog with shapes, numbers and keyboard, hotspot editor maps to the crop; converter keeps PowerPoint's picture crop. Spec: `docs/specs/I-090-image-cropping.md` · done 2026-10-13 · claude
 - [x] **I-074** [format/viewer] Graphs with vendored **Cytoscape.js 3.34.3** (D-011 refined): `graph` slot and block (show format 0.2) with inline `nodes` / `edges` or a `data/*.json` file, `layout`, and audience `steps` that reveal nodes or focus one; node colors from the template by tag (`--slipr-graph-*`); reader pan, zoom, node panel with "Go to slide", tag filter, keyboard node list; static node list as fallback and for screen readers; `graph` layouts in both templates (default 1.4.0, Conclusion 0.1.5); demo slide and data-file block; export; editor read-only (E-020). Spec: `docs/specs/I-074-graph.md` · done 2026-10-13 · claude
 - [x] **I-089** [format/editor/viewer/converter] Text elements on slides (D-016): overlays with `text` (inline Markdown) and a free `style` (font, size, bold / italic / underline / uppercase, alignment, colors, fill opacity, border, radius, text outline, padding) in show format 0.2; `shared/text-style.js`; rendered in both modes (reader search, glossary terms); editor **+ Add text** with palette-first style controls, free resize and keyboard moves on the preview; the converter turns badges, callouts and leftover text boxes into text elements with their look (theme colors resolved). Spec: `docs/specs/I-089-text-elements.md` · done 2026-10-13 · claude
 - [x] **V-019** [viewer] User manual inside the viewer: `viewer/help.html` (comprehensive offline guide for audience and reader experiences, phone remote control pairing, mobile ergonomics, Wi-Fi hotspot setup with Windows Defender Firewall Private profile and Node.js rule fixes, interactive blocks, popups, personal annotations, full-text search, keyboard and clicker cheatsheet, and troubleshooting; light and dark themes, offline-first), opened via `?` / `F1` in both modes, top-bar Help button in Reader mode, pairing dialog tip, and viewer start screen · done 2026-10-13 · claude

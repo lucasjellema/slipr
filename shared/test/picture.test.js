@@ -4,16 +4,17 @@ import { pictureStyle, pictureAttributes } from '../picture.js';
 
 describe('picture style and opacity (D-014, I-084)', () => {
   test('a style id becomes the template class; opacity below 1 is kept', () => {
-    assert.deepEqual(pictureStyle({ src: 'a.png', style: 'soft', opacity: 0.25 }), { className: 'slipr-picture-soft', opacity: '0.25' });
-    assert.deepEqual(pictureStyle({ src: 'a.png' }), { className: null, opacity: null });
-    assert.deepEqual(pictureStyle({ src: 'a.png', opacity: 1 }), { className: null, opacity: null });
-    assert.deepEqual(pictureStyle({ src: 'a.png', opacity: 0 }), { className: null, opacity: '0' });
+    const none = { viewBox: null, crop: null };
+    assert.deepEqual(pictureStyle({ src: 'a.png', style: 'soft', opacity: 0.25 }), { className: 'slipr-picture-soft', opacity: '0.25', ...none });
+    assert.deepEqual(pictureStyle({ src: 'a.png' }), { className: null, opacity: null, ...none });
+    assert.deepEqual(pictureStyle({ src: 'a.png', opacity: 1 }), { className: null, opacity: null, ...none });
+    assert.deepEqual(pictureStyle({ src: 'a.png', opacity: 0 }), { className: null, opacity: '0', ...none });
   });
 
   test('malformed values add nothing', () => {
     for (const style of ['Shadow', 'a b', '"x', '', 3]) assert.equal(pictureStyle({ style }).className, null, String(style));
     for (const opacity of ['0.5', NaN, null]) assert.equal(pictureStyle({ opacity }).opacity, null, String(opacity));
-    assert.deepEqual(pictureStyle(undefined), { className: null, opacity: null });
+    assert.deepEqual(pictureStyle(undefined), { className: null, opacity: null, viewBox: null, crop: null });
   });
 
   test('as HTML attributes', () => {

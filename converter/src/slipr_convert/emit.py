@@ -101,11 +101,11 @@ def build_show(
 
 
 def _needs_format_02(value) -> bool:
-    """Does a slide use show format 0.2: extra images, or a picture with a style or opacity?"""
+    """Does a slide use show format 0.2: extra images, or a picture with a style, opacity or crop?"""
     if isinstance(value, dict):
         if value.get("overlays"):
             return True
-        if isinstance(value.get("src"), str) and ("style" in value or "opacity" in value):
+        if isinstance(value.get("src"), str) and ("style" in value or "opacity" in value or "crop" in value):
             return True
         return any(_needs_format_02(v) for v in value.values())
     if isinstance(value, list):

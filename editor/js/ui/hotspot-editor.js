@@ -6,8 +6,14 @@
  * image, each hotspot has a title and Markdown text. "+ Add hotspot" places
  * one in the middle for keyboard users. Coordinates are fractions 0–1 of the
  * image, as in the show format.
+ *
+ * A cropped picture (I-090) is shown cropped; hotspot positions stay on the
+ * whole picture, so clicks and drags are mapped back, and a hotspot outside
+ * the crop has no marker (its row says so).
  */
 import { h } from '../dom.js';
+import { applyPictureStyle } from '../../../shared/picture.js';
+import { isShown, normalCrop, toPicture, toShown } from '../../../shared/crop.js';
 import { markdownToolbar } from './markdown-toolbar.js';
 
 /** Selected hotspot per block id, so a re-render keeps the selection. */
@@ -46,10 +52,18 @@ export function hotspotEditor({ store, slideId, block }) {
     rowEls.forEach((r, i) => r.classList.toggle('is-selected', i === index));
   };
 
-  const add = (/** @type {number} */ x, /** @type {number} */ y) => {
+  const crop = normalCrop(block.image?.crop);
+  /** A position on the shown picture as a hotspot position (on the whole picture). */
+  const onPicture = (/** @type {{ x: number, y: number }} */ p) => {
+    const at = toPicture(p, crop);
+    return { x: Math.round(at.x * 10000) / 10000, y: Math.round(at.y * 10000) / 10000 };
+  };
+
+  /** @param {number} x @param {number} y  Position on the shown picture. */
+  const add = (x, y) => {
     const index = spots.length;
     select(index);
-    store.dispatch('addHotspot', { ...ids, x, y });
+    store.dispatch('addHotspot', { ...ids, ...onPicture({ x, y }) });
     focusLater(index, 'title');
   };
 
@@ -65,6 +79,7 @@ export function hotspotEditor({ store, slideId, block }) {
     alt: block.image?.alt ?? '',
     draggable: 'false',
   }));
+  if (crop) applyPictureStyle(img, { crop });
   const frame = h('div', { class: 'slipr-hs-frame' }, [img]);
 
   /** Fractions of the image for a pointer position. */
@@ -79,10 +94,12 @@ export function hotspotEditor({ store, slideId, block }) {
   });
 
   spots.forEach((/** @type {any} */ spot, /** @type {number} */ index) => {
+    const shown = toShown(spot, crop);
     const marker = /** @type {HTMLButtonElement} */ (h('button', {
       type: 'button',
       class: `slipr-hs-marker ${index === current ? 'is-selected' : ''}`,
-      style: `left:${spot.x * 100}%;top:${spot.y * 100}%`,
+      style: `left:${shown.x * 100}%;top:${shown.y * 100}%`,
+      hidden: isShown(shown) ? undefined : true,
       'data-hotspot-marker': `${blockId}:${index}`,
       'aria-label': `Hotspot ${index + 1}: ${spot.title}. Arrow keys move it, Delete removes it.`,
       title: spot.title,
@@ -98,7 +115,7 @@ export function hotspotEditor({ store, slideId, block }) {
       } catch {
         // Not a live pointer (e.g. a synthetic event): dragging still works while over the marker.
       }
-      drag = { x: spot.x, y: spot.y, moved: false };
+      drag = { x: shown.x, y: shown.y, moved: false };
       // Never scroll while dragging: positions are measured against the image.
       marker.focus({ preventScroll: true });
     });
@@ -114,7 +131,7 @@ export function hotspotEditor({ store, slideId, block }) {
       drag = null;
       select(index);
       if (done?.moved) {
-        store.dispatch('updateHotspot', { ...ids, index, patch: { x: done.x, y: done.y } });
+        store.dispatch('updateHotspot', { ...ids, index, patch: onPicture(done) });
         focusLater(index, 'marker');
       }
     });
@@ -128,7 +145,9 @@ export function hotspotEditor({ store, slideId, block }) {
         e.preventDefault();
         select(index);
         const [dx, dy] = moves[e.key];
-        store.dispatch('updateHotspot', { ...ids, index, patch: { x: spot.x + dx, y: spot.y + dy } }, {
+        // A step is a fraction of the shown picture.
+        const patch = { x: spot.x + dx * (crop?.w ?? 1), y: spot.y + dy * (crop?.h ?? 1) };
+        store.dispatch('updateHotspot', { ...ids, index, patch }, {
           coalesceKey: `hotspot-move-${blockId}-${index}`,
         });
         focusLater(index, 'marker');
@@ -151,6 +170,7 @@ export function hotspotEditor({ store, slideId, block }) {
     h('li', { class: `slipr-hs-row ${index === current ? 'is-selected' : ''}` }, [
       h('span', { class: 'slipr-hs-number', 'aria-hidden': 'true' }, [String(index + 1)]),
       h('div', { class: 'slipr-hs-fields' }, [
+        isShown(toShown(spot, crop)) ? null : h('p', { class: 'slipr-help' }, ['Outside the crop: not shown. Show more of the picture (Crop…) or delete this hotspot.']),
         h('input', {
           type: 'text',
           class: 'slipr-input slipr-input-sm',

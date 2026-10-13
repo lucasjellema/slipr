@@ -124,7 +124,7 @@ Renderer rules:
 | `text` | any | `textContent` |
 | `richtext` | any block element | Sanitised HTML from the Markdown subset |
 | `list` | `<ul>` / `<ol>` | `<li>` elements, nested lists for indented items |
-| `image` | `<img>` | `src`, `alt`, plus `object-fit` from `fit` |
+| `image` | `<img>` | `src`, `alt`, plus `object-fit` from `fit`; a cropped picture (I-090) gets an inline `object-view-box` (or, in browsers without it, a cropped bitmap), so the template's own `object-fit` applies to the cropped part. Give image slots an `object-fit` (`cover` or `contain`): without one, a cropped part is stretched to the box |
 | `code` | `<pre>` | `<code class="language-…">` |
 | `quote` | `<blockquote>` | text plus `<cite>` |
 | `cards` | any container | One clone of the slot's `<template>` blueprint per card (see below) |

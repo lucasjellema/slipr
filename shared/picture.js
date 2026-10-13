@@ -1,47 +1,58 @@
 // @ts-check
 /**
- * Picture style and opacity of an image value (D-014, I-084). DOM-free, so
- * both renderers use it: shared/render.js (elements) and shared/blocks.js
- * (HTML strings).
+ * Picture style, opacity (D-014, I-084) and crop (I-090) of an image value.
+ * DOM-free, so both renderers use it: shared/render.js (elements) and
+ * shared/blocks.js (HTML strings).
  *
  * A style is the template class `slipr-picture-<id>`. The class is added for
  * any well-formed id: a style the template does not define has no CSS, so
  * the picture is simply unstyled (the validator warns about it).
+ *
+ * A crop becomes `object-view-box: inset(…)` and `data-crop="x y w h"`, which
+ * shared/crop.js uses where the browser lacks object-view-box.
  */
+import { cropInset, normalCrop } from './crop.js';
 
 const STYLE_ID = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 /**
- * @param {any} image  An image value: { src, alt, style?, opacity? }.
- * @returns {{ className: string | null, opacity: string | null }}
- *   The class to add, and the CSS opacity ('0'–'1') when it is not 1.
+ * @param {any} image  An image value: { src, alt, style?, opacity?, crop? }.
+ * @returns {{ className: string | null, opacity: string | null, viewBox: string | null, crop: string | null }}
+ *   The class to add, the CSS opacity ('0'–'1') when it is not 1, and for a
+ *   crop the object-view-box value and the data-crop numbers.
  */
 export function pictureStyle(image) {
   const style = image?.style;
   const className = typeof style === 'string' && STYLE_ID.test(style) ? `slipr-picture-${style}` : null;
   const o = image?.opacity;
   const opacity = typeof o === 'number' && Number.isFinite(o) && o < 1 ? String(Math.max(0, Math.round(o * 1000) / 1000)) : null;
-  return { className, opacity };
+  const c = normalCrop(image?.crop);
+  return { className, opacity, viewBox: c ? cropInset(c) : null, crop: c ? `${c.x} ${c.y} ${c.w} ${c.h}` : null };
 }
 
 /**
  * The same as HTML attributes for an <img> (leading space included, or '').
- * Safe for HTML: the class matches STYLE_ID and the opacity is a number.
+ * Safe for HTML: the class matches STYLE_ID, and opacity and crop are numbers.
  * @param {any} image
  * @returns {string}
  */
 export function pictureAttributes(image) {
-  const { className, opacity } = pictureStyle(image);
-  return (className ? ` class="${className}"` : '') + (opacity ? ` style="opacity:${opacity}"` : '');
+  const { className, opacity, viewBox, crop } = pictureStyle(image);
+  const css = [opacity ? `opacity:${opacity}` : '', viewBox ? `object-view-box:${viewBox}` : ''].filter(Boolean).join(';');
+  return (className ? ` class="${className}"` : '') + (css ? ` style="${css}"` : '') + (crop ? ` data-crop="${crop}"` : '');
 }
 
 /**
- * Apply the style and opacity to an image element.
+ * Apply the style, opacity and crop to an image element.
  * @param {HTMLImageElement} img
  * @param {any} image
  */
 export function applyPictureStyle(img, image) {
-  const { className, opacity } = pictureStyle(image);
+  const { className, opacity, viewBox, crop } = pictureStyle(image);
   if (className) img.classList.add(className);
   if (opacity) img.style.opacity = opacity;
+  if (viewBox && crop) {
+    img.style.setProperty('object-view-box', viewBox);
+    img.dataset.crop = crop;
+  }
 }

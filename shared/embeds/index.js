@@ -39,6 +39,7 @@
 import { escape } from '../markdown.js';
 import { pictureAttributes } from '../picture.js';
 import { grantConsent, hasConsent } from './consent.js';
+import { applyCropFallback } from '../crop.js';
 import * as diagram from './diagram.js';
 import * as graph from './graph.js';
 import * as pdf from './pdf.js';
@@ -188,6 +189,8 @@ export function fillEmbedElement(el, kind, value, ctx, options = {}) {
 export async function hydrateEmbeds(root, options = {}) {
   const target = root ?? (typeof document !== 'undefined' ? document : null);
   if (!target || typeof target.querySelectorAll !== 'function') return;
+  // Cropped pictures in reader blocks, where the browser lacks object-view-box (I-090).
+  applyCropFallback(target);
   const all = /** @type {HTMLElement[]} */ ([...target.querySelectorAll('[data-embed]')]);
   if (!all.length) return;
   addEmbedStylesheet(all[0].ownerDocument); // static embeds need it too
