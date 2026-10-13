@@ -97,6 +97,14 @@ export async function startAudience(app, ctx) {
     toggleRemoteSync(deck, ctx, revealEl);
   });
 
+  // ? and F1: Open user manual (V-019)
+  deck.addKeyBinding({ keyCode: 191, key: '?', description: 'User manual' }, () => {
+    window.open('help.html#audience', 'slipr-viewer-help', 'noopener');
+  });
+  deck.addKeyBinding({ keyCode: 112, key: 'F1', description: 'User manual' }, () => {
+    window.open('help.html#audience', 'slipr-viewer-help', 'noopener');
+  });
+
   // Optional corner button to open phone remote pairing
   const remoteBtn = h('button', {
     class: 'slipr-remote-btn',

@@ -412,7 +412,7 @@ function createModalDOM(session) {
   const tipSummary = document.createElement('summary');
   tipSummary.textContent = 'Conference Wi-Fi or cannot connect?';
   const tipP = document.createElement('p');
-  tipP.innerHTML = 'Many guest networks block device-to-device connections. To bypass this, turn on your phone’s <strong>Personal Hotspot</strong> and connect your laptop to it.';
+  tipP.innerHTML = 'Many guest networks block device-to-device connections. To bypass this, turn on your phone’s <strong>Personal Hotspot</strong> and connect your laptop to it. If Windows Firewall blocks it, switch the Wi-Fi profile to Private. <a href="help.html#remote" target="_blank" rel="noopener">See help guide &amp; firewall fix</a>.';
   tipDetails.append(tipSummary, tipP);
 
   modal.append(closeBtn, title, subtitle, qrBox, urlRow, statusEl, metaRow, tipDetails);
