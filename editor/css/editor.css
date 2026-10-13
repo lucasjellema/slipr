@@ -1878,6 +1878,70 @@ body.is-screen #slipr-editor-banners {
   scroll-margin-top: 8px;
 }
 
+/* Collapsed by default: the header toggles the fields below it. */
+.slipr-overlay-row:not(.is-expanded) {
+  padding-block: 4px;
+}
+
+.slipr-overlay-row-toggle {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.slipr-overlay-row-toggle:hover {
+  background: color-mix(in srgb, var(--slipr-editor-accent) 10%, transparent);
+}
+
+.slipr-overlay-row-toggle:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent);
+}
+
+.slipr-overlay-row-chevron {
+  flex: none;
+  transition: transform 0.15s;
+}
+
+.slipr-overlay-row.is-expanded .slipr-overlay-row-chevron {
+  transform: rotate(90deg);
+}
+
+.slipr-overlay-row-thumb {
+  flex: none;
+  width: 28px;
+  height: 20px;
+  object-fit: contain;
+  border-radius: 2px;
+}
+
+.slipr-overlay-row-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--slipr-editor-text-muted);
+}
+
+.slipr-overlay-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-overlay-row-body[hidden] {
+  display: none;
+}
+
 /* The row of the overlay selected on the preview (same color as its box there). */
 .slipr-overlay-row.is-selected {
   border-color: var(--slipr-editor-warning);
@@ -1892,6 +1956,7 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-overlay-row-title {
+  flex: none;
   font-weight: 600;
   color: var(--slipr-editor-text-strong);
 }

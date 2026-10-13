@@ -6,11 +6,18 @@
  * stacking order, remove), a drop zone to add an image and a button to add a
  * text. Placing and sizing happens on the audience preview
  * (ui/overlay-editor.js).
+ *
+ * Rows are collapsed by default to a one-line header (kind, number, a short
+ * description, tools); the header's toggle expands the fields. Selecting an
+ * overlay on the preview expands its row.
  */
 import { h } from '../dom.js';
 import { addImageToOverlay, addOverlayImage } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
-import { selectOverlay, selectedOverlay, showOverlaySelected, focusOverlayText } from './overlay-editor.js';
+import {
+  selectOverlay, selectedOverlay, showOverlaySelected, focusOverlayText,
+  isOverlayExpanded, setOverlayExpanded, remapOverlayExpanded, showOverlayRowExpanded,
+} from './overlay-editor.js';
 import { pictureStyleControls } from './picture-style.js';
 import { textStyleControls } from './text-style-controls.js';
 import { imageValue } from '../slot-values.js';
@@ -106,13 +113,38 @@ export function buildOverlaySection(slide, store) {
       }),
     ])));
 
+  /** Move an overlay in the stacking order; its row stays expanded or collapsed. @param {number} i @param {number} j */
+  const move = (i, j) => {
+    remapOverlayExpanded(slideId, (k) => (k === i ? j : k === j ? i : k));
+    store.dispatch('moveOverlay', { slideId, index: i, toIndex: j });
+  };
+
   const rows = overlays.map((/** @type {any} */ o, /** @type {number} */ i) => {
     const fragment = o.fragment === true ? 'true' : typeof o.fragment === 'string' ? o.fragment : '';
     const isText = typeof o.text === 'string';
     const what = `${isText ? 'text' : 'image'} ${i + 1}`;
-    return h('li', { class: `slipr-overlay-row ${isText ? 'is-text' : ''} ${selectedOverlay(slideId) === i ? 'is-selected' : ''}`, 'data-overlay-index': String(i) }, [
+    const open = isOverlayExpanded(slideId, i);
+    const bodyId = `slipr-overlay-body-${i}`;
+    const summary = (isText ? o.text.replace(/\s+/g, ' ').trim() : o.image?.alt ?? '') || (isText ? '(no text)' : '(no alt text)');
+    /** @type {HTMLElement} */
+    const row = h('li', {
+      class: `slipr-overlay-row ${isText ? 'is-text' : ''} ${selectedOverlay(slideId) === i ? 'is-selected' : ''} ${open ? 'is-expanded' : ''}`,
+      'data-overlay-index': String(i),
+    }, [
       h('div', { class: 'slipr-overlay-row-head' }, [
-        h('span', { class: 'slipr-overlay-row-title' }, [`${isText ? 'Text' : 'Image'} ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
+        h('button', {
+          type: 'button',
+          class: 'slipr-overlay-row-toggle',
+          'aria-expanded': String(open),
+          'aria-controls': bodyId,
+          title: open ? 'Hide the settings' : 'Show the settings',
+          onclick: () => showOverlayRowExpanded(row, slideId, i, !isOverlayExpanded(slideId, i)),
+        }, [
+          h('span', { class: 'slipr-overlay-row-chevron', 'aria-hidden': 'true' }, ['▸']),
+          !isText && o.image?.src ? h('img', { class: 'slipr-overlay-row-thumb', src: resolveAsset?.(o.image.src) ?? o.image.src, alt: '' }) : null,
+          h('span', { class: 'slipr-overlay-row-title' }, [`${isText ? 'Text' : 'Image'} ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
+          h('span', { class: 'slipr-overlay-row-summary' }, [summary]),
+        ]),
         h('div', { class: 'slipr-overlay-row-tools' }, [
           h('button', {
             type: 'button', class: 'slipr-item-btn', title: 'Select it on the preview, to move and resize it',
@@ -122,37 +154,44 @@ export function buildOverlaySection(slide, store) {
           h('button', {
             type: 'button', class: 'slipr-item-btn', title: 'Bring forward', 'aria-label': `Bring ${what} forward`,
             disabled: i === overlays.length - 1 ? true : undefined,
-            onclick: () => store.dispatch('moveOverlay', { slideId, index: i, toIndex: i + 1 }),
+            onclick: () => move(i, i + 1),
           }, ['▲']),
           h('button', {
             type: 'button', class: 'slipr-item-btn', title: 'Send backward', 'aria-label': `Send ${what} backward`,
             disabled: i === 0 ? true : undefined,
-            onclick: () => store.dispatch('moveOverlay', { slideId, index: i, toIndex: i - 1 }),
+            onclick: () => move(i, i - 1),
           }, ['▼']),
           h('button', {
             type: 'button', class: 'slipr-item-btn slipr-item-btn-danger',
             title: isText ? 'Remove this text from the slide' : 'Remove this image from the slide (the file stays)',
             'aria-label': `Remove ${what}`,
-            onclick: () => { selectOverlay(null); store.dispatch('deleteOverlay', { slideId, index: i }); },
+            onclick: () => {
+              selectOverlay(null);
+              remapOverlayExpanded(slideId, (k) => (k === i ? -1 : k > i ? k - 1 : k));
+              store.dispatch('deleteOverlay', { slideId, index: i });
+            },
           }, ['🗑']),
         ]),
       ]),
-      positionFields(o, i),
-      ...(isText ? textFields(o, i) : imageFields(o, i)),
-      h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
-      h('select', {
-        id: `slipr-overlay-fragment-${i}`,
-        class: 'slipr-select',
-        onchange: (/** @type {Event} */ e) => {
-          const v = /** @type {HTMLSelectElement} */ (e.target).value;
-          store.dispatch('updateOverlay', { slideId, index: i, patch: { fragment: v === '' ? undefined : v === 'true' ? true : v } });
-        },
-      }, [
-        h('option', { value: '', selected: fragment === '' ? true : undefined }, ['Visible from the start']),
-        h('option', { value: 'true', selected: fragment === 'true' ? true : undefined }, ['Appears on the next click']),
-        ...EFFECTS.map((style) => h('option', { value: style, selected: fragment === style ? true : undefined }, [`Appears on the next click: ${style}`])),
+      h('div', { id: bodyId, class: 'slipr-overlay-row-body', hidden: open ? undefined : true }, [
+        positionFields(o, i),
+        ...(isText ? textFields(o, i) : imageFields(o, i)),
+        h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
+        h('select', {
+          id: `slipr-overlay-fragment-${i}`,
+          class: 'slipr-select',
+          onchange: (/** @type {Event} */ e) => {
+            const v = /** @type {HTMLSelectElement} */ (e.target).value;
+            store.dispatch('updateOverlay', { slideId, index: i, patch: { fragment: v === '' ? undefined : v === 'true' ? true : v } });
+          },
+        }, [
+          h('option', { value: '', selected: fragment === '' ? true : undefined }, ['Visible from the start']),
+          h('option', { value: 'true', selected: fragment === 'true' ? true : undefined }, ['Appears on the next click']),
+          ...EFFECTS.map((style) => h('option', { value: style, selected: fragment === style ? true : undefined }, [`Appears on the next click: ${style}`])),
+        ]),
       ]),
     ]);
+    return row;
   });
 
   return h('fieldset', { class: 'slipr-fieldset slipr-overlays-form' }, [
@@ -166,6 +205,7 @@ export function buildOverlaySection(slide, store) {
       image: undefined,
       resolveAsset,
       onFile: (file) => runImage(async () => {
+        setOverlayExpanded(slideId, overlays.length, true); // the new image's row opens
         const index = await addOverlayImage(store, { slideId, file });
         if (store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.overlays?.[index]) {
           selectOverlay(slideId, index);
@@ -180,6 +220,7 @@ export function buildOverlaySection(slide, store) {
       onclick: () => {
         const index = overlays.length;
         selectOverlay(slideId, index);
+        setOverlayExpanded(slideId, index, true);
         store.dispatch('addOverlay', { slideId, overlay: { text: 'Text', ...NEW_TEXT_BOX } });
         toPreview();
         focusOverlayText(index, { select: true });

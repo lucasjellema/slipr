@@ -54,6 +54,50 @@ export function selectedOverlay(slideId) {
 }
 
 /**
+ * Which overlay rows in the Slide tab are expanded, per slide (all collapsed
+ * by default). Kept here, not in the DOM, because the form re-renders after
+ * every change.
+ * @type {Map<string, Set<number>>}
+ */
+const expanded = new Map();
+
+/** @param {string} slideId @param {number} index */
+export function isOverlayExpanded(slideId, index) {
+  return expanded.get(slideId)?.has(index) ?? false;
+}
+
+/** @param {string} slideId @param {number} index @param {boolean} open */
+export function setOverlayExpanded(slideId, index, open) {
+  const set = expanded.get(slideId) ?? new Set();
+  if (open) set.add(index);
+  else set.delete(index);
+  expanded.set(slideId, set);
+}
+
+/**
+ * Keep the expanded rows with their overlays when the list changes order.
+ * @param {string} slideId
+ * @param {(index: number) => number} map  Old index → new index (-1: removed).
+ */
+export function remapOverlayExpanded(slideId, map) {
+  const set = expanded.get(slideId);
+  if (set) expanded.set(slideId, new Set([...set].map(map).filter((i) => i >= 0)));
+}
+
+/**
+ * Open or close a row in place (no re-render), and remember it.
+ * @param {HTMLElement} row  A `.slipr-overlay-row`.
+ * @param {string} slideId @param {number} index @param {boolean} open
+ */
+export function showOverlayRowExpanded(row, slideId, index, open) {
+  setOverlayExpanded(slideId, index, open);
+  row.classList.toggle('is-expanded', open);
+  row.querySelector('.slipr-overlay-row-toggle')?.setAttribute('aria-expanded', String(open));
+  const body = /** @type {HTMLElement | null} */ (row.querySelector('.slipr-overlay-row-body'));
+  if (body) body.hidden = !open;
+}
+
+/**
  * Focus a text element's text area in the Slide tab once the form has
  * re-rendered (after adding one, or a double-click on the preview).
  * @param {number} index @param {{ select?: boolean }} [options]
@@ -69,17 +113,18 @@ export function focusOverlayText(index, options = {}) {
 }
 
 /**
- * Mark the selected overlay's row in the Slide tab and scroll it into view,
+ * Mark the selected overlay's row in the Slide tab, expand it and scroll it into view,
  * so its fields are ready to edit (keyboard focus stays on the preview). Does
  * nothing when the Slide tab is not shown.
- * @param {number} index  -1: none selected.
+ * @param {string} slideId @param {number} index  -1: none selected.
  */
-export function revealOverlayRow(index) {
+export function revealOverlayRow(slideId, index) {
   for (const row of document.querySelectorAll('.slipr-overlay-row.is-selected')) row.classList.remove('is-selected');
   if (index < 0) return;
   const row = /** @type {HTMLElement | null} */ (document.querySelector(`.slipr-overlay-row[data-overlay-index="${index}"]`));
   if (!row) return;
   row.classList.add('is-selected');
+  showOverlayRowExpanded(row, slideId, index, true);
   // Scroll only when part of the row is out of sight, then bring its head to the top.
   let pane = row.parentElement;
   while (pane && !(pane.scrollHeight > pane.clientHeight && /auto|scroll/.test(getComputedStyle(pane).overflowY))) pane = pane.parentElement;
@@ -148,7 +193,7 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
     selectOverlay(index < 0 ? null : slideId, index);
     draw();
     if (index >= 0) boxes[index]?.focus({ preventScroll: true });
-    revealOverlayRow(index);
+    revealOverlayRow(slideId, index);
   }
 
   // ---------------------------------------------------------------- pointer

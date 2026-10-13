@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Collapsible rows for extra images and text elements
+- **Changed** each row in **Extra images and text** is collapsed by default to one line (number, thumbnail or text, tools); its header (▸) expands the settings. A new overlay and the one selected on the preview open by themselves; the state survives re-renders and follows ▲ / ▼ and delete (`isOverlayExpanded()` and friends in `ui/overlay-editor.js`).
+
 ### 2026-10-13: Selecting on the preview shows the settings
 - **Added** selecting an extra image or text element on the preview (click, or Tab to it) highlights its row in the Slide tab and scrolls the whole row into view, so its fields are ready to edit; keyboard focus stays on the preview. No animation with reduced motion (`revealOverlayRow()` in `ui/overlay-editor.js`).
 
