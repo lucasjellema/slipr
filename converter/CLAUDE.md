@@ -30,8 +30,8 @@ From `converter/`:
 
 ## Invariants
 
-- **Never lose content silently.** Text that doesn't fit the chosen layout goes to the slide's **reader layer** (`converted-*` blocks) and the report; pictures that don't fit become **extra images** (`overlays`) at their PowerPoint place, or reader image blocks when their size is unknown. Unsupported elements (tables, charts, SmartArt, …) get a marker in the speaker notes and the report.
-- Never carry PowerPoint styling (colours, fonts, positions) into the show. The template owns the looks. The one exception is the position and size of pictures that fit no slot (extra images, D-013). Write `"slipr": "0.2"` only when a show has them.
+- **Never lose content silently.** Placeholder text that doesn't fit the chosen layout goes to the slide's **reader layer** (`converted-*` blocks) and the report; pictures that don't fit become **extra images** (`overlays`) at their PowerPoint place, and text boxes that don't fit (and shapes with a fill or line, always) **text elements**, or reader blocks when the slide size is unknown. Unsupported elements (tables, charts, SmartArt, …) get a marker in the speaker notes and the report.
+- Never carry PowerPoint styling (colours, fonts, positions) into the show. The template owns the looks. The exceptions are the position and size of pictures that fit no slot (extra images, D-013), and the position, size and look of text elements (D-016: `reader.text_look()` → `mapping._text_style()`, fonts matched to the template's first). Write `"slipr": "0.2"` only when a show has them.
 - Output must validate against `../shared/schema/show.schema.json` **and** pass `shared/validate.js` with the template (the contract test in `test_cli.py`). Never copy the schema into this package.
 - Never overwrite an existing output folder without `--force`.
 - Escape Slipr Markdown characters in PowerPoint text (`text.escape_markdown`). Unescape when filling plain `text` slots (`mapping.markdown_to_plain`).

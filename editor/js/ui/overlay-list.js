@@ -18,9 +18,6 @@ import { NEW_TEXT_BOX } from '../actions.js';
 
 const EFFECTS = ['fade-in', 'fade-up', 'fade-down', 'fade-left', 'fade-right', 'fade-in-then-semi-out', 'semi-fade-out', 'grow', 'shrink'];
 
-/** @param {number} n */
-const pct = (n) => `${Math.round(n * 100)}%`;
-
 /**
  * @param {any} slide
  * @param {import('../store.js').EditorStore} store
@@ -90,6 +87,25 @@ export function buildOverlaySection(slide, store) {
     }),
   ];
 
+  /**
+   * Place and size as numbers (percentages of the slide), next to moving and
+   * resizing on the preview. Stored on change; kept inside the slide.
+   * @param {any} o @param {number} i
+   */
+  const positionFields = (o, i) => h('div', { class: 'slipr-overlay-position', role: 'group', 'aria-label': `Place and size of ${typeof o.text === 'string' ? 'text' : 'image'} ${i + 1}, in % of the slide` },
+    /** @type {const} */ ([['x', 'Left'], ['y', 'Top'], ['w', 'Width'], ['h', 'Height']]).map(([key, text]) => h('label', { class: 'slipr-text-style-field slipr-text-style-number' }, [
+      h('span', { class: 'slipr-label' }, [`${text} %`]),
+      h('input', {
+        id: `slipr-overlay-${key}-${i}`,
+        type: 'number', class: 'slipr-input', min: '0', max: '100', step: '0.5',
+        value: String(Math.round(o[key] * 1000) / 10),
+        onchange: (/** @type {Event} */ e) => {
+          const v = Number(/** @type {HTMLInputElement} */ (e.target).value);
+          if (Number.isFinite(v)) store.dispatch('updateOverlay', { slideId, index: i, patch: { [key]: v / 100 } });
+        },
+      }),
+    ])));
+
   const rows = overlays.map((/** @type {any} */ o, /** @type {number} */ i) => {
     const fragment = o.fragment === true ? 'true' : typeof o.fragment === 'string' ? o.fragment : '';
     const isText = typeof o.text === 'string';
@@ -97,9 +113,6 @@ export function buildOverlaySection(slide, store) {
     return h('li', { class: `slipr-overlay-row ${isText ? 'is-text' : ''}` }, [
       h('div', { class: 'slipr-overlay-row-head' }, [
         h('span', { class: 'slipr-overlay-row-title' }, [`${isText ? 'Text' : 'Image'} ${i + 1}${i === overlays.length - 1 && overlays.length > 1 ? ' (in front)' : ''}`]),
-        h('span', { class: 'slipr-help', title: 'Position and size on the slide. Change them on the preview.' }, [
-          `at ${pct(o.x)}, ${pct(o.y)} · ${pct(o.w)} × ${pct(o.h)}`,
-        ]),
         h('div', { class: 'slipr-overlay-row-tools' }, [
           h('button', {
             type: 'button', class: 'slipr-item-btn', title: 'Select it on the preview, to move and resize it',
@@ -124,6 +137,7 @@ export function buildOverlaySection(slide, store) {
           }, ['🗑']),
         ]),
       ]),
+      positionFields(o, i),
       ...(isText ? textFields(o, i) : imageFields(o, i)),
       h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
       h('select', {

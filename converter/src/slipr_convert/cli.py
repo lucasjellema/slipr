@@ -84,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
 
     r = result.report
     print(f"Converted {len(r.slides)} slides -> {out_dir / 'show.json'}")
-    print(f"  {len(result.assets)} image(s), {r.placed_count} placed as extra image(s), {r.moved_count} item(s) moved to the reader layer, {r.skipped_count} element(s) not converted")
+    print(f"  {len(result.assets)} image(s), {r.placed_count} placed on the slide (extra images, text elements), {r.moved_count} item(s) moved to the reader layer, {r.skipped_count} element(s) not converted")
     if r.warnings:
         print(f"  WARNING: {len(r.warnings)} validation problem(s), see conversion-report.md")
     print(f"  Report: {out_dir / 'conversion-report.md'}")

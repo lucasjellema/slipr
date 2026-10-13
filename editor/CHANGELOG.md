@@ -7,6 +7,7 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 ### 2026-10-13: Text elements on slides (I-089, D-016)
 - **Added** the Slide tab section **Extra images and text** (was *Extra images*): **+ Add text** places a text element in the middle of the slide and selects its text. A text row has the text (inline Markdown) and its look (`ui/text-style-controls.js`): font and size (the template's first), bold / italic / underline / uppercase, alignment, text color and fill from the template's palette or a color picker, fill opacity, and folded away border, corners, padding and text outline.
 - **Added** text boxes on the audience preview: moved like extra images, resized freely (Shift keeps the ratio), Alt+Left / Right width and Alt+Up / Down height, and double-click or Enter (when selected) jumps to the text.
+- **Changed** each extra image and text element has **Left / Top / Width / Height** number fields (in % of the slide) instead of a read-only "at x, y · w × h" line.
 - **Added** actions: `addOverlay` / `updateOverlay` take text elements and clean their style (`cleanTextStyle`); find & replace include their text. The manual has a *Text elements* section.
 
 ### 2026-10-12: Autosave draft to IndexedDB with crash recovery (I-020)

@@ -62,12 +62,13 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Picture shadow, soft edges, rounded corners, outline; transparency | the template's matching **picture style** (`pptxEffect`); `opacity` | ✅ |
 | Presentation title / author / date, slide size | `meta`, `settings.aspectRatio` (16:9 or 4:3) | ✅ |
 | Pictures that don't fit the chosen layout | **extra images** on the slide (`overlays`, show format 0.2) at their PowerPoint position and size | ✅ |
-| Text that doesn't fit the chosen layout | **reader layer** text blocks, so it is never lost | ✅ |
+| Text boxes and shapes with a fill or outline (badges, pills, callouts); text boxes that don't fit the chosen layout | **text elements** on the slide (`overlays` with `text`, show format 0.2) at their place, with font (the template's heading / body font when it matches), size, capitals, alignment, text color, fill and its transparency, outline, rounded corners and inner margin (theme colors resolved) | ✅ |
+| Placeholder text that doesn't fit the chosen layout | **reader layer** text blocks, so it is never lost | ✅ |
 | Tables | *(next)* `table` block/slot (I-040). Now: reported, plus a warning in the slide notes | ❌ |
 | Charts | *(next)* `chart` slot with the **chart's real data** (I-046). Now: reported | ❌ |
 | SmartArt, diagrams, OLE objects, video | *(later)* image fallback via LibreOffice (I-041). Now: reported | ❌ |
 | Logos and decorations from the master | ignored on purpose: the template provides them | n/a |
-| Colours, fonts, positions | ignored on purpose, because the template decides (except the place of extra pictures, D-013) | n/a |
+| Colours, fonts, positions | ignored on purpose, because the template decides (except the place of extra pictures, D-013, and the place and look of text elements, D-016) | n/a |
 
 ## How layouts are chosen
 
@@ -76,7 +77,7 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 2. **Title-only slides:** the first one becomes `title`, later ones `section`.
 3. **Best fit:** otherwise, the layout whose slots match the slide's text blocks and pictures with the least left over.
 
-Text that doesn't fit, such as a third text block, goes to the slide's reader layer. A picture that doesn't fit, such as a second picture or a logo, becomes an **extra image** on the slide at the same place as in PowerPoint (the show is then format 0.2). Both are listed in the report.
+Placeholder text that doesn't fit, such as a third text block, goes to the slide's reader layer. A picture that doesn't fit, such as a second picture or a logo, becomes an **extra image** on the slide at the same place as in PowerPoint (the show is then format 0.2). A text box that doesn't fit becomes a **text element** at its place, and a text box or shape with a fill or outline (a badge, a pill, a callout) always does: it needs no slot. All are listed in the report.
 
 ## The conversion report
 

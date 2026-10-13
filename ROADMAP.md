@@ -116,6 +116,7 @@ Pick from the *Next* section of the backlog. Likely candidates: PDF export, hous
 4. ✅ Extra images placed freely on a slide: show format 0.2, renderer, editor (move and resize on the preview), converter (done 2026-10-11). [I-083, D-013]
 5. ✅ Picture styles (shadow, soft edges, rounded, frame) from the template, plus a free opacity: template format 0.3, editor style picker, converter (done 2026-10-11). [I-084, D-014]
 6. ✅ Glossary terms clickable in reader-mode slides, with other names (aliases) per term (done 2026-10-12). [I-086, D-015]
+7. ✅ Text elements placed and styled freely on a slide (badges, labels, callouts): show format 0.2, renderer, editor, converter (done 2026-10-13). [I-089, D-016]
 
 ---
 

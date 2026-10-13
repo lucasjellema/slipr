@@ -120,8 +120,11 @@ def _extract_shape(shape, model: SlideModel) -> None:
                                    style_of=lambda paragraph: reader.paragraph_style(shape, paragraph))
     if markdown:
         placeholder = ph_type.name.lower() if ph_type is not None else None
+        # Text boxes and shapes keep their size and look: they may become text elements (I-089).
+        look = None if shape.is_placeholder else reader.text_look(shape)
         model.bodies.append(TextBody(markdown=markdown, is_list=markdown.lstrip().startswith("- "),
-                                     placeholder=placeholder, top=top, left=left, idx=idx))
+                                     placeholder=placeholder, top=top, left=left, idx=idx,
+                                     width=int(shape.width or 0), height=int(shape.height or 0), look=look))
 
 
 def _image_of(shape):

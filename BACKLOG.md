@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -104,17 +104,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-018** [editor] Bug: **Save overwrites changes made to `show.json` on disk** since the editor opened it. The editor writes its in-memory show without checking the file, so newer work from elsewhere (another editor window, a Claude session, a git pull) is silently lost. Happened twice on 2026-10-11/12 with `shows/demo/show.json`: an editor window still holding older content saved over committed changes (I-084 styles, I-086 aliases) and brought back deleted test images. Fix: remember the file's `lastModified` (and content hash) when opening and after each save; before saving, read the file again, and if it changed, don't overwrite silently. Offer **Reload from disk** (discarding the in-memory edits), **Save anyway** (overwrite), or **Cancel**; ideally also notice the change when the window regains focus. Same check for Present / Read (they save first) · todo · —
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
-- [ ] **I-089** [format/editor/viewer/converter] **Freeform text elements / overlays on slides**:
-  - In addition to layout placeholders, authors can add floating **text elements** on top of the slide canvas, matching the free-placement overlay model of extra images (I-083).
-  - **Position & size**: `x`, `y`, `w`, `h` as fractions (0–1) of the canvas, scaling proportionally with the slide. Visual manipulation on the audience preview (drag to move, resize handles, arrow keys / Alt+arrows, Delete) and numerical inputs in the Slide tab.
-  - **Typography & styling**:
-    - **Font**: selection of template brand fonts (title, body), system fonts, or monospace; responsive font size with presets or direct numeric control.
-    - **Style**: font weight (regular, bold), italic, underline, uppercase, and text alignment (left, center, right).
-    - **Colors**: text/font color (color picker / palette), background fill color with opacity/alpha slider.
-    - **Outlining & borders**: box border (width, style, color, corner radius for badges/pills/chips) and text outline / halo (stroke width and color) for high contrast over photos and colored backgrounds.
-    - **Padding**: configurable internal padding around the text.
-  - **Audience & reader modes**: rendered in front of the layout in `.slipr-overlays`; optional step-by-step appearance (`fragment` with Reveal effects); included in reader search index and accessible screen reader text.
-  - **PPTX converter**: maps non-placeholder PowerPoint text boxes, callouts, and floating badges directly into text overlays, preserving original positions and styles instead of losing them. Spec: `docs/specs/I-089-text-elements.md` (D-016) · in progress · claude
 
 ### Converter
 - [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
@@ -187,6 +176,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-089** [format/editor/viewer/converter] Text elements on slides (D-016): overlays with `text` (inline Markdown) and a free `style` (font, size, bold / italic / underline / uppercase, alignment, colors, fill opacity, border, radius, text outline, padding) in show format 0.2; `shared/text-style.js`; rendered in both modes (reader search, glossary terms); editor **+ Add text** with palette-first style controls, free resize and keyboard moves on the preview; the converter turns badges, callouts and leftover text boxes into text elements with their look (theme colors resolved). Spec: `docs/specs/I-089-text-elements.md` · done 2026-10-13 · claude
 - [x] **I-002** [viewer/tools] Phone as remote control: next/previous tactile buttons and swipe navigation, live speaker notes with font scaling, upcoming slide peek, presentation timer, haptic feedback and wake lock, zero-dependency local WebSocket relay (RFC 6455 over Node.js http) with LAN IP discovery, and instant QR-code pairing modal · done 2026-10-12 · claude
 - [x] **I-020** [editor] Autosave draft to IndexedDB with crash recovery: automatic persistence to IndexedDB every 5 s while dirty, flush on tab hide/close, recovery dialog on open with relative timestamps, undoable restoreDraft action, banner fallback, and cleanup on clean save · done 2026-10-12 · claude
 - [x] **I-088** [editor] Dedicated Glossary Editor with deck-aware word completion: split view, search, filters, sorting, real-time deck word autocompletion and unglossaried suggestions drawer, ID rename with show-wide reference rewriting, live Markdown preview, and slide jump navigation · done 2026-10-12 · claude

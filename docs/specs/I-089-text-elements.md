@@ -1,6 +1,6 @@
 # I-089: Text elements on a slide
 
-Status: **in progress** · 2026-10-13 · Phase 6 · Decision D-016
+Status: **done** · 2026-10-13 · Phase 6 · Decision D-016. Verified in Claude's browser pane (DOM checks; screenshots were unreliable): audience mode (demo badge, fragment), reader mode (the glossary term in a text element opens its popover, `slipr-mode-reader-fixed`), the editor (+ Add text, typing, style controls, free corner resize, Alt+arrows, double-click to the text, undo), and a converted sample deck. A real mouse drag and the look on a phone are still for Lucas to try
 
 ## Goal
 

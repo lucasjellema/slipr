@@ -1899,6 +1899,12 @@ body.is-screen #slipr-editor-banners {
   margin: 0;
 }
 
+.slipr-overlay-position {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
 .slipr-overlay-add-text {
   align-self: flex-start;
   margin-top: 8px;

@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Text boxes and shapes → text elements (I-089, D-016)
+- **Added** `reader.text_look()`: a text box's or shape's fill (solid, or a gradient's first color) and its transparency, outline (width, dash, color), rounded-rectangle radius (ellipses become pills), anchor, inset, first paragraph's alignment, and the runs' size, typeface, color, capitals and underline. Theme colors (`schemeClr`, style references, lumMod / lumOff / shade / tint / alpha) are resolved from the master's theme. `TextLook` in `model.py`; `TextBody` gets `width`, `height` and `look`.
+- **Added** the mapping: text boxes and shapes with a fill or line become text elements at their place (they need no slot); plain text boxes that don't fit the layout become text elements instead of reader blocks. Fonts map to the template's heading / body font first (theme fonts, or a name matching `styleguide.fonts`), else mono or serif, else the body font; sizes and lengths become percentages of the slide width. Text elements are in front of extra images. The report lists them as "Placed as a text element".
+- **Added** a badge and a theme-styled shape to the sample deck (slide 2), and `tests/test_text_elements.py`. 45 tests.
+
 ### 2026-10-11: Picture effects → picture styles (I-084)
 - **Added** `reader.picture_effects()`: a picture's outer shadow, soft edges, rounded-rectangle geometry and visible outline, and its transparency (`a:alphaModFix`). `ImageRef` gets `effects` and `opacity`.
 - **Added** the mapping: the first template picture style whose `pptxEffect` matches one of the effects (in the order shadow, soft edges, rounded corners, border) becomes the picture's `style`; the transparency becomes `opacity`. Without a matching style the report says so. A show that uses either is format 0.2.

@@ -18,8 +18,9 @@ import pytest
 from lxml import etree
 from pptx import Presentation
 from pptx.dml.color import RGBColor
-from pptx.enum.shapes import PP_PLACEHOLDER
-from pptx.util import Inches
+from pptx.enum.shapes import MSO_SHAPE, PP_PLACEHOLDER
+from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.util import Inches, Pt
 
 REPO = Path(__file__).resolve().parents[2]
 P = "http://schemas.openxmlformats.org/presentationml/2006/main"
@@ -131,6 +132,20 @@ def build_sample_deck() -> bytes:
     p4 = tf.add_paragraph(); p4.text = "Costs *stable* [flat]"  # literal Markdown characters
     s2.notes_slide.notes_text_frame.text = "Mention the new team."
     add_build_animation(s2)
+    # …a "New" badge: a filled rounded rectangle with white capitals (→ a text element, I-089)
+    badge = s2.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, Inches(10), Inches(0.5), Inches(2), Inches(0.6))
+    badge.fill.solid()
+    badge.fill.fore_color.rgb = RGBColor(0xBC, 0x44, 0x8C)
+    badge.line.fill.background()
+    badge.text_frame.vertical_anchor = MSO_ANCHOR.MIDDLE
+    p = badge.text_frame.paragraphs[0]
+    p.alignment = PP_ALIGN.CENTER
+    r = p.add_run(); r.text = "New"
+    r.font.size = Pt(14); r.font.color.rgb = RGBColor(0xFF, 0xFF, 0xFF)
+    r._r.get_or_add_rPr().set("cap", "all")  # noqa: SLF001
+    # …and a shape in the theme's default style (accent 1 fill, white text, dark outline)
+    draft = s2.shapes.add_shape(MSO_SHAPE.OVAL, Inches(10), Inches(6), Inches(2), Inches(1))
+    draft.text_frame.text = "Draft"
 
     # 3. Section header (its body has no bullets via the layout)
     s3 = prs.slides.add_slide(layout(prs, "Section Header"))

@@ -16,7 +16,7 @@ class SlideReport:
     layout: str = ""
     reason: str = ""
     moved: list[str] = field(default_factory=list)  # content placed in the reader layer
-    placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083)
+    placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083), text boxes as text elements (I-089)
     skipped: list[str] = field(default_factory=list)  # content that could not be converted
     notes: list[str] = field(default_factory=list)  # other remarks
 
@@ -52,7 +52,7 @@ class Report:
             "",
             f"- Slides: {len(self.slides)}",
             f"- Content moved to the reader layer: {self.moved_count}",
-            f"- Pictures placed as extra images: {self.placed_count}",
+            f"- Placed on the slide as extra images or text elements: {self.placed_count}",
             f"- Elements not converted: {self.skipped_count}",
             "",
         ]
@@ -64,7 +64,7 @@ class Report:
             lines.append("")
             lines.append(f"- Layout: **{s.layout}** ({s.reason})")
             lines += [f"- Moved to reader layer: {m}" for m in s.moved]
-            lines += [f"- Placed as an extra image: {p}" for p in s.placed]
+            lines += [f"- Placed as a text element: {p}" if p.startswith("text box") else f"- Placed as an extra image: {p}" for p in s.placed]
             lines += [f"- ⚠ Not converted: {k}" for k in s.skipped]
             lines += [f"- {n}" for n in s.notes]
             lines.append("")

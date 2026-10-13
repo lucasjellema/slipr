@@ -11,6 +11,36 @@ from .report import Report
 
 
 @dataclass
+class TextLook:
+    """What a free text box or shape looks like, in PowerPoint terms (EMU,
+    points, #rrggbb). mapping.py turns it into a Slipr text style.
+
+    typeface: the first run's font, or '+mj-lt' / '+mn-lt' for the theme's
+    heading / body font; None when inherited.
+    """
+
+    typeface: str | None = None
+    size_pt: float | None = None
+    caps: bool = False
+    underline: bool = False
+    align: str | None = None  # 'center' | 'right'; None = left
+    anchor: str | None = None  # 'middle' | 'bottom'; None = top
+    color: str | None = None
+    fill: str | None = None
+    fill_alpha: float | None = None  # 0–1, None = opaque
+    line_width: int = 0  # EMU; 0 = no visible line
+    line_dash: str | None = None  # 'dashed' | 'dotted'; None = solid
+    line_color: str | None = None
+    corner: int = 0  # corner radius, EMU
+    inset: int = 91440  # left inset (PowerPoint's default 0.1 in)
+
+    @property
+    def is_shape(self) -> bool:
+        """True when the box itself is visible (a fill or a line): a badge, pill or callout."""
+        return bool(self.fill or self.line_width)
+
+
+@dataclass
 class TextBody:
     """A block of text from a placeholder or text box."""
 
@@ -20,6 +50,9 @@ class TextBody:
     top: int = 0
     left: int = 0
     idx: int | None = None  # placeholder idx (for template placeholder roles), None for text boxes
+    width: int = 0
+    height: int = 0
+    look: TextLook | None = None  # text boxes and shapes only (not placeholders): their look, I-089
 
     @property
     def plain_length(self) -> int:

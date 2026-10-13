@@ -18,13 +18,16 @@ Layout choice, in order:
 
 Nothing is lost: text or pictures that do not fit the chosen layout go to
 the slide's READER LAYER (text / image blocks), so readers still see them.
+When the slide size is known, pictures become extra images (D-013) and text
+boxes become text elements (D-016) at their PowerPoint place instead; text
+boxes and shapes with a visible box (badges, callouts) always do.
 """
 from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field, replace
 
-from .model import ImageRef, SlideModel, TextBody
+from .model import ImageRef, SlideModel, TextBody, TextLook
 
 LIST_TYPES = {"list", "richtext"}
 _NUMBER_ONLY = re.compile(r"^\d{1,2}[.)]?$")
@@ -126,7 +129,7 @@ class MappedSlide:
     layout: str
     reason: str
     moved: list[str] = field(default_factory=list)
-    placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083)
+    placed: list[str] = field(default_factory=list)  # pictures placed as extra images (I-083), text boxes as text elements (I-089)
     picture_styles: list[dict] = field(default_factory=list)  # the template's pictureStyles (I-084)
     skipped: list[str] = field(default_factory=list)
     remarks: list[str] = field(default_factory=list)
@@ -157,6 +160,12 @@ def map_slide(
     numbering = [b for b in sm.bodies if _NUMBER_ONLY.match(markdown_to_plain(b.markdown))]
     if numbering:
         sm = replace(sm, bodies=[b for b in sm.bodies if b not in numbering])
+    # Text boxes and shapes whose box is visible (a fill or a line: badges, pills,
+    # callouts) become text elements at their place; they need no slot (D-016, I-089).
+    shaped = [b for b in sm.bodies if b.look is not None and b.look.is_shape] if _known_size(slide_size) else []
+    if shaped:
+        sm = replace(sm, bodies=[b for b in sm.bodies if all(b is not s for s in shaped)])
+    fonts = (template.get("styleguide") or {}).get("fonts") or {}
 
     layout_id, reason = choose_layout(sm, template, mapping)
     layout = next(l for l in template["layouts"] if l["id"] == layout_id)
@@ -210,7 +219,16 @@ def map_slide(
         if text_slots and not body.is_list and "\n" not in body.markdown and len(body.markdown) <= 120:
             content[_take(text_slots, "subtitle", "caption") or text_slots.pop(0)] = markdown_to_plain(body.markdown)
             bodies.remove(body)
-    for n, body in enumerate(bodies, 1):
+    # What is left: text boxes become text elements at their place (I-089),
+    # placeholder text goes to the reader layer.
+    text_overlays: list[tuple[TextBody, dict]] = []
+    n = 0
+    for body in shaped + bodies:
+        if body.look is not None and (overlay := _text_overlay_value(body, slide_size, fonts)) is not None:
+            text_overlays.append((body, overlay))
+            result.placed.append(f"text box “{_preview(body.markdown)}”")
+            continue
+        n += 1
         blocks.append({"id": f"converted-text-{n}", "type": "text", "md": body.markdown})
         result.moved.append(f"text block {n} (“{_preview(body.markdown)}”)")
 
@@ -228,6 +246,8 @@ def map_slide(
         else:
             blocks.append({"id": f"converted-image-{n}", "type": "image", "image": value})
             result.moved.append(f"picture {n}")
+    # Text elements in front of the extra images (labels on pictures), in reading order.
+    overlays += [o for _, o in sorted(text_overlays, key=lambda pair: (pair[0].top, pair[0].left))]
 
     if not had_title:
         result.remarks.append("no title found on this slide")
@@ -409,18 +429,116 @@ def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
 def _overlay_value(ref: ImageRef, image: dict, slide_size: tuple[int, int] | None) -> dict | None:
     """An extra image at the picture's place on the slide (fractions of the
     slide, kept inside it), or None when the slide or picture size is unknown."""
-    if not slide_size or slide_size[0] <= 0 or slide_size[1] <= 0 or ref.width <= 0 or ref.height <= 0:
+    box = _box(ref.left, ref.top, ref.width, ref.height, slide_size)
+    return None if box is None else {"image": image, **box}
+
+
+def _known_size(slide_size: tuple[int, int] | None) -> bool:
+    return bool(slide_size) and slide_size[0] > 0 and slide_size[1] > 0
+
+
+def _box(left: int, top: int, width: int, height: int, slide_size: tuple[int, int] | None) -> dict | None:
+    """x, y, w, h as fractions of the slide, kept inside it; None when a size is unknown."""
+    if not _known_size(slide_size) or width <= 0 or height <= 0:
         return None
     sw, sh = slide_size
+    w = min(1.0, max(0.02, width / sw))
+    h = min(1.0, max(0.02, height / sh))
+    x = min(1.0 - w, max(0.0, left / sw))
+    y = min(1.0 - h, max(0.0, top / sh))
+    return {"x": round(x, 4), "y": round(y, 4), "w": round(w, 4), "h": round(h, 4)}
 
-    def frac(v: float) -> float:
-        return round(v, 4)
 
-    w = min(1.0, max(0.02, ref.width / sw))
-    h = min(1.0, max(0.02, ref.height / sh))
-    x = min(1.0 - w, max(0.0, ref.left / sw))
-    y = min(1.0 - h, max(0.0, ref.top / sh))
-    return {"image": image, "x": frac(x), "y": frac(y), "w": frac(w), "h": frac(h)}
+def _text_overlay_value(body: TextBody, slide_size: tuple[int, int] | None, fonts: dict) -> dict | None:
+    """A text element at the text box's place, with its look (D-016, I-089), or
+    None when the slide or box size is unknown."""
+    box = _box(body.left, body.top, body.width, body.height, slide_size)
+    if box is None or body.look is None:
+        return None
+    value: dict = {"text": _inline_text(body.markdown)}
+    style = _text_style(body.look, slide_size[0], fonts)
+    if style:
+        value["style"] = style
+    return value | box
+
+
+def _inline_text(md: str) -> str:
+    """Block Markdown → the inline Markdown of a text element: one line per
+    paragraph or list item (bullets become "•"), no blank lines."""
+    lines = []
+    for line in md.split("\n"):
+        if not line.strip():
+            continue
+        m = re.match(r"^\s*[-*+]\s+(.*)$", line)
+        lines.append(f"• {m.group(1)}" if m else line.strip())
+    return "\n".join(lines)
+
+
+_MONO_FONTS = ("consolas", "courier", "menlo", "monaco", "cascadia", "mono", "lucida console")
+_SERIF_FONTS = ("serif", "times", "georgia", "cambria", "garamond", "palatino", "book antiqua")
+
+
+def _font_role(typeface: str | None, fonts: dict) -> str:
+    """The text style font for a PowerPoint typeface: the template's heading or
+    body font when it is the theme's or the template's, a platform mono or
+    serif font for those families, else the template's body font."""
+    if not typeface or typeface.startswith("+mn"):
+        return "body"
+    if typeface.startswith("+mj"):
+        return "heading"
+    face = typeface.strip().lower()
+
+    def family(v) -> str:  # "Arial Black (uppercase)" → "arial black"
+        return re.sub(r"\s*\(.*$", "", str(v or "")).strip().lower()
+
+    if face == family(fonts.get("heading")):
+        return "heading"
+    if face == family(fonts.get("body")):
+        return "body"
+    if any(k in face for k in _MONO_FONTS):
+        return "mono"
+    if "sans" not in face and any(k in face for k in _SERIF_FONTS):
+        return "serif"
+    return "body"
+
+
+def _text_style(look: TextLook, slide_width: int, fonts: dict) -> dict:
+    """A Slipr text style (schema key order) from a PowerPoint look. Lengths
+    become percentages of the slide width, sizes from points."""
+    def pct(emu: float, high: float) -> float:
+        return round(min(high, max(0.0, emu / slide_width * 100)), 2)
+
+    style: dict = {}
+    font = _font_role(look.typeface, fonts)
+    if font != "body":
+        style["font"] = font
+    if look.size_pt:
+        style["size"] = round(min(20.0, max(0.5, look.size_pt * 12700 / slide_width * 100)), 2)
+    if look.underline:
+        style["underline"] = True
+    if look.caps:
+        style["uppercase"] = True
+    if look.align:
+        style["align"] = look.align
+    if look.anchor:
+        style["valign"] = look.anchor
+    if look.color:
+        style["color"] = look.color
+    if look.fill:
+        style["background"] = look.fill
+        if look.fill_alpha is not None and look.fill_alpha < 1:
+            style["backgroundOpacity"] = look.fill_alpha
+    if look.line_width and (width := pct(look.line_width, 5)) > 0:
+        style["borderWidth"] = width
+        if look.line_dash:
+            style["borderStyle"] = look.line_dash
+        if look.line_color:
+            style["borderColor"] = look.line_color
+    if look.corner and (radius := pct(look.corner, 50)) > 0:
+        style["radius"] = radius
+    if look.inset and (padding := pct(look.inset, 10)) > 0:
+        style["padding"] = padding
+    return style
 
 
 def markdown_to_plain(md: str) -> str:
