@@ -100,10 +100,17 @@ export async function startReader(app, ctx) {
     toast,
   });
 
+  const helpBtn = h('button', { type: 'button', class: 'reader-tool', title: 'User manual (?)' }, [
+    h('span', { 'aria-hidden': 'true' }, ['?']), h('span', { class: 'reader-tool-label' }, ['Help']),
+  ]);
+  helpBtn.addEventListener('click', () => {
+    window.open('help.html#reader', 'slipr-viewer-help', 'noopener');
+  });
+
   const topbar = h('header', { class: 'reader-topbar' }, [
     menu,
     h('a', { class: 'reader-topbar-title', href: '#top' }, [show.meta.title]),
-    h('div', { class: 'reader-tools' }, [tailor.button, searchUi.button, notes.button]),
+    h('div', { class: 'reader-tools' }, [tailor.button, searchUi.button, notes.button, helpBtn]),
     present,
   ]);
   let contents = buildContents(model, marks);
@@ -291,6 +298,8 @@ export async function startReader(app, ctx) {
       const i = ids.indexOf(spy?.current() ?? ids[0]);
       const next = ids[Math.min(ids.length - 1, Math.max(0, i + (key === 'j' ? 1 : -1)))];
       if (next) location.hash = `#${next}`;
+    } else if (key === '?' || event.key === 'F1') {
+      window.open('help.html#reader', 'slipr-viewer-help', 'noopener');
     }
   });
 }

@@ -9,7 +9,9 @@ The viewer makes one show available in two very different ways:
 | Character | Linear, presenter-driven, with animations and visualizations | Interactive and explorative, tailored to the reader |
 | Feels like | PowerPoint / Keynote | An interactive article or a small learning site |
 
-> Status: **audience mode** and **reader mode** work, including personalisation, progress, bookmarks, search and annotations (roadmap Phases 1–3), plus Phase 6: single-file export, Mermaid diagrams, extra images and picture styles on slides, and glossary terms clickable on slides in reader mode. Features not built yet are marked *(planned)*.
+> Status: **audience mode** and **reader mode** work, including personalisation, progress, bookmarks, search and annotations (roadmap Phases 1–3), plus Phase 6: single-file export, Mermaid diagrams, extra images and picture styles on slides, glossary terms clickable on slides, and phone remote control (I-002).
+>
+> 📖 **User manual:** a dedicated offline manual is available in [`help.html`](help.html) (open via `?` or `F1` in both modes, the top bar button in Reader mode, or from the viewer start page). See [The Slipr concept](help.html#concept), [Audience mode](help.html#audience), [Phone remote](help.html#remote), [Reader mode](help.html#reader), and [Troubleshooting](help.html#troubleshooting).
 
 ## Opening a show
 
@@ -63,12 +65,14 @@ Built on Reveal.js. The aim is a polished, linear presentation.
 | `→` `Space` `PageDown` | Next slide / next build step |
 | `←` `PageUp` | Previous |
 | `S` | Presenter view |
+| `P` | Phone remote control pairing modal |
 | `O` / `Esc` | Overview of all slides, including backup slides |
 | `F` | Full screen |
 | `B` / `.` | Black screen |
 | `R` | Switch to reader mode at the current slide (an agenda slide maps to the chapter it introduces) |
 | `Alt`+click | Zoom into the clicked area (click again to zoom out) |
 | `Ctrl`+`Shift`+`F` | Search the slides |
+| `?` / `F1` | User manual ([`help.html#audience`](help.html#audience)) |
 
 Most presentation clickers send `PageUp`/`PageDown`, so they work out of the box.
 
@@ -146,3 +150,4 @@ Full-text search across slides, reader blocks (including text and labels inside 
 | `M` | Bookmark the current slide |
 | `A` | Switch to audience mode at this slide |
 | `Esc` | Close a popup, a panel, or the contents drawer |
+| `?` / `F1` | User manual ([`help.html#reader`](help.html#reader)) |

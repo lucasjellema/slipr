@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slipr Viewer Help</title>
+  <script>
+    // Theme before the first paint: follows theme choice or system OS preference.
+    (() => {
+      let choice = 'system';
+      try { choice = localStorage.getItem('slipr-editor-theme') || 'system'; } catch {}
+      const light = choice === 'light' || (choice !== 'dark' && matchMedia('(prefers-color-scheme: light)').matches);
+      document.documentElement.dataset.theme = light ? 'light' : 'dark';
+    })();
+  </script>
+  <link rel="stylesheet" href="css/help.css">
+</head>
+<body>
+  <a class="skip" href="#content">Skip to the manual</a>
+
+  <header class="top">
+    <span class="brand">Slipr Viewer</span>
+    <span class="top-title">User manual</span>
+  </header>
+
+  <div class="page">
+    <nav class="toc" aria-label="Contents">
+      <h2>Contents</h2>
+      <ol>
+        <li><a href="#concept">The Slipr concept</a></li>
+        <li><a href="#audience">Audience mode</a></li>
+        <li><a href="#remote">Phone remote control</a></li>
+        <li><a href="#reader">Reader mode</a></li>
+        <li><a href="#tailoring">Tailoring &amp; profiles</a></li>
+        <li><a href="#blocks">Interactive blocks</a></li>
+        <li><a href="#glossary">Glossary &amp; popups</a></li>
+        <li><a href="#annotations">Personal annotations</a></li>
+        <li><a href="#search">Full-text search</a></li>
+        <li><a href="#open">Opening &amp; sharing</a></li>
+        <li><a href="#shortcuts">Keyboard &amp; clicker cheatsheet</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ol>
+    </nav>
+
+    <main id="content" class="content">
+
+      <section id="concept">
+        <h1>The Slipr concept</h1>
+        <p>Slipr presentations bridge the gap between live keynote presentations and detailed written documentation. Traditional slide decks force an impossible compromise: either slides are dense walls of text unsuitable for a live audience, or they are brief visuals that become useless handouts afterwards.</p>
+        <p>Slipr solves this by storing <strong>one show file</strong> (<code>show.json</code>) that powers two distinct delivery experiences:</p>
+        <dl>
+          <dt>Audience mode</dt>
+          <dd>A polished, linear presentation for a room and big screen. High-level, punchy slides with step-by-step builds, smooth auto-animate transitions, dual-screen presenter view, and phone remote control.</dd>
+          <dt>Reader mode</dt>
+          <dd>An interactive, self-paced reading experience for individuals. Contains the slide visuals alongside a rich <strong>reader layer</strong>: deep explanations, code tabs, interactive diagrams, image hotspots, web embeds, and PDF documents, tailored to the reader's role and preferred detail level.</dd>
+        </dl>
+        <div class="tip">
+          <strong>Key advantage:</strong> You author and maintain a single deck. When presenting live to stakeholders, use Audience mode. When sharing notes, follow-up briefings, or onboarding materials, share Reader mode.
+        </div>
+      </section>
+
+      <section id="audience">
+        <h2>Audience mode</h2>
+        <p>Audience mode is built on <strong>Reveal.js</strong> and designed for confident, professional delivery on stage, in meeting rooms, or over video calls.</p>
+
+        <h3>Presenter controls</h3>
+        <p>You can advance slides using standard keyboard keys, presentation clickers, or touch gestures:</p>
+        <ul>
+          <li><strong>Next step or slide:</strong> <kbd>→</kbd>, <kbd>Space</kbd>, or <kbd>PageDown</kbd>.</li>
+          <li><strong>Previous step or slide:</strong> <kbd>←</kbd> or <kbd>PageUp</kbd>.</li>
+          <li><strong>Fullscreen:</strong> Press <kbd>F</kbd> to enter or exit fullscreen.</li>
+          <li><strong>Blackout screen:</strong> Press <kbd>B</kbd> or <kbd>.</kbd> to blank the projection when taking open questions or directing attention away from the screen. Press again to restore.</li>
+        </ul>
+
+        <h3>Fragments and auto-animate</h3>
+        <p>Slides can reveal content incrementally using <strong>fragments</strong> (step-by-step appearance of cards, bullet points, or overlay images). When multiple consecutive slides share common layout elements, Slipr's <strong>auto-animate</strong> morphs titles, images, and card boxes smoothly between slides.</p>
+
+        <h3>Agenda slides &amp; chapter bar</h3>
+        <p>Shows structured into chapters automatically generate clean <strong>agenda slides</strong> introducing each section. A discreet progress bar along the bottom of the screen indicates chapter progress throughout the presentation.</p>
+
+        <h3>Dual-screen presenter console</h3>
+        <p>Press <kbd>S</kbd> to open the built-in speaker view in a separate window. Drag this window onto your private laptop display while projecting the main window onto the auditorium display. The speaker view includes:</p>
+        <ul>
+          <li>Current slide display and upcoming slide preview.</li>
+          <li>Live speaker notes formatted in readable type.</li>
+          <li>Elapsed presentation timer and current wall clock.</li>
+        </ul>
+        <p class="note"><strong>Browser note:</strong> Your browser may prompt you to allow popups on <code>localhost</code> when pressing <kbd>S</kbd> for the first time.</p>
+
+        <h3>Overview grid and zoom</h3>
+        <ul>
+          <li><strong>Overview grid:</strong> Press <kbd>O</kbd> or <kbd>Esc</kbd> to zoom out into a birds-eye grid of all slides. Click any thumbnail to jump directly to it. Backup slides appear with dashed borders at the end of the grid.</li>
+          <li><strong>Area zoom:</strong> Hold <kbd>Alt</kbd> and click anywhere on a slide to zoom smoothly into that specific element or chart. Click again to zoom back out.</li>
+        </ul>
+
+        <h3>Continuing in Reader mode</h3>
+        <p>Press <kbd>R</kbd> at any point during a talk to seamlessly switch the viewer into <strong>Reader mode</strong> at the current slide, allowing you or your audience to inspect deep-dive background material.</p>
+      </section>
+
+      <section id="remote">
+        <h2>Phone remote control (secondary device)</h2>
+        <p>Slipr includes a built-in mobile remote control that runs directly in your phone's web browser. You do not need to install any mobile app from an app store. Your phone pairs instantly with the laptop presentation over a local WebSocket connection, giving you tactile navigation buttons, live speaker notes, and an elapsed presentation timer in the palm of your hand.</p>
+
+        <h3>Starting the relay server</h3>
+        <p>Open a terminal on your laptop in the Slipr project folder and start the local relay server:</p>
+        <pre><code>npm run remote</code></pre>
+        <p>The relay starts on port <code>8080</code> (or your custom port) and automatically detects your laptop's local area network (LAN) IP address.</p>
+
+        <h3>Pairing your phone</h3>
+        <ol>
+          <li>Open your presentation in Audience mode.</li>
+          <li>Press <kbd>P</kbd> on your keyboard or click the <strong>📱</strong> button in the bottom-right corner of the slide.</li>
+          <li>A pairing modal appears displaying a standalone SVG QR code containing your session address and an authentication token.</li>
+          <li>Open your phone's camera app or QR scanner and scan the QR code. Your phone opens <code>http://&lt;laptop-ip&gt;:8080/viewer/remote/?session=...</code>.</li>
+          <li>The remote connects immediately and the modal on your laptop displays <em>"Phone connected"</em>.</li>
+        </ol>
+
+        <h3>Mobile remote features</h3>
+        <table>
+          <thead><tr><th>Feature</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Tactile touch zones</strong></td>
+              <td>Large, high-contrast <strong>Next</strong> and <strong>Prev</strong> buttons (82px minimum height) engineered for comfortable single-thumb operation without needing to look down at your screen.</td>
+            </tr>
+            <tr>
+              <td><strong>Swipe gestures</strong></td>
+              <td>Swipe left anywhere on the screen to advance to the next slide or build step; swipe right to navigate back. Vertical scrolling is isolated so you can scroll through long speaker notes without triggering accidental slide changes.</td>
+            </tr>
+            <tr>
+              <td><strong>Live speaker notes &amp; zoom</strong></td>
+              <td>The presenter's private notes for the active slide stream in real time. Use the <strong>A+</strong> and <strong>A-</strong> buttons in the header to increase or decrease font size for optimal readability on any phone screen.</td>
+            </tr>
+            <tr>
+              <td><strong>Upcoming slide peek</strong></td>
+              <td>Displays the title of the next slide and the current slide number (<code>Slide X of Y</code>), helping you make seamless verbal transitions.</td>
+            </tr>
+            <tr>
+              <td><strong>Presentation timer</strong></td>
+              <td>An elapsed timer counting minutes and seconds (<code>MM:SS</code>) with start, pause, and reset controls to keep you on schedule.</td>
+            </tr>
+            <tr>
+              <td><strong>Haptic feedback</strong></td>
+              <td>Subtle vibration pulses (<code>navigator.vibrate</code>) acknowledge button presses and slide changes.</td>
+            </tr>
+            <tr>
+              <td><strong>Screen wake lock</strong></td>
+              <td>Utilizes the Screen Wake Lock API (<code>navigator.wakeLock</code>) to prevent your phone screen from dimming or going to sleep while you are speaking.</td>
+            </tr>
+            <tr>
+              <td><strong>Auto-reconnect &amp; manual entry</strong></td>
+              <td>If Wi-Fi drops momentarily, the remote attempts reconnection automatically. If your camera cannot scan QR codes, you can enter the 6-character session code manually on the remote landing page.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Using your phone's personal hotspot</h3>
+        <p>When presenting at venues without accessible Wi-Fi, or where corporate guest networks isolate connected devices (preventing devices from communicating with each other), turn on your phone's <strong>Personal Hotspot</strong> and connect your laptop's Wi-Fi to your phone.</p>
+
+        <h4>Troubleshooting: "Cannot reach page" on personal hotspot</h4>
+        <p>If your laptop is connected to your phone's personal hotspot but opening the remote URL or scanning the QR code results in a browser error such as <em>"Cannot reach page"</em>, <em>"Server took too long to respond"</em>, or a connection timeout, the issue is almost always <strong>Windows Defender Firewall</strong> blocking incoming connections.</p>
+        <p class="note"><strong>Why this happens:</strong> When a Windows laptop connects to a mobile personal hotspot (such as an iPhone or Android hotspot on <code>172.20.10.x</code> or <code>192.168.43.x</code>), Windows classifies the new network adapter profile as a <strong>Public network</strong> for security. On Public networks, Windows Firewall blocks all inbound connections by default, preventing your phone from reaching port 8080 on your laptop.</p>
+
+        <p>Use either of the following two solutions to resolve this:</p>
+
+        <h4>Solution 1: Switch the Wi-Fi connection to "Private" in Windows (Recommended)</h4>
+        <p>Switching your phone hotspot's network profile from Public to Private tells Windows that the network is trusted, allowing local connections between your phone and laptop:</p>
+        <ul>
+          <li><strong>Option A — Via Windows Settings:</strong>
+            <ol>
+              <li>Press <kbd>Win + I</kbd> to open Windows Settings.</li>
+              <li>Go to <strong>Network &amp; internet</strong> → <strong>Wi-Fi</strong>.</li>
+              <li>Click on the active Wi-Fi connection (your phone's hotspot name).</li>
+              <li>Under <strong>Network profile type</strong>, select <strong>Private network</strong>.</li>
+            </ol>
+          </li>
+          <li><strong>Option B — Via PowerShell (Administrator):</strong>
+            <pre><code># Check current connection profile
+Get-NetConnectionProfile
+
+# Switch Wi-Fi interface to Private
+Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private</code></pre>
+          </li>
+        </ul>
+
+        <h4>Solution 2: Allow Node.js through Windows Defender Firewall</h4>
+        <p>If corporate policies require keeping network profiles set to Public, explicitly allow Node.js inbound traffic on Public networks:</p>
+        <ol>
+          <li>Press the Windows key, type <strong>"Allow an app through Windows Firewall"</strong>, and press <kbd>Enter</kbd>.</li>
+          <li>Click the <strong>Change settings</strong> button (requires administrator rights).</li>
+          <li>Scroll through the list of allowed apps to find <strong>Node.js: Server-side JavaScript</strong>.</li>
+          <li>Ensure that the checkbox for <strong>Public</strong> is checked (in addition to Private).</li>
+          <li>Click <strong>OK</strong> to apply.</li>
+        </ol>
+
+        <p>Once adjusted, refresh the remote page on your phone or re-scan the QR code, and the remote UI will connect immediately.</p>
+      </section>
+
+      <section id="reader">
+        <h2>Reader mode</h2>
+        <p>Reader mode turns your presentation into an engaging, interactive document. Built from the ground up without Reveal.js, it offers clean responsive typography, chapter navigation, progress tracking, and personalized detail levels.</p>
+
+        <h3>Screen layout</h3>
+        <ul>
+          <li><strong>Top bar:</strong> Contains the show title, chapter drawer toggle (on mobile), the <strong>⚙ Tailor</strong> panel, <strong>⌕ Search</strong>, <strong>✎ My notes</strong>, and a <strong>Present ▶</strong> button to switch to Audience mode.</li>
+          <li><strong>Table of contents drawer:</strong> On wide desktop displays, the table of contents sits in a left navigation pane. On narrow screens and mobile phones, it opens smoothly from the menu icon. Shows read progress (<em>"n of m read"</em>) and visited checkmarks.</li>
+          <li><strong>Article body:</strong> Each slide is presented as a section with its visual slide canvas at the top, followed by speaker notes and the rich reader layer blocks.</li>
+          <li><strong>Keyboard navigation:</strong> Press <kbd>J</kbd> to jump to the next slide on your path, and <kbd>K</kbd> to jump to the previous slide.</li>
+        </ul>
+
+        <h3>Returning to Audience mode</h3>
+        <p>Click <strong>Present ▶</strong> in the top bar or press <kbd>A</kbd> on your keyboard to launch Audience mode directly at the slide you are currently reading.</p>
+      </section>
+
+      <section id="tailoring">
+        <h2>Tailoring &amp; profiles</h2>
+        <p>Not every reader needs the same information. A developer wants architecture diagrams and code samples; an executive needs executive summaries and strategic trade-offs. Reader mode lets users tailor what they see without altering the show file.</p>
+
+        <h3>The Tailor panel (⚙)</h3>
+        <p>Click the <strong>⚙ Tailor</strong> button in the top bar or press <kbd>D</kbd> to open the tailoring panel:</p>
+        <dl>
+          <dt>Audience profiles</dt>
+          <dd>Select a role (e.g. <em>Developer</em>, <em>Manager</em>, <em>Architect</em>). Blocks targeted at other roles are hidden, while blocks designated for all profiles remain visible.</dd>
+          <dt>Detail levels (Depth 1 to 3)</dt>
+          <dd>
+            <ul>
+              <li><strong>Level 1 (Essentials):</strong> High-level overview; only primary summaries and foundational blocks are shown.</li>
+              <li><strong>Level 2 (Standard):</strong> The default reading experience with standard explanations.</li>
+              <li><strong>Level 3 (Deep dive):</strong> Shows every block, including extensive technical appendices, deep code tabs, and extended background.</li>
+            </ul>
+            <p>You can press <kbd>D</kbd> anytime while reading to cycle through detail levels instantly.</p>
+          </dd>
+          <dt>Reading routes (Paths)</dt>
+          <dd>Select a curated route through the show (e.g. <em>5-minute overview</em> or <em>Full architectural walkthrough</em>). The table of contents and <kbd>J</kbd>/<kbd>K</kbd> keys guide you through only the slides included on that path.</dd>
+          <dt>Presenter notes</dt>
+          <dd>Toggle whether speaker notes appear under each slide as <em>"What the presenter said"</em> collapsible sections.</dd>
+        </dl>
+      </section>
+
+      <section id="blocks">
+        <h2>Interactive blocks</h2>
+        <p>The reader layer supports a variety of rich, interactive content blocks that bring depth to your slides:</p>
+
+        <h3>Cards</h3>
+        <p>Structured, responsive grids of cards with icons, subtitles, and bullet points. Perfect for feature matrices, market overviews, or team rosters.</p>
+
+        <h3>Tabs</h3>
+        <p>Multi-tabbed interactive containers allowing readers to switch between alternative code implementations, multiple languages, or before/after comparisons without cluttering the page.</p>
+
+        <h3>Image hotspots</h3>
+        <p>Interactive numbered pins placed over diagrams or photographs. Clicking or hovering a pin opens a popover detailing what that part of the image represents.</p>
+
+        <h3>Embedded web pages</h3>
+        <p>Sandboxed iframes for live interactive web apps, dashboards, or video demonstrations. To protect privacy and adhere to offline-first principles, external sites show an explicit <em>"Load embed"</em> button before establishing connections, with link-card fallbacks and an <em>"Open in new tab"</em> button.</p>
+
+        <h3>PDF documents</h3>
+        <p>Embedded PDF documents rendered via vendored <strong>PDF.js</strong>. Readers can page through documents, zoom in and out, copy text, and search across PDF page contents directly from Slipr's search index.</p>
+
+        <h3>Mermaid diagrams</h3>
+        <p>Flowcharts, sequence diagrams, state machines, and class diagrams rendered dynamically as clean SVGs using vendored <strong>Mermaid</strong>. Diagrams scale smoothly, adapt to light/dark themes, and render entirely offline without external network requests.</p>
+      </section>
+
+      <section id="glossary">
+        <h2>Glossary &amp; popups</h2>
+        <p>Slipr makes domain knowledge accessible without interrupting reading flow:</p>
+        <ul>
+          <li><strong>Glossary terms:</strong> Terms defined in the show glossary are automatically highlighted with a subtle dotted underline on slides and reader blocks (or explicitly authored via <code>[[term]]</code>). Hovering or clicking a term displays an instant popover with its definition, aliases, and a link to view all glossary entries.</li>
+          <li><strong>Popups:</strong> Author footnotes and parenthetical clarifications using <code>^[popup text]</code> syntax. Readers can hover or tap to read the note in place.</li>
+        </ul>
+      </section>
+
+      <section id="annotations">
+        <h2>Personal annotations &amp; notes</h2>
+        <p>Slipr provides comprehensive annotation tools stored privately in your browser's local storage or IndexedDB:</p>
+
+        <h3>Highlights and text notes</h3>
+        <p>Select any text passage on a slide or reader block with your mouse or finger. A tooltip appears allowing you to <strong>Highlight</strong> the text or <strong>Add note</strong>. Highlights persist across browser sessions and anchor robustly even if surrounding text changes.</p>
+
+        <h3>Slide notes and object pins</h3>
+        <ul>
+          <li><strong>Slide notes:</strong> Click <strong>✎ Note</strong> next to a slide header to write private markdown notes for that entire slide.</li>
+          <li><strong>Object pins:</strong> Click <strong>📍 Pin</strong> on a slide to turn it into a pin board. Click anywhere on a slide element (a specific bullet, image, or card) to attach a numbered pin note. Hovering a pin reveals its note.</li>
+        </ul>
+
+        <h3>Bookmarks</h3>
+        <p>Click the <strong>★</strong> bookmark icon on any slide or press <kbd>M</kbd> to bookmark it. Bookmarked slides are pinned to the top of the table of contents for quick reference.</p>
+
+        <h3>"My notes" panel (N)</h3>
+        <p>Click the <strong>✎ My notes</strong> button in the top bar or press <kbd>N</kbd> to open your personal annotation notebook. All highlights, slide notes, pins, and bookmarks are gathered here, grouped by slide. Clicking any note scrolls directly to that item in the article.</p>
+
+        <h3>Exporting and importing annotations</h3>
+        <p>Inside the "My notes" panel:</p>
+        <ul>
+          <li><strong>Export Markdown:</strong> Generates a clean, readable <code>.md</code> document of all your highlights and notes, ready to paste into Notion, Obsidian, or share with colleagues.</li>
+          <li><strong>Export JSON:</strong> Backs up your raw annotations for safe keeping.</li>
+          <li><strong>Import JSON:</strong> Restores annotations or transfers them to another browser or device. Slipr merges notes intelligently, preserving the latest edit.</li>
+        </ul>
+      </section>
+
+      <section id="search">
+        <h2>Full-text search</h2>
+        <p>Press <kbd>/</kbd> or <kbd>Ctrl + K</kbd> anywhere in Reader mode (or click the <strong>⌕ Search</strong> button in the top bar) to open the instant search modal.</p>
+        <ul>
+          <li><strong>Comprehensive index:</strong> Searches across slide titles, slide body copy, reader blocks, tabs, cards, image alt texts, glossary terms and aliases, and embedded PDF documents.</li>
+          <li><strong>Instant &amp; fuzzy:</strong> Matches word beginnings (e.g. typing <em>"arch"</em> finds <em>"architecture"</em>) and ignores accents and letter casing.</li>
+          <li><strong>On-page highlighting:</strong> Selecting a result jumps directly to the target block and highlights the matching words on screen using the CSS Custom Highlight API.</li>
+          <li><strong>Tailoring awareness:</strong> If matching content is hidden by your current profile or depth setting, the search dialog reports the count of hidden matches with a one-click <strong>"show everything"</strong> option.</li>
+        </ul>
+      </section>
+
+      <section id="open">
+        <h2>Opening &amp; sharing shows</h2>
+        <p>Slipr provides flexible options for opening and distributing presentations:</p>
+
+        <h3>URL parameters</h3>
+        <p>Point your browser to the viewer with query parameters:</p>
+        <pre><code># Open in Audience mode
+http://localhost:8080/viewer/?show=../shows/demo/show.json
+
+# Open in Reader mode
+http://localhost:8080/viewer/?show=../shows/demo/show.json&amp;mode=reader
+
+# Pre-tailored link for a specific role and depth
+http://localhost:8080/viewer/?show=../shows/demo/show.json&amp;mode=reader&amp;profile=dev&amp;depth=3&amp;path=quick</code></pre>
+
+        <h3>Local show folders (File System Access API)</h3>
+        <p>On Chrome and Edge, open <code>viewer/</code> without parameters and click <strong>Open a show folder…</strong> to pick a show folder from your disk. Slipr loads the show directly without uploading your files to any external server. The folder is remembered in your browser under <code>viewer/?folder=&lt;key&gt;</code>.</p>
+
+        <h3>Single-file HTML exports (offline presenting)</h3>
+        <p>Shows can be compiled into a single, self-contained offline HTML file using the Slipr Editor's <strong>Export…</strong> button or the CLI:</p>
+        <pre><code>npm run export -- shows/demo</code></pre>
+        <p>The resulting <code>exports/demo.html</code> contains the entire presentation, template styles, fonts, images, diagrams, and runtime bundled together. It requires zero backend servers, zero installations, and presents seamlessly offline when double-clicked on any computer.</p>
+      </section>
+
+      <section id="shortcuts">
+        <h2>Keyboard &amp; clicker cheatsheet</h2>
+        <table>
+          <thead>
+            <tr><th>Context</th><th>Shortcut</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Audience</strong></td><td><kbd>→</kbd> / <kbd>Space</kbd> / <kbd>PageDown</kbd></td><td>Next build fragment or slide</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>←</kbd> / <kbd>PageUp</kbd></td><td>Previous build fragment or slide</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>S</kbd></td><td>Open speaker console window</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>P</kbd></td><td>Open phone remote pairing QR modal</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>O</kbd> / <kbd>Esc</kbd></td><td>Toggle thumbnail overview grid</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>F</kbd></td><td>Toggle fullscreen presentation</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>B</kbd> / <kbd>.</kbd></td><td>Toggle blackout / pause screen</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>R</kbd></td><td>Switch to Reader mode at current slide</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>Alt</kbd> + Click</td><td>Zoom into clicked slide region</td></tr>
+            <tr><td><strong>Audience</strong></td><td><kbd>?</kbd> / <kbd>F1</kbd></td><td>Open this user manual</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>/</kbd> or <kbd>Ctrl</kbd>+<kbd>K</kbd></td><td>Open full-text search</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>J</kbd> / <kbd>K</kbd></td><td>Next / previous slide on path</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>D</kbd></td><td>Cycle detail level (1 → 2 → 3)</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>N</kbd></td><td>Toggle "My notes" panel</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>M</kbd></td><td>Toggle bookmark on current slide</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>A</kbd></td><td>Switch to Audience mode at current slide</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>Esc</kbd></td><td>Close drawer, search, or notes panel</td></tr>
+            <tr><td><strong>Reader</strong></td><td><kbd>?</kbd> / <kbd>F1</kbd></td><td>Open this user manual</td></tr>
+            <tr><td><strong>Clicker</strong></td><td>Forward button</td><td>Next slide / fragment (maps to <kbd>PageDown</kbd>)</td></tr>
+            <tr><td><strong>Clicker</strong></td><td>Back button</td><td>Previous slide / fragment (maps to <kbd>PageUp</kbd>)</td></tr>
+            <tr><td><strong>Mobile Remote</strong></td><td>Left / right swipe</td><td>Next / previous slide</td></tr>
+            <tr><td><strong>Mobile Remote</strong></td><td>Tap Next / Prev</td><td>Advance or step back with haptic tap</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="troubleshooting">
+        <h2>Troubleshooting</h2>
+
+        <h3>Dev server or relay not responding</h3>
+        <p>Slipr requires a local HTTP server for loading shows and WebSocket connections:</p>
+        <ul>
+          <li>Start the static file server: <code>npm run serve</code> (serves on <code>http://localhost:8080</code>).</li>
+          <li>Start the mobile remote relay server: <code>npm run remote</code> (serves static files and WebSocket relay on port 8080).</li>
+        </ul>
+
+        <h3>Phone remote "Can't reach page" / Connection timed out</h3>
+        <p>If you are connected via your phone's personal hotspot and the phone cannot load the remote URL:</p>
+        <ol>
+          <li>Ensure <code>npm run remote</code> is actively running in your terminal.</li>
+          <li>Check your Windows network profile. When connecting to a phone hotspot, Windows defaults to a <strong>Public network</strong>, causing Windows Defender Firewall to block inbound traffic.</li>
+          <li><strong>Fix:</strong> Switch your Wi-Fi profile from <strong>Public</strong> to <strong>Private</strong> in Windows Settings (<kbd>Win + I</kbd> → <em>Network &amp; internet</em> → <em>Wi-Fi</em> → click hotspot name → select <em>Private network</em>) or run <code>Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private</code> in PowerShell.</li>
+          <li>Alternatively, allow <strong>Node.js: Server-side JavaScript</strong> through Windows Defender Firewall for Public networks. See the <a href="#remote">Phone remote control</a> section for step-by-step instructions.</li>
+        </ol>
+
+        <h3>Guest Wi-Fi client isolation</h3>
+        <p>Some corporate, hotel, or conference Wi-Fi networks enable <em>Client Isolation</em> (preventing devices on the same Wi-Fi network from communicating with one another). When client isolation is enabled, your phone cannot connect to your laptop even if both are on the same Wi-Fi. In this scenario, switch to using your phone's <strong>Personal Hotspot</strong> as documented above.</p>
+
+        <h3>Folder permission lost after browser restart</h3>
+        <p>When opening a show via a local folder handle (<code>?folder=&lt;key&gt;</code>), the browser may require you to re-confirm permission after restarting Chrome or Edge. Simply click the <strong>Allow access</strong> button on the prompt page to resume.</p>
+
+        <h3>Validation errors on show.json</h3>
+        <p>If a show fails to open, the viewer displays a structured diagnostic report detailing schema violations, missing assets, or invalid layout references. Open the show in the <strong>Slipr Editor</strong> (<code>editor/</code>) to visually inspect and correct invalid slots or missing files without editing raw JSON.</p>
+      </section>
+
+    </main>
+  </div>
+</body>
+</html>
