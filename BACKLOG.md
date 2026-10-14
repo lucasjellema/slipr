@@ -116,11 +116,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-042** [converter] Whole-slide image fallback for slides that cannot be mapped
 - [ ] **I-044** [converter] Batch-convert a folder of decks
 - [ ] **I-045** [converter] Reverse direction: export a Slipr show to PPTX (e.g. via PptxGenJS)
-- [ ] **I-101** [editor] **Collapsible slide list sidebar to enlarge preview**:
-  - Add a collapse toggle button (e.g. `◀` / `▶` on the sidebar header or panel splitter) and an optional shortcut (e.g. `Ctrl+\` or `[`).
-  - When collapsed, the slide list hides or shrinks into a thin icon rail (showing slide numbers / current slide dot), giving all left-column width to the slide editor and enabling the live slide preview to automatically scale up larger.
-  - A toggle button on the rail or top bar instantly expands the slide list back to normal width.
-  - Remembers collapsed/expanded state across reloads in `localStorage`. · todo · —
 
 ### Templates & format
 - [ ] **I-050** [templates] House-style template based on your organization's style guide
@@ -162,6 +157,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-101** [editor] Collapsible slide list: ◀ in its header (or `Ctrl+\`) collapses it to a rail of slide numbers (current slide highlighted, titles as tooltips and for screen readers) so the slide form and the preview get its width (the preview may grow to 1280 px); ▶ or `Ctrl+\` expands it; remembered in `localStorage`. `editor/js/sidebar.js` · done 2026-10-14 · claude
 - [x] **E-020** [editor] Graph editor: the `graph` slot and a new **Graph** reader block type get a live mini graph (+ Node, 🔗 Connect two nodes, click a node to open its row, Fit, snapshot as fallback with an alt text naming the nodes), rows for nodes, links, layout and the build-up while presenting, a data file picker (into `data/`; the file's nodes read-only, **Move into the slide** to edit them), caption and fallback image. Fixed on the way: a fallback image on a graph slot added web page fields. `editor/js/graph-values.js`, `editor/js/ui/graph-fields.js`. Spec: `docs/specs/I-074-graph.md`, section *Graph editor* · done 2026-10-14 · claude
 - [x] **E-021** [editor] Map editor (Lucas's decisions 2026-10-14: mini map in the form, snapshot, full scope): the `map` slot and a new **Map** reader block type get an interactive mini map (click to add places, drag pins, use this view, fit to places, snapshot as fallback with an alt text naming the places), rows for places, the tour while presenting, GeoJSON layers (file picker into `data/`), background (OpenStreetMap / none / show folder / other server), while presenting, load, caption and fallback image. `editor/js/map-values.js`, `editor/js/ui/map-fields.js`. Spec: `docs/specs/I-075-map.md`, section *Map editor* · done 2026-10-14 · claude
 - [x] **I-099** [format/viewer] Local map tiles everywhere (I-075 follow-up), without a format change: folder and zip shows read tiles through the context's `readAsset` (passed by `hydrateEmbeds`, also in the editor preview); the single-file export lists the tile folder (`packShow` `listFiles`: `npm run export`, editor Export… for folder shows) and packs the tiles the template names; fixture `shows/fixtures/local-tiles/`. Spec: `docs/specs/I-075-map.md` · done 2026-10-14 · claude

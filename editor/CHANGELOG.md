@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Collapsible slide list (I-101)
+- **Added** **◀** at the top of the slide list (and `Ctrl+\`) collapses it to a 52 px rail of slide numbers (current slide highlighted, the title as tooltip and for screen readers); the slide form and the preview share the width, and the preview may grow to 1280 px. **▶** or `Ctrl+\` expands it again. The choice is remembered in `localStorage` (`slipr-editor-sidebar`); `js/sidebar.js`.
+
 ### 2026-10-14: Graph editor (E-020)
 - **Added** a graph editor for the `graph` slot and a new **Graph** reader block type (`ui/graph-fields.js`, value helpers `graph-values.js`): a live mini graph drawn like the preview (+ Node, 🔗 Connect: click two nodes to link them, click a node to open its row, Fit, 📷 Snapshot as fallback with an alt text naming the nodes); rows for nodes (label, tags, Markdown, linked slide, id; renaming an id follows in links and steps; remove with its links), links (from, to, reverse, label), the layout, the build-up while presenting (slots: Show steps with node buttons, Focus steps), the data file (**Choose file…** into `data/`, its nodes dashed and read-only, **Move into the slide**), caption and fallback image. A graph slot or block makes a 0.1 show 0.2.
 - **Fixed** a fallback image added to a graph slot gave it web page fields (`title`, `url`), which made the show invalid: `withFallback()` in `block-values.js` keeps each embed value's shape.

@@ -25,7 +25,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Area | In short | Manual |
 |---|---|---|
 | Show folders | Open, create from a template and save show folders anywhere on disk; recent shows; clean `show.json` diffs | [Open, create and save](help.html#files) |
-| Slide list | Go to slide, add (in a chosen layout), duplicate, delete, reorder by dragging, hide from the audience | [The slide list](help.html#slides) |
+| Slide list | Go to slide, add (in a chosen layout), duplicate, delete, reorder by dragging, hide from the audience; collapse to a column of numbers to enlarge the preview | [The slide list](help.html#slides) |
 | Show grid | All slides as thumbnails, grouped by chapter: select several, drag to move or regroup, duplicate, hide, delete; add, rename, move and delete chapters | [Show grid](help.html#grid) |
 | Slide library | Copy slides into a library in your browser and insert them into other shows (another template, links, glossary and files handled); tags, collections, export / import as zip | [Slide library](help.html#library) |
 | Slide tab | A form generated from the layout; a layout picker with live previews; text, Markdown, images, quotes, code, cards and diagrams (Mermaid); notes, chapter, tags, builds and transitions | [Slide tab](help.html#slide-tab) |

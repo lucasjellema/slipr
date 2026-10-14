@@ -3311,3 +3311,82 @@ body.is-screen #slipr-editor-banners {
   gap: 3px;
   flex: 1 1 100%;
 }
+
+/* ---------- Collapsible slide list (I-101) ---------- */
+
+.slipr-sidebar-toggle {
+  flex-shrink: 0;
+  min-width: 28px;
+  padding-inline: 6px;
+}
+
+.slipr-sidebar-toggle-expand,
+.is-sidebar-collapsed .slipr-sidebar-toggle-collapse {
+  display: none;
+}
+
+.is-sidebar-collapsed .slipr-sidebar-toggle-expand {
+  display: inline;
+}
+
+.slipr-panel-header:has(.slipr-sidebar-toggle) {
+  gap: 8px;
+}
+
+.slipr-panel-header:has(.slipr-sidebar-toggle) .slipr-panel-title {
+  margin-right: auto;
+}
+
+/* Collapsed: the left column is a rail of slide numbers; the form and the preview share its width. */
+.is-sidebar-collapsed .slipr-editor-main {
+  grid-template-columns: 52px 1.1fr 1.3fr;
+}
+
+.is-sidebar-collapsed .slipr-panel-header {
+  justify-content: center;
+  padding: 8px 4px;
+}
+
+.is-sidebar-collapsed .slipr-panel-header > :not(.slipr-sidebar-toggle),
+.is-sidebar-collapsed .slipr-slide-filter-row,
+.is-sidebar-collapsed .slipr-slide-item-tools {
+  display: none;
+}
+
+.is-sidebar-collapsed .slipr-slide-items {
+  padding: 6px 4px;
+  gap: 3px;
+}
+
+.is-sidebar-collapsed .slipr-slide-item {
+  position: relative;
+  justify-content: center;
+  padding: 6px 0;
+}
+
+.is-sidebar-collapsed .slipr-slide-item-num {
+  width: auto;
+  text-align: center;
+  font-size: 12px;
+  color: var(--slipr-editor-text);
+}
+
+.is-sidebar-collapsed .slipr-slide-item.is-selected .slipr-slide-item-num {
+  color: var(--slipr-editor-text-strong);
+  font-weight: 700;
+}
+
+/* The title stays for screen readers (and as the item's tooltip). */
+.is-sidebar-collapsed .slipr-slide-item-info {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* More room for the preview: let the slide grow past its normal cap. */
+.is-sidebar-collapsed .slipr-preview-scaler {
+  max-width: 1280px;
+}

@@ -16,6 +16,7 @@ import { exportShow } from './export.js';
 import { exportZip } from './export-zip.js';
 import { mountShowGrid } from './ui/show-grid.js';
 import { openLibraryDialog } from './ui/library-dialog.js';
+import { savedCollapsed, setSidebarCollapsed } from './sidebar.js';
 import { mountGlossaryEditor } from './ui/glossary-editor.js';
 import { watchTheme } from './theme.js';
 import { mountToolbar } from './ui/toolbar.js';
@@ -188,6 +189,7 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
   // 4. Left sidebar (slide list)
   const sidebarEl = document.getElementById('slipr-editor-sidebar');
   if (sidebarEl) {
+    setSidebarCollapsed(savedCollapsed(), { remember: false }); // I-101: as it was last time
     mountSlideList(sidebarEl, store, { onGrid: () => grid.open() });
   }
 

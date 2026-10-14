@@ -4,6 +4,7 @@
  */
 
 import { openHelp } from './help.js';
+import { toggleSidebar } from './sidebar.js';
 
 /**
  * Register global keyboard shortcuts on the window.
@@ -52,6 +53,13 @@ export function registerShortcuts(store, { onSave, onPresent, onRead, onFindRepl
       e.preventDefault();
       const currentId = store.state.selectedSlideId;
       store.dispatch('addSlide', { afterSlideId: currentId, templateLayouts: store.state.template?.layouts });
+      return;
+    }
+
+    // Collapse or expand the slide list (I-101): Ctrl+\ / Cmd+\
+    if (mod && !e.altKey && !e.shiftKey && (e.key === '\\' || e.code === 'Backslash')) {
+      e.preventDefault();
+      toggleSidebar();
       return;
     }
 

@@ -10,6 +10,7 @@ import { h } from '../dom.js';
 import { slideTitle } from '../../../shared/render.js';
 import { dropIndex, matchSlides, navigateIndex } from '../slide-filter.js';
 import { openLayoutPicker } from './layout-picker.js';
+import { isSidebarCollapsed, toggleSidebar } from '../sidebar.js';
 
 /**
  * Mount the slide list sidebar into container.
@@ -94,7 +95,20 @@ export function mountSlideList(container, store, handlers = {}) {
   function renderHeader() {
     const state = store.state;
     const slides = Array.isArray(state.show?.slides) ? state.show.slides : [];
+    const collapsed = isSidebarCollapsed();
+    const toggleLabel = collapsed ? 'Show the slide list (Ctrl+\\)' : 'Collapse the slide list to make room for the preview (Ctrl+\\)';
     header.replaceChildren(
+      // I-101: collapse to a rail of slide numbers (◀), and back (▶); see ../sidebar.js.
+      h('button', {
+        type: 'button',
+        class: 'slipr-btn slipr-btn-sm slipr-sidebar-toggle',
+        'data-sidebar-toggle': '',
+        'aria-controls': 'slipr-editor-sidebar',
+        'aria-expanded': String(!collapsed),
+        'aria-label': toggleLabel,
+        title: toggleLabel,
+        onclick: () => toggleSidebar(),
+      }, [h('span', { class: 'slipr-sidebar-toggle-collapse', 'aria-hidden': 'true' }, ['◀']), h('span', { class: 'slipr-sidebar-toggle-expand', 'aria-hidden': 'true' }, ['▶'])]),
       h('div', { class: 'slipr-panel-title' }, [`Slides (${slides.length})`]),
       h('div', { class: 'slipr-panel-actions' }, [
         h(
@@ -183,6 +197,7 @@ export function mountSlideList(container, store, handlers = {}) {
         {
           class: `slipr-slide-item ${isSelected ? 'is-selected' : ''} ${isAudienceHidden ? 'is-audience-hidden' : ''}`,
           'data-slide-id': slide.id,
+          title: `${idx + 1}. ${title}`, // the collapsed rail (I-101) shows only the number
           draggable: 'true',
           tabindex: isSelected ? '0' : '-1',
           'aria-current': isSelected ? 'true' : undefined,
