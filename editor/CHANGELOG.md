@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Double-click in the show grid (I-100)
+- **Fixed** double-clicking a slide in the show grid did not open it: each click re-renders the cards, so the browser's `dblclick` never reached the grid. Two plain clicks on the same slide now close the grid, select the slide in the slide list and show it in the Slide tab and preview (Ctrl- and Shift-clicks still only select).
+
 ### 2026-10-14: Slide library (I-029)
 - **Added** a slide library in the browser (IndexedDB `slipr-library`): **Copy to library…** in the show grid's selection bar and **Copy current slide…** in the library copy slides with their files, reader layer and glossary terms, with tags, a note and a collection. **📚 Library** in the toolbar browses it (thumbnails in this show's template, search, tag / collection / template / source filters, sorting) and inserts the selected slides after the current one in one undo step: layouts switched when this template lacks them (content kept aside), links between inserted slides remapped and others removed, missing profiles removed, glossary terms added (the show's own win), files copied (renamed on a clash), chapter of the slide before. Manage entries (title, tags, note, collection, order by drag or ▲ ▼, update from the current slide, remove), collections, and export / import the library as a zip. Modules `js/library/` and `ui/library-dialog.js`; action `insertSlides`. Spec `docs/specs/I-029-slide-library.md`.
 

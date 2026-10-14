@@ -438,10 +438,23 @@ export function mountShowGrid(host, store) {
   }
 
   // ------------------------------------------------------------------ mouse
+  // A double-click opens the slide (I-100). Each click re-renders the cards, so
+  // the browser's own dblclick rarely fires (its two clicks hit different
+  // elements): count clicks on the same slide instead.
+  /** @type {{ id: string, at: number } | null} */
+  let lastClick = null;
+  const DOUBLE_CLICK_MS = 500;
   body.addEventListener('click', (e) => {
     const el = /** @type {HTMLElement} */ (e.target).closest('.slipr-grid-card');
     if (!(el instanceof HTMLElement)) return;
     const id = /** @type {string} */ (el.dataset.slideId);
+    const plain = !e.shiftKey && !e.ctrlKey && !e.metaKey;
+    if (plain && (e.detail >= 2 || (lastClick?.id === id && e.timeStamp - lastClick.at < DOUBLE_CLICK_MS))) {
+      lastClick = null;
+      openSlide(id);
+      return;
+    }
+    lastClick = plain ? { id, at: e.timeStamp } : null;
     if (e.shiftKey && anchorId) selected = new Set(selectRange(order(), anchorId, id));
     else if (e.ctrlKey || e.metaKey) {
       if (selected.has(id)) selected.delete(id);
