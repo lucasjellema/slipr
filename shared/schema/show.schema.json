@@ -474,7 +474,7 @@
       "properties": {
         "data": { "type": "string", "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!/).+\\.(geo)?json$", "description": "A GeoJSON file in the show folder (.geojson or .json)." },
         "title": { "type": "string" },
-        "tag": { "type": "string", "minLength": 1, "description": "Picks the layer's template color, like a marker's first tag." }
+        "tag": { "type": "string", "minLength": 1, "description": "Picks the layer's template color, like a marker's first tag. Without a tag the layer is background (land, borders): drawn in neutral colors, and left out of the fitted first view." }
       }
     },
     "mapTiles": {

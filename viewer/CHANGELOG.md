@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Map fixes (I-075)
+- **Fixed** the **Place…** list of a map leaves out places hidden by the tag filter.
+- **Added** background layers (a GeoJSON layer without a tag) draw in neutral colors under the rest; the first view fits the places, not the background.
+
 ### 2026-10-13: Maps (I-075)
 - **Added** map slides and blocks. Audience mode tours a map from place to place, click by click. Reader mode: drag to pan, + / −, Fit, click a pin or pick it from the Place… list to see its text and slide, filter by tag; the background map from OpenStreetMap waits for **Load**, like an embedded page. Reader search finds place titles and text.
 

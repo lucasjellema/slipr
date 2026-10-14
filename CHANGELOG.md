@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-14: Map background layers (I-075 follow-up)
+- **Added** a map layer without a `tag` is background: filled with the template's page color, outlined in its muted color, and left out of the fitted first view (unless the map has nothing else). Schema description and format docs.
+- **Changed** the demo's offline map block: an outline of the Netherlands as background (`shows/demo/data/netherlands.geojson`, the European part of Natural Earth 1:50m admin-0 countries v5.1.2, public domain, rounded to 4 decimals) under the route, with `zoom: 8` so some coast stays in view.
+- **Fixed** the map's **Place…** list offered places hidden by the tag filter, and picking one opened the panel of a pin that was not on the map.
+
 ### 2026-10-13: Maps (I-075, D-011 refined)
 - **Added** `vendor/leaflet-1.9.4/` (Leaflet, BSD-2-Clause, from npm `leaflet@1.9.4`, integrity checked; `dist/leaflet-src.esm.js`, `dist/leaflet.css` and its images, see its `VENDORED.md`).
 - **Added** to show format 0.2: the `map` slot and block types (`center`, `zoom`, `markers`, GeoJSON `layers`, `tiles`, `load`, `caption`, `fallback`; slots also `steps` and `present`; blocks also `title`). Schema `$defs/map`, `latLng`, `mapMarker`, `mapLayer`, `mapTiles`, `mapStep`, `blockMap`. Validation: a 0.1 show, no center / markers / layers, positions or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a bad layer address and `steps` / `present` on a block are errors; duplicate marker ids, unknown markers in steps, unknown marker slides, missing layer files and a tile server without attribution are warnings; marker Markdown is checked. Layer files join `collectImagePaths()`. Template slot type `map`.

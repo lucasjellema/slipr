@@ -313,7 +313,7 @@ Places on an interactive map, drawn with the vendored Leaflet (D-011), loaded on
 |---|---|
 | `center`, `zoom` | The first view: `{ "lat", "lng" }` and a zoom level (0–22). Without a center the view fits the markers and layers, and `zoom` is the most it zooms in |
 | `markers` | `lat`, `lng` (required), `title`, `md` (shown when a reader selects the place), `tags` (the first picks the color), `slide` (the place links to that slide), `id` (for steps) |
-| `layers` | GeoJSON files in the show folder (`.geojson` / `.json`): `data` (required), `title`, `tag` (the color). Checked, exported and opened from folders like images |
+| `layers` | GeoJSON files in the show folder (`.geojson` / `.json`): `data` (required), `title`, `tag` (the color). A layer without a `tag` is background (land, borders): neutral colors, and not part of the fitted first view. Checked, exported and opened from folders like images |
 | `tiles` | The background. Absent: OpenStreetMap (with its attribution). An `https:` URL template with `{z}/{x}/{y}`, or `{ "url", "attribution", "maxZoom" }` (attribution as plain text): another tile server. A relative template (`tiles/{z}/{x}/{y}.png`): tiles in the show folder (shows served by URL only, for now). `"none"`: no background, nothing loaded from a server |
 | `steps` | Slots in audience mode only: one per click, after the slide's own fragments. `{ "marker": id, "zoom"? }` flies to that place (zoom 12 by default) and shows its name. Going back works |
 | `present` | Slots, audience mode: `"live"` (default) loads the tiles; `"static"` shows the fallback and contacts nothing |

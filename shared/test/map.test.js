@@ -170,6 +170,6 @@ describe('map validation (I-075)', () => {
     assert.ok(w(withMap({ markers, tiles: 'https://t.example.org/{z}/{x}/{y}.png' })).includes('tile-attribution'));
     assert.ok(!w(withMap({ markers })).includes('tile-attribution'), 'OpenStreetMap needs none from the author');
     const { warnings } = validateShow(clone(demo), { template, imageExists: (src) => src !== 'data/route.geojson' });
-    assert.ok(warnings.some((x) => x.code === 'missing-file' && x.path.endsWith('.layers[0].data')));
+    assert.ok(warnings.some((x) => x.code === 'missing-file' && x.path.endsWith('.layers[1].data')));
   });
 });

@@ -340,10 +340,14 @@ export async function hydrate(el, live) {
   }
 
   // GeoJSON layers: lines and areas in the layer's tag color; points as small circles.
+  // A layer without a tag is background (land, borders): the template's page color, a muted outline.
   const overlays = layerDefs.map((def, i) => {
-    const color = colorOf(def.tag);
+    const color = def.tag ? colorOf(def.tag) : theme.muted;
+    const style = def.tag
+      ? { color, weight: 3, opacity: 0.9, fillColor: color, fillOpacity: 0.18 }
+      : { color, weight: 1.2, opacity: 0.8, fillColor: theme.bg, fillOpacity: 1 };
     return L.geoJSON(geojson[i], {
-      style: () => ({ color, weight: 3, opacity: 0.9, fillColor: color, fillOpacity: 0.18 }),
+      style: () => style,
       pointToLayer: (/** @type {any} */ _f, /** @type {any} */ at) => L.circleMarker(at, { radius: 6, color, weight: 2, fillColor: color, fillOpacity: 0.7 }),
       onEachFeature: (/** @type {any} */ feature, /** @type {any} */ layer) => {
         const name = feature?.properties?.name ?? feature?.properties?.title ?? def.title;
@@ -399,9 +403,11 @@ export async function hydrate(el, live) {
     }
     const bounds = L.latLngBounds([]);
     for (const m of markers) bounds.extend([m.lat, m.lng]);
-    for (const o of overlays) if (o.getBounds().isValid()) bounds.extend(o.getBounds());
+    // Background layers (no tag) are context: the view fits them only when nothing else is there.
+    const focus = overlays.filter((_, i) => layerDefs[i].tag);
+    for (const o of (markers.length || focus.length ? focus : overlays)) if (o.getBounds().isValid()) bounds.extend(o.getBounds());
     if (!bounds.isValid()) map.setView([0, 0], 1, { animate: false });
-    else if (markers.length === 1 && !overlays.length) map.setView(bounds.getCenter(), Number.isFinite(own.zoom) ? own.zoom : STEP_ZOOM, { animate: false });
+    else if (markers.length === 1 && !layerDefs.some((l) => l.tag)) map.setView(bounds.getCenter(), Number.isFinite(own.zoom) ? own.zoom : STEP_ZOOM, { animate: false });
     else {
       // A margin that scales with the map, and room above for the pins (32 px tall).
       const size = map.getSize();
@@ -502,6 +508,8 @@ function readerControls(el, map, markers, pins, colors, theme, home) {
     make('option', { value: '' }, ['Place…']),
     ...order.map(({ m, i }) => make('option', { value: String(i) }, [m.title])),
   ]));
+  /** @param {number} index @returns {HTMLOptionElement | null} */
+  const optionOf = (index) => picker.querySelector(`option[value="${index}"]`);
 
   /** @type {number | null} */
   let current = null;
@@ -510,7 +518,11 @@ function readerControls(el, map, markers, pins, colors, theme, home) {
     if (current !== null) pins[current]?.getElement()?.classList.remove('slipr-map-pin--selected');
     current = index;
     picker.value = index === null ? '' : String(index);
-    const m = index === null ? null : markers[index];
+    const m = index === null || !map.hasLayer(pins[index]) ? null : markers[index]; // a hidden place cannot be selected
+    if (!m) {
+      current = null;
+      picker.value = '';
+    }
     panel.replaceChildren();
     panel.hidden = !m;
     if (!m || index === null) return;
@@ -552,6 +564,12 @@ function readerControls(el, map, markers, pins, colors, theme, home) {
           if (current === i) select(null);
           pins[i].remove();
         } else if (!hide && !map.hasLayer(pins[i])) pins[i].addTo(map);
+        // The Place… list offers only the places on show.
+        const option = optionOf(i);
+        if (option) {
+          option.hidden = hide;
+          option.disabled = hide;
+        }
       });
     });
     return chip;
@@ -571,7 +589,7 @@ function readerControls(el, map, markers, pins, colors, theme, home) {
 }
 
 /**
- * @typedef {{ palette: string[] }} Theme
+ * @typedef {{ palette: string[], muted: string, bg: string }} Theme
  */
 
 /**
@@ -584,5 +602,9 @@ function themeOf(el) {
   const v = (/** @type {string} */ name, /** @type {string} */ fallback) => style.getPropertyValue(name).trim() || fallback;
   // Without the template's palette: its primary and accent, then four neutral colors.
   const defaults = [v('--slipr-color-primary', '#1F3A5F'), v('--slipr-color-accent', '#F2A900'), '#2A9D8F', '#7B5EA7', '#C8553D', '#5B6573'];
-  return { palette: defaults.map((d, i) => v(`--slipr-graph-${i + 1}`, d)) };
+  return {
+    palette: defaults.map((d, i) => v(`--slipr-graph-${i + 1}`, d)),
+    muted: v('--slipr-color-muted', '#5B6573'),
+    bg: v('--slipr-color-bg', '#FFFFFF'),
+  };
 }

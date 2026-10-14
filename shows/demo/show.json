@@ -797,8 +797,13 @@
             "id": "map-offline",
             "type": "map",
             "title": "The route, fully offline",
+            "zoom": 8,
             "tiles": "none",
             "layers": [
+              {
+                "data": "data/netherlands.geojson",
+                "title": "The Netherlands"
+              },
               {
                 "data": "data/route.geojson",
                 "title": "Route",
@@ -831,7 +836,7 @@
                 ]
               }
             ],
-            "caption": "No tiles: the route comes from a GeoJSON file in the show folder, so nothing leaves your browser."
+            "caption": "No tiles: the outline and the route are GeoJSON files in the show folder, so nothing leaves your browser."
           }
         ]
       }

@@ -406,7 +406,7 @@ describe('robustness', () => {
 
 describe('helpers', () => {
   test('collectImagePaths lists unique image sources, local PDFs, graph data files and map layers', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['data/route.geojson', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
+    assert.deepEqual(collectImagePaths(demo).sort(), ['data/netherlands.geojson', 'data/route.geojson', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {
