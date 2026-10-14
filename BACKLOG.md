@@ -83,12 +83,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-034** [viewer] Show my pins and notes in audience mode too (presenter's private view, e.g. in the speaker window), and pins on reader-block images (hotspot-style)
 
 ### Editor
-- [ ] **I-103** [editor] **Enlarged preview in a near-full-page dialog**, for easier editing of text elements, extra images and other things placed on the slide:
-  - A **⤢ Enlarge** button in the preview header (and a shortcut, e.g. `F11` or `Ctrl+Shift+E`) opens the slide preview in a modal dialog that fills almost the whole window (e.g. 96 vw × 92 vh, the slide scaled to fit at 16:9); **Esc**, ✕ or the button again closes it.
-  - Same renderer and the same editing as the side pane: select, drag, resize and keyboard-move extra images and text elements (`mountOverlayEditor`), double-click a text element to edit its text; every change is one undo step, and the side pane and form follow while the dialog is open.
-  - A slim bar in the dialog: slide number and title with ‹ › to the previous / next slide (or PageUp / PageDown), Audience / Reader switch, and a compact panel (or the selected element's style controls) so a text element can be styled without closing the dialog.
-  - Focus moves into the dialog and back to the button on close; works in light and dark theme; theme tokens only.
-  - Update `editor/help.html` (Live preview) and the shortcut table. · todo · —
 - [ ] **I-021** [editor] Text-overflow detection: warn when content does not fit the layout at 1920×1080
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
@@ -163,6 +157,12 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-103** [editor] **Enlarged preview in a near-full-page dialog**, for easier editing of text elements, extra images and other things placed on the slide:
+  - A **⤢ Enlarge** button in the preview header (and a shortcut, e.g. `F11` or `Ctrl+Shift+E`) opens the slide preview in a modal dialog that fills almost the whole window (e.g. 96 vw × 92 vh, the slide scaled to fit at 16:9); **Esc**, ✕ or the button again closes it.
+  - Same renderer and the same editing as the side pane: select, drag, resize and keyboard-move extra images and text elements (`mountOverlayEditor`), double-click a text element to edit its text; every change is one undo step, and the side pane and form follow while the dialog is open.
+  - A slim bar in the dialog: slide number and title with ‹ › to the previous / next slide (or PageUp / PageDown), Audience / Reader switch, and a compact panel (or the selected element's style controls) so a text element can be styled without closing the dialog.
+  - Focus moves into the dialog and back to the button on close; works in light and dark theme; theme tokens only.
+  - Update `editor/help.html` (Live preview) and the shortcut table. Built with `Ctrl+Shift+E` and the *Extra images and text* section as the panel beside the slide. `editor/js/ui/preview-dialog.js` · done 2026-10-14 · claude
 - [x] **I-102** [editor] **One-row top bar, grouped by task** (proposal 2026-10-14; the bar now has 17 controls on two rows). Saves a row of height (about 45 px) for the form and preview:
   - **File ▾** menu next to the show title: New show…, Open folder… (new shortcut `Ctrl+O`), Open zip…, the recent shows (the start screen's remembered folders), Save (`Ctrl+S`), Export as one HTML file…, Export as zip…. Replaces six buttons; the two exports get clear names.
   - Show title with the unsaved-changes dot, then **Save** as the one visible primary button.

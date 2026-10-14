@@ -39,7 +39,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |
 | Show settings | Metadata, presentation settings, chapters, profiles, glossary, reading routes | [Show settings](help.html#settings) |
 | Glossary | Terms with definitions that readers open in a popup; insert them with the toolbar; deletes that keep the words | [Glossary](help.html#glossary) |
-| Preview | Audience or reader view, as any profile at any depth, with the slide's errors and warnings | [Live preview](help.html#preview) |
+| Preview | Audience or reader view, as any profile at any depth, with the slide's errors and warnings; enlarge it to almost the whole window to place and edit images and text on the slide | [Live preview](help.html#preview) |
 | Find and replace | Across slides, notes, reader blocks and settings; one undo step | [Find and replace](help.html#find) |
 | Present and Read | Save, then open the viewer at the selected slide | [Present and Read](help.html#present) |
 | Export | One HTML file with show, template and viewer that presents offline (unsaved changes included) | [Export as one file](help.html#export) |

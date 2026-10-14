@@ -9,9 +9,9 @@ import { toggleSidebar } from './sidebar.js';
 /**
  * Register global keyboard shortcuts on the window.
  * @param {import('./store.js').EditorStore} store
- * @param {{ onSave?: () => void, onOpen?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
+ * @param {{ onSave?: () => void, onOpen?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void, onEnlarge?: () => void }} [handlers]
  */
-export function registerShortcuts(store, { onSave, onOpen, onPresent, onRead, onFindReplace } = {}) {
+export function registerShortcuts(store, { onSave, onOpen, onPresent, onRead, onFindReplace, onEnlarge } = {}) {
   window.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().includes('MAC');
     const mod = isMac ? e.metaKey : e.ctrlKey;
@@ -45,6 +45,13 @@ export function registerShortcuts(store, { onSave, onOpen, onPresent, onRead, on
     if (mod && !e.altKey && !e.shiftKey && (e.key === 'o' || e.key === 'O')) {
       e.preventDefault();
       if (onOpen) onOpen();
+      return;
+    }
+
+    // Enlarged preview, open or close (I-103): Ctrl+Shift+E / Cmd+Shift+E
+    if (mod && e.shiftKey && !e.altKey && (e.key === 'e' || e.key === 'E')) {
+      e.preventDefault();
+      if (onEnlarge) onEnlarge();
       return;
     }
 

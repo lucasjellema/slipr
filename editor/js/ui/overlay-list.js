@@ -15,7 +15,7 @@ import { h } from '../dom.js';
 import { addImageToOverlay, addOverlayImage } from '../image-input.js';
 import { imageField, runImage } from './image-field.js';
 import {
-  selectOverlay, selectedOverlay, showOverlaySelected, focusOverlayText,
+  selectOverlay, selectedOverlay, showOverlaySelected, focusOverlayText, overlayRoot,
   isOverlayExpanded, setOverlayExpanded, remapOverlayExpanded, showOverlayRowExpanded,
 } from './overlay-editor.js';
 import { pictureStyleControls } from './picture-style.js';
@@ -28,9 +28,11 @@ const EFFECTS = ['fade-in', 'fade-up', 'fade-down', 'fade-left', 'fade-right', '
 /**
  * @param {any} slide
  * @param {import('../store.js').EditorStore} store
+ * @param {{ idPrefix?: string }} [options]  idPrefix: keeps element ids unique when the
+ *   section is shown twice (the Slide tab and the enlarged preview, I-103).
  * @returns {HTMLElement}
  */
-export function buildOverlaySection(slide, store) {
+export function buildOverlaySection(slide, store, { idPrefix = 'slipr-overlay' } = {}) {
   const overlays = Array.isArray(slide.overlays) ? slide.overlays : [];
   const slideId = slide.id;
   const resolveAsset = store.state.resolveAsset;
@@ -47,9 +49,9 @@ export function buildOverlaySection(slide, store) {
       resolveAsset,
       onFile: (file) => runImage(() => addImageToOverlay(store, { slideId, index: i, file })),
     }),
-    h('label', { class: 'slipr-label', for: `slipr-overlay-alt-${i}` }, ['Alt text']),
+    h('label', { class: 'slipr-label', for: `${idPrefix}-alt-${i}` }, ['Alt text']),
     h('input', {
-      id: `slipr-overlay-alt-${i}`,
+      id: `${idPrefix}-alt-${i}`,
       type: 'text',
       class: 'slipr-input',
       value: o.image?.alt ?? '',
@@ -70,9 +72,10 @@ export function buildOverlaySection(slide, store) {
 
   /** The text and the look of a text element (D-016). @param {any} o @param {number} i */
   const textFields = (o, i) => [
-    h('label', { class: 'slipr-label', for: `slipr-overlay-text-${i}` }, ['Text']),
+    h('label', { class: 'slipr-label', for: `${idPrefix}-text-${i}` }, ['Text']),
     h('textarea', {
-      id: `slipr-overlay-text-${i}`,
+      id: `${idPrefix}-text-${i}`,
+      'data-overlay-text': String(i),
       class: 'slipr-textarea slipr-overlay-text-input',
       rows: '2',
       placeholder: 'The text; **bold**, *italic*, [[glossary-id]]; Enter starts a new line',
@@ -82,7 +85,7 @@ export function buildOverlaySection(slide, store) {
       },
     }, [o.text]),
     textStyleControls({
-      id: `slipr-overlay-style-${i}`,
+      id: `${idPrefix}-style-${i}`,
       label: `Text ${i + 1}`,
       style: o.style,
       palette,
@@ -103,7 +106,7 @@ export function buildOverlaySection(slide, store) {
     /** @type {const} */ ([['x', 'Left'], ['y', 'Top'], ['w', 'Width'], ['h', 'Height']]).map(([key, text]) => h('label', { class: 'slipr-text-style-field slipr-text-style-number' }, [
       h('span', { class: 'slipr-label' }, [`${text} %`]),
       h('input', {
-        id: `slipr-overlay-${key}-${i}`,
+        id: `${idPrefix}-${key}-${i}`,
         type: 'number', class: 'slipr-input', min: '0', max: '100', step: '0.5',
         value: String(Math.round(o[key] * 1000) / 10),
         onchange: (/** @type {Event} */ e) => {
@@ -124,7 +127,7 @@ export function buildOverlaySection(slide, store) {
     const isText = typeof o.text === 'string';
     const what = `${isText ? 'text' : 'image'} ${i + 1}`;
     const open = isOverlayExpanded(slideId, i);
-    const bodyId = `slipr-overlay-body-${i}`;
+    const bodyId = `${idPrefix}-body-${i}`;
     const summary = (isText ? o.text.replace(/\s+/g, ' ').trim() : o.image?.alt ?? '') || (isText ? '(no text)' : '(no alt text)');
     /** @type {HTMLElement} */
     const row = h('li', {
@@ -176,9 +179,9 @@ export function buildOverlaySection(slide, store) {
       h('div', { id: bodyId, class: 'slipr-overlay-row-body', hidden: open ? undefined : true }, [
         positionFields(o, i),
         ...(isText ? textFields(o, i) : imageFields(o, i)),
-        h('label', { class: 'slipr-label', for: `slipr-overlay-fragment-${i}` }, ['In audience mode']),
+        h('label', { class: 'slipr-label', for: `${idPrefix}-fragment-${i}` }, ['In audience mode']),
         h('select', {
-          id: `slipr-overlay-fragment-${i}`,
+          id: `${idPrefix}-fragment-${i}`,
           class: 'slipr-select',
           onchange: (/** @type {Event} */ e) => {
             const v = /** @type {HTMLSelectElement} */ (e.target).value;
@@ -232,6 +235,6 @@ export function buildOverlaySection(slide, store) {
 /** Focus the selected box on the preview once it has re-rendered. */
 function queueFocus() {
   setTimeout(() => {
-    /** @type {HTMLElement | null} */ (document.querySelector('.slipr-overlay-box.is-selected'))?.focus({ preventScroll: false });
+    /** @type {HTMLElement | null} */ (overlayRoot().querySelector('.slipr-overlay-box.is-selected'))?.focus({ preventScroll: false });
   }, 250);
 }

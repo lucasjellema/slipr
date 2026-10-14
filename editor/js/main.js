@@ -25,6 +25,7 @@ import { mountSlideForm } from './ui/slide-form.js';
 import { mountReaderForm } from './ui/reader-form.js';
 import { mountShowSettings } from './ui/show-settings.js';
 import { mountPreview } from './ui/preview.js';
+import { togglePreviewDialog } from './ui/preview-dialog.js';
 import { renderAccessScreen, renderStartScreen, showBanner, checkDraftRecovery } from './ui/dialogs.js';
 import { openFindReplaceDialog } from './ui/find-replace.js';
 import { registerShortcuts } from './shortcuts.js';
@@ -210,7 +211,7 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
   // 6. Right viewport (live preview)
   const previewEl = document.getElementById('slipr-editor-preview');
   if (previewEl) {
-    mountPreview(previewEl, store);
+    mountPreview(previewEl, store, { onEnlarge: () => togglePreviewDialog(store) });
   }
 
   // 7. Paste an image anywhere outside a text field: it goes into the current
@@ -238,6 +239,7 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
     onOpen: () => run(() => (canOpenFolders() ? openFolder(store) : openZipFile(store))),
     onPresent: () => present('audience'),
     onFindReplace: () => openFindReplaceDialog(store),
+    onEnlarge: () => togglePreviewDialog(store),
   });
 
   // 9. Draft autosave and crash recovery (I-020)

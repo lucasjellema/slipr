@@ -6,19 +6,27 @@
 
 import { h } from '../dom.js';
 import { issuesForSlide } from '../store.js';
-import { renderSlide } from '../../../shared/render.js';
+import { renderSlide, slideTitle } from '../../../shared/render.js';
 import { renderBlocks } from '../../../shared/blocks.js';
 import { hydrateEmbeds } from '../../../shared/embeds/index.js';
 import { readShowFile } from '../io/show-files.js';
 import { blockVisible, personalize } from '../../../viewer/reader/personalize.js';
 import { mountOverlayEditor, onOverlaySelection } from './overlay-editor.js';
 
+/** Shortcut that opens and closes the enlarged preview (I-103). */
+export const ENLARGE_SHORTCUT = 'Ctrl+Shift+E';
+
 /**
  * Mount the live preview pane into container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
+ * @param {{ onEnlarge?: () => void, enlarged?: { onClose: () => void } }} [options]
+ *   onEnlarge: shows the ⤢ Enlarge button. enlarged: the pane inside the enlarged
+ *   preview dialog (I-103), with slide navigation and a close button instead.
+ * @returns {{ destroy: () => void }}
  */
-export function mountPreview(container, store) {
+export function mountPreview(container, store, options = {}) {
+  const { onEnlarge, enlarged } = options;
   const root = h('div', { class: 'slipr-preview-pane' });
   container.append(root);
 
@@ -102,8 +110,27 @@ export function mountPreview(container, store) {
     }
 
     const header = h('div', { class: 'slipr-preview-header' }, [
+      enlarged ? slideNavigation(store) : null,
       modeGroup,
       h('div', { class: 'slipr-preview-sim-controls' }, simControls),
+      enlarged
+        ? h('button', {
+            type: 'button',
+            class: 'slipr-btn slipr-btn-sm slipr-preview-close',
+            title: `Close the enlarged preview (Esc or ${ENLARGE_SHORTCUT})`,
+            'aria-label': 'Close the enlarged preview',
+            onclick: () => enlarged.onClose(),
+          }, ['✕'])
+        : onEnlarge
+          ? h('button', {
+              type: 'button',
+              class: 'slipr-btn slipr-btn-sm slipr-btn-icon slipr-preview-enlarge',
+              title: `Enlarge the preview to almost the whole window, to place and edit things on the slide (${ENLARGE_SHORTCUT})`,
+              'aria-label': 'Enlarge the preview',
+              'aria-haspopup': 'dialog',
+              onclick: () => onEnlarge(),
+            }, [h('span', { 'aria-hidden': 'true' }, ['⤢'])])
+          : null,
     ]);
 
     // 2. Viewport
@@ -195,9 +222,9 @@ export function mountPreview(container, store) {
     hydrateEmbeds(viewport, { readAsset: (path) => readShowFile(store.state, path) });
   }
 
-  onOverlaySelection(scheduleRender);
+  const stopSelection = onOverlaySelection(scheduleRender);
 
-  store.subscribe(({ changedKeys }) => {
+  const unsubscribe = store.subscribe(({ changedKeys }) => {
     if (
       changedKeys.includes('show') ||
       changedKeys.includes('selectedSlideId') ||
@@ -211,4 +238,44 @@ export function mountPreview(container, store) {
   });
 
   render();
+
+  return {
+    destroy() {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      stopSelection();
+      unsubscribe();
+      root.remove();
+    },
+  };
 }
+
+/**
+ * ‹ 3 / 20: title › for the enlarged preview (I-103). PageUp / PageDown do the
+ * same (global shortcuts).
+ * @param {import('../store.js').EditorStore} store
+ */
+function slideNavigation(store) {
+  const slides = store.state.show?.slides ?? [];
+  const index = slides.findIndex((/** @type {any} */ s) => s.id === store.state.selectedSlideId);
+  const slide = slides[index];
+  const go = (/** @type {number} */ step) => {
+    const next = slides[index + step];
+    if (next) store.selectSlide(next.id);
+  };
+  const title = slide ? slideTitle(slide) || `Slide ${index + 1}` : '';
+  return h('div', { class: 'slipr-preview-nav', role: 'group', 'aria-label': 'Slide' }, [
+    h('button', {
+      type: 'button', class: 'slipr-btn slipr-btn-sm slipr-btn-icon', title: 'Previous slide (PageUp)', 'aria-label': 'Previous slide',
+      disabled: index <= 0 ? true : undefined, onclick: () => go(-1),
+    }, ['‹']),
+    h('span', { class: 'slipr-preview-nav-label', title, 'aria-live': 'polite' }, [
+      h('span', { class: 'slipr-preview-nav-number' }, [`${index + 1} / ${slides.length}`]),
+      title ? ` ${title}` : '',
+    ]),
+    h('button', {
+      type: 'button', class: 'slipr-btn slipr-btn-sm slipr-btn-icon', title: 'Next slide (PageDown)', 'aria-label': 'Next slide',
+      disabled: index < 0 || index >= slides.length - 1 ? true : undefined, onclick: () => go(1),
+    }, ['›']),
+  ]);
+}
+

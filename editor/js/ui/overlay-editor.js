@@ -43,9 +43,23 @@ export function showOverlaySelected(slideId, index = -1) {
   for (const fn of listeners) fn();
 }
 
-/** Call fn when showOverlaySelected changes the selection. @param {() => void} fn */
+/**
+ * Call fn when showOverlaySelected changes the selection.
+ * @param {() => void} fn
+ * @returns {() => void}  Stops calling it.
+ */
 export function onOverlaySelection(fn) {
   listeners.add(fn);
+  return () => listeners.delete(fn);
+}
+
+/**
+ * Where overlays are edited now: the enlarged preview while it is open (I-103),
+ * else the page. The page behind a modal dialog cannot take focus.
+ * @returns {ParentNode}
+ */
+export function overlayRoot() {
+  return document.querySelector('dialog.slipr-preview-dialog[open]') ?? document;
 }
 
 /** The selected extra image of a slide, or -1. @param {string} slideId */
@@ -98,13 +112,14 @@ export function showOverlayRowExpanded(row, slideId, index, open) {
 }
 
 /**
- * Focus a text element's text area in the Slide tab once the form has
- * re-rendered (after adding one, or a double-click on the preview).
+ * Focus a text element's text area once the form has re-rendered (after
+ * adding one, or a double-click on the preview): in the Slide tab, or in the
+ * enlarged preview's panel while that is open (I-103).
  * @param {number} index @param {{ select?: boolean }} [options]
  */
 export function focusOverlayText(index, options = {}) {
   setTimeout(() => {
-    const area = /** @type {HTMLTextAreaElement | null} */ (document.getElementById(`slipr-overlay-text-${index}`));
+    const area = /** @type {HTMLTextAreaElement | null} */ (overlayRoot().querySelector(`textarea[data-overlay-text="${index}"]`));
     if (!area) return;
     area.focus({ preventScroll: true });
     area.scrollIntoView({ block: 'nearest' });
@@ -121,8 +136,14 @@ export function focusOverlayText(index, options = {}) {
 export function revealOverlayRow(slideId, index) {
   for (const row of document.querySelectorAll('.slipr-overlay-row.is-selected')) row.classList.remove('is-selected');
   if (index < 0) return;
-  const row = /** @type {HTMLElement | null} */ (document.querySelector(`.slipr-overlay-row[data-overlay-index="${index}"]`));
-  if (!row) return;
+  // The Slide tab's row, and the enlarged preview's while it is open (I-103).
+  for (const row of /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll(`.slipr-overlay-row[data-overlay-index="${index}"]`))) {
+    revealRow(row, slideId, index);
+  }
+}
+
+/** @param {HTMLElement} row @param {string} slideId @param {number} index */
+function revealRow(row, slideId, index) {
   row.classList.add('is-selected');
   showOverlayRowExpanded(row, slideId, index, true);
   // Scroll only when part of the row is out of sight, then bring its head to the top.
@@ -135,6 +156,16 @@ export function revealOverlayRow(slideId, index) {
     const instant = document.hidden || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     row.scrollIntoView({ block: 'start', behavior: instant ? 'auto' : 'smooth' });
   }
+}
+
+/**
+ * Edit a text element's text: in the enlarged preview's panel while it is
+ * open, else in the Slide tab.
+ * @param {import('../store.js').EditorStore} store @param {number} index
+ */
+function editText(store, index) {
+  if (overlayRoot() === document) store.setActiveTab('slide');
+  focusOverlayText(index, { select: true });
 }
 
 /** @param {number} n */
@@ -285,8 +316,7 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
     } else if (e.key === 'Enter' && typeof o.text === 'string' && selectedOverlay(slideId) === index) {
       // The keyboard way to a double-click: edit the selected text.
       done();
-      store.setActiveTab('slide');
-      focusOverlayText(index, { select: true });
+      editText(store, index);
     } else if (e.key === 'Enter' || e.key === ' ') {
       done();
       select(index);
@@ -296,8 +326,7 @@ export function mountOverlayEditor(slideEl, slide, store, options = {}) {
     const boxEl = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-overlay-box');
     if (!(boxEl instanceof HTMLElement) || !boxEl.classList.contains('is-text')) return;
     e.preventDefault();
-    store.setActiveTab('slide');
-    focusOverlayText(Number(boxEl.dataset.index), { select: true });
+    editText(store, Number(boxEl.dataset.index));
   });
   layer.addEventListener('focusin', (e) => {
     const boxEl = /** @type {HTMLElement} */ (e.target).closest?.('.slipr-overlay-box');
