@@ -11,7 +11,7 @@ import { createStore } from './store.js';
 import { addStylesheet, h, isTextEntry } from './dom.js';
 import { addImageToSlot, imageFileFrom, pasteTargetSlot } from './image-input.js';
 import { canOpenFolders, ensurePermission, hasPermission } from './io/fs-access.js';
-import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, openZipFile, save } from './files.js';
+import { goToFolder, guardUnsavedChanges, newShow, openFolder, openRecentFolder, openViewer, openZipFile, save } from './files.js';
 import { exportShow } from './export.js';
 import { exportZip } from './export-zip.js';
 import { mountShowGrid } from './ui/show-grid.js';
@@ -183,6 +183,12 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
       onFindReplace: () => openFindReplaceDialog(store),
+      canOpenFolders: canOpenFolders(),
+      // The start screen's remembered folders, without the one that is open.
+      listRecent: async () => (await listFolders())
+        .filter((r) => r.key !== new URLSearchParams(location.search).get('folder'))
+        .slice(0, 8),
+      onRecent: (key) => run(() => openRecentFolder(store, key)),
     });
   }
 
@@ -228,6 +234,8 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
   // 8. Global shortcuts
   registerShortcuts(store, {
     onSave: () => run(() => save(store)),
+    // Ctrl+O (I-102): a folder where the browser can open one, else a zip.
+    onOpen: () => run(() => (canOpenFolders() ? openFolder(store) : openZipFile(store))),
     onPresent: () => present('audience'),
     onFindReplace: () => openFindReplaceDialog(store),
   });

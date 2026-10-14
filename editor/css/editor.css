@@ -93,26 +93,20 @@ body.slipr-editor-app {
   overflow: hidden;
 }
 
-/* ---------- Toolbar ---------- */
+/* ---------- Toolbar (one row, grouped by task; I-102) ---------- */
 
 .slipr-toolbar {
   min-height: 48px;
   background: var(--slipr-editor-surface);
   border-bottom: 1px solid var(--slipr-editor-border);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  justify-content: space-between;
   padding: 6px 16px;
-  gap: 8px 12px;
+  gap: 12px;
   flex-shrink: 0;
-}
-
-.slipr-toolbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+  position: relative;
+  z-index: 50; /* menus open over the panels */
 }
 
 .slipr-logo-text {
@@ -122,27 +116,34 @@ body.slipr-editor-app {
   color: var(--slipr-editor-text-strong);
 }
 
-.slipr-toolbar-badge {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  background: var(--slipr-editor-surface-raised);
-  padding: 2px 6px;
-  border-radius: 4px;
-  color: var(--slipr-editor-muted);
+.slipr-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* In a narrow window the title gives way first. */
+.slipr-toolbar-start {
+  flex: 0 1 auto;
+  min-width: 0;
+  gap: 8px;
+}
+
+.slipr-toolbar-end {
+  margin-left: auto;
 }
 
 .slipr-toolbar-title {
   font-size: 14px;
   color: var(--slipr-editor-text);
   font-weight: 500;
-  margin-left: 8px;
-  border-left: 1px solid var(--slipr-editor-border);
-  padding-left: 12px;
+  min-width: 3em;
   max-width: 320px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  flex: 0 1 auto;
 }
 
 .slipr-dirty-dot {
@@ -150,10 +151,186 @@ body.slipr-editor-app {
   font-size: 14px;
 }
 
-.slipr-toolbar-group {
+.slipr-toolbar .slipr-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.slipr-btn-icon {
+  min-width: 32px;
+  justify-content: center;
+}
+
+/* Narrow windows: Grid, Glossary and Library move into ⋯ instead of wrapping. */
+@media (max-width: 1100px) {
+  .slipr-toolbar-views {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .slipr-toolbar,
+  .slipr-toolbar .slipr-toolbar-group {
+    padding-inline: 8px;
+    gap: 4px;
+  }
+
+  .slipr-toolbar .slipr-toolbar-group {
+    padding-inline: 0;
+  }
+
+  .slipr-toolbar-title {
+    min-width: 0;
+  }
+}
+
+/* Phone width: the title and the labels of Read and Present give way. */
+@media (max-width: 480px) {
+  .slipr-logo-text,
+  .slipr-toolbar-title,
+  .slipr-toolbar .slipr-btn-text {
+    display: none;
+  }
+}
+
+/* ---------- Menus (File ▾, ⋯ More; I-102) ---------- */
+
+.slipr-menu-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.slipr-menu-button[aria-expanded="true"] {
+  background: var(--slipr-editor-hover);
+  border-color: var(--slipr-editor-border-strong);
+}
+
+.slipr-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  min-width: 240px;
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: var(--slipr-editor-surface-raised);
+  border: 1px solid var(--slipr-editor-border-strong);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px var(--slipr-editor-shadow);
+  padding: 4px;
+  z-index: 100;
+}
+
+.slipr-menu[hidden] {
+  display: none;
+}
+
+.slipr-menu-start {
+  left: 0;
+}
+
+.slipr-menu-end {
+  right: 0;
+}
+
+.slipr-menu-item {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--slipr-editor-text);
+  font: inherit;
+  font-size: 13px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.slipr-menu-item:hover,
+.slipr-menu-item:focus {
+  background: var(--slipr-editor-hover);
+  outline: none;
+}
+
+.slipr-menu-item:focus-visible {
+  outline: 2px solid var(--slipr-editor-indicator);
+  outline-offset: -2px;
+}
+
+.slipr-menu-item[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.slipr-menu-item[role="menuitemradio"]::before {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  flex-shrink: 0;
+  margin-right: -8px;
+}
+
+.slipr-menu-item[aria-checked="true"]::before {
+  content: '✓';
+  color: var(--slipr-editor-indicator);
+}
+
+.slipr-menu-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.slipr-menu-label > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slipr-menu-detail {
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-menu-hint {
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--slipr-editor-muted);
+  white-space: nowrap;
+}
+
+.slipr-menu-heading {
+  padding: 6px 10px 2px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--slipr-editor-muted);
+}
+
+.slipr-menu-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--slipr-editor-border);
+}
+
+.slipr-menu .is-narrow-only {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .slipr-menu .is-narrow-only {
+    display: flex;
+  }
+
+  .slipr-menu .slipr-menu-separator.is-narrow-only {
+    display: block;
+  }
 }
 
 /* ---------- Buttons & Inputs ---------- */
@@ -1792,12 +1969,6 @@ body.is-screen #slipr-editor-banners {
 }
 
 .slipr-grid-selection .slipr-select {
-  width: auto;
-}
-
-/* ---------- Theme switch (I-082) ---------- */
-
-.slipr-theme-select {
   width: auto;
 }
 

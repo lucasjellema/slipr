@@ -89,16 +89,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - A slim bar in the dialog: slide number and title with ‹ › to the previous / next slide (or PageUp / PageDown), Audience / Reader switch, and a compact panel (or the selected element's style controls) so a text element can be styled without closing the dialog.
   - Focus moves into the dialog and back to the button on close; works in light and dark theme; theme tokens only.
   - Update `editor/help.html` (Live preview) and the shortcut table. · todo · —
-- [ ] **I-102** [editor] **One-row top bar, grouped by task** (proposal 2026-10-14; the bar now has 17 controls on two rows). Saves a row of height (about 45 px) for the form and preview:
-  - **File ▾** menu next to the show title: New show…, Open folder… (new shortcut `Ctrl+O`), Open zip…, the recent shows (the start screen's remembered folders), Save (`Ctrl+S`), Export as one HTML file…, Export as zip…. Replaces six buttons; the two exports get clear names.
-  - Show title with the unsaved-changes dot, then **Save** as the one visible primary button.
-  - **Undo, Redo, Find** as icon buttons with tooltips (`Ctrl+Z`, `Ctrl+Y`, `Ctrl+F`).
-  - **Grid, Glossary, Library** keep their labels (editor views).
-  - Right side: **Read** and **Present ▶** (Present the more prominent), then **⋯ More**: theme (System / Light / Dark), Help (`F1`), keyboard shortcuts.
-  - Narrow windows: Grid, Glossary and Library move into ⋯ instead of wrapping to a second row.
-  - Menus follow the menu-button pattern (arrow keys, Enter, Esc, `aria-haspopup` / `aria-expanded`), vanilla JS; theme tokens only (`theme-contrast` test).
-  - Update `editor/help.html` (the screen, toolbar, shortcuts) and the README table.
-  - Questions for Lucas: keep **Save** visible (recommended) or only in File + `Ctrl+S`? Theme in ⋯ (recommended) or still a visible control? · todo · —
 - [ ] **I-021** [editor] Text-overflow detection: warn when content does not fit the layout at 1920×1080
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
@@ -173,6 +163,16 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-102** [editor] **One-row top bar, grouped by task** (proposal 2026-10-14; the bar now has 17 controls on two rows). Saves a row of height (about 45 px) for the form and preview:
+  - **File ▾** menu next to the show title: New show…, Open folder… (new shortcut `Ctrl+O`), Open zip…, the recent shows (the start screen's remembered folders), Save (`Ctrl+S`), Export as one HTML file…, Export as zip…. Replaces six buttons; the two exports get clear names.
+  - Show title with the unsaved-changes dot, then **Save** as the one visible primary button.
+  - **Undo, Redo, Find** as icon buttons with tooltips (`Ctrl+Z`, `Ctrl+Y`, `Ctrl+F`).
+  - **Grid, Glossary, Library** keep their labels (editor views).
+  - Right side: **Read** and **Present ▶** (Present the more prominent), then **⋯ More**: theme (System / Light / Dark), Help (`F1`), keyboard shortcuts.
+  - Narrow windows: Grid, Glossary and Library move into ⋯ instead of wrapping to a second row.
+  - Menus follow the menu-button pattern (arrow keys, Enter, Esc, `aria-haspopup` / `aria-expanded`), vanilla JS; theme tokens only (`theme-contrast` test).
+  - Update `editor/help.html` (the screen, toolbar, shortcuts) and the README table.
+  - Questions for Lucas: keep **Save** visible (recommended) or only in File + `Ctrl+S`? Theme in ⋯ (recommended) or still a visible control? Built with both recommendations (Save visible, theme in ⋯). `editor/js/ui/toolbar.js`, `editor/js/ui/menu-button.js`, `editor/js/menu-nav.js` · done 2026-10-14 · claude
 - [x] **I-101** [editor] Collapsible slide list: ◀ in its header (or `Ctrl+\`) collapses it to a rail of slide numbers (current slide highlighted, titles as tooltips and for screen readers) so the slide form and the preview get its width (the preview may grow to 1280 px); ▶ or `Ctrl+\` expands it; remembered in `localStorage`. `editor/js/sidebar.js` · done 2026-10-14 · claude
 - [x] **E-020** [editor] Graph editor: the `graph` slot and a new **Graph** reader block type get a live mini graph (+ Node, 🔗 Connect two nodes, click a node to open its row, Fit, snapshot as fallback with an alt text naming the nodes), rows for nodes, links, layout and the build-up while presenting, a data file picker (into `data/`; the file's nodes read-only, **Move into the slide** to edit them), caption and fallback image. Fixed on the way: a fallback image on a graph slot added web page fields. `editor/js/graph-values.js`, `editor/js/ui/graph-fields.js`. Spec: `docs/specs/I-074-graph.md`, section *Graph editor* · done 2026-10-14 · claude
 - [x] **E-021** [editor] Map editor (Lucas's decisions 2026-10-14: mini map in the form, snapshot, full scope): the `map` slot and a new **Map** reader block type get an interactive mini map (click to add places, drag pins, use this view, fit to places, snapshot as fallback with an alt text naming the places), rows for places, the tour while presenting, GeoJSON layers (file picker into `data/`), background (OpenStreetMap / none / show folder / other server), while presenting, load, caption and fallback image. `editor/js/map-values.js`, `editor/js/ui/map-fields.js`. Spec: `docs/specs/I-075-map.md`, section *Map editor* · done 2026-10-14 · claude

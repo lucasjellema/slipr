@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: One-row top bar, grouped by task (I-102)
+- **Changed** the toolbar is one row (48 px instead of two rows): **File ▾** (New show…, Open folder…, Open zip…, recent shows, Save, Export as one HTML file…, Export as zip…) replaces six buttons; the show title with its unsaved dot and **Save** stay visible; Undo, Redo and Find are icon buttons with tooltips; Grid, Glossary and Library keep their labels; at the right **Read**, **Present ▶** and **⋯ More** (theme System / Light / Dark, Help, keyboard shortcuts), which replaces the theme select and **? Help**. Below 1100 px Grid, Glossary and Library move into ⋯; on phone widths the title and the labels of Read and Present give way. The toolbar is built once and updated in place, so an open menu survives undo or typing elsewhere.
+- **Added** a reusable menu button (`ui/menu-button.js`, keyboard logic in `menu-nav.js` with tests) following the WAI-ARIA menu-button pattern: `aria-haspopup` / `aria-expanded`, Enter / Space / ↓ / ↑ open, arrows, Home, End and type-ahead move, Esc closes and returns focus, Tab or a click elsewhere closes.
+- **Added** `Ctrl+O` opens a show folder (a zip in browsers that cannot open folders); recent shows in the File menu (`openRecentFolder()` in `files.js` asks about unsaved changes first).
+
 ### 2026-10-14: Collapsible slide list (I-101)
 - **Added** **◀** at the top of the slide list (and `Ctrl+\`) collapses it to a 52 px rail of slide numbers (current slide highlighted, the title as tooltip and for screen readers); the slide form and the preview share the width, and the preview may grow to 1280 px. **▶** or `Ctrl+\` expands it again. The choice is remembered in `localStorage` (`slipr-editor-sidebar`); `js/sidebar.js`.
 

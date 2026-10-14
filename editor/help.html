@@ -71,7 +71,7 @@
           <li><strong>Recent shows</strong>: the folders you opened before in this browser. One click reopens a show.</li>
           <li>The <strong>demo show</strong> link opens the example show that comes with Slipr. Use it to look around.</li>
         </ul>
-        <p>This manual is always one click away: the <strong>? Help</strong> button in the toolbar, or <kbd>F1</kbd>, which opens the section for the tab you are working in.</p>
+        <p>This manual is always one click away: <strong>⋯</strong> → <strong>Help</strong> at the right end of the toolbar, or <kbd>F1</kbd>, which opens the section for the tab you are working in.</p>
       </section>
 
       <section id="concepts">
@@ -105,7 +105,7 @@
         <h2>The screen</h2>
         <figure class="diagram" aria-label="Editor screen layout">
 <pre>┌────────────────────────────────────────────────────────────────────────────┐
-│ Title * Undo Redo Find Open… New… Save Export… Grid Present Read ? Help    │
+│ File ▾  Title ●  Save  ↶ ↷ Find  Grid Glossary Library  Read  Present ▶  ⋯ │
 ├───────────────┬────────────────────────────┬───────────────────────────────┤
 │ Slides ▦ Show │ [Slide] [Reader]           │ Preview  Audience | Reader    │
 │ [Go to slide] │ Layout: [Title + bullets]  │ ┌──────────────────────┐      │
@@ -116,23 +116,32 @@
 └───────────────┴────────────────────────────┴───────────────────────────────┘</pre>
         </figure>
         <ol>
-          <li><strong>Toolbar</strong> (top): the show's title with a dot (<code>●</code>) when there are unsaved changes, undo and redo, find and replace, open, new, save and export, the show grid, Present and Read, this help, and the theme. In a narrow window it wraps onto two lines.</li>
+          <li><strong>Toolbar</strong> (top), one row grouped by task:
+            <ul>
+              <li><strong>File ▾</strong>: <strong>New show…</strong>, <strong>Open folder…</strong> (<kbd>Ctrl</kbd>+<kbd>O</kbd>), <strong>Open zip…</strong>, your <strong>recent shows</strong>, <strong>Save</strong>, <strong>Export as one HTML file…</strong> and <strong>Export as zip…</strong>.</li>
+              <li>The show's title, with a dot (<code>●</code>) when there are unsaved changes, and <strong>Save</strong> (<kbd>Ctrl</kbd>+<kbd>S</kbd>).</li>
+              <li><strong>↶</strong> undo, <strong>↷</strong> redo and <strong>🔍</strong> find and replace; hover a button for its name and key.</li>
+              <li><strong>▦ Grid</strong>, <strong>📖 Glossary</strong> and <strong>📚 Library</strong>: the editor's full-page views.</li>
+              <li>At the right: <strong>Read</strong>, <strong>Present ▶</strong>, and <strong>⋯</strong> (More) with the theme, this manual (<kbd>F1</kbd>) and the keyboard shortcuts.</li>
+            </ul>
+            In a narrow window Grid, Glossary and Library move into <strong>⋯</strong>, so the toolbar stays one row. The menus work with the keyboard too: <kbd>Enter</kbd> or <kbd>↓</kbd> opens one, the arrow keys (or the first letter of an item) move, <kbd>Enter</kbd> chooses, <kbd>Esc</kbd> closes.</li>
           <li><strong>Slide list</strong> (left): every slide in order, with a <em>Go to slide</em> box, and <strong>⚙ Show</strong> for the show settings.</li>
           <li><strong>Inspector</strong> (middle): the <strong>Slide</strong> tab for the audience layer and the <strong>Reader</strong> tab for the reader layer of the selected slide, or the show settings.</li>
           <li><strong>Preview</strong> (right): the selected slide as the audience or a reader will see it, and any problems with it.</li>
         </ol>
         <h3>Light or dark</h3>
-        <p>The theme menu at the end of the toolbar switches the editor between <strong>☀ Light</strong>, <strong>☾ Dark</strong> and <strong>◐ System</strong>, which follows your computer's light or dark setting. The choice is remembered in this browser, and this manual follows it too. It only changes the editor: slides always show in their template's own colours.</p>
+        <p><strong>⋯</strong> at the end of the toolbar switches the editor between <strong>☀ Light</strong>, <strong>☾ Dark</strong> and <strong>◐ System</strong>, which follows your computer's light or dark setting. The choice is remembered in this browser, and this manual follows it too. It only changes the editor: slides always show in their template's own colours.</p>
         <p>Messages such as <em>Saved</em> appear in a bar under the toolbar.</p>
       </section>
 
       <section id="files">
         <h2>Open, create and save</h2>
         <h3>Open a show</h3>
-        <p>Click <strong>Open…</strong> and choose the folder that contains <code>show.json</code>. The browser asks once whether the editor may read and change that folder; allow it. The editor's address becomes <code>editor/?folder=…</code>: you can bookmark and reload it. After a browser restart the editor may ask again; click <strong>Allow access</strong>.</p>
+        <p>Choose <strong>File ▾</strong> → <strong>Open folder…</strong> (or press <kbd>Ctrl</kbd>+<kbd>O</kbd>) and choose the folder that contains <code>show.json</code>. The browser asks once whether the editor may read and change that folder; allow it. The editor's address becomes <code>editor/?folder=…</code>: you can bookmark and reload it. After a browser restart the editor may ask again; click <strong>Allow access</strong>.</p>
+        <p>Shows you opened before are listed under <strong>Recent shows</strong> in the File menu (and on the start screen): one click opens one again.</p>
         <h3>Create a show</h3>
         <ol>
-          <li>Click <strong>New…</strong>.</li>
+          <li>Choose <strong>File ▾</strong> → <strong>New show…</strong>.</li>
           <li>Enter a title and choose a template.</li>
           <li>Pick an <strong>empty</strong> folder. The editor writes <code>show.json</code> with a title slide, and an empty <code>images/</code> folder.</li>
         </ol>
@@ -685,7 +694,7 @@
 
         <h3>Colors and checks</h3>
         <p>As for graphs, the template chooses the colors: every tag gets the next color of its palette. Warnings: a place id used twice, a step that names a place without that id, a <code>slide</code> that doesn't exist, a layer file that isn't there, and a tile server without an attribution. The demo show has an example on the slide <em>A map on a slide</em>, with an offline map block below it: an outline of the Netherlands as background (Natural Earth, free to use), a route and three places.</p>
-        <p class="note">Map pictures in the show folder (<code>tiles/…</code>) work everywhere: in shows opened with <strong>Open…</strong> or from a zip, served shows, and <strong>Export…</strong> (which packs every tile into the file, so keep a tile set to the area and zoom levels you need). A show opened by its web address cannot be listed, so its export leaves the tiles out and says so: open the show folder instead. OpenStreetMap's tiles may not be downloaded in bulk: make offline tiles with a tool that respects its tile usage policy (<em>operations.osmfoundation.org/policies/tiles</em>), or use <code>"tiles": "none"</code>.</p>
+        <p class="note">Map pictures in the show folder (<code>tiles/…</code>) work everywhere: in shows opened with <strong>Open folder…</strong> or from a zip, served shows, and <strong>Export as one HTML file…</strong> (which packs every tile into the file, so keep a tile set to the area and zoom levels you need). A show opened by its web address cannot be listed, so its export leaves the tiles out and says so: open the show folder instead. OpenStreetMap's tiles may not be downloaded in bulk: make offline tiles with a tool that respects its tile usage policy (<em>operations.osmfoundation.org/policies/tiles</em>), or use <code>"tiles": "none"</code>.</p>
       </section>
 
       <section id="markdown">
@@ -814,7 +823,7 @@
 
       <section id="find">
         <h2>Find and replace</h2>
-        <p>Press <kbd>Ctrl</kbd>+<kbd>F</kbd> or <kbd>Ctrl</kbd>+<kbd>H</kbd>, or click <strong>🔍 Find &amp; Replace</strong>. The search covers the whole show: slide fields and cards, speaker notes, reader summaries and blocks (including tabs and hotspots), and the show's metadata, chapters and glossary.</p>
+        <p>Press <kbd>Ctrl</kbd>+<kbd>F</kbd> or <kbd>Ctrl</kbd>+<kbd>H</kbd>, or click <strong>🔍</strong> in the toolbar. The search covers the whole show: slide fields and cards, speaker notes, reader summaries and blocks (including tabs and hotspots), and the show's metadata, chapters and glossary.</p>
         <ul>
           <li>Tick <strong>Match case</strong> or <strong>Whole word</strong> to narrow the search.</li>
           <li>Every match is listed with its place (for example <em>Speaker notes</em> or <em>Card 2: title</em>). Click a match to go to its slide.</li>
@@ -833,7 +842,7 @@
 
       <section id="export">
         <h2>Export as one file</h2>
-        <p><strong>Export…</strong> saves the show as <strong>one HTML file</strong> that holds everything needed to present and read it: the show, its images, its template with fonts and illustrations, and the Slipr viewer. Whoever gets the file can open it with a double-click: no Slipr, no server, no internet, nothing to install.</p>
+        <p><strong>File ▾</strong> → <strong>Export as one HTML file…</strong> saves the show as <strong>one HTML file</strong> that holds everything needed to present and read it: the show, its images, its template with fonts and illustrations, and the Slipr viewer. Whoever gets the file can open it with a double-click: no Slipr, no server, no internet, nothing to install.</p>
 
         <h3>When to use it</h3>
         <ul>
@@ -845,12 +854,12 @@
         <h3>Export a show</h3>
         <ol>
           <li>Fix any <span class="sev sev-error">errors</span> under the preview first: the exported file shows the same error page as the viewer would.</li>
-          <li>Click <strong>Export…</strong> in the toolbar.</li>
+          <li>Choose <strong>File ▾</strong> → <strong>Export as one HTML file…</strong>.</li>
           <li>Choose where to save the file. Its name is the show's id, for example <code>demo.html</code>; you can change it. In a browser without a save dialog the file goes to your downloads.</li>
           <li>Wait a moment while the editor packs the show. A message under the toolbar says where the file went and how big it is.</li>
         </ol>
         <p>The export is the show <strong>as it is in the editor</strong>, with unsaved changes included. Exporting does not save the show itself; press <kbd>Ctrl</kbd>+<kbd>S</kbd> for that.</p>
-        <p class="note">A show opened by its address (<code>?show=…</code>) can only be exported when it is inside the Slipr folder, like the demo. For a show elsewhere, open its folder with <strong>Open…</strong> first.</p>
+        <p class="note">A show opened by its address (<code>?show=…</code>) can only be exported when it is inside the Slipr folder, like the demo. For a show elsewhere, open its folder with <strong>File ▾</strong> → <strong>Open folder…</strong> first.</p>
 
         <h3>Open an exported file</h3>
         <ul>
@@ -885,15 +894,15 @@
         <p>More in <a href="#trouble">Troubleshooting</a>. The same export is available as a command for the Slipr folder: <code>npm run export -- shows/&lt;name&gt;</code>.</p>
 
         <h3>Export to zip archive (.zip / .slipr)</h3>
-        <p><strong>Export Zip…</strong> packages the current show as a standard zip archive (<code>.zip</code> or <code>.slipr</code>) containing <code>show.json</code>, all referenced images, data files and local documents, including any unsaved in-memory edits. Compression happens entirely in the browser using native Web Streams without any external tools.</p>
+        <p><strong>File ▾</strong> → <strong>Export as zip…</strong> packages the current show as a standard zip archive (<code>.zip</code> or <code>.slipr</code>) containing <code>show.json</code>, all referenced images, data files and local documents, including any unsaved in-memory edits. Compression happens entirely in the browser using native Web Streams without any external tools.</p>
         <ul>
           <li><strong>Portable show package:</strong> easily share, back up or transfer your presentation without bundling the entire viewer code.</li>
-          <li><strong>Re-openable in the editor:</strong> anyone with the zip archive can open it with <strong>Open Zip…</strong> in the editor to continue editing.</li>
+          <li><strong>Re-openable in the editor:</strong> anyone with the zip archive can open it with <strong>File ▾</strong> → <strong>Open zip…</strong> in the editor to continue editing.</li>
           <li><strong>Direct presentation in viewer:</strong> the viewer can present zip files directly over the web via <code>?zip=&lt;url&gt;</code> (I-087).</li>
         </ul>
 
         <h3>Open a zip archive</h3>
-        <p>Click <strong>Open Zip…</strong> in the toolbar or <strong>Open zip archive…</strong> on the start screen. You can choose any <code>.zip</code> or <code>.slipr</code> file:</p>
+        <p>Choose <strong>File ▾</strong> → <strong>Open zip…</strong> or <strong>Open zip archive…</strong> on the start screen. You can choose any <code>.zip</code> or <code>.slipr</code> file:</p>
         <ul>
           <li>The archive is decompressed client-side in memory without uploading to any server.</li>
           <li>Works in all modern browsers, including Firefox and Safari where local directory pickers are unavailable.</li>
@@ -921,6 +930,7 @@
           <thead><tr><th>Keys</th><th>Action</th></tr></thead>
           <tbody>
             <tr><td><kbd>Ctrl</kbd>+<kbd>S</kbd></td><td>Save</td></tr>
+            <tr><td><kbd>Ctrl</kbd>+<kbd>O</kbd></td><td>Open a show folder (in browsers that cannot open folders: a zip)</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>Z</kbd></td><td>Undo</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>Y</kbd>, <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd></td><td>Redo</td></tr>
             <tr><td><kbd>Ctrl</kbd>+<kbd>F</kbd>, <kbd>Ctrl</kbd>+<kbd>H</kbd></td><td>Find and replace</td></tr>
@@ -937,6 +947,7 @@
             <tr><td><kbd>F1</kbd></td><td>This manual, at the section for the current tab</td></tr>
             <tr><td>On a selected extra image</td><td>See <a href="#extra-images">Extra images</a>: arrows, <kbd>Shift</kbd>+arrows, <kbd>Alt</kbd>+arrows, <kbd>Delete</kbd>, <kbd>Esc</kbd></td></tr>
             <tr><td>On a selected text element</td><td>See <a href="#text-elements">Text elements</a>: as an extra image, and <kbd>Enter</kbd> edits its text</td></tr>
+            <tr><td><kbd>Enter</kbd>, <kbd>↓</kbd> / <kbd>↑</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>, a letter, <kbd>Esc</kbd></td><td>In the File and ⋯ menus: open, move, choose, close</td></tr>
             <tr><td>In the show grid</td><td>See <a href="#grid">Show grid</a>: arrows, <kbd>Shift</kbd>/<kbd>Ctrl</kbd>+arrows, <kbd>Space</kbd>, <kbd>Ctrl</kbd>+<kbd>A</kbd>, <kbd>Alt</kbd>+<kbd>←</kbd>/<kbd>→</kbd>, <kbd>Ctrl</kbd>+<kbd>D</kbd>, <kbd>Delete</kbd>, <kbd>Enter</kbd>, <kbd>Esc</kbd></td></tr>
           </tbody>
         </table>
@@ -955,7 +966,7 @@
           <dd>The browser may block the new tab. Allow pop-ups for the editor's address, and check the message bar for a save problem.</dd>
           <dt>The show will not open in the viewer</dt>
           <dd>It has an error. Errors are listed under the preview of the slide that has them, in red.</dd>
-          <dt>Export… does nothing, or nothing is saved</dt>
+          <dt>Export does nothing, or nothing is saved</dt>
           <dd>The save dialog may have been cancelled. Without a save dialog (some browsers) the file is downloaded instead: look in your downloads. A message under the toolbar reports where the file went.</dd>
           <dt>The exported file stays on "Loading show…"</dt>
           <dd>Open it in Chrome or Edge (tested); other current browsers should work too, but older ones cannot run it. If it still fails, export again and check the message bar for warnings about missing files.</dd>

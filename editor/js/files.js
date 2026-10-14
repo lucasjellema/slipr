@@ -4,7 +4,7 @@
  * reopened by URL as `?folder=<key>` (D-012), so opening or creating a show
  * reloads the page with the new key.
  */
-import { rememberFolder } from '../../shared/folder-handles.js';
+import { recallFolder, rememberFolder } from '../../shared/folder-handles.js';
 import { canOpenFolders, createShowInFolder, ensurePermission, pickFolder, readShowJson, saveShow, writeImage } from './io/fs-access.js';
 import { buildNewShow } from './io/new-show.js';
 import { openChooseDialog, openDialog, openNewShowDialog, showBanner } from './ui/dialogs.js';
@@ -61,6 +61,20 @@ export async function openFolder(store) {
     throw new Error(`The folder "${handle.name}" has no show.json. Pick the folder that contains a show, or use New… to create one.`);
   }
   goToFolder(await rememberFolder(handle, { title: show.meta?.title }));
+}
+
+/**
+ * Open a recently used show folder from the File menu (I-102): after the
+ * unsaved-changes question, ask for access (this runs from a click) and go there.
+ * @param {import('./store.js').EditorStore} store
+ * @param {string} key
+ */
+export async function openRecentFolder(store, key) {
+  if (!okToLeave(store)) return;
+  const record = await recallFolder(key);
+  if (!record) throw new Error('That show folder is no longer known to this browser. Open it with Open folder….');
+  if (!(await ensurePermission(record.handle))) throw new Error(`Access to the folder "${record.name}" was not granted.`);
+  goToFolder(key);
 }
 
 /**

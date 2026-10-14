@@ -9,9 +9,9 @@ import { toggleSidebar } from './sidebar.js';
 /**
  * Register global keyboard shortcuts on the window.
  * @param {import('./store.js').EditorStore} store
- * @param {{ onSave?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
+ * @param {{ onSave?: () => void, onOpen?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
-export function registerShortcuts(store, { onSave, onPresent, onRead, onFindReplace } = {}) {
+export function registerShortcuts(store, { onSave, onOpen, onPresent, onRead, onFindReplace } = {}) {
   window.addEventListener('keydown', (e) => {
     const isMac = navigator.platform.toUpperCase().includes('MAC');
     const mod = isMac ? e.metaKey : e.ctrlKey;
@@ -38,6 +38,13 @@ export function registerShortcuts(store, { onSave, onPresent, onRead, onFindRepl
     if (mod && !e.altKey && !e.shiftKey && (e.key === 's' || e.key === 'S')) {
       e.preventDefault();
       if (onSave) onSave();
+      return;
+    }
+
+    // Open a show: Ctrl+O / Cmd+O (I-102)
+    if (mod && !e.altKey && !e.shiftKey && (e.key === 'o' || e.key === 'O')) {
+      e.preventDefault();
+      if (onOpen) onOpen();
       return;
     }
 

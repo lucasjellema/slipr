@@ -8,7 +8,7 @@ The **Slipr Editor** is a browser application for creating and editing Slipr sho
 
 The full, step-by-step guide is **[help.html](help.html)**, built into the editor:
 
-- click **? Help** in the toolbar,
+- choose **⋯** → **Help** at the right end of the toolbar,
 - press `F1` (it opens at the section for the tab you are in), or
 - open <http://localhost:8080/editor/help.html> while `npm run serve` runs.
 
@@ -24,7 +24,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 
 | Area | In short | Manual |
 |---|---|---|
-| Show folders | Open, create from a template and save show folders anywhere on disk; recent shows; clean `show.json` diffs | [Open, create and save](help.html#files) |
+| Show folders | Open, create from a template and save show folders anywhere on disk, all from the **File** menu; recent shows; clean `show.json` diffs | [Open, create and save](help.html#files) |
 | Slide list | Go to slide, add (in a chosen layout), duplicate, delete, reorder by dragging, hide from the audience; collapse to a column of numbers to enlarge the preview | [The slide list](help.html#slides) |
 | Show grid | All slides as thumbnails, grouped by chapter: select several, drag to move or regroup, duplicate, hide, delete; add, rename, move and delete chapters | [Show grid](help.html#grid) |
 | Slide library | Copy slides into a library in your browser and insert them into other shows (another template, links, glossary and files handled); tags, collections, export / import as zip | [Slide library](help.html#library) |
@@ -44,7 +44,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Present and Read | Save, then open the viewer at the selected slide | [Present and Read](help.html#present) |
 | Export | One HTML file with show, template and viewer that presents offline (unsaved changes included) | [Export as one file](help.html#export) |
 
-The editor has a **light and a dark theme**: choose ☀ Light, ☾ Dark or ◐ System (follows your computer) at the end of the toolbar; the choice is remembered in your browser. Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
+The editor has a **light and a dark theme**: choose ☀ Light, ☾ Dark or ◐ System (follows your computer) under **⋯** at the end of the toolbar; the choice is remembered in your browser. Everything can be undone (`Ctrl+Z`). The most used keys: `Ctrl+S` save, `Ctrl+O` open, `Ctrl+F` find, `Ctrl+Enter` new slide, `F5` present, `F1` help. The full list is under [Keyboard shortcuts](help.html#shortcuts).
 
 ## Browser requirements
 
