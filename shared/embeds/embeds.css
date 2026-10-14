@@ -111,33 +111,35 @@
 }
 .slipr-pdf-step { display: none; }
 
-/* ---------- graphs (I-074) ---------- */
-/* Node colors (by tag) come from the template's --slipr-graph-1 … 6; see shared/embeds/graph.js. */
-.slipr-embed--graph {
+/* ---------- graphs (I-074) and maps (I-075) ---------- */
+/* Node, marker and layer colors (by tag) come from the template's --slipr-graph-1 … 6;
+   see shared/embeds/graph.js and map.js. The two share their toolbar and panel look. */
+:is(.slipr-embed--graph, .slipr-embed--map) {
   display: flex;
   flex-direction: column;
   position: relative;
   font-family: var(--slipr-font-body, system-ui, sans-serif);
 }
-.slipr-graph-canvas {
+:is(.slipr-graph-canvas, .slipr-map-canvas) {
   width: 100%;
   height: 24rem;
   border: 1px solid var(--slipr-color-surface, #e5e7eb);
   border-radius: var(--slipr-radius, 0.4rem);
   background: var(--slipr-color-bg, #fff);
 }
-/* On a slide the layout sizes the graph. */
+/* On a slide the layout sizes the graph or map. */
 [data-slot].slipr-embed--graph .slipr-graph-canvas { flex: 1; min-height: 0; height: auto; border: 0; background: none; }
-.slipr-embed--graph > .slipr-embed-live { display: flex; flex-direction: column; }
-[data-slot].slipr-embed--graph > .slipr-embed-live { flex: 1; min-height: 0; }
-.slipr-graph-list { margin: 0; padding-left: 1.2em; font-size: 0.9em; line-height: 1.5; }
-.slipr-graph-list-more { list-style: none; color: var(--slipr-color-muted, #5b6573); }
+[data-slot].slipr-embed--map .slipr-map-canvas { flex: 1; min-height: 0; height: auto; }
+:is(.slipr-embed--graph, .slipr-embed--map) > .slipr-embed-live { display: flex; flex-direction: column; }
+[data-slot]:is(.slipr-embed--graph, .slipr-embed--map) > .slipr-embed-live { flex: 1; min-height: 0; }
+:is(.slipr-graph-list, .slipr-map-list) { margin: 0; padding-left: 1.2em; font-size: 0.9em; line-height: 1.5; }
+:is(.slipr-graph-list-more, .slipr-map-list-layer) { list-style: none; color: var(--slipr-color-muted, #5b6573); }
 /* Once drawn, the list stays for screen readers only. */
-.slipr-embed--graph[data-embed-state="ready"] > .slipr-embed-fallback[data-fallback="list"] {
+:is(.slipr-embed--graph, .slipr-embed--map)[data-embed-state="ready"] > .slipr-embed-fallback[data-fallback="list"] {
   display: block; position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
-.slipr-graph-toolbar {
+:is(.slipr-graph-toolbar, .slipr-map-toolbar) {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -146,7 +148,7 @@
   font-size: 0.85em;
   color: var(--slipr-color-muted, #5b6573);
 }
-.slipr-graph-btn, .slipr-graph-picker, .slipr-graph-tag {
+:is(.slipr-graph-btn, .slipr-graph-picker, .slipr-graph-tag, .slipr-map-btn, .slipr-map-picker, .slipr-map-tag) {
   font: inherit;
   padding: 0.25em 0.6em;
   border: 1px solid var(--slipr-color-surface, #e5e7eb);
@@ -155,15 +157,15 @@
   color: var(--slipr-color-text, #1e2329);
   cursor: pointer;
 }
-.slipr-graph-btn { min-width: 2.2em; }
-.slipr-graph-tags { display: inline-flex; flex-wrap: wrap; gap: 0.3em; }
-.slipr-graph-tag { display: inline-flex; align-items: center; gap: 0.35em; }
-.slipr-graph-tag[aria-pressed="false"] { opacity: 0.45; text-decoration: line-through; }
-.slipr-graph-swatch { width: 0.8em; height: 0.8em; border-radius: 50%; }
-.slipr-graph-btn:focus-visible, .slipr-graph-picker:focus-visible, .slipr-graph-tag:focus-visible {
+:is(.slipr-graph-btn, .slipr-map-btn) { min-width: 2.2em; }
+:is(.slipr-graph-tags, .slipr-map-tags) { display: inline-flex; flex-wrap: wrap; gap: 0.3em; }
+:is(.slipr-graph-tag, .slipr-map-tag) { display: inline-flex; align-items: center; gap: 0.35em; }
+:is(.slipr-graph-tag, .slipr-map-tag)[aria-pressed="false"] { opacity: 0.45; text-decoration: line-through; }
+:is(.slipr-graph-swatch, .slipr-map-swatch) { width: 0.8em; height: 0.8em; border-radius: 50%; }
+:is(.slipr-graph-btn, .slipr-graph-picker, .slipr-graph-tag, .slipr-map-btn, .slipr-map-picker, .slipr-map-tag):focus-visible {
   outline: 2px solid var(--slipr-color-accent, #f2a900); outline-offset: 2px;
 }
-.slipr-graph-panel {
+:is(.slipr-graph-panel, .slipr-map-panel) {
   margin-top: 0.5em;
   padding: 0.7em 0.9em;
   border-left: 3px solid var(--slipr-color-accent, #f2a900);
@@ -171,13 +173,25 @@
   color: var(--slipr-color-text, #1e2329);
   font-size: 0.9em;
 }
-.slipr-graph-panel[hidden] { display: none; }
-.slipr-graph-panel-title { margin: 0 0 0.3em; font-weight: 700; }
-.slipr-graph-panel-body > :first-child { margin-top: 0; }
+:is(.slipr-graph-panel, .slipr-map-panel)[hidden] { display: none; }
+:is(.slipr-graph-panel-title, .slipr-map-panel-title) { margin: 0 0 0.3em; font-weight: 700; }
+:is(.slipr-graph-panel-body, .slipr-map-panel-body) > :first-child { margin-top: 0; }
 .slipr-graph-panel-links { margin: 0.4em 0 0; color: var(--slipr-color-muted, #5b6573); }
-.slipr-graph-panel-actions { display: flex; gap: 0.8em; align-items: center; margin: 0.5em 0 0; }
-.slipr-graph-panel-slide { color: var(--slipr-color-primary, #1f3a5f); font-weight: 600; }
-.slipr-graph-step { display: none; }
+:is(.slipr-graph-panel-actions, .slipr-map-panel-actions) { display: flex; gap: 0.8em; align-items: center; margin: 0.5em 0 0; }
+:is(.slipr-graph-panel-slide, .slipr-map-panel-slide) { color: var(--slipr-color-primary, #1f3a5f); font-weight: 600; }
+:is(.slipr-graph-step, .slipr-map-step) { display: none; }
+
+/* Maps (I-075): Leaflet's panes stack up to z-index 1000; keep that inside the map. */
+.slipr-map-canvas { position: relative; isolation: isolate; z-index: 0; overflow: hidden; font-size: 0.8rem; }
+.slipr-map-canvas .leaflet-container, .slipr-map-canvas.leaflet-container { font-family: var(--slipr-font-body, system-ui, sans-serif); }
+.slipr-map-list-empty { margin: 0; color: var(--slipr-color-muted, #5b6573); }
+/* Marker pins are drawn by Slipr (an SVG in the tag color), not Leaflet's images. */
+.slipr-map-pin { background: none; border: 0; }
+.slipr-map-pin svg { display: block; filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.35)); transition: transform 0.15s; transform-origin: 50% 100%; }
+.slipr-map-pin:is(:hover, :focus-visible, .slipr-map-pin--selected) svg { transform: scale(1.25); }
+.slipr-map-pin:focus-visible { outline: 2px solid var(--slipr-color-accent, #f2a900); outline-offset: 2px; border-radius: 4px; }
+.slipr-map-pin--selected svg path { stroke: var(--slipr-color-accent, #f2a900); stroke-width: 2.5; }
+.slipr-map-canvas .leaflet-control-attribution { font-size: 0.7rem; }
 
 /* ---------- click-to-load ---------- */
 .slipr-embed-consent {

@@ -277,9 +277,10 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       else fillEmbedElement(el, 'pdf', value, ctx, { mode: /** @type {any} */ (options.mode) });
       break;
 
-    case 'graph': {
-      // A graph (I-074): node list now, the drawing from hydrateEmbeds().
-      fillEmbedElement(el, 'graph', value, ctx, { mode: /** @type {any} */ (options.mode) });
+    case 'graph':
+    case 'map': {
+      // A graph (I-074) or a map (I-075): a list now, the drawing from hydrateEmbeds().
+      fillEmbedElement(el, type, value, ctx, { mode: /** @type {any} */ (options.mode) });
       if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
         const figcaption = doc.createElement('figcaption');
         figcaption.className = 'slipr-caption';

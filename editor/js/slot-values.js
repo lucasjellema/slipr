@@ -111,6 +111,25 @@ export function graphSummary(value) {
 }
 
 /**
+ * A map's read-only summary (I-075: maps are edited in show.json for now).
+ * @param {any} value
+ * @returns {string}
+ */
+export function mapSummary(value) {
+  const m = Array.isArray(value?.markers) ? value.markers.length : 0;
+  const l = Array.isArray(value?.layers) ? value.layers.length : 0;
+  const s = Array.isArray(value?.steps) ? value.steps.length : 0;
+  const parts = [`Map: ${m} place${m === 1 ? '' : 's'}`];
+  if (l) parts.push(`${l} layer${l === 1 ? '' : 's'}`);
+  if (s) parts.push(`${s} step${s === 1 ? '' : 's'}`);
+  const tiles = value?.tiles === 'none' ? 'no tiles'
+    : typeof (value?.tiles?.url ?? value?.tiles) === 'string' ? `tiles from ${String(value.tiles.url ?? value.tiles).replace(/^https:\/\/([^/]+).*$/, '$1')}`
+      : 'OpenStreetMap tiles';
+  parts.push(tiles);
+  return `${parts.join(', ')}. Edit it in show.json.`;
+}
+
+/**
  * Short read-only summary of a slot value that has no editor yet.
  * @param {string | undefined} slotType
  * @param {any} value
@@ -125,6 +144,7 @@ export function describeValue(slotType, value) {
     return value.source ? `“${value.text}” (${value.source})` : `“${value.text}”`;
   }
   if (slotType === 'graph' && value && typeof value === 'object') return graphSummary(value);
+  if (slotType === 'map' && value && typeof value === 'object') return mapSummary(value);
   if (slotType === 'code' && typeof value?.code === 'string') {
     const lines = value.code.split('\n').length;
     return `${value.language ?? 'code'}, ${lines} line${lines === 1 ? '' : 's'}`;

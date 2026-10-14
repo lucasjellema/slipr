@@ -1,0 +1,13 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Demo route: Amsterdam, Utrecht, Rotterdam" },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [[4.8922, 52.3731], [5.1214, 52.0907], [4.4792, 51.9225]]
+      }
+    }
+  ]
+}

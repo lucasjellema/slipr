@@ -24,9 +24,9 @@ const MIME = /** @type {Record<string, string>} */ ({
   js: 'text/javascript', mjs: 'text/javascript', json: 'application/json', css: 'text/css', html: 'text/html',
   svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
   avif: 'image/avif', woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf', otf: 'font/otf', ico: 'image/x-icon',
-  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', mp4: 'video/mp4', webm: 'video/webm',
+  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', geojson: 'application/geo+json', mp4: 'video/mp4', webm: 'video/webm',
 });
-const TEXT_TYPES = new Set(['text/javascript', 'application/json', 'text/css', 'text/html', 'image/svg+xml', 'text/plain', 'text/markdown']);
+const TEXT_TYPES = new Set(['text/javascript', 'application/json', 'application/geo+json', 'text/css', 'text/html', 'image/svg+xml', 'text/plain', 'text/markdown']);
 
 /** @param {string} path */
 export function mimeType(path) {
@@ -343,9 +343,11 @@ export async function packShow({ readFile, showDir, templateDir, entry = 'viewer
     importMap[VIRTUAL_ROOT + path] = `data:text/javascript;base64,${toBase64(encoder.encode(code))}`;
     queue.push(...imports);
     for (const target of metaUrls) {
+      // Files of an embed library (module, stylesheet), needed only when its kind is used.
+      if (skipLibraries.some((lib) => target.startsWith(lib))) continue;
       if (/\.m?js$/.test(target)) {
-        // A module loaded by computed URL: an embed library, needed only when its kind is used.
-        if (!skipLibraries.some((lib) => target.startsWith(lib))) queue.push(target);
+        // A module loaded by computed URL.
+        queue.push(target);
       } else if (target.endsWith('.css')) {
         const css = await readText(target);
         if (css !== null) addFile(target, await inlineCssUrls(css, target, readFile, warnings), 'text/css');

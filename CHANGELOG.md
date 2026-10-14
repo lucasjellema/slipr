@@ -6,6 +6,13 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-13: Maps (I-075, D-011 refined)
+- **Added** `vendor/leaflet-1.9.4/` (Leaflet, BSD-2-Clause, from npm `leaflet@1.9.4`, integrity checked; `dist/leaflet-src.esm.js`, `dist/leaflet.css` and its images, see its `VENDORED.md`).
+- **Added** to show format 0.2: the `map` slot and block types (`center`, `zoom`, `markers`, GeoJSON `layers`, `tiles`, `load`, `caption`, `fallback`; slots also `steps` and `present`; blocks also `title`). Schema `$defs/map`, `latLng`, `mapMarker`, `mapLayer`, `mapTiles`, `mapStep`, `blockMap`. Validation: a 0.1 show, no center / markers / layers, positions or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a bad layer address and `steps` / `present` on a block are errors; duplicate marker ids, unknown markers in steps, unknown marker slides, missing layer files and a tile server without attribution are warnings; marker Markdown is checked. Layer files join `collectImagePaths()`. Template slot type `map`.
+- **Added** `shared/embeds/map.js`: the static place list, lazy Leaflet drawing with Slipr's own pins in the template's graph palette, tiles from OpenStreetMap (click-to-load in reader mode, live in audience mode), a server, the show folder or none; audience steps fly from place to place on hidden Reveal fragments; reader Fit / place list / tag filter / place panel. Reader search indexes place titles and text.
+- **Changed** the single-file export also leaves out the stylesheets of unused embed libraries, and knows `.geojson`.
+- **Changed** both templates: a `map` layout (default 1.5.0, Conclusion 0.1.6). The demo has a map slide ("A map on a slide", three steps) and an offline map block with a GeoJSON route (`data/route.geojson`); the Conclusion demo a map slide. Spec `docs/specs/I-075-map.md`; show and template format docs.
+
 ### 2026-10-13: Pictures morph between slides (I-091)
 - **Added** to show format 0.2: `morphId` on image values (a name that pairs two pictures between auto-animate slides). Validation: an error in a 0.1 show; the same name twice on one slide is a warning. `shared/picture.js` writes `data-morph-id`.
 - **Changed** the demo: "AI help, kept in its cage" and a new detail slide (`s-ai-detail`) have auto-animate on, so the photo zooms into the robot. Spec `docs/specs/I-091-image-morph.md` (with the Reveal.js spike).

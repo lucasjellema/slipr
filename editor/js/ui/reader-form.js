@@ -5,10 +5,10 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
-import { GRAPH_HELP } from '../help.js';
+import { GRAPH_HELP, MAP_HELP } from '../help.js';
 import { pictureStyleControls } from './picture-style.js';
 import { addImageToBlock } from '../image-input.js';
-import { graphSummary, imageValue } from '../slot-values.js';
+import { graphSummary, imageValue, mapSummary } from '../slot-values.js';
 import { imageField, runImage } from './image-field.js';
 import { hotspotEditor } from './hotspot-editor.js';
 import { markdownToolbar } from './markdown-toolbar.js';
@@ -264,7 +264,9 @@ export function mountReaderForm(container, store) {
           h('div', { class: 'slipr-readonly' }, [describeBlock(block)]),
           block.type === 'graph'
             ? h('span', { class: 'slipr-help' }, ['Graphs are written in show.json for now: ', h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a graph']), '.'])
-            : h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
+            : block.type === 'map'
+              ? h('span', { class: 'slipr-help' }, ['Maps are written in show.json for now: ', h('a', { href: MAP_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a map']), '.'])
+              : h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
         );
       } else {
         // Default text markdown editor
@@ -395,6 +397,7 @@ function describeBlock(block) {
   if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
   if (block.type === 'pdf') return `${block.title || 'PDF document'}: ${block.pdf || '(no file yet)'}`;
   if (block.type === 'graph') return `${block.title ? `${block.title}. ` : ''}${graphSummary(block)}`;
+  if (block.type === 'map') return `${block.title ? `${block.title}. ` : ''}${mapSummary(block)}`;
   return block.type;
 }
 

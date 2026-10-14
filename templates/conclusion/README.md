@@ -21,6 +21,7 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 | `web` | Title with a live web page (or its screenshot) in the content area. Not in the PowerPoint template (I-071) | kicker, title, page (`web`) |
 | `pdf` | Title with a page (or a range, one page per click) of a PDF in the content area. Not in the PowerPoint template (I-072) | kicker, title, document (`pdf`) |
 | `graph` | Title with a graph in the content area; node colors from the brand palette (magenta, blue, cyan, green, purple, red). Not in the PowerPoint template (I-074) | kicker, title, graph (`graph`) |
+| `map` | Title with an interactive map in the content area; pins and GeoJSON layers in the brand palette (by tag). Not in the PowerPoint template (I-075) | kicker, title, map (`map`) |
 | `columns-4` | Four white columns (Textbox 4x) | kicker, title, cards ≤ 4 × (title ≤ 18, text) |
 | `boxes-9` | Nine numbered boxes (Textbox 9x) | kicker, title, cards ≤ 9 × (title ≤ 24, text ≤ 210) |
 | `facts` | Key figures over a photo (Facts & figures); the right column is mirrored | kicker, title, cards ≤ 6 × (value ≤ 8, label ≤ 42, icon), image |

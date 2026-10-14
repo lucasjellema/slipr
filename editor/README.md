@@ -32,6 +32,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Extra images | Put more pictures on a slide, anywhere: move and resize them on the preview, let them appear one by one | [Extra images](help.html#extra-images) |
 | Text elements | Put a badge, label or callout anywhere on a slide, with its own font, size, colors, fill and border (the template's first) | [Text elements](help.html#text-elements) |
 | Graphs | Show a network of nodes and links, built up click by click; written in show.json for now, drawn in the preview | [Graphs](help.html#graphs) |
+| Maps | Show places on an interactive map, toured click by click; written in show.json for now, drawn in the preview | [Maps](help.html#maps) |
 | Picture styles | Shadow, soft edges, rounded corners or a frame from the template, and an opacity, on any picture | [Picture styles](help.html#picture-styles) |
 | Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links, diagrams) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
 | Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |

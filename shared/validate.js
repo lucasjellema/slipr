@@ -17,6 +17,7 @@ import { checkSchema } from './schema-check.js';
 import { foldText } from './glossary.js';
 import { pdfEntries } from './embeds/pdf.js';
 import { isGraph } from './embeds/graph.js';
+import { isMap, tileSource } from './embeds/map.js';
 import { isShown, normalCrop, toShown } from './crop.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
@@ -76,6 +77,7 @@ export function validateShow(show, options = {}) {
     checkOverlays(slide, at, show.slipr, errors, warnings);
     checkEmbeds(slide, at, show.slipr, errors, warnings, options.imageExists);
     checkGraphs(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
+    checkMaps(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -226,6 +228,10 @@ export function collectImagePaths(show) {
     for (const [image] of embedFallbacks(slide, '')) found.push(image.src);
     // Graph data files (I-074): checked, embedded and opened like images.
     for (const { value } of graphEntries(slide, '')) if (typeof value.data === 'string') found.push(value.data);
+    // Map GeoJSON layers (I-075): the same.
+    for (const { value } of mapEntries(slide, '')) {
+      for (const layer of arrayOf(value.layers)) if (typeof layer?.data === 'string' && !/^[a-z][a-z0-9+.-]*:|^\//i.test(layer.data)) found.push(layer.data);
+    }
     // PDF files in the show folder (I-072): checked, embedded and opened like images.
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
@@ -625,6 +631,65 @@ function checkGraphs(slide, at, version, errors, warnings, fileExists, slideIds)
 }
 
 /**
+ * The maps of a slide (I-075): slot values and map blocks, with their path.
+ * @param {any} slide @param {string} at
+ * @returns {{ value: any, path: string, block: boolean }[]}
+ */
+function mapEntries(slide, at) {
+  /** @type {{ value: any, path: string, block: boolean }[]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isMap(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type === 'map' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
+  });
+  return found;
+}
+
+/**
+ * Maps (I-075): format 0.2; unique marker ids; steps and marker slides that
+ * point somewhere; layer files exist (with a file check); tiles from another
+ * server than OpenStreetMap name their attribution.
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
+ * @param {Set<string>} slideIds
+ */
+function checkMaps(slide, at, version, errors, warnings, fileExists, slideIds) {
+  for (const { value, path, block } of mapEntries(slide, at)) {
+    if (version === '0.1') {
+      errors.push({ path, code: 'format-version', message: `a map ${block ? 'block' : 'slot'} needs show format 0.2: set "slipr" to "0.2"` });
+    }
+    arrayOf(value.layers).forEach((layer, k) => {
+      if (typeof layer?.data === 'string' && fileExists && !fileExists(layer.data)) {
+        warnings.push({ path: `${path}.layers[${k}].data`, code: 'missing-file', message: `map layer file "${layer.data}" not found` });
+      }
+    });
+    const ids = new Set();
+    arrayOf(value.markers).forEach((m, k) => {
+      if (!isObject(m)) return;
+      if (typeof m.id === 'string') {
+        if (ids.has(m.id)) warnings.push({ path: `${path}.markers[${k}].id`, code: 'duplicate-marker', message: `marker "${m.id}" is listed twice; steps use the first one` });
+        ids.add(m.id);
+      }
+      if (typeof m.slide === 'string' && !slideIds.has(m.slide)) {
+        warnings.push({ path: `${path}.markers[${k}].slide`, code: 'unknown-slide', message: `unknown slide "${m.slide}"` });
+      }
+    });
+    arrayOf(value.steps).forEach((step, k) => {
+      if (typeof step?.marker === 'string' && !ids.has(step.marker)) {
+        warnings.push({ path: `${path}.steps[${k}].marker`, code: 'unknown-marker', message: `unknown marker "${step.marker}": give the marker this id` });
+      }
+    });
+    const tiles = tileSource(value);
+    if (value.tiles !== undefined && tiles.kind === 'server' && !tiles.attribution) {
+      warnings.push({ path: `${path}.tiles`, code: 'tile-attribution', message: 'tiles from a server usually require an attribution: use { "url": ..., "attribution": "..." }' });
+    }
+  }
+}
+
+/**
  * Call fn for every Markdown-bearing string in the show.
  * @param {any} show
  * @param {(text: string, path: string) => void} fn
@@ -649,6 +714,9 @@ function forEachMarkdown(show, fn) {
     arrayOf(slide?.overlays).forEach((o, j) => visit(o?.text, `${at}.overlays[${j}].text`));
     for (const { value, path } of graphEntries(slide, at)) {
       arrayOf(value.nodes).forEach((n, k) => visit(n?.md, `${path}.nodes[${k}].md`));
+    }
+    for (const { value, path } of mapEntries(slide, at)) {
+      arrayOf(value.markers).forEach((m, k) => visit(m?.md, `${path}.markers[${k}].md`));
     }
     arrayOf(slide?.reader?.blocks).forEach((block, j) => {
       const bat = `${at}.reader.blocks[${j}]`;
@@ -696,6 +764,7 @@ function matchesSlotType(value, type) {
     case 'web': return isObject(value) && typeof value.url === 'string';
     case 'pdf': return isObject(value) && typeof value.pdf === 'string';
     case 'graph': return isGraph(value);
+    case 'map': return isMap(value);
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -715,6 +784,7 @@ function slotTypeLabel(type) {
     web: 'a web page object { "url": ..., "title": ... }',
     pdf: 'a PDF object { "pdf": ..., "title": ... }',
     graph: 'a graph object { "nodes": [...], "edges": [...] } or { "data": "data/....json" }',
+    map: 'a map object { "center": {...}, "markers": [...] }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

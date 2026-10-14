@@ -726,6 +726,117 @@
       }
     },
     {
+      "id": "s-map",
+      "layout": "map",
+      "chapter": "how",
+      "tags": [
+        "embed"
+      ],
+      "content": {
+        "title": "A map on a slide",
+        "map": {
+          "markers": [
+            {
+              "id": "amsterdam",
+              "lat": 52.3731,
+              "lng": 4.8922,
+              "title": "Amsterdam",
+              "tags": [
+                "city"
+              ],
+              "md": "Canals, museums and the first stop of the tour."
+            },
+            {
+              "id": "utrecht",
+              "lat": 52.0907,
+              "lng": 5.1214,
+              "title": "Utrecht",
+              "tags": [
+                "city"
+              ],
+              "md": "The Dom tower marks the center of the country."
+            },
+            {
+              "id": "rotterdam",
+              "lat": 51.9225,
+              "lng": 4.4792,
+              "title": "Rotterdam",
+              "tags": [
+                "port"
+              ],
+              "md": "Europe's largest port. This place links to a slide.",
+              "slide": "s-thanks"
+            }
+          ],
+          "steps": [
+            {
+              "marker": "amsterdam",
+              "zoom": 11
+            },
+            {
+              "marker": "utrecht",
+              "zoom": 12
+            },
+            {
+              "marker": "rotterdam",
+              "zoom": 11
+            }
+          ]
+        },
+        "caption": "Each click flies to the next place. Readers pan, zoom and click a place."
+      },
+      "reader": {
+        "summary": "Slides can hold an interactive map.",
+        "blocks": [
+          {
+            "id": "map-how",
+            "type": "text",
+            "md": "A **map** shows places with pins in the template's colors. While presenting it tours from place to place. In reader mode you pan, zoom and click a pin; the map tiles come from OpenStreetMap and load after your click on **Load**."
+          },
+          {
+            "id": "map-offline",
+            "type": "map",
+            "title": "The route, fully offline",
+            "tiles": "none",
+            "layers": [
+              {
+                "data": "data/route.geojson",
+                "title": "Route",
+                "tag": "route"
+              }
+            ],
+            "markers": [
+              {
+                "lat": 52.3731,
+                "lng": 4.8922,
+                "title": "Amsterdam",
+                "tags": [
+                  "city"
+                ]
+              },
+              {
+                "lat": 52.0907,
+                "lng": 5.1214,
+                "title": "Utrecht",
+                "tags": [
+                  "city"
+                ]
+              },
+              {
+                "lat": 51.9225,
+                "lng": 4.4792,
+                "title": "Rotterdam",
+                "tags": [
+                  "port"
+                ]
+              }
+            ],
+            "caption": "No tiles: the route comes from a GeoJSON file in the show folder, so nothing leaves your browser."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

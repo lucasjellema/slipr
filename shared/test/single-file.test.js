@@ -135,6 +135,22 @@ describe('single-file export: whole shows (I-054)', () => {
     assert.equal(hasMermaid(conclusion), false);
   });
 
+  test('Leaflet (module and stylesheet) only for shows with maps', async () => {
+    const leaflet = (/** @type {any} */ packed) => Object.keys(packed.map).some((k) => k.includes('/leaflet'))
+      || Object.keys(packed.files).some((k) => k.includes('/leaflet'));
+    assert.equal(leaflet(parse((await packShow({ readFile: readRepo, showDir: 'shows/demo' })).html)), true);
+    // The same show without its map slide.
+    const withoutMaps = async (/** @type {string} */ path) => {
+      if (path !== 'shows/demo/show.json') return readRepo(path);
+      const show = JSON.parse(new TextDecoder().decode(await readRepo(path)));
+      show.slides = show.slides.filter((/** @type {any} */ s) => s.layout !== 'map');
+      return new TextEncoder().encode(JSON.stringify(show));
+    };
+    const result = await packShow({ readFile: withoutMaps, showDir: 'shows/demo' });
+    assert.equal(leaflet(parse(result.html)), false);
+    assert.ok(!result.files.includes('show/data/route.geojson'));
+  });
+
   test('a missing show folder is a clear error', async () => {
     await assert.rejects(packShow({ readFile: readRepo, showDir: 'shows/nope' }), /No show\.json/);
   });

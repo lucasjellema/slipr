@@ -186,6 +186,23 @@
       }
     },
     {
+      "id": "s-map",
+      "layout": "map",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Map",
+        "title": "A tour of three cities",
+        "map": {
+          "markers": [
+            { "id": "amsterdam", "lat": 52.3731, "lng": 4.8922, "title": "Amsterdam", "tags": ["city"] },
+            { "id": "utrecht", "lat": 52.0907, "lng": 5.1214, "title": "Utrecht", "tags": ["city"], "md": "The center of the country." },
+            { "id": "rotterdam", "lat": 51.9225, "lng": 4.4792, "title": "Rotterdam", "tags": ["port"] }
+          ],
+          "steps": [{ "marker": "amsterdam", "zoom": 11 }, { "marker": "utrecht", "zoom": 12 }, { "marker": "rotterdam", "zoom": 11 }]
+        }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",

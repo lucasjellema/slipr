@@ -273,6 +273,12 @@
 .slipr-figure--graph { align-items: stretch; }
 .slipr-graph { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
 
+/* ---------- Layout: map (I-075) ---------- */
+
+.slipr-layout--map { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--map { align-items: stretch; }
+.slipr-layout--map .slipr-map { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
 /* ---------- Reader mode: reflow on narrow screens ----------
  * Below ~640px the slide stops being a scaled 16:9 picture and becomes
  * ordinary flowing content with rem-based type.
@@ -303,6 +309,7 @@
   .slipr-mode-reader .slipr-web { flex: none; height: 70vh; font-size: 0.9rem; }
   .slipr-mode-reader .slipr-pdf { flex: none; height: 70vh; font-size: 0.9rem; }
   .slipr-mode-reader .slipr-graph { flex: none; height: 60vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-layout--map .slipr-map { flex: none; height: 60vh; font-size: 0.9rem; }
 }
 
 /* ---------- Picture styles (template format 0.3, D-014, I-084) ----------

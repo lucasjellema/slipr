@@ -118,6 +118,7 @@ Pick from the *Next* section of the backlog. Likely candidates: PDF export, hous
 6. ✅ Glossary terms clickable in reader-mode slides, with other names (aliases) per term (done 2026-10-12). [I-086, D-015]
 7. ✅ Text elements placed and styled freely on a slide (badges, labels, callouts): show format 0.2, renderer, editor, converter (done 2026-10-13). [I-089, D-016]
 8. ✅ Graphs (Cytoscape.js): slot and block, steps in audience mode, explore in reader mode, template colors by tag (done 2026-10-13). [I-074, D-011]
+9. ✅ Maps (Leaflet): slot and block, a tour from place to place in audience mode, explore in reader mode, OpenStreetMap behind click-to-load, offline with no tiles or local tiles (done 2026-10-13). [I-075, D-011]
 
 ---
 

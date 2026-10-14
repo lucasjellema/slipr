@@ -36,6 +36,19 @@ const graph = (def) => ({
   },
 });
 
+/** A map value or block (I-075): its keys, and those of markers, layers, tiles and steps. @param {any} def @returns {Shape} */
+const map = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    center: { keys: keysOf(defs.latLng) },
+    markers: { items: { keys: keysOf(defs.mapMarker) } },
+    layers: { items: { keys: keysOf(defs.mapLayer) } },
+    tiles: { keys: ['url', 'attribution', 'maxZoom'] },
+    steps: { items: { keys: keysOf(defs.mapStep) } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -46,6 +59,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
   if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
   if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
+  if ('markers' in value || 'center' in value || 'layers' in value) return map(defs.map);
   if ('kind' in value) return { keys: keysOf(defs.chart) };
   if ('text' in value) return { keys: keysOf(defs.quote) };
   return {};
@@ -56,6 +70,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
   const name = 'block' + String(value?.type ?? '').split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join('');
   const def = defs[name];
   if (value?.type === 'graph') return graph(def);
+  if (value?.type === 'map') return map(def);
   return {
     keys: keysOf(def),
     fields: {

@@ -1,8 +1,8 @@
 // @ts-check
 /**
  * Rich embeds (I-070, D-011): the shared foundation for content that needs a
- * library or another server: diagrams, web pages, PDFs and graphs (maps
- * next). Every kind is available as an audience slot type and a reader block
+ * library or another server: diagrams, web pages, PDFs, graphs and maps.
+ * Every kind is available as an audience slot type and a reader block
  * type, and has one module `shared/embeds/<kind>.js`:
  *
  *   library      vendor folder it lazy-loads, or null (the export skips it when unused)
@@ -42,6 +42,7 @@ import { grantConsent, hasConsent } from './consent.js';
 import { applyCropFallback } from '../crop.js';
 import * as diagram from './diagram.js';
 import * as graph from './graph.js';
+import * as map from './map.js';
 import * as pdf from './pdf.js';
 import * as web from './web.js';
 
@@ -63,12 +64,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf, graph };
+export const EMBED_KINDS = { diagram, web, pdf, graph, map };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -101,6 +102,7 @@ export function usedEmbedKinds(show) {
       if (web.isWeb(value)) kinds.add('web');
       if (pdf.isPdf(value)) kinds.add('pdf');
       if (graph.isGraph(value)) kinds.add('graph');
+      if (map.isMap(value)) kinds.add('map');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);

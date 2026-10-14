@@ -1,7 +1,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { GRAPH_HELP, HELP_SECTIONS, helpUrl } from '../js/help.js';
+import { GRAPH_HELP, HELP_SECTIONS, MAP_HELP, helpUrl } from '../js/help.js';
 
 const html = await readFile(new URL('../help.html', import.meta.url), 'utf8');
 const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
@@ -18,6 +18,7 @@ describe('user manual (E-016)', () => {
   test('every tab section exists in help.html', () => {
     for (const id of Object.values(HELP_SECTIONS)) assert.ok(ids.has(id), `help.html has no id="${id}"`);
     assert.ok(ids.has(GRAPH_HELP.split('#')[1]), 'the graph fields link to an existing section');
+    assert.ok(ids.has(MAP_HELP.split('#')[1]), 'the map fields link to an existing section');
   });
 
   test('every link inside help.html points to an existing section', () => {

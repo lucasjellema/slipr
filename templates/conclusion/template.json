@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -452,6 +452,17 @@
         { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
         { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
         { "name": "graph", "type": "graph", "label": "Graph", "required": true }
+      ]
+    },
+    {
+      "id": "map",
+      "name": "Map",
+      "description": "Title with an interactive map (a tour from place to place in audience mode) in the content area.",
+      "file": "layouts/map.html",
+      "slots": [
+        { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
+        { "name": "map", "type": "map", "label": "Map", "required": true }
       ]
     },
     {

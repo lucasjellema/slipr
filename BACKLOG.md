@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), image cropping (I-090), picture morphs (I-091), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), maps (I-075), image cropping (I-090), picture morphs (I-091), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -96,6 +96,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **E-018** [editor] Bug: **Save overwrites changes made to `show.json` on disk** since the editor opened it. The editor writes its in-memory show without checking the file, so newer work from elsewhere (another editor window, a Claude session, a git pull) is silently lost. Happened twice on 2026-10-11/12 with `shows/demo/show.json`: an editor window still holding older content saved over committed changes (I-084 styles, I-086 aliases) and brought back deleted test images. Fix: remember the file's `lastModified` (and content hash) when opening and after each save; before saving, read the file again, and if it changed, don't overwrite silently. Offer **Reload from disk** (discarding the in-memory edits), **Save anyway** (overwrite), or **Cancel**; ideally also notice the change when the window regains focus. Same check for Present / Read (they save first) · todo · —
 - [ ] **E-019** [editor] Diagram editor: diagram slots and blocks are read-only in the editor (no Mermaid textarea, no caption, no fallback image from I-070). Add a field editor for the `diagram` slot and a Diagram block editor (`BLOCK_TYPES` lacks `diagram`), with a fallback image field like the Embedded Page block
 - [ ] **E-020** [editor] Graph editor: graph slots and blocks (I-074) are read-only in the editor. Add a field editor: nodes (id, label, tags, Markdown, linked slide) and edges as rows, layout, the audience steps, a data file picker, caption and fallback image; the preview already draws the graph
+- [ ] **E-021** [editor] Map editor: map slots and blocks (I-075) are read-only in the editor. Add a field editor: places as rows (title, position, tags, Markdown, linked slide; ideally "click on the preview to place"), first view (center, zoom, or "use the current view"), audience steps, GeoJSON layer picker, tiles (OpenStreetMap / none / folder / other server with attribution), present, load, caption and fallback image (ideally a "snapshot the current view" button); the preview already draws the map
 - [ ] **I-059** [editor] `setLayout` keeps slots by name only; the design says name *and* type. No template has a slot name with two types today, but a future one would get an invalid value on a layout switch. Keep a value only if the new slot has the same type (else set it aside in `_orphaned`)
 - [x] **I-092** [editor/format] **Export a show to a zip file and import from an uploaded zip file in the editor**:
   - **Export to zip (`.zip` / `.slipr`)**:
@@ -129,15 +130,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
-- [ ] **I-075** [format/viewer] **Interactive map (Leaflet)**: a `map` slot and block with `center`, `zoom`, `markers` (`lat`, `lng`, `title`, `md`, optional `slide`), optional GeoJSON layers (relative file) and a tile source.
-  - Vendored **Leaflet**.
-  - Reader mode: pan and zoom, with marker popups as Slipr popovers.
-  - Audience mode: fragments as a `flyTo` tour from marker to marker.
-  - **Offline and privacy:** map tiles come from a server, which conflicts with D-002 (offline) and D-010 (privacy). Solutions:
-    - click-to-load (I-070: done, per site per tab, `load: "auto"` to skip)
-    - a static image fallback rendered at authoring time
-    - optional local tiles for offline presenting
-  - Respect the tile provider's usage policy and show the required attribution (e.g. OpenStreetMap) · todo · —
+- [ ] **I-099** [format/viewer] Local map tiles everywhere (I-075 follow-up): tiles in the show folder (`"tiles": "tiles/{z}/{x}/{y}.png"`) load only when the show is served by URL. Shows opened from a folder or zip get blob URLs only for files `collectImagePaths()` lists, and the single-file export packs only those, but a tile set has no file list. Options: list the tile folder through the folder / zip source (and in `npm run export`), or an optional `tiles.bounds` + `minZoom` / `maxZoom` that lets Slipr enumerate the tiles; then resolve each tile URL through the show's sources in `shared/embeds/map.js`
 
 ### AI authoring
 - [ ] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
@@ -168,6 +161,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-075** [format/viewer] Interactive maps with vendored **Leaflet 1.9.4** (D-011 refined): `map` slot and block (show format 0.2) with `center` / `zoom`, `markers` (position, title, Markdown, tags, linked slide), GeoJSON `layers` from the show folder and `tiles` (OpenStreetMap by default with its attribution, another https server, tiles in the show folder, or `"none"`); audience `steps` fly from place to place; reader pan / zoom / Fit, place panel with "Go to slide", place list, tag filter; pins and layers in the template's graph palette by tag; click-to-load in reader mode, live in audience mode (`present: "static"` for none), static place list and fallback image; `map` layouts in both templates (default 1.5.0, Conclusion 0.1.6); demo slide with an offline map block; export (Leaflet only for shows with maps); editor read-only (E-021); local tiles beyond served shows: I-099. Spec: `docs/specs/I-075-map.md` · done 2026-10-13 · claude
 - [x] **I-098** [viewer] Grid overview in audience mode (`Esc` / `O`): thumbnails wrapping to the window, grouped by chapter, the row under the mouse or keyboard focus enlarged 1.25 × while the others make room; click / Enter goes to the slide at its start, arrow keys move, Esc returns; replaces Reveal's single-row overview (`viewer/audience/grid-overview.js`) · done 2026-10-13 · claude
 - [x] **I-003** [viewer] Laser pointer (`L`), spotlight (`K`) and pen (`D`; `X` erases) in audience mode: own vanilla module `viewer/audience/presenter-tools.js` (Lucas: no third-party plugin), drawings per slide until a reload, template accent color, touch-safe, `Esc` turns tools off · done 2026-10-13 · claude
 - [x] **I-091** [viewer/format/editor] Morph transition for pictures between auto-animate slides: a Slipr `autoAnimateMatcher` (`viewer/audience/morph.js`) pairs pictures by `morphId`, file or slot and animates width / height (no distortion), crop, focus, opacity and radius; `morphId` on image values (show format 0.2); editor **Morph name** field; reduced motion turns it off; demo slide `s-ai-detail`. Spec (with the Reveal spike): `docs/specs/I-091-image-morph.md` · done 2026-10-13 · claude

@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Maps (I-075)
+- **Added** map slides and blocks. Audience mode tours a map from place to place, click by click. Reader mode: drag to pan, + / −, Fit, click a pin or pick it from the Place… list to see its text and slide, filter by tag; the background map from OpenStreetMap waits for **Load**, like an embedded page. Reader search finds place titles and text.
+
 ### 2026-10-13: Grid overview (I-098)
 - **Changed** `Esc` / `O` in audience mode open `audience/grid-overview.js` instead of Reveal's overview (`overview: false`): a grid of thumbnails that wraps to the window (2–8 columns), grouped by chapter with backup slides last. The row under the mouse, or with the keyboard focus, grows to the full width (1.25 ×) while the others make room. Click, tap or `Enter` goes to the slide at its start; arrow keys, `Home` and `End` move; `Esc` or `O` returns. Thumbnails are copies of the presented slides with every step shown and embeds as their static fallback, made as they scroll into view. Esc still closes Reveal's help first; presenter tools turn off.
 

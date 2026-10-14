@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-13: Maps, read-only (I-075)
+- **Added** map slots and blocks show a summary ("Map: 3 places, 3 steps, OpenStreetMap tiles") with a link to the new **Maps** section of the manual, and are edited in show.json for now; the preview draws them. Saving keeps the key order of maps, markers, layers, tiles and steps.
+
 ### 2026-10-13: Morph name (I-091)
 - **Added** a **Morph name** field under every picture, next to Crop… (cleaned to letters, digits, `-` and `_`; empty removes it), to pair two different pictures for the morph between auto-animate slides.
 

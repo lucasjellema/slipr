@@ -131,6 +131,7 @@ Renderer rules:
 | `diagram` | any container | Rendered SVG diagram from Mermaid source |
 | `pdf` | any container (give it a size; it becomes a flex column) | A page of a PDF, fitted to the element; with a page range, one page per click in audience mode (I-072). Shows format 0.2 |
 | `graph` | any container (give it a size; it becomes a flex column) | A graph drawn to fill the element; in audience mode built up by its steps, in reader mode with a toolbar and node panel below it (I-074). Node colors come from **`--slipr-graph-1` … `--slipr-graph-6`** (by tag; without them the template's primary and accent colors and four neutral ones), text from `--slipr-font-body`, links from `--slipr-color-muted`, the focus ring from `--slipr-color-accent`. Shows format 0.2 |
+| `map` | any container (give it a size; it becomes a flex column) | An interactive map filling the element (Leaflet); in audience mode a tour from place to place, in reader mode with a toolbar and place panel below it (I-075). Pin and layer colors come from the graph palette **`--slipr-graph-1` … `6`** (by tag), the selection ring from `--slipr-color-accent`. Shows format 0.2 |
 | `web` | any container (give it a size; it becomes a flex column) | A live web page in a sandboxed frame that fills the element, or the show's screenshot (I-071). Shows format 0.2 |
 
 - An element whose optional slot is **empty** gets the attribute `data-empty` so CSS can hide it or reflow around it.
