@@ -15,6 +15,7 @@ import { goToFolder, guardUnsavedChanges, newShow, openFolder, openViewer, openZ
 import { exportShow } from './export.js';
 import { exportZip } from './export-zip.js';
 import { mountShowGrid } from './ui/show-grid.js';
+import { openLibraryDialog } from './ui/library-dialog.js';
 import { mountGlossaryEditor } from './ui/glossary-editor.js';
 import { watchTheme } from './theme.js';
 import { mountToolbar } from './ui/toolbar.js';
@@ -177,6 +178,7 @@ async function startEditor(ctx, { showUrl, folderHandle, zipSource } = {}) {
       onExportZip: () => run(() => exportZip(store)),
       onGrid: () => grid.toggle(),
       onGlossary: () => glossary.toggle(),
+      onLibrary: () => run(() => openLibraryDialog({ store })),
       onPresent: () => present('audience'),
       onRead: () => present('reader'),
       onFindReplace: () => openFindReplaceDialog(store),

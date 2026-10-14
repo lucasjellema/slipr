@@ -1779,6 +1779,25 @@ export function duplicateSlides(show, { slideIds }) {
 }
 
 /**
+ * Insert slides from the slide library (I-029), prepared by
+ * library/library-model.js prepareInsert(): after `afterSlideId` (or at the
+ * end), adding the glossary terms the show lacks. One undo step.
+ * @param {any} show
+ * @param {{ slides: any[], afterSlideId?: string | null, glossary?: Record<string, any> }} payload
+ * @returns {any}
+ */
+export function insertSlides(show, { slides, afterSlideId = null, glossary = {} }) {
+  if (!Array.isArray(slides) || !slides.length) return show;
+  const list = Array.isArray(show.slides) ? [...show.slides] : [];
+  const at = list.findIndex((s) => s.id === afterSlideId);
+  list.splice(at === -1 ? list.length : at + 1, 0, ...clone(slides));
+  const next = { ...show, slides: list };
+  const add = Object.entries(glossary).filter(([id]) => !show.glossary?.[id]);
+  if (add.length) next.glossary = { ...(show.glossary ?? {}), ...Object.fromEntries(clone(add)) };
+  return syncChapterOrder(next);
+}
+
+/**
  * Delete slides (with the same reference clean-up as deleteSlide). A show
  * keeps at least one slide: deleting them all does nothing.
  * @param {any} show
@@ -2053,6 +2072,7 @@ export const actions = {
   duplicateSlide,
   moveSlides,
   duplicateSlides,
+  insertSlides,
   deleteSlides,
   setSlidesHidden,
   setSlidesChapter,

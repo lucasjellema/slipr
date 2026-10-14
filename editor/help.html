@@ -33,6 +33,7 @@
         <li><a href="#files">Open, create and save</a></li>
         <li><a href="#slides">The slide list</a></li>
         <li><a href="#grid">Show grid</a></li>
+        <li><a href="#library">Slide library</a></li>
         <li><a href="#slide-tab">Slide tab</a></li>
         <li><a href="#images">Images</a></li>
         <li><a href="#extra-images">Extra images</a></li>
@@ -231,6 +232,41 @@
           <li>Click <strong>+ Chapter</strong> and type <em>Backup</em>.</li>
           <li>Click <strong>Hide from audience</strong>. The slides get the <strong>◌ backup</strong> badge. In the presentation they come after the last slide, without numbers, for questions afterwards; readers find them in the <em>Backup</em> chapter.</li>
         </ol>
+      </section>
+
+      <section id="library">
+        <h2>Slide library</h2>
+        <p>The slide library keeps slides you want to <strong>reuse in other shows</strong>: a title slide with the right logo, a team slide, a pricing table, a map. It lives in this browser and is shared by every show you open here; nothing is sent anywhere. A library slide is a <strong>copy</strong>: it keeps the slide, its pictures and files, its reader layer and the glossary terms it uses, and does not change when you change the slide later.</p>
+
+        <h3>Copy slides into the library</h3>
+        <ul>
+          <li>In the <a href="#grid">show grid</a>, select one or more slides and choose <strong>Copy to library…</strong> in the selection bar.</li>
+          <li>Or open <strong>📚 Library</strong> and choose <strong>Copy current slide…</strong> (the slide selected in the editor).</li>
+        </ul>
+        <p>Give the copy a title (one slide), <strong>tags</strong> (separated by commas, to find it again), a <strong>note</strong> and a <strong>collection</strong> (or <em>New collection…</em>). A file the slide uses that cannot be found is left out, and the notice says which.</p>
+
+        <h3>Insert library slides into this show</h3>
+        <p>Click <strong>📚 Library</strong> in the toolbar. Each thumbnail shows the slide <strong>as it will look in this show</strong>, in this show's template. Search (titles, tags, notes and the slides' text), click tags to filter, or pick a collection, template or source show. Click slides to select them (click again to unselect), then <strong>Insert … after “…”</strong>: they are added after the slide you are on, in library order, and the first one is selected. One <kbd>Ctrl</kbd>+<kbd>Z</kbd> takes them all out again.</p>
+        <p>What happens on the way in:</p>
+        <ul>
+          <li><strong>Another template.</strong> A slide keeps its layout when this template has one with the same name. Otherwise it gets the layout that takes most of its content, and content without a place there is <em>kept aside</em> (it comes back when you pick a layout that has it, see <a href="#slide-tab">Slide tab</a>). The library shows this before you insert: <em>Becomes: …</em> and <em>Kept aside: …</em>.</li>
+          <li><strong>Links.</strong> Links between slides you insert together keep working. Links to slides that are not in this show are removed: related slides, <em>Link to slide</em> blocks (they become their label as text), and the slide links of graph nodes and map places. Links written in text stay and show up as warnings.</li>
+          <li><strong>Profiles and chapter.</strong> Reader profiles this show does not have are removed from blocks (a block left without one shows to everyone). Inserted slides join the chapter of the slide they follow.</li>
+          <li><strong>Glossary.</strong> Terms this show lacks are added. When this show already has a term with the same id, its own definition is kept.</li>
+          <li><strong>Files.</strong> Pictures and other files are copied into the show folder. If the show already has a different file with the same name, the copy gets a new name.</li>
+        </ul>
+        <p>A notice after inserting lists everything that was changed.</p>
+
+        <h3>Manage the library</h3>
+        <ul>
+          <li>Click a slide to see its details on the right: change its <strong>title</strong>, <strong>tags</strong>, <strong>note</strong> and <strong>collection</strong> and choose <strong>Save details</strong>. It also says where and when it was copied.</li>
+          <li><strong>Update from current slide</strong> replaces the library slide with the slide you are on in the editor (title, tags, note and collection stay).</li>
+          <li><strong>Remove from library</strong> deletes it from the library; shows that use it keep their copy.</li>
+          <li><strong>Order:</strong> with <em>My order</em>, drag a slide onto another one in the same collection, or use <strong>▲</strong> / <strong>▼</strong>.</li>
+          <li><strong>Collections…</strong> adds, renames, orders and removes collections. A slide is in at most one collection; removing a collection keeps its slides.</li>
+          <li><strong>Export…</strong> saves the library (or only the selected slides) as a <code>.zip</code>: a backup, or a way to take it to another browser or computer. <strong>Import…</strong> adds the slides of such a zip; slides you already have are kept, unless the zip has a newer version.</li>
+        </ul>
+        <p class="note">The library is stored in this browser's storage for this site. Clearing the browser's site data deletes it: export it now and then as a backup.</p>
       </section>
 
       <section id="slide-tab">

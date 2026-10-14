@@ -88,6 +88,7 @@ The viewer and the editor never know which template is in use: everything goes t
 
 - Development: any static file server from the repo root, for example `npx http-server .` or `python -m http.server`. Pages use `fetch()`, so `file://` will not work.
 - Presenting: the same static server on the laptop. Later this could be a packaged offline single-file export (see backlog).
+- Browser storage (no server, D-010): the editor keeps draft autosaves (`slipr-drafts`, I-020), remembered folders (`folder-handles.js`) and the **slide library** (`slipr-library`, I-029: entries, collections and content-addressed files; `editor/js/library/`) in IndexedDB; the viewer keeps reader data (`slipr-reader`, D-010).
 - Publishing for readers: copy `viewer/`, `shared/`, `vendor/`, the template and the show folder to any static host. Or export the show as **one HTML file** (`npm run export`, or **Export…** in the editor; I-054) and share or host just that file: it presents offline.
 
 ## Testing strategy

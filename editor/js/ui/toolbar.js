@@ -11,7 +11,7 @@ import { HELP_PAGE, helpUrl } from '../help.js';
  * Mount the editor toolbar into a container.
  * @param {HTMLElement} container
  * @param {import('../store.js').EditorStore} store
- * @param {{ onOpen?: () => void, onOpenZip?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onExportZip?: () => void, onGrid?: () => void, onGlossary?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
+ * @param {{ onOpen?: () => void, onOpenZip?: () => void, onNew?: () => void, onSave?: () => void, onExport?: () => void, onExportZip?: () => void, onGrid?: () => void, onGlossary?: () => void, onLibrary?: () => void, onPresent?: () => void, onRead?: () => void, onFindReplace?: () => void }} [handlers]
  */
 export function mountToolbar(container, store, handlers = {}) {
   const root = h('header', { class: 'slipr-toolbar' });
@@ -139,6 +139,15 @@ export function mountToolbar(container, store, handlers = {}) {
           onclick: () => handlers.onGlossary?.(),
         },
         ['📖 Glossary']
+      ),
+      h(
+        'button',
+        {
+          class: 'slipr-btn',
+          title: 'Slide library: reuse slides from your other shows, and copy slides into it (I-029)',
+          onclick: () => handlers.onLibrary?.(),
+        },
+        ['📚 Library']
       ),
       h(
         'button',

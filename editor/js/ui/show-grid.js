@@ -15,6 +15,7 @@
 import { h } from '../dom.js';
 import { renderSlide, slideTitle } from '../../../shared/render.js';
 import { hydrateEmbeds } from '../../../shared/embeds/index.js';
+import { openCopyToLibraryDialog } from './library-dialog.js';
 import { issuesForSlide } from '../store.js';
 import { emptyChapters, gridMove, selectRange, slideRuns } from '../show-grid-model.js';
 import { uniqueId } from '../show-entities.js';
@@ -167,6 +168,10 @@ export function mountShowGrid(host, store) {
     selectionBar.replaceChildren(
       h('span', { class: 'slipr-grid-count' }, [`${ids.length} selected`]),
       h('button', { type: 'button', class: 'slipr-btn slipr-btn-sm', title: 'Duplicate (Ctrl+D)', onclick: () => duplicate() }, ['Duplicate']),
+      h('button', {
+        type: 'button', class: 'slipr-btn slipr-btn-sm', title: 'Copy the selected slides into your slide library, to reuse them in other shows',
+        onclick: () => openCopyToLibraryDialog({ store, slideIds: ids }),
+      }, ['Copy to library…']),
       h('button', {
         type: 'button', class: 'slipr-btn slipr-btn-sm',
         title: allHidden ? 'Show in audience mode again' : 'Hide from audience mode (backup slides; reader mode still shows them)',
