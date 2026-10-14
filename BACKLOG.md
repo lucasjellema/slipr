@@ -127,6 +127,15 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
+- [ ] **I-101** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
+  - **Data source**: external `.csv` file in `data/` (e.g. `data/sales.csv`) or inline CSV string; parsed client-side with zero external runtime dependencies (D-001/D-002); packaged in single-file HTML exports and zip archives.
+  - **Presentation & styling**: clean layout styled with `--slipr-*` template tokens, zebra striping, sticky header row, and auto-alignment (numbers right-aligned, text left-aligned, dates/codes centered).
+  - **Scrollable & pinned**: scrollbars when rows exceed visible limit (`maxRows` or container height) and when columns exceed container width; sticky header stays fixed while scrolling rows; optional pinned first column stays fixed while scrolling horizontally.
+  - **Sorting & filtering**: optional interactive sorting (click column header to toggle ascending / descending / original order) and text filter / search box to instantly filter rows.
+  - **Aggregates & totals**: optional summary footer row with calculated totals (sum, average, min, max, count) for numeric columns.
+  - **Column controls**: hide specific columns (via author config or interactive toggle), customize display headers, and specify column formatting (currency, percentage, decimals, date).
+  - **Audience mode**: clean slide layout; optional step-by-step row reveals or highlighting on clicks (Reveal fragments).
+  - **Reader mode**: full interactivity with search, column sorting, pagination/filter, "Copy to clipboard", and "Download CSV"; cell text is indexed for reader full-text search (`/`). · todo · —
 
 ### AI authoring
 - [ ] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
