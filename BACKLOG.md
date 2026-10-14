@@ -127,7 +127,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
 
 ### Rich embeds & visualizations
-- [ ] **I-101** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
+- [ ] **I-104** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
   - **Data source**: external `.csv` file in `data/` (e.g. `data/sales.csv`) or inline CSV string; parsed client-side with zero external runtime dependencies (D-001/D-002); packaged in single-file HTML exports and zip archives.
   - **Presentation & styling**: clean layout styled with `--slipr-*` template tokens, zebra striping, sticky header row, and auto-alignment (numbers right-aligned, text left-aligned, dates/codes centered).
   - **Scrollable & pinned**: scrollbars when rows exceed visible limit (`maxRows` or container height) and when columns exceed container width; sticky header stays fixed while scrolling rows; optional pinned first column stays fixed while scrolling horizontally.
@@ -136,8 +136,15 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - **Column controls**: hide specific columns (via author config or interactive toggle), customize display headers, and specify column formatting (currency, percentage, decimals, date).
   - **Audience mode**: clean slide layout; optional step-by-step row reveals or highlighting on clicks (Reveal fragments).
   - **Reader mode**: full interactivity with search, column sorting, pagination/filter, "Copy to clipboard", and "Download CSV"; cell text is indexed for reader full-text search (`/`). · todo · —
+- [ ] **I-105** [format/viewer/editor] **Tag cloud / word cloud from CSV data (`tag-cloud` slot and block)**:
+  - **Data source**: external `.csv` file in `data/` (e.g. `data/keywords.csv`) or inline CSV block with terms and optional weights or frequencies (`term, weight`), parsed client-side with zero external runtime dependencies (D-001/D-002).
+  - **Layout & visual design**: font sizes scaled proportionally to weight/frequency; colors styled with template tokens (`--slipr-graph-*` or accent palette); clean spatial packing that stays legible and fits the slide aspect ratio.
+  - **Glossary integration (D-015)**: tags matching glossary entries (`show.glossary[term]`) automatically link to their glossary definitions. In **Reader mode**, clicking a tag opens its glossary popover with term details, aliases, markdown notes, and related slides.
+  - **Audience mode**: clean presentation view for key themes, survey results, or audience keywords; optional steps to pulse, highlight or reveal top terms on clicks.
+  - **Reader mode**: fully interactive with glossary popovers, click-to-filter related slides, and inclusion of terms in the reader full-text search index (`/`). · todo · —
 
 ### AI authoring
+
 - [ ] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
   - **Contents of the instruction:**
     - what Slipr is and the two-layer idea: a concise audience layer, with depth in the reader layer
