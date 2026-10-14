@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Map editor (E-021)
+- **Added** a map editor for the `map` slot and a new **Map** reader block type (`ui/map-fields.js`, value helpers `map-values.js`): an interactive mini map (📍 Click to add, + Place at center, drag a pin to move it, Use this view, Fit to places, 📷 Snapshot as fallback, which draws the mini map's tiles, layers, pins and attribution into a PNG with an alt text naming the places); rows for places (title, position, tags, Markdown, linked slide, id; reorder, remove with their steps), the tour while presenting (slots: place and zoom per step, reorder), GeoJSON layers (copied into `data/` by **+ Add layer from file…**, title, tag), the background (OpenStreetMap, none, show folder, other server with attribution and max zoom, with hints), while presenting, load straight away, caption and fallback image. The mini map is kept across re-renders. A map slot or block makes a 0.1 show 0.2. The image helpers take a suggested alt text.
+
 ### 2026-10-14: Local map tiles (I-099)
 - **Fixed** the preview of a map with tiles in the show folder showed no background for folder and zip shows; tiles are now read like the show's other files (`js/io/show-files.js`, shared with the slide library).
 - **Changed** **Export…** packs a map's local tiles into the file (folder shows; a show opened by URL gets a warning instead).

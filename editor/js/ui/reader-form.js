@@ -5,7 +5,7 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
-import { GRAPH_HELP, MAP_HELP } from '../help.js';
+import { GRAPH_HELP } from '../help.js';
 import { pictureStyleControls } from './picture-style.js';
 import { addImageToBlock } from '../image-input.js';
 import { graphSummary, imageValue, mapSummary } from '../slot-values.js';
@@ -15,7 +15,10 @@ import { markdownToolbar } from './markdown-toolbar.js';
 import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
-import { addPdf } from '../image-input.js';
+import { addLayerFile, addPdf } from '../image-input.js';
+import { mapFields } from './map-fields.js';
+import { MAP_FIELDS } from '../map-values.js';
+import { readShowFile } from '../io/show-files.js';
 import { slideTitle } from '../../../shared/render.js';
 
 /** Actions the reader form dispatches while the user types. */
@@ -30,6 +33,7 @@ const BLOCK_TYPES = [
   { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
   { type: 'pdf', label: 'PDF Document' },
+  { type: 'map', label: 'Map' },
 ];
 
 /** Block ids whose "For" picker is open, so a re-render keeps it open. */
@@ -256,6 +260,8 @@ export function mountReaderForm(container, store) {
         bodyEl.append(embedEditor(store, slide.id, block));
       } else if (block.type === 'pdf') {
         bodyEl.append(pdfBlockEditor(store, slide.id, block));
+      } else if (block.type === 'map') {
+        bodyEl.append(mapBlockEditor(store, slide.id, block));
       } else if (block.type === 'slide-ref') {
         bodyEl.append(slideRefEditor(store, slide, block));
       } else if (block.type !== 'text') {
@@ -264,9 +270,7 @@ export function mountReaderForm(container, store) {
           h('div', { class: 'slipr-readonly' }, [describeBlock(block)]),
           block.type === 'graph'
             ? h('span', { class: 'slipr-help' }, ['Graphs are written in show.json for now: ', h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a graph']), '.'])
-            : block.type === 'map'
-              ? h('span', { class: 'slipr-help' }, ['Maps are written in show.json for now: ', h('a', { href: MAP_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a map']), '.'])
-              : h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
+            : h('span', { class: 'slipr-help' }, [`This ${block.type} block can't be edited here yet. Edit show.json directly.`])
         );
       } else {
         // Default text markdown editor
@@ -643,6 +647,49 @@ function pdfBlockEditor(store, slideId, block) {
     addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
     resolveAsset: store.state.resolveAsset,
   }));
+}
+
+/**
+ * Map (I-075, E-021): title, then the map editor (mini map, places, layers,
+ * background, caption, fallback image).
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function mapBlockEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
+  /** @param {any} next @param {boolean} [typing] */
+  const write = (next, typing = false) => {
+    // The map fields as a patch: a field the value no longer has is removed.
+    const patch = Object.fromEntries(MAP_FIELDS.map((k) => [k, next?.[k]]));
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, typing ? { coalesceKey: `block-map-${block.id}` } : {});
+  };
+  return h('div', { class: 'slipr-embed-editor slipr-map-fields' }, [
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm',
+      placeholder: 'Title (optional, above the map)',
+      'aria-label': 'Map: title',
+      value: block.title ?? '',
+      oninput: (/** @type {Event} */ e) => store.dispatch('updateBlock', {
+        slideId, blockId: block.id, patch: { title: /** @type {HTMLInputElement} */ (e.target).value || undefined },
+      }, { coalesceKey: `block-title-${block.id}` }),
+    }),
+    ...mapFields({
+      key: `block:${slideId}:${block.id}`,
+      label: 'Map',
+      kind: 'block',
+      read,
+      write,
+      readFile: (path) => readShowFile(store.state, path),
+      addLayerFile: (file, done) => addLayerFile(store, { file, write: done }),
+      addFallback: (file, alt) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback', alt }),
+      resolveAsset: store.state.resolveAsset,
+      slides: store.state.show?.slides ?? [],
+      currentSlideId: slideId,
+    }),
+  ]);
 }
 
 /**

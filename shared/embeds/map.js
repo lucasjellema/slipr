@@ -37,7 +37,7 @@ export const errorLabel = 'Map could not be drawn';
 
 /** The default tile source: OpenStreetMap's standard tiles (usage policy: https://operations.osmfoundation.org/policies/tiles/). */
 export const OSM_TILES = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
+export const OSM_ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors';
 const PALETTE_SIZE = 6;
 /** Zoom for a step without its own, and for a single marker without `zoom`. */
 export const STEP_ZOOM = 12;
@@ -328,6 +328,24 @@ function addLeafletStylesheet(doc) {
 }
 
 /**
+ * Leaflet and its stylesheet, loaded once (also for the editor's map editor, E-021).
+ * @param {Document} doc
+ * @returns {Promise<any>}  The Leaflet module.
+ */
+export async function loadLeaflet(doc) {
+  const [L] = await Promise.all([getLeaflet(), addLeafletStylesheet(doc)]);
+  return L;
+}
+
+/**
+ * A pin as SVG markup (fill escaped): Slipr's marker icon.
+ * @param {string} color
+ */
+export function pinSvg(color) {
+  return `<svg viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 31c-1-3-10-12-10-19a10 10 0 0 1 20 0c0 7-9 16-10 19z" fill="${escape(color)}" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>`;
+}
+
+/**
  * Draw the map into `live`. Throws when Leaflet cannot load or a layer file cannot be read.
  * @param {HTMLElement} el  The embed element.
  * @param {HTMLElement} live  Where the rendered content goes.
@@ -417,7 +435,7 @@ export async function hydrate(el, live, options = {}) {
     const color = colorOf(m.tags[0]);
     const icon = L.divIcon({
       className: 'slipr-map-pin',
-      html: `<svg viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 31c-1-3-10-12-10-19a10 10 0 0 1 20 0c0 7-9 16-10 19z" fill="${escape(color)}" stroke="#fff" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="#fff"/></svg>`,
+      html: pinSvg(color),
       iconSize: [24, 32],
       iconAnchor: [12, 31],
       tooltipAnchor: [0, -28],
@@ -545,7 +563,7 @@ export async function hydrate(el, live, options = {}) {
  * `read` (a folder or zip source): each tile becomes an object URL, freed once drawn.
  * @param {any} L @param {(path: string) => Promise<Blob | null>} read
  */
-function localTileLayer(L, read) {
+export function localTileLayer(L, read) {
   return L.TileLayer.extend({
     createTile(/** @type {any} */ coords, /** @type {(err: any, tile: HTMLElement) => void} */ done) {
       const img = document.createElement('img');
@@ -685,7 +703,7 @@ function readerControls(el, map, markers, pins, colors, theme, home) {
  * @param {HTMLElement} el
  * @returns {Theme}
  */
-function themeOf(el) {
+export function themeOf(el) {
   const style = getComputedStyle(el);
   const v = (/** @type {string} */ name, /** @type {string} */ fallback) => style.getPropertyValue(name).trim() || fallback;
   // Without the template's palette: its primary and accent, then four neutral colors.

@@ -89,8 +89,11 @@ A tile set has no list of files in the show, so it cannot be handled like images
 
 A large tile set makes a large export (every tile is embedded): keep offline tile sets to the zoom levels and area the talk needs.
 
+## Map editor (E-021, 2026-10-14)
+
+Lucas's decisions: places are set on an **interactive mini map in the form** (not on the slide preview), with a **snapshot** button for the fallback image, and the full scope (places, steps, layers with a file picker, tiles, present, load, caption, fallback, and Map as a reader block type). Modules: `editor/js/map-values.js` (DOM-free value helpers, tested) and `editor/js/ui/map-fields.js` (shared by the `map` slot editor and the Map block editor). The mini map uses the same Leaflet loader, pins and local tile layer as the viewer (`loadLeaflet()`, `pinSvg()`, `localTileLayer()` exported from `shared/embeds/map.js`); its tiles from servers load with `crossOrigin` so a snapshot can draw them. The snapshot draws the loaded tiles, the vector layers and pins (serialized SVG) and the attribution text into a canvas; a server without CORS taints it, which is reported. New places get an id from their title (steps need ids); renaming an id updates the steps, removing a place removes its steps.
+
 ## Out of scope
 
-- Editing maps in the editor (read-only for now; backlog E-021).
 - Rendering a snapshot of the map as the fallback image at authoring time.
 - Marker clusters, custom icons per marker, popups with images, steps that fit a layer or a group of markers.

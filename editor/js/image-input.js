@@ -6,12 +6,14 @@
  * `{ src, alt }`, and the alt-text dialog opens. Undo restores the previous
  * image; the copied file stays (images are never deleted automatically).
  */
-import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath } from './io/images.js';
+import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath, shortHash } from './io/images.js';
 import { canOpenFolders, ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
 import { pdfValue, webValue } from './block-values.js';
+import { mapValue } from './map-values.js';
+import { isMap } from '../../shared/embeds/map.js';
 import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
@@ -81,7 +83,7 @@ export function pasteTargetSlot(template, slide) {
  *   read: (slide: any) => any, write: (image: any) => void }} target
  *   `read` returns the current image value of the target, `write` stores a new one.
  */
-async function addImage(store, { slideId, file, fallbackName, read, write }) {
+async function addImage(store, { slideId, file, fallbackName, read, write, defaultAlt }) {
   const handle = store.state.folderHandle;
   if (!handle && !store.state.zipSource && canOpenFolders()) {
     showBanner('To add images, Slipr needs to write to the show folder. Choose it, then add the image again.', 'info', { timeout: 6000 });
@@ -113,7 +115,7 @@ async function addImage(store, { slideId, file, fallbackName, read, write }) {
 
   const previous = read(slideOf());
   const keepAlt = previous?.src === path;
-  write(imageValue(keepAlt ? previous : { ...previous, alt: undefined }, { src: path }));
+  write(imageValue(keepAlt ? previous : { ...previous, alt: defaultAlt || undefined }, { src: path }));
 
   if (file.size > LARGE_IMAGE_BYTES) {
     showBanner(`This image is ${(file.size / 1024 / 1024).toFixed(1)} MB. Large images make shows slow to open; consider a smaller or compressed version.`, 'info', { timeout: 8000 });
@@ -123,7 +125,7 @@ async function addImage(store, { slideId, file, fallbackName, read, write }) {
   openAltTextDialog({
     path,
     previewUrl,
-    alt: keepAlt ? previous?.alt ?? '' : '',
+    alt: keepAlt ? previous?.alt ?? '' : defaultAlt ?? '',
     onClose: () => URL.revokeObjectURL(previewUrl),
     onSave: (alt) => {
       const current = read(slideOf());
@@ -151,20 +153,21 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
 
 /**
  * Copy an image into the show folder and make it the fallback image of a
- * `web` (I-071) or `pdf` (I-072) slot, then ask for alt text.
+ * `web` (I-071), `pdf` (I-072) or `map` (I-075, E-021) slot, then ask for alt text.
  * @param {import('./store.js').EditorStore} store
- * @param {{ slideId: string, slot: string, file: File }} target
+ * @param {{ slideId: string, slot: string, file: File, alt?: string }} target  alt: suggested alt text (a map snapshot).
  */
-export async function addFallbackToSlot(store, { slideId, slot, file }) {
+export async function addFallbackToSlot(store, { slideId, slot, file, alt }) {
   const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
   await addImage(store, {
     slideId,
     file,
     fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${slot}-fallback`,
+    defaultAlt: alt,
     read: (s) => s?.content?.[slot]?.fallback,
     write: (image) => {
       const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slot];
-      const merge = current && typeof current.pdf === 'string' ? pdfValue : webValue;
+      const merge = isMap(current) ? mapValue : current && typeof current.pdf === 'string' ? pdfValue : webValue;
       store.dispatch('setSlot', { slideId, slot, value: merge(current, { fallback: image }) });
     },
   });
@@ -174,14 +177,15 @@ export async function addFallbackToSlot(store, { slideId, slot, file }) {
  * Copy an image into the show folder and put it in a reader block's image
  * field (`image`, or an embed's `fallback`, I-070), then ask for alt text.
  * @param {import('./store.js').EditorStore} store
- * @param {{ slideId: string, blockId: string, file: File, field?: 'image' | 'fallback' }} target
+ * @param {{ slideId: string, blockId: string, file: File, field?: 'image' | 'fallback', alt?: string }} target  alt: suggested alt text.
  */
-export async function addImageToBlock(store, { slideId, blockId, file, field = 'image' }) {
+export async function addImageToBlock(store, { slideId, blockId, file, field = 'image', alt }) {
   const slide = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
   await addImage(store, {
     slideId,
     file,
     fallbackName: `${slugify(slide?.content?.title ?? '') || slideId}-${field === 'image' ? 'reader' : field}`,
+    defaultAlt: alt,
     read: (s) => s?.reader?.blocks?.find((/** @type {any} */ b) => b.id === blockId)?.[field],
     write: (image) => store.dispatch('updateBlock', { slideId, blockId, patch: { [field]: image } }),
   });
@@ -307,4 +311,38 @@ export async function addPdf(store, { file, fallbackName, write }) {
   await writeImage(handle, path, blob); // writes any file; keeps an existing one
   store.state.registerAsset?.(path, blob);
   write(path);
+}
+
+/**
+ * Copy a GeoJSON file into the show's data/ folder (a map layer, E-021) and
+ * hand its path and a title (from the file name) to `write`. Shows without a
+ * folder keep it in memory for this session, like added pictures.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, write: (path: string, title: string) => void }} target
+ */
+export async function addLayerFile(store, { file, write }) {
+  const name = file.name || 'layer.geojson';
+  if (!/\.(geo)?json$/i.test(name)) throw new Error(`"${name}" is not a GeoJSON file (.geojson or .json).`);
+  const bytes = await file.arrayBuffer();
+  let json;
+  try {
+    json = JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    throw new Error(`"${name}" is not valid JSON.`);
+  }
+  const types = ['FeatureCollection', 'Feature', 'Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
+  if (!types.includes(json?.type)) throw new Error(`"${name}" is JSON, but not GeoJSON (no "type": "FeatureCollection" or a geometry).`);
+  const base = name.replace(/\.(geo)?json$/i, '');
+  const path = `data/${slugify(base).slice(0, 40).replace(/-+$/, '') || 'layer'}-${await shortHash(bytes)}.${/\.geojson$/i.test(name) ? 'geojson' : 'json'}`;
+  const blob = new Blob([bytes], { type: 'application/geo+json' });
+  const handle = store.state.folderHandle;
+  if (handle) {
+    if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
+    await writeImage(handle, path, blob); // writes any file; keeps an existing one
+  } else {
+    if (!store.state.inMemoryAssets) store.state.inMemoryAssets = new Map();
+    store.state.inMemoryAssets.set(path, blob);
+  }
+  store.state.registerAsset?.(path, blob);
+  write(path, base.replace(/[-_]+/g, ' ').trim());
 }

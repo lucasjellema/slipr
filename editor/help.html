@@ -294,7 +294,7 @@
           <dt>Diagram</dt><dd>A Mermaid diagram definition (plain text) with an optional caption. Rendered directly in the browser as an interactive SVG on slides using the <strong>Diagram</strong> layout. See <a href="#diagrams">Diagrams (Mermaid)</a>.</dd>
           <dt>Web page</dt><dd>On the <strong>Web page</strong> layout: the address (https, or a file in the show folder) and a title. <strong>While presenting</strong>: <em>show the live page</em> (clickable on the slide, no Load button) or <em>show the fallback image</em> (a screenshot; nothing is loaded, good for offline talks). In reader mode a page from another site waits for the reader's <strong>Load</strong> unless you tick <strong>In reader mode, load straight away</strong>. <strong>Allow the page to…</strong> gives extra permissions; see <a href="#reader-tab">Embedded Page</a>.</dd>
           <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links. The editor shows a summary and draws the graph in the preview; you write the graph itself in <code>show.json</code>. See <a href="#graphs">Graphs</a>.</dd>
-          <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map. The editor shows a summary and draws the map in the preview; you write the map itself in <code>show.json</code>. See <a href="#maps">Maps</a>.</dd>
+          <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map, edited with a mini map (click to add, drag to move), plus the tour while presenting, layers, background and fallback image. See <a href="#maps">Maps</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
         <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
@@ -471,7 +471,7 @@
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
             <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>Written in <code>show.json</code> for now (see <a href="#graphs">Graphs</a>); the editor shows a summary</td></tr>
-            <tr><td><strong>Map</strong></td><td>Places on a map readers explore: drag, zoom, click a place for its text and slide, filter by tag</td><td>Written in <code>show.json</code> for now (see <a href="#maps">Maps</a>); the editor shows a summary</td></tr>
+            <tr><td><strong>Map</strong></td><td>Places on a map readers explore: drag, zoom, click a place for its text and slide, filter by tag</td><td>A mini map (click to add places, drag to move, use the current view, snapshot), places, layers, background, caption, fallback image (see <a href="#maps">Maps</a>)</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
@@ -601,10 +601,33 @@
       <section id="maps">
         <h2>Maps</h2>
         <p>A <strong>map</strong> shows places: offices, a route, where something happened. You list the <strong>places</strong> (pins) with their latitude and longitude. While presenting, a map can fly from place to place, click by click; readers can explore it: drag it, zoom, click a place to read about it and jump to its slide, and filter by tag.</p>
-        <p class="tip"><strong>For now you write a map in <code>show.json</code></strong>, like a graph (see <a href="#graphs">Graphs</a>). The editor shows a summary such as <em>Map: 3 places, 3 steps, OpenStreetMap tiles</em> and draws the map in the preview. Save in the editor first, and reload the show after editing the file by hand. To find a latitude and longitude, right-click a spot on <em>openstreetmap.org</em> and choose <em>Show address</em>.</p>
+        <p>To add one, give a slide the <strong>Map</strong> layout, or add a <strong>Map</strong> block in the <a href="#reader-tab">Reader tab</a>. Everything is edited in the form; the preview shows the result.</p>
 
-        <h3>A map on a slide</h3>
-        <p>Add a slide with the <strong>Map</strong> layout, save, and fill its <code>map</code> slot in <code>show.json</code>:</p>
+        <h3>The mini map</h3>
+        <p>At the top of the map fields is a small map you can work in: drag to move around, <strong>+</strong> / <strong>−</strong> or the mouse wheel to zoom.</p>
+        <ul>
+          <li><strong>📍 Click to add</strong>: while it is on, every click on the mini map adds a place there. Turn it off to move around without adding.</li>
+          <li><strong>+ Place at center</strong> adds a place in the middle of the mini map (handy with the keyboard; then type its position or drag it).</li>
+          <li><strong>Drag a pin</strong> to move a place. Click a pin to open its details below.</li>
+          <li><strong>Use this view</strong> makes what the mini map shows now the map's first view. <strong>Fit to places</strong> removes that again: the map then shows all its places and layers. The line under the buttons says which it is.</li>
+          <li><strong>📷 Snapshot as fallback</strong> saves a picture of the mini map as the map's <em>fallback image</em> (for print, slide thumbnails and presenting without a connection), with an alt text that names the places. It works with OpenStreetMap and with map pictures in the show folder; a tile server that does not allow copying gives a message instead. A show opened by its web address first asks for the show folder, as for any picture.</li>
+        </ul>
+
+        <h3>Places, tour, layers, background</h3>
+        <ul>
+          <li><strong>Places</strong>: click a place to open it: title, latitude and longitude, tags (the first picks the color), text for readers (<a href="#markdown">Markdown</a>), a linked slide (<strong>Go to slide</strong> in reader mode) and its id. ▲ ▼ change the order, <strong>Show on map</strong> centers the mini map on it, 🗑 removes it (and the tour steps that visit it).</li>
+          <li><strong>Tour while presenting</strong> (slides only): <strong>+ Add step</strong> adds a click that flies to a place; choose the place and, if you like, a zoom level (empty: 12). Reorder with ▲ ▼.</li>
+          <li><strong>Layers</strong>: <strong>+ Add layer from file…</strong> copies a GeoJSON file (<code>.geojson</code> or <code>.json</code>) into the show's <code>data/</code> folder. Give it a title and a tag for a color; without a tag it is background (land, borders), drawn plainly under everything else.</li>
+          <li><strong>Background map</strong>: OpenStreetMap (from the internet), None (only places and layers, works offline), map pictures in the show folder (offline; a path such as <code>tiles/{z}/{x}/{y}.png</code>), or another tile server (its address, the attribution it asks for, and its highest zoom). For a background from the internet you can also choose what happens <strong>while presenting</strong> (the live map, or the fallback picture) and whether reader mode <strong>loads it straight away</strong> instead of waiting for the reader's click on Load.</li>
+          <li><strong>Caption</strong> and <strong>fallback image</strong> (choose, paste or drop a picture, or use the snapshot).</li>
+        </ul>
+        <p>Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>; typing in a field counts as one step.</p>
+
+        <h3>In show.json</h3>
+        <p>For reference, this is what the editor writes (you can also edit it by hand; reload the show afterwards).</p>
+
+        <h4>A map on a slide</h4>
+        <p>The <code>map</code> slot of a slide with the <strong>Map</strong> layout:</p>
         <pre><code>"map": {
   "markers": [
     { "id": "ams", "lat": 52.3731, "lng": 4.8922, "title": "Amsterdam",
@@ -617,7 +640,7 @@
   ]
 }</code></pre>
 
-        <h3>The fields</h3>
+        <h4>The fields</h4>
         <dl>
           <dt><code>markers</code></dt><dd>One entry per place. <code>lat</code> and <code>lng</code> are required (decimal degrees). <code>title</code> is its name (shown next to the pin). <code>tags</code> group places: the first tag picks the color. <code>md</code> is the text a reader sees after clicking the place (<a href="#markdown">Markdown</a>). <code>slide</code> is a slide id: the place gets a <strong>Go to slide</strong> link. <code>id</code> names the place for <code>steps</code>.</dd>
           <dt><code>center</code> and <code>zoom</code></dt><dd>The first view: <code>{ "lat": …, "lng": … }</code> and a zoom level from 0 (the whole world) to about 18 (a street). Without a center the map shows all its places and layers; <code>zoom</code> then says how far it may zoom in at most (handy with a background outline, to keep some of it in view).</dd>
@@ -630,7 +653,7 @@
           <dt><code>fallback</code></dt><dd>An optional picture (<code>{ "src": "images/map.png", "alt": "…" }</code>), for example a screenshot of the map, for print, slide thumbnails and presenting with <code>"present": "static"</code>. Without one, Slipr shows the places as a list, which is also what screen readers get.</dd>
         </dl>
 
-        <h3>A map in the reader layer</h3>
+        <h4>A map in the reader layer</h4>
         <p>A map can also be a reader block. Add it to the slide's <code>reader.blocks</code> with an <code>id</code>, <code>"type": "map"</code> and an optional <code>title</code>, plus the same fields as above except <code>steps</code> and <code>present</code>:</p>
         <pre><code>{ "id": "route", "type": "map", "title": "The route", "tiles": "none",
   "layers": [{ "data": "data/route.geojson", "tag": "route" }] }</code></pre>
