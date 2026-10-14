@@ -125,6 +125,13 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
+- [ ] **I-106** [templates/editor] **Visual Template Editor (compose and customize Slipr templates)**:
+  - **Brand & Theme Designer**: visual palette editor (primary, accent, background, surface, text, and `--slipr-graph-*` 1–6 color scales) with real-time WCAG AA contrast validation; typography controls (heading, body, code fonts, size scales, line heights) with local `.woff2` font uploads or system/web font selectors.
+  - **Layout Composer**: visual canvas (16:9 and 4:3) to build and arrange layout fragments (`layouts/*.html`); add and configure slots (`text`, `image`, `quote`, `code`, `cards`, `diagram`, `graph`, `map`, `table`) with validation constraints (`maxLength`, `maxItems`, `required`, placeholder labels).
+  - **Master Branding & Chrome**: global header/footer rules, slide number placement, persistent logos/watermarks, and picture style effects (shadow, soft edges, rounded corners, borders).
+  - **Reader Theme Styler**: customize article typography, reading column width, tab bars, callout cards, and glossaries in Reader mode (`reader.css`).
+  - **Live Preview & Test Drive**: real-time dual-mode preview (Audience + Reader) using sample slides as you tweak tokens and layouts; one-click "Test in Editor" to launch a new show with the template.
+  - **Import & Export**: clone any existing template (`default`, `conclusion`), import from PPTX mapping (pairs with `I-043`), and save/export as a folder or `.zip` template package (`template.json`, `theme.css`, `reader.css`, `layouts/`, `assets/`). · todo · —
 
 ### Rich embeds & visualizations
 - [ ] **I-104** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
