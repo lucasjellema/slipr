@@ -95,7 +95,7 @@ export async function startAudience(app, ctx) {
   });
   // Embeds render in the background (I-070, I-072): a large PDF or a slow page
   // must not hold up the show; until then each shows its static fallback.
-  hydrateEmbeds(slidesEl).catch((err) => console.warn('Slipr: embeds failed:', err));
+  hydrateEmbeds(slidesEl, { readAsset: ctx.readAsset }).catch((err) => console.warn('Slipr: embeds failed:', err));
 
   // R: continue reading this slide in reader mode. Agenda slides map to the
   // first slide of the chapter they introduce.

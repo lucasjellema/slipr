@@ -9,6 +9,7 @@ import { issuesForSlide } from '../store.js';
 import { renderSlide } from '../../../shared/render.js';
 import { renderBlocks } from '../../../shared/blocks.js';
 import { hydrateEmbeds } from '../../../shared/embeds/index.js';
+import { readShowFile } from '../io/show-files.js';
 import { blockVisible, personalize } from '../../../viewer/reader/personalize.js';
 import { mountOverlayEditor, onOverlaySelection } from './overlay-editor.js';
 
@@ -190,7 +191,8 @@ export function mountPreview(container, store) {
     }
 
     root.append(header, viewport, diagnostics);
-    hydrateEmbeds(viewport);
+    // Map tiles in the show folder are read like the show's other files (I-099).
+    hydrateEmbeds(viewport, { readAsset: (path) => readShowFile(store.state, path) });
   }
 
   onOverlaySelection(scheduleRender);

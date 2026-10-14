@@ -14,10 +14,16 @@
  */
 import { collectImagePaths } from '../validate.js';
 import { EMBED_KINDS, usedEmbedKinds } from '../embeds/index.js';
+import { localTileTemplates, tileFolder, tilePattern } from '../embeds/map.js';
 
 export const VIRTUAL_ROOT = 'https://slipr.invalid/';
 
 /** @typedef {(path: string) => Promise<Uint8Array | null>} ReadFile */
+/**
+ * The files under a folder (relative to the Slipr folder), as paths relative to
+ * that folder, recursively; null when it cannot be listed.
+ * @typedef {(dir: string) => Promise<string[] | null>} ListFiles
+ */
 /** @typedef {{ type: string, text?: string, b64?: string }} BundledFile */
 
 const MIME = /** @type {Record<string, string>} */ ({
@@ -255,11 +261,12 @@ const RUNTIME = `(() => {
 
 /**
  * Pack a show into one HTML file.
- * @param {{ readFile: ReadFile, showDir: string, templateDir?: string, entry?: string, viewerCss?: string }} options
+ * @param {{ readFile: ReadFile, listFiles?: ListFiles, showDir: string, templateDir?: string, entry?: string, viewerCss?: string }} options
  *   showDir: the show folder (contains show.json), relative to the Slipr folder.
+ *   listFiles: lists folders, for map tiles in the show folder (I-099); without it they are left out.
  * @returns {Promise<{ html: string, title: string, modules: string[], files: string[], warnings: string[] }>}
  */
-export async function packShow({ readFile, showDir, templateDir, entry = 'viewer/js/main.js', viewerCss = 'viewer/css/viewer.css' }) {
+export async function packShow({ readFile, listFiles, showDir, templateDir, entry = 'viewer/js/main.js', viewerCss = 'viewer/css/viewer.css' }) {
   /** @type {string[]} */
   const warnings = [];
   const readText = async (/** @type {string} */ path) => {
@@ -296,6 +303,26 @@ export async function packShow({ readFile, showDir, templateDir, entry = 'viewer
     }
     // Keep the path exactly as the show writes it, so resolveAsset finds it.
     addFile(normalizePath(`show/${rel}`) ?? `show/${rel}`, bytes);
+  }
+  // Map tiles in the show folder (I-099): every file the tile template names.
+  for (const template of localTileTemplates(show)) {
+    const folder = tileFolder(template);
+    const listed = listFiles ? await listFiles(normalizePath(`${dir}/${folder}`) ?? dir) : null;
+    if (!listed) {
+      warnings.push(`show: the map tiles in ${folder || 'the show folder'}/ could not be listed; left out (the map shows no background)`);
+      continue;
+    }
+    const pattern = tilePattern(template);
+    let count = 0;
+    for (const name of listed) {
+      const rel = folder ? `${folder}/${name}` : name;
+      if (!pattern.test(rel)) continue;
+      const bytes = await readFile(normalizePath(`${dir}/${rel}`) ?? '');
+      if (!bytes) continue;
+      addFile(`show/${rel}`, bytes);
+      count += 1;
+    }
+    if (!count) warnings.push(`show: no map tiles found for ${template}`);
   }
 
   // ---- the template: template.json, layouts (URLs inlined), stylesheets (URLs inlined) ----

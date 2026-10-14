@@ -165,7 +165,7 @@ export async function startReader(app, ctx) {
         h('p', { class: 'reader-made-with' }, ['Made with Slipr']),
       ]),
     );
-    hydrateEmbeds(main);
+    hydrateEmbeds(main, { readAsset: ctx.readAsset });
     const fresh = buildContents(model, marks);
     contents.nav.replaceWith(fresh.nav);
     if (contents.nav.classList.contains('is-open')) fresh.nav.classList.add('is-open');

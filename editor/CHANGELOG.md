@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Local map tiles (I-099)
+- **Fixed** the preview of a map with tiles in the show folder showed no background for folder and zip shows; tiles are now read like the show's other files (`js/io/show-files.js`, shared with the slide library).
+- **Changed** **Export…** packs a map's local tiles into the file (folder shows; a show opened by URL gets a warning instead).
+
 ### 2026-10-14: Double-click in the show grid (I-100)
 - **Fixed** double-clicking a slide in the show grid did not open it: each click re-renders the cards, so the browser's `dblclick` never reached the grid. Two plain clicks on the same slide now close the grid, select the slide in the slide list and show it in the Slide tab and preview (Ctrl- and Shift-clicks still only select).
 

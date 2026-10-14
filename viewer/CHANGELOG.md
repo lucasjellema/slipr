@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Local map tiles in folder and zip shows (I-099)
+- **Fixed** maps with tiles in the show folder showed no background in shows opened with `?folder=` or `?zip=`; audience and reader mode now read the tiles from the folder or zip.
+
 ### 2026-10-14: Map fixes (I-075)
 - **Fixed** the **Place…** list of a map leaves out places hidden by the tag filter.
 - **Added** background layers (a GeoJSON layer without a tag) draw in neutral colors under the rest; the first view fits the places, not the background.

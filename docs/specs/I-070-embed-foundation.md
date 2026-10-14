@@ -27,7 +27,7 @@ I-071 (web slot, sandbox options, screenshots), I-072 (PDF), I-074 (graph) and I
 | `errorLabel` | Heading of the error box when hydration fails |
 | `attributes(value, ctx)` | Data attributes for the embed element (DOM-free). `class` is added to `slipr-embed slipr-embed--<kind>`. `data-embed-origin` turns on click-to-load; `data-embed-print="fallback"` prints the fallback instead of the live content |
 | `staticHtml(value, ctx)` | `{ html, fallback }`: static content when the value has no fallback image (DOM-free, built with `escape()`) |
-| `hydrate(el, live)` | Async: render the live content into `live`; import the library here. Throws on failure |
+| `hydrate(el, live, options)` | Async: render the live content into `live`; import the library here. Throws on failure. `options.readAsset(path)` reads a show file for shows from a folder or a zip (I-099: map tiles) |
 
 Register the kind in `shared/embeds/index.js` (`EMBED_KINDS`, and the slot/block type maps), add the slot/block type to the schema, `docs/show-format.md` and validation, and make `usedEmbedKinds()` recognise it.
 

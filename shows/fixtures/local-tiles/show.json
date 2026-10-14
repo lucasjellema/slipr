@@ -1,0 +1,46 @@
+{
+  "slipr": "0.2",
+  "id": "local-tiles",
+  "meta": {
+    "title": "Local map tiles",
+    "language": "en"
+  },
+  "template": {
+    "ref": "../../../templates/default",
+    "version": "^1.5"
+  },
+  "slides": [
+    {
+      "id": "s-map",
+      "layout": "map",
+      "content": {
+        "title": "Tiles from the show folder",
+        "map": {
+          "center": {
+            "lat": 20,
+            "lng": 0
+          },
+          "zoom": 1,
+          "tiles": {
+            "url": "tiles/{z}/{x}/{y}.png",
+            "attribution": "Test tiles (I-099 fixture)",
+            "maxZoom": 2
+          },
+          "markers": [
+            {
+              "lat": 52.37,
+              "lng": 4.89,
+              "title": "Amsterdam"
+            },
+            {
+              "lat": -33.87,
+              "lng": 151.21,
+              "title": "Sydney"
+            }
+          ]
+        },
+        "caption": "Fixture for I-099: 21 plain tiles (zoom 0 to 2) in tiles/, one color per zoom level."
+      }
+    }
+  ]
+}

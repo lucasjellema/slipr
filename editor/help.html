@@ -637,7 +637,7 @@
 
         <h3>Colors and checks</h3>
         <p>As for graphs, the template chooses the colors: every tag gets the next color of its palette. Warnings: a place id used twice, a step that names a place without that id, a <code>slide</code> that doesn't exist, a layer file that isn't there, and a tile server without an attribution. The demo show has an example on the slide <em>A map on a slide</em>, with an offline map block below it: an outline of the Netherlands as background (Natural Earth, free to use), a route and three places.</p>
-        <p class="note">Map pictures in the show folder (<code>tiles/…</code>) work when the show is served from a folder (as with <code>npm run serve</code>), not yet in shows opened with <strong>Open…</strong> or exported as one file. OpenStreetMap's tiles may not be downloaded in bulk: make offline tiles with a tool that respects its tile usage policy (<em>operations.osmfoundation.org/policies/tiles</em>), or use <code>"tiles": "none"</code>.</p>
+        <p class="note">Map pictures in the show folder (<code>tiles/…</code>) work everywhere: in shows opened with <strong>Open…</strong> or from a zip, served shows, and <strong>Export…</strong> (which packs every tile into the file, so keep a tile set to the area and zoom levels you need). A show opened by its web address cannot be listed, so its export leaves the tiles out and says so: open the show folder instead. OpenStreetMap's tiles may not be downloaded in bulk: make offline tiles with a tool that respects its tile usage policy (<em>operations.osmfoundation.org/policies/tiles</em>), or use <code>"tiles": "none"</code>.</p>
       </section>
 
       <section id="markdown">

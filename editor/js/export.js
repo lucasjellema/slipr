@@ -57,6 +57,37 @@ function fileReader(store, { showDir, appBase, showBase }) {
 }
 
 /**
+ * The packer's `listFiles` (map tiles in the show folder, I-099): only shows
+ * opened as a folder can be listed; a show opened by URL cannot.
+ * @param {import('./store.js').EditorStore} store
+ * @param {string} showDir
+ * @returns {(dir: string) => Promise<string[] | null>}
+ */
+function folderLister(store, showDir) {
+  return async (dir) => {
+    const handle = store.state.folderHandle;
+    if (!handle || showDir !== FOLDER || (dir !== FOLDER && !dir.startsWith(`${FOLDER}/`))) return null;
+    try {
+      let folder = handle;
+      for (const part of dir.slice(FOLDER.length).split('/').filter(Boolean)) folder = await folder.getDirectoryHandle(part);
+      /** @type {string[]} */
+      const found = [];
+      /** @param {any} d @param {string} prefix */
+      const walk = async (d, prefix) => {
+        for await (const [name, entry] of d.entries()) {
+          if (entry.kind === 'file') found.push(prefix + name);
+          else if (entry.kind === 'directory') await walk(entry, `${prefix}${name}/`);
+        }
+      };
+      await walk(folder, '');
+      return found;
+    } catch {
+      return null;
+    }
+  };
+}
+
+/**
  * Where the show is in the packer's path space: the folder (`__show__`), or for
  * a show opened by URL its path under the Slipr folder.
  * @param {import('./store.js').EditorStore} store
@@ -111,7 +142,7 @@ export async function exportShow(store, showUrl) {
   if (target === 'cancelled') return;
 
   showBanner('Exporting… packing the show, its template and the viewer into one file.', 'info', { timeout: 4000 });
-  const result = await packShow({ readFile: fileReader(store, { ...where, appBase }), showDir: where.showDir });
+  const result = await packShow({ readFile: fileReader(store, { ...where, appBase }), listFiles: folderLister(store, where.showDir), showDir: where.showDir });
   const blob = new Blob([result.html], { type: 'text/html' });
 
   let name = fileName(show);

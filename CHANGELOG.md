@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-14: Local map tiles everywhere (I-099)
+- **Added** `readAsset(path)` on the show context of folder and zip shows (`shared/load.js`), and a `readAsset` option for `hydrateEmbeds()` that embed kinds receive in `hydrate(el, live, options)`. Maps with tiles in the show folder read each tile through it, so they work in shows opened from a folder or a zip (viewer and editor preview).
+- **Added** an optional `listFiles(dir)` to `packShow()`: the single-file export packs every tile a local tile template names (`localTileTemplates()`, `tileFolder()`, `tilePattern()` in `shared/embeds/map.js`). `npm run export` and the editor's Export… (folder shows) provide it.
+- **Added** fixture `shows/fixtures/local-tiles/` (21 plain tiles) and `shared/test/local-tiles.test.js`. Spec: `docs/specs/I-075-map.md`, section *Local tiles everywhere*.
+
 ### 2026-10-14: Map background layers (I-075 follow-up)
 - **Added** a map layer without a `tag` is background: filled with the template's page color, outlined in its muted color, and left out of the fitted first view (unless the map has nothing else). Schema description and format docs.
 - **Changed** the demo's offline map block: an outline of the Netherlands as background (`shows/demo/data/netherlands.geojson`, the European part of Natural Earth 1:50m admin-0 countries v5.1.2, public domain, rounded to 4 decimals) under the route, with `zoom: 8` so some coast stays in view.

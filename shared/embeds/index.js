@@ -12,7 +12,8 @@
  *                            (options: { mode, slot }, see EmbedOptions)
  *   staticHtml(value, ctx)   { html, fallback } when the value has no fallback image
  *   afterHtml(value, options) optional: markup after the fallback (e.g. Reveal fragments)
- *   hydrate(el, live)        render the live content into `live` (async, may throw)
+ *   hydrate(el, live, options)  render the live content into `live` (async, may throw);
+ *                            options.readAsset reads a show file (shows from a folder or zip)
  *
  * Rendering is two-step. `render.js` and `blocks.js` write an embed element
  * with a static fallback inside (the value's `fallback` image, or the kind's
@@ -53,7 +54,7 @@ import * as web from './web.js';
  * @property {string} errorLabel
  * @property {(value: any, ctx: EmbedContext, options?: EmbedOptions) => Record<string, string>} attributes
  * @property {(value: any, ctx: EmbedContext) => { html: string, fallback: string }} staticHtml
- * @property {(el: HTMLElement, live: HTMLElement) => Promise<void>} hydrate
+ * @property {(el: HTMLElement, live: HTMLElement, options?: { readAsset?: (path: string) => Promise<Blob | null> }) => Promise<void>} hydrate
  * @property {(value: any, options?: EmbedOptions) => string} [afterHtml]
  */
 /** @typedef {{ resolveAsset: (src: string) => string }} EmbedContext */
@@ -180,6 +181,8 @@ export function fillEmbedElement(el, kind, value, ctx, options = {}) {
 /**
  * @typedef {object} HydrateOptions
  * @property {boolean} [thumbnail]  Editor thumbnails: only kinds with `thumbnail`, never a Load button.
+ * @property {(path: string) => Promise<Blob | null>} [readAsset]  Read a file of the show by its path
+ *   (shows opened from a folder or a zip, whose files have no URL until read): map tiles (I-099).
  */
 
 /**
@@ -202,25 +205,26 @@ export async function hydrateEmbeds(root, options = {}) {
     if (!def || (options.thumbnail && !def.thumbnail)) return null;
     const origin = el.dataset.embedOrigin;
     if (origin && !hasConsent(origin)) {
-      if (!options.thumbnail) showConsent(el, origin);
+      if (!options.thumbnail) showConsent(el, origin, options);
       return null;
     }
-    return hydrateOne(el, def);
+    return hydrateOne(el, def, options);
   }));
 }
 
 /**
  * @param {HTMLElement} el
  * @param {EmbedKind} def
+ * @param {HydrateOptions} [options]
  */
-async function hydrateOne(el, def) {
+async function hydrateOne(el, def, options = {}) {
   el.querySelector(':scope > .slipr-embed-consent')?.remove();
   el.querySelector(':scope > .slipr-embed-error')?.remove();
   el.dataset.embedState = 'loading';
   const live = el.ownerDocument.createElement('div');
   live.className = 'slipr-embed-live';
   try {
-    await def.hydrate(el, live);
+    await def.hydrate(el, live, { readAsset: options.readAsset });
     el.querySelector(':scope > .slipr-embed-live')?.remove();
     el.append(live);
     el.dataset.embedState = 'ready';
@@ -246,8 +250,9 @@ async function hydrateOne(el, def) {
  * loads every waiting embed from the same site on the page.
  * @param {HTMLElement} el
  * @param {string} origin
+ * @param {HydrateOptions} [options]
  */
-function showConsent(el, origin) {
+function showConsent(el, origin, options = {}) {
   const doc = el.ownerDocument;
   const host = hostOf(origin);
   const box = doc.createElement('div');
@@ -268,7 +273,7 @@ function showConsent(el, origin) {
       .filter((other) => other.dataset.embedOrigin === origin);
     for (const other of waiting) {
       const def = EMBED_KINDS[other.dataset.embed ?? ''];
-      if (def) hydrateOne(other, def);
+      if (def) hydrateOne(other, def, options);
     }
   });
   box.append(note, button);

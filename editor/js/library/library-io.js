@@ -9,49 +9,13 @@ import { contentHash } from './library-store.js';
 import { entryFromSlide, pathWithHash, prepareInsert, slideFiles, updatedEntry } from './library-model.js';
 import { writeImage } from '../io/fs-access.js';
 import { mimeType } from '../../../shared/zip.js';
+import { readShowFile } from '../io/show-files.js';
+
+export { readShowFile };
 
 /** @typedef {import('./library-model.js').LibraryEntry} LibraryEntry */
 /** @typedef {import('./library-store.js').SlideLibrary} SlideLibrary */
 /** @typedef {import('../store.js').EditorStore} EditorStore */
-
-/**
- * A file in a folder, by a `/`-separated path, or null.
- * @param {FileSystemDirectoryHandle} handle @param {string} path
- * @returns {Promise<Blob | null>}
- */
-async function readFolderFile(handle, path) {
-  const parts = path.split('/').filter((p) => p && p !== '.');
-  if (!parts.length || parts.includes('..')) return null;
-  try {
-    let dir = handle;
-    for (const part of parts.slice(0, -1)) dir = await dir.getDirectoryHandle(part);
-    return await (await dir.getFileHandle(/** @type {string} */ (parts.at(-1)))).getFile();
-  } catch {
-    return null;
-  }
-}
-
-/**
- * A file of the open show (a path relative to show.json), or null when it is missing.
- * @param {EditorStore['state']} state
- * @param {string} path
- * @returns {Promise<Blob | null>}
- */
-export async function readShowFile(state, path) {
-  const own = state.inMemoryAssets?.get(path);
-  if (own) return own;
-  if (state.folderHandle) return readFolderFile(state.folderHandle, path);
-  if (state.zipSource) {
-    const blob = await state.zipSource.readFile(path).catch(() => null);
-    if (blob) return blob;
-  }
-  try {
-    const res = await fetch(state.resolveAsset?.(path) ?? path);
-    return res.ok ? await res.blob() : null;
-  } catch {
-    return null;
-  }
-}
 
 /**
  * Library entries for slides of the open show, with their files.

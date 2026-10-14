@@ -38,6 +38,8 @@ import { normalizePath } from './folder-source.js';
  * @property {Map<string, LayoutInfo>} layouts
  * @property {import('./validate.js').ValidationResult} validation  show + template issues combined
  * @property {(src: string) => string} resolveAsset  Resolve a path relative to show.json.
+ * @property {(path: string) => Promise<Blob | null>} [readAsset]  Read a show file by its path: shows from a
+ *   folder or a zip, whose files have no URL until read (map tiles, I-099). Absent for shows loaded by URL.
  * @property {(path: string) => string} resolveTemplateAsset  Resolve a path relative to template.json.
  * @property {(src: string, blob: Blob) => void} registerAsset  Make a file just added to the show folder
  *   resolvable (folder shows use blob: URLs; for URL shows the server serves it, so this does nothing).
@@ -145,6 +147,7 @@ export async function loadShowFromFolder(source, options = {}) {
     layouts,
     validation: validateAll(show, template, imageExists),
     resolveAsset: (src) => blobUrls.get(src) ?? src,
+    readAsset: (path) => source.readFile(path),
     resolveTemplateAsset: (path) => new URL(path, templateHref).href,
     registerAsset: (src, blob) => {
       if (!blobUrls.has(src)) blobUrls.set(src, createObjectURL(blob));
@@ -193,6 +196,7 @@ export async function loadShowFromZip(source, options = {}) {
     layouts,
     validation: validateAll(show, template, imageExists),
     resolveAsset: (src) => blobUrls.get(src) ?? src,
+    readAsset: (path) => source.readFile(path),
     resolveTemplateAsset: (path) => new URL(path, templateHref).href,
     registerAsset: (src, blob) => {
       if (!blobUrls.has(src)) blobUrls.set(src, createObjectURL(blob));

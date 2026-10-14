@@ -69,7 +69,7 @@ An embed kind (I-070 contract). The static content is an accessible **list** of 
 | Reader mode, tiles from a server | Click-to-load per site per tab (I-070), unless `load: "auto"` |
 | Audience mode, tiles from a server | Live (no question); `present: "static"` for none |
 | `tiles: "none"` | Never contacts a server, works everywhere (also folder sources and exports) |
-| Local tiles `tiles/{z}/{x}/{y}.png` | Load without a question from the show's own folder when the show is served by URL (e.g. `npm run serve`, a static host). **Not yet** for shows opened from a folder or zip (only files listed by `collectImagePaths()` get blob URLs) or in single-file exports: a tile set has no list of files (backlog chore) |
+| Local tiles `tiles/{z}/{x}/{y}.png` | Load without a question from the show's own folder: by URL when the show is served (e.g. `npm run serve`, a static host); through the context's `readAsset` for shows opened from a folder or a zip (each tile read as a blob when Leaflet asks for it); packed into single-file exports, which list the tile folder (I-099, below) |
 | Fallback image | Print, thumbnails, `present: "static"`, errors |
 
 OpenStreetMap's tile policy forbids bulk downloading ("prefetching") of its tiles; authors who want local tiles make them with a tool and source that allow it.
@@ -78,9 +78,19 @@ OpenStreetMap's tile policy forbids bulk downloading ("prefetching") of its tile
 
 Both templates get a `map` layout (default 1.5.0: title, map, caption; Conclusion 0.1.6: kicker, title, map). They need no new tokens: maps use the graph palette.
 
+## Local tiles everywhere (I-099, 2026-10-14)
+
+A tile set has no list of files in the show, so it cannot be handled like images (`collectImagePaths()` gives no tile paths, so folder and zip shows got no blob URLs for tiles, and the export packed none). Now, without a format change:
+
+- **Folder and zip shows**: `loadShowFromFolder()` / `loadShowFromZip()` give the context a `readAsset(path)` (the source's `readFile`). Audience and reader mode pass it to `hydrateEmbeds(root, { readAsset })`, which passes it on to the kind's `hydrate(el, live, { readAsset })`. A map with local tiles (`data-map-tiles-local`, the template as written) then uses a Leaflet tile layer whose `createTile` reads each tile through `readAsset` and shows it as an object URL (freed once drawn). Shows loaded by URL have no `readAsset` and keep loading tiles by URL. The editor preview reads tiles like the show's other files (`editor/js/io/show-files.js`: session files, folder, zip, URL).
+- **Single-file export**: `packShow()` takes an optional `listFiles(dir)`. For each local tile template the show uses (`localTileTemplates()`), it lists the template's folder (`tileFolder()`) and packs every file the template names (`tilePattern()`: `{z}`, `{x}`, `{y}` numbers, `{s}` a letter, `{r}` `@2x` or nothing). `npm run export` lists with Node's `readdir`; the editor's **Export…** walks the folder handle. A show the editor opened by URL cannot be listed: its tiles are left out, with a warning.
+- **Zip export** (editor, I-092) already copies every file of a folder or zip show, tiles included.
+- Fixture `shows/fixtures/local-tiles/` (21 plain tiles, zoom 0 to 2); tests in `shared/test/local-tiles.test.js`. Verified in Claude's browser pane: the single-file export (16 tiles from the file, no requests), `viewer/?zip=` and `viewer/?folder=` in audience and reader mode, the editor preview of a folder show, and the editor's Export… of a folder show (21 tiles packed).
+
+A large tile set makes a large export (every tile is embedded): keep offline tile sets to the zoom levels and area the talk needs.
+
 ## Out of scope
 
 - Editing maps in the editor (read-only for now; backlog E-021).
-- Local tiles in folder sources, zip archives and single-file exports (backlog).
 - Rendering a snapshot of the map as the fallback image at authoring time.
 - Marker clusters, custom icons per marker, popups with images, steps that fit a layer or a group of markers.

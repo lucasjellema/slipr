@@ -127,6 +127,53 @@ export function tileOrigin(template) {
 }
 
 /**
+ * Local tile templates (tiles in the show folder) the maps of a show use. DOM-free.
+ * @param {any} show
+ * @returns {string[]}
+ */
+export function localTileTemplates(show) {
+  const found = new Set();
+  for (const slide of Array.isArray(show?.slides) ? show.slides : []) {
+    const values = [...Object.values(slide?.content && typeof slide.content === 'object' ? slide.content : {}),
+      ...(Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks.filter((/** @type {any} */ b) => b?.type === 'map') : [])];
+    for (const value of values) {
+      if (!isMap(value)) continue;
+      const tiles = tileSource(value);
+      if (tiles.kind === 'local') found.add(tiles.url);
+    }
+  }
+  return [...found];
+}
+
+/**
+ * The folder a local tile template's files live in (`tiles/{z}/{x}/{y}.png` →
+ * `tiles`; `{z}/{x}/{y}.png` → ``), relative to show.json.
+ * @param {string} template
+ */
+export function tileFolder(template) {
+  const head = template.split('{')[0];
+  const cut = head.lastIndexOf('/');
+  return cut < 0 ? '' : head.slice(0, cut).replace(/^\.\//, '');
+}
+
+/**
+ * A pattern for the paths (relative to show.json) a local tile template names:
+ * `{z}`, `{x}`, `{y}` are numbers, `{s}` a letter, `{r}` empty or `@2x`.
+ * @param {string} template
+ * @returns {RegExp}
+ */
+export function tilePattern(template) {
+  const parts = template.replace(/^\.\//, '').split(/(\{[a-z]+\})/);
+  const body = parts.map((part) => {
+    if (part === '{z}' || part === '{x}' || part === '{y}') return '-?\\d+';
+    if (part === '{s}') return '[a-z0-9]';
+    if (part === '{r}') return '(?:@2x)?';
+    return part.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&');
+  }).join('');
+  return new RegExp(`^${body}$`);
+}
+
+/**
  * Palette index (0-based) per tag, in order of first use (markers first, then layers).
  * @param {MapMarker[]} markers @param {MapLayer[]} layers
  * @returns {Map<string, number>}
@@ -185,6 +232,8 @@ export function attributes(value, ctx, options = {}) {
     const cut = tiles.url.indexOf('{');
     const head = cut < 0 ? tiles.url : tiles.url.slice(0, cut);
     attrs['data-map-tiles'] = (head ? ctx.resolveAsset(head) : ctx.resolveAsset('./')) + (cut < 0 ? '' : tiles.url.slice(cut));
+    // As written: shows read from a folder or a zip read each tile through hydrateEmbeds' readAsset (I-099).
+    attrs['data-map-tiles-local'] = tiles.url;
   } else if (tiles.kind === 'server') {
     attrs['data-map-tiles'] = tiles.url;
   }
@@ -282,8 +331,10 @@ function addLeafletStylesheet(doc) {
  * Draw the map into `live`. Throws when Leaflet cannot load or a layer file cannot be read.
  * @param {HTMLElement} el  The embed element.
  * @param {HTMLElement} live  Where the rendered content goes.
+ * @param {{ readAsset?: (path: string) => Promise<Blob | null> }} [options]
+ *   readAsset: read a file of the show (shows from a folder or a zip): local tiles are read through it.
  */
-export async function hydrate(el, live) {
+export async function hydrate(el, live, options = {}) {
   const own = JSON.parse(el.dataset.map ?? '{}');
   const markers = /** @type {MapMarker[]} */ (Array.isArray(own.markers) ? own.markers : []);
   const layerDefs = /** @type {(MapLayer & { src: string })[]} */ (Array.isArray(own.layers) ? own.layers : []);
@@ -325,12 +376,16 @@ export async function hydrate(el, live) {
   /** @type {any} */ (el).sliprMap = map; // for debugging and browser checks
 
   const tiles = el.dataset.mapTiles;
+  const localTiles = el.dataset.mapTilesLocal;
   if (tiles) {
     const maxZoom = Number(el.dataset.mapMaxZoom) || 19;
     // The author's attribution is text (show data is never HTML); OpenStreetMap's is a link.
     const attribution = tiles === OSM_TILES ? OSM_ATTRIBUTION : escape(el.dataset.mapAttribution ?? '');
-    const layer = L.tileLayer(tiles, { maxZoom, attribution, referrerPolicy: 'strict-origin-when-cross-origin' });
-    if (/** @type {any} */ (globalThis).SLIPR_BUNDLE) {
+    const read = options.readAsset;
+    const layer = localTiles && read
+      ? new (localTileLayer(L, read))(localTiles, { maxZoom, attribution })
+      : L.tileLayer(tiles, { maxZoom, attribution, referrerPolicy: 'strict-origin-when-cross-origin' });
+    if (!(localTiles && read) && /** @type {any} */ (globalThis).SLIPR_BUNDLE) {
       // Tiles in a single-file export: only those packed into the file exist.
       layer.getTileUrl = function getTileUrl(/** @type {any} */ coords) {
         return /** @type {any} */ (globalThis).SLIPR_BUNDLE.url(L.TileLayer.prototype.getTileUrl.call(this, coords));
@@ -483,6 +538,39 @@ export async function hydrate(el, live) {
   new ResizeObserver(check).observe(canvas);
   // Also once the layout around it has settled (resize observers wait for a rendered frame).
   setTimeout(check, 250);
+}
+
+/**
+ * A Leaflet tile layer whose tiles are files of the show, read through
+ * `read` (a folder or zip source): each tile becomes an object URL, freed once drawn.
+ * @param {any} L @param {(path: string) => Promise<Blob | null>} read
+ */
+function localTileLayer(L, read) {
+  return L.TileLayer.extend({
+    createTile(/** @type {any} */ coords, /** @type {(err: any, tile: HTMLElement) => void} */ done) {
+      const img = document.createElement('img');
+      img.alt = '';
+      img.setAttribute('role', 'presentation');
+      const path = L.TileLayer.prototype.getTileUrl.call(this, coords);
+      read(path).then((blob) => {
+        if (!blob) {
+          done(new Error(`Map tile ${path} is not in the show`), img);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          done(null, img);
+        };
+        img.onerror = () => {
+          URL.revokeObjectURL(url);
+          done(new Error(`Map tile ${path} could not be drawn`), img);
+        };
+        img.src = url;
+      }, (err) => done(err, img));
+      return img;
+    },
+  });
 }
 
 /**
