@@ -293,7 +293,7 @@
           <dt>Cards</dt><dd>Layouts with repeated items (columns, numbered boxes, key figures, image cards, people) get one group of fields per card. A counter such as <code>7 / 18</code> shows how much room a field has and turns yellow when the text is too long. Move cards with <strong>▲</strong> / <strong>▼</strong>, remove one with <strong>🗑</strong>, and add one with <strong>+ Add card</strong>, up to the number the layout has room for.</dd>
           <dt>Diagram</dt><dd>A Mermaid diagram definition (plain text) with an optional caption. Rendered directly in the browser as an interactive SVG on slides using the <strong>Diagram</strong> layout. See <a href="#diagrams">Diagrams (Mermaid)</a>.</dd>
           <dt>Web page</dt><dd>On the <strong>Web page</strong> layout: the address (https, or a file in the show folder) and a title. <strong>While presenting</strong>: <em>show the live page</em> (clickable on the slide, no Load button) or <em>show the fallback image</em> (a screenshot; nothing is loaded, good for offline talks). In reader mode a page from another site waits for the reader's <strong>Load</strong> unless you tick <strong>In reader mode, load straight away</strong>. <strong>Allow the page to…</strong> gives extra permissions; see <a href="#reader-tab">Embedded Page</a>.</dd>
-          <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links. The editor shows a summary and draws the graph in the preview; you write the graph itself in <code>show.json</code>. See <a href="#graphs">Graphs</a>.</dd>
+          <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links, edited with a mini graph (add nodes, click two nodes to link them), plus the build-up while presenting, layout, data file and fallback image. See <a href="#graphs">Graphs</a>.</dd>
           <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map, edited with a mini map (click to add, drag to move), plus the tour while presenting, layers, background and fallback image. See <a href="#maps">Maps</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
@@ -470,7 +470,7 @@
             <tr><td><strong>PDF Document</strong></td><td>A PDF with page buttons and zoom; its text turns up in search</td><td><strong>Choose PDF…</strong> (or a path / https address), a title, optional pages (one, or a range readers can page through), a fallback image</td></tr>
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
-            <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>Written in <code>show.json</code> for now (see <a href="#graphs">Graphs</a>); the editor shows a summary</td></tr>
+            <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>A mini graph (+ Node, 🔗 Connect, snapshot), nodes, links, layout, data file, caption, fallback image (see <a href="#graphs">Graphs</a>)</td></tr>
             <tr><td><strong>Map</strong></td><td>Places on a map readers explore: drag, zoom, click a place for its text and slide, filter by tag</td><td>A mini map (click to add places, drag to move, use the current view, snapshot), places, layers, background, caption, fallback image (see <a href="#maps">Maps</a>)</td></tr>
           </tbody>
         </table>
@@ -554,10 +554,34 @@
       <section id="graphs">
         <h2>Graphs</h2>
         <p>A <strong>graph</strong> shows how things relate: parts of a system, ideas, people, steps. You list the <strong>nodes</strong> (the boxes) and the <strong>links</strong> between them; Slipr places them by itself. While presenting, a graph can grow click by click; readers can explore it: drag it, zoom, click a node to read about it and jump to its slide, and filter by tag.</p>
-        <p class="tip"><strong>For now you write a graph in <code>show.json</code></strong> (open it in a text editor such as VS Code; it suggests the field names as you type). The editor shows a summary such as <em>Graph: 7 nodes, 8 links, 3 steps</em> and draws the graph in the preview. Save in the editor first, and reload the show after editing the file by hand.</p>
+        <p>To add one, give a slide the <strong>Graph</strong> layout, or add a <strong>Graph</strong> block in the <a href="#reader-tab">Reader tab</a>. Everything is edited in the form; the preview shows the result.</p>
 
-        <h3>A graph on a slide</h3>
-        <p>Add a slide with the <strong>Graph</strong> layout, save, and fill its <code>graph</code> slot in <code>show.json</code>:</p>
+        <h3>The mini graph</h3>
+        <p>At the top of the graph fields is a small drawing of the graph, laid out the way readers will see it. Drag to move around, use the mouse wheel to zoom.</p>
+        <ul>
+          <li><strong>+ Node</strong> adds a node; name it in its row below.</li>
+          <li><strong>🔗 Connect</strong>: while it is on, click a node and then another to link them (the arrow points to the second). Click an empty spot to start over.</li>
+          <li><strong>Click a node</strong> (with Connect off) to open its row below.</li>
+          <li><strong>Fit</strong> shows the whole graph again.</li>
+          <li><strong>📷 Snapshot as fallback</strong> saves a picture of the graph as its <em>fallback image</em> (for print and slide thumbnails), with an alt text that names the nodes. A show opened by its web address first asks for the show folder, as for any picture.</li>
+        </ul>
+
+        <h3>Nodes, links, layout, build-up</h3>
+        <ul>
+          <li><strong>Nodes</strong>: click a node to open it: label, tags (the first picks the color), text for readers (<a href="#markdown">Markdown</a>), a linked slide (<strong>Go to slide</strong> in reader mode) and its id. Changing the id changes it in the links and steps too. ▲ ▼ change the order, <strong>Show in graph</strong> zooms the mini graph to it, 🗑 removes it with its links.</li>
+          <li><strong>Links</strong>: from, to (→ reverses the direction) and an optional label. <strong>+ Add link</strong> links two nodes that are not linked yet; 🔗 Connect is quicker for several.</li>
+          <li><strong>Layout</strong>: Automatic (related nodes pull together), Tree (top down, for hierarchies and flows), Rings, Circle or Grid.</li>
+          <li><strong>Build-up while presenting</strong> (slides only): <strong>+ Show step</strong> makes a click that brings in nodes (pick them with the buttons; they are hidden until that click), <strong>+ Focus step</strong> one that zooms in on a node and its neighbours. Reorder with ▲ ▼.</li>
+          <li><strong>Data file</strong>, for a large graph: <strong>Choose file…</strong> copies a JSON file with <code>{ "nodes": [...], "edges": [...] }</code> into the show's <code>data/</code> folder. Its nodes appear dashed in the mini graph and cannot be edited in the form; <strong>Move into the slide</strong> copies them into the graph, where you can edit them (the file is then no longer used).</li>
+          <li><strong>Caption</strong> and <strong>fallback image</strong> (choose, paste or drop a picture, or use the snapshot).</li>
+        </ul>
+        <p>Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>; typing in a field counts as one step.</p>
+
+        <h3>In show.json</h3>
+        <p>For reference, this is what the editor writes (you can also edit it by hand; reload the show afterwards).</p>
+
+        <h4>A graph on a slide</h4>
+        <p>The <code>graph</code> slot of a slide with the <strong>Graph</strong> layout:</p>
         <pre><code>"graph": {
   "nodes": [
     { "id": "show", "label": "show.json", "tags": ["format"],
@@ -575,7 +599,7 @@
   ]
 }</code></pre>
 
-        <h3>The fields</h3>
+        <h4>The fields</h4>
         <dl>
           <dt><code>nodes</code></dt><dd>One entry per box. <code>id</code> is required and must be unique (links and steps use it). <code>label</code> is the text on the box (default: the id). <code>tags</code> group nodes: the first tag picks the color. <code>md</code> is the text a reader sees after clicking the node (<a href="#markdown">Markdown</a>). <code>slide</code> is a slide id: the node gets a <strong>Go to slide</strong> link.</dd>
           <dt><code>edges</code></dt><dd>The links: <code>from</code> and <code>to</code> (node ids; the arrow points to <code>to</code>), and an optional <code>label</code> on the line.</dd>
@@ -586,7 +610,7 @@
           <dt><code>fallback</code></dt><dd>An optional picture (<code>{ "src": "images/graph.png", "alt": "…" }</code>) for print and slide thumbnails. Without one, Slipr shows the nodes and links as a list, which is also what screen readers get.</dd>
         </dl>
 
-        <h3>A graph in the reader layer</h3>
+        <h4>A graph in the reader layer</h4>
         <p>A graph can also be a reader block, under a slide in reader mode. Add it to the slide's <code>reader.blocks</code> in <code>show.json</code>, with an <code>id</code>, <code>"type": "graph"</code> and an optional <code>title</code>, plus the same fields as above except <code>steps</code>. Like any block it can have <code>for</code> (profiles) and <code>depth</code>:</p>
         <pre><code>{ "id": "team-map", "type": "graph", "depth": 2, "title": "Who works with whom",
   "data": "data/team.json", "layout": "breadthfirst" }</code></pre>

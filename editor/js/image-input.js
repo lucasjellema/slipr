@@ -11,9 +11,7 @@ import { canOpenFolders, ensurePermission, findImageBySuffix, writeImage } from 
 import { slugify } from './io/new-show.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
-import { pdfValue, webValue } from './block-values.js';
-import { mapValue } from './map-values.js';
-import { isMap } from '../../shared/embeds/map.js';
+import { withFallback } from './block-values.js';
 import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
@@ -153,7 +151,7 @@ export async function addImageToSlot(store, { slideId, slot, file }) {
 
 /**
  * Copy an image into the show folder and make it the fallback image of a
- * `web` (I-071), `pdf` (I-072) or `map` (I-075, E-021) slot, then ask for alt text.
+ * `web` (I-071), `pdf` (I-072), `graph` (I-074, E-020) or `map` (I-075, E-021) slot, then ask for alt text.
  * @param {import('./store.js').EditorStore} store
  * @param {{ slideId: string, slot: string, file: File, alt?: string }} target  alt: suggested alt text (a map snapshot).
  */
@@ -167,8 +165,7 @@ export async function addFallbackToSlot(store, { slideId, slot, file, alt }) {
     read: (s) => s?.content?.[slot]?.fallback,
     write: (image) => {
       const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slot];
-      const merge = isMap(current) ? mapValue : current && typeof current.pdf === 'string' ? pdfValue : webValue;
-      store.dispatch('setSlot', { slideId, slot, value: merge(current, { fallback: image }) });
+      store.dispatch('setSlot', { slideId, slot, value: withFallback(current, image) });
     },
   });
 }
@@ -314,15 +311,16 @@ export async function addPdf(store, { file, fallbackName, write }) {
 }
 
 /**
- * Copy a GeoJSON file into the show's data/ folder (a map layer, E-021) and
- * hand its path and a title (from the file name) to `write`. Shows without a
- * folder keep it in memory for this session, like added pictures.
+ * Copy a JSON data file into the show's data/ folder and hand its path and a
+ * title (from the file name) to `write`. `check` says what is wrong with the
+ * parsed JSON, or null. Shows without a folder keep it in memory for this
+ * session, like added pictures. Used for map layers (E-021) and graph data (E-020).
  * @param {import('./store.js').EditorStore} store
- * @param {{ file: File, write: (path: string, title: string) => void }} target
+ * @param {{ file: File, extensions: RegExp, kind: string, check: (json: any) => string | null, write: (path: string, title: string) => void }} target
  */
-export async function addLayerFile(store, { file, write }) {
-  const name = file.name || 'layer.geojson';
-  if (!/\.(geo)?json$/i.test(name)) throw new Error(`"${name}" is not a GeoJSON file (.geojson or .json).`);
+async function addDataFile(store, { file, extensions, kind, check, write }) {
+  const name = file.name || 'data.json';
+  if (!extensions.test(name)) throw new Error(`"${name}" is not a ${kind} file.`);
   const bytes = await file.arrayBuffer();
   let json;
   try {
@@ -330,11 +328,12 @@ export async function addLayerFile(store, { file, write }) {
   } catch {
     throw new Error(`"${name}" is not valid JSON.`);
   }
-  const types = ['FeatureCollection', 'Feature', 'Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
-  if (!types.includes(json?.type)) throw new Error(`"${name}" is JSON, but not GeoJSON (no "type": "FeatureCollection" or a geometry).`);
-  const base = name.replace(/\.(geo)?json$/i, '');
-  const path = `data/${slugify(base).slice(0, 40).replace(/-+$/, '') || 'layer'}-${await shortHash(bytes)}.${/\.geojson$/i.test(name) ? 'geojson' : 'json'}`;
-  const blob = new Blob([bytes], { type: 'application/geo+json' });
+  const problem = check(json);
+  if (problem) throw new Error(`"${name}": ${problem}`);
+  const ext = /\.([a-z]+)$/i.exec(name)?.[1]?.toLowerCase() ?? 'json';
+  const base = name.replace(/\.[a-z]+$/i, '');
+  const path = `data/${slugify(base).slice(0, 40).replace(/-+$/, '') || 'data'}-${await shortHash(bytes)}.${ext}`;
+  const blob = new Blob([bytes], { type: ext === 'geojson' ? 'application/geo+json' : 'application/json' });
   const handle = store.state.folderHandle;
   if (handle) {
     if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
@@ -345,4 +344,30 @@ export async function addLayerFile(store, { file, write }) {
   }
   store.state.registerAsset?.(path, blob);
   write(path, base.replace(/[-_]+/g, ' ').trim());
+}
+
+const GEOJSON_TYPES = ['FeatureCollection', 'Feature', 'Point', 'MultiPoint', 'LineString', 'MultiLineString', 'Polygon', 'MultiPolygon', 'GeometryCollection'];
+
+/**
+ * Copy a GeoJSON file into data/ (a map layer, E-021).
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, write: (path: string, title: string) => void }} target
+ */
+export function addLayerFile(store, { file, write }) {
+  return addDataFile(store, {
+    file, write, extensions: /\.(geo)?json$/i, kind: 'GeoJSON (.geojson or .json)',
+    check: (json) => (GEOJSON_TYPES.includes(json?.type) ? null : 'this is JSON, but not GeoJSON (no "type": "FeatureCollection" or a geometry).'),
+  });
+}
+
+/**
+ * Copy a graph data file into data/ (E-020): JSON with { "nodes": [...], "edges": [...] }.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, write: (path: string, title: string) => void }} target
+ */
+export function addGraphDataFile(store, { file, write }) {
+  return addDataFile(store, {
+    file, write, extensions: /\.json$/i, kind: 'JSON (.json)',
+    check: (json) => (json && Array.isArray(json.nodes) ? null : 'this is JSON, but not graph data (no "nodes": [...]).'),
+  });
 }

@@ -65,9 +65,12 @@ Both templates get a `graph` layout (title, graph, caption; Conclusion: kicker, 
 - Visibility is tracked with the display flag Slipr sets, not with Cytoscape's `:visible`, which lags behind a style change.
 - The embed element gets `sliprGraph` (the Cytoscape instance) for debugging and browser checks.
 
+## Graph editor (E-020, 2026-10-14)
+
+Done with the recommended scope (the question was not answered; the same approach as the map editor, E-021): a **live mini graph in the form** with + Node, 🔗 Connect (click two nodes to link them), click-to-open a node's row, Fit and **Snapshot as fallback** (`cy.png()`, without the editor's marks, with an alt text naming the nodes); rows for nodes, links, layout and steps (slots); a **data file** picker (copied into `data/`): the file's nodes are drawn dashed and listed read-only, and **Move into the slide** copies them inline and drops the file reference (the editor never writes data files). Modules: `editor/js/graph-values.js` (DOM-free value helpers, tested) and `editor/js/ui/graph-fields.js`, shared by the slot editor and the new Graph block editor. The mini graph uses the viewer's Cytoscape loader, style and layout (`getCytoscape()`, `graphStyle()`, `runLayout()`, `themeOf()`, `highlight()` exported from `shared/embeds/graph.js`). Node ids come from labels; renaming an id renames it in links and steps, removing a node removes its links and its place in the steps. Found while checking: a fallback image added to a graph slot went through the web page value helper and added `title` / `url`; `withFallback()` (`editor/js/block-values.js`) now picks the value's own shape.
+
 ## Out of scope
 
-- Editing graphs in the editor (read-only for now; backlog item).
 - Fixed node positions (`preset` layout), node shapes or sizes per node, compound (nested) nodes.
 - Glossary popups inside node Markdown (terms show as text in the node panel).
 - I-017 (the show's own concept map) builds on this later.

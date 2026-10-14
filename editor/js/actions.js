@@ -12,6 +12,7 @@
 import { renameGlossaryRef, unlinkGlossary } from './show-entities.js';
 import { cleanTextStyle } from '../../shared/text-style.js';
 import { isMap } from '../../shared/embeds/map.js';
+import { isGraph } from '../../shared/embeds/graph.js';
 
 /**
  * Generate a random short identifier.
@@ -251,9 +252,9 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, value);
-  // A web page (I-071), PDF (I-072) or map (I-075) slot, or an embed fallback (I-070), needs format 0.2.
+  // A web page (I-071), PDF (I-072), graph (I-074) or map (I-075) slot, or an embed fallback (I-070), needs format 0.2.
   const embed02 = value && typeof value === 'object' && !Array.isArray(value)
-    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value));
+    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value) || isGraph(value));
   if (embed02 && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
@@ -557,7 +558,7 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
 }
 
 /** Block types and the order of the type picker. */
-export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf', 'map'];
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf', 'graph', 'map'];
 
 /**
  * A block converted to another type, in a valid shape for that type (see the
@@ -615,6 +616,18 @@ export function convertBlock(block, type, defaults = {}) {
         ...(block.load ? { load: block.load } : {}),
         ...(block.fallback ? { fallback: block.fallback } : {}),
       };
+    case 'graph':
+      // A new graph (I-074, E-020) starts with one node; the graph editor adds the rest.
+      return {
+        ...base, ...(title ? { title } : {}),
+        ...(Array.isArray(block.nodes) || typeof block.data === 'string' ? {} : { nodes: [{ id: 'node-1', label: 'Node 1' }] }),
+        ...(Array.isArray(block.nodes) ? { nodes: block.nodes } : {}),
+        ...(Array.isArray(block.edges) ? { edges: block.edges } : {}),
+        ...(typeof block.data === 'string' ? { data: block.data } : {}),
+        ...(block.layout ? { layout: block.layout } : {}),
+        ...(block.caption ? { caption: block.caption } : {}),
+        ...(block.fallback ? { fallback: block.fallback } : {}),
+      };
     case 'map':
       // A new map (I-075, E-021) starts on the whole world; places come from the map editor.
       return {
@@ -644,8 +657,8 @@ export function setBlockType(show, { slideId, blockId, type }) {
   if (!Array.isArray(show.slides)) return show;
   const index = show.slides.findIndex((/** @type {any} */ s) => s.id === slideId);
   const neighbour = show.slides[index + 1] ?? show.slides[index - 1];
-  // A PDF (I-072) or map (I-075) block needs show format 0.2.
-  if ((type === 'pdf' || type === 'map') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
+  // A PDF (I-072), graph (I-074) or map (I-075) block needs show format 0.2.
+  if ((type === 'pdf' || type === 'graph' || type === 'map') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   return mapBlock(show, slideId, blockId, (b) => (b.type === type ? b : convertBlock(b, type, { slideId: neighbour?.id })));
 }
 

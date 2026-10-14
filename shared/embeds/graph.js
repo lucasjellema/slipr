@@ -29,7 +29,7 @@ export const errorLabel = 'Graph could not be drawn';
 export const GRAPH_LAYOUTS = ['cose', 'breadthfirst', 'concentric', 'circle', 'grid'];
 const PALETTE_SIZE = 6;
 /** Node text size in graph units: the view's zoom scales it with the drawing. */
-const TEXT_SIZE = 18;
+export const TEXT_SIZE = 18;
 
 /**
  * Is this a graph value (slot value or block)?
@@ -175,8 +175,8 @@ export function afterHtml(value, options = {}) {
 /** @type {Promise<any> | null} */
 let cytoscapePromise = null;
 
-/** Lazy-load the vendored Cytoscape.js once. */
-async function getCytoscape() {
+/** Lazy-load the vendored Cytoscape.js once (also for the editor's graph editor, E-020). */
+export async function getCytoscape() {
   if (!cytoscapePromise) {
     cytoscapePromise = import(new URL('../../vendor/cytoscape-3.34.3/dist/cytoscape.esm.min.mjs', import.meta.url).href)
       .then((mod) => mod.default ?? mod);
@@ -328,7 +328,7 @@ function widen(cy, placed) {
  * Place the nodes: deterministic (cose starts from a circle, not at random).
  * @param {any} cy @param {string} name
  */
-function runLayout(cy, name) {
+export function runLayout(cy, name) {
   const layout = GRAPH_LAYOUTS.includes(name) ? name : 'cose';
   // A fixed box, not the container's: a slide that is not shown yet measures 0 × 0.
   // Placement only (fit: false): the view is fitted afterwards.
@@ -347,7 +347,7 @@ function runLayout(cy, name) {
  * Highlight a node and its neighbours, fading the rest; null clears it.
  * @param {any} cy @param {string | null} id
  */
-function highlight(cy, id) {
+export function highlight(cy, id) {
   cy.batch(() => {
     cy.elements().removeClass('faded focused');
     if (!id) return;
@@ -459,7 +459,7 @@ function readerControls(el, cy, nodes, colors, theme) {
  * @param {HTMLElement} el
  * @returns {Theme}
  */
-function themeOf(el) {
+export function themeOf(el) {
   const style = getComputedStyle(el);
   const v = (/** @type {string} */ name, /** @type {string} */ fallback) => style.getPropertyValue(name).trim() || fallback;
   // Without the template's graph palette: its primary and accent, then four neutral colors.
@@ -479,7 +479,7 @@ function themeOf(el) {
  * Cytoscape styles from the template tokens; `size` is the node text size in graph units.
  * @param {Theme} t @param {number} size
  */
-function graphStyle(t, size) {
+export function graphStyle(t, size) {
   return [
     {
       selector: 'node',

@@ -3244,3 +3244,70 @@ body.is-screen #slipr-editor-banners {
   flex: 1 1 180px;
   width: auto;
 }
+
+/* ---------- Graph editor (E-020); rows and sections share the map editor's styles ---------- */
+
+.slipr-graph-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* White like a slide: node label colors are chosen for a light background. */
+.slipr-graph-editor-canvas {
+  height: 260px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+  background: #FFFFFF;
+}
+
+.slipr-graph-editor.is-connecting .slipr-graph-editor-canvas {
+  outline: 2px solid var(--slipr-editor-indicator);
+  outline-offset: 2px;
+}
+
+.slipr-graph-editor-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.slipr-graph-editor-tools .is-active {
+  border-color: var(--slipr-editor-indicator);
+  background: var(--slipr-editor-selected);
+}
+
+.slipr-graph-editor-status {
+  margin: 0;
+}
+
+.slipr-graph-edge-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 4px;
+  align-items: center;
+}
+
+.slipr-graph-edge-row .slipr-select,
+.slipr-graph-edge-row .slipr-input {
+  width: 100%;
+  min-width: 0;
+}
+
+.slipr-graph-step-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.slipr-graph-step-row > .slipr-select {
+  width: auto;
+}
+
+.slipr-graph-step-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  flex: 1 1 100%;
+}

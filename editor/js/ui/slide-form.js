@@ -9,11 +9,12 @@ import { GRAPH_HELP, MAP_HELP } from '../help.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
-import { addFallbackToSlot, addImageToSlot, addLayerFile, addPdf, imageFileFrom } from '../image-input.js';
+import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addPdf, imageFileFrom } from '../image-input.js';
 import { pdfValue, webValue } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
 import { mapFields } from './map-fields.js';
+import { graphFields } from './graph-fields.js';
 import { readShowFile } from '../io/show-files.js';
 import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
@@ -393,6 +394,25 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       slides: store.state.show?.slides ?? [],
       currentSlideId: slideId,
     }))];
+  } else if (kind === 'graph') {
+    // A graph (I-074, E-020): the same fields as the Graph block, plus the build-up while presenting.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    inputs = [h('div', { class: 'slipr-embed-editor slipr-map-fields' }, graphFields({
+      key: `slot:${slideId}:${slotName}`,
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: (next, typing) => {
+        current = next;
+        store.dispatch('setSlot', { slideId, slot: slotName, value: next }, typing ? { coalesceKey: `${coalesceKey}-graph` } : {});
+      },
+      readFile: (path) => readShowFile(store.state, path),
+      addDataFile: (file, write) => addGraphDataFile(store, { file, write }),
+      addFallback: (file, alt) => addFallbackToSlot(store, { slideId, slot: slotName, file, alt }),
+      resolveAsset: store.state.resolveAsset,
+      slides: store.state.show?.slides ?? [],
+      currentSlideId: slideId,
+    }))];
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [
@@ -412,9 +432,8 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     ? `This ${slotDef.type ?? ''} slot can't be edited here yet. Edit show.json directly.`.replace('  ', ' ')
     : helpText;
 
-  const helpEl = kind === 'readonly' && slotDef.type === 'graph'
-    ? h('span', { class: 'slipr-help' }, ['Graphs are written in show.json for now: ',
-        h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['how to write a graph']), '.'])
+  const helpEl = kind === 'graph'
+    ? h('span', { class: 'slipr-help' }, [h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['How graphs work']), ': nodes, links, the build-up while presenting and data files.'])
     : kind === 'map'
       ? h('span', { class: 'slipr-help' }, [h('a', { href: MAP_HELP, target: 'slipr-help', rel: 'noopener' }, ['How maps work']), ': places, the tour while presenting, layers and offline maps.'])
     : help ? h('span', { class: 'slipr-help' }, [help]) : null;
