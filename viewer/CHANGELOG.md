@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-14: Data tables (I-104)
+- **Added** tables on slides and in the reader layer (`shared/embeds/table.js`): sorting and a filter box (in both modes when the author allows them), totals, colours from the template, a header that stays in place and a first column that can. In audience mode rows appear and rows, columns or cells are highlighted click by click, and the table starts from the author's sort and filter each time the slide is shown. Reader mode adds a **Columns** menu, **Copy** and **Download CSV**; search finds headers and typed-in cells. The manual (`help.html`) has a *Tables* part.
+
 ### 2026-10-14: Local map tiles in folder and zip shows (I-099)
 - **Fixed** maps with tiles in the show folder showed no background in shows opened with `?folder=` or `?zip=`; audience and reader mode now read the tiles from the folder or zip.
 

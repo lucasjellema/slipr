@@ -45,6 +45,7 @@ editor/
     ├── block-values.js   ✅ DOM-free: tabs (add, move, remove, set), embed URL problems and height (I-036)
     ├── help.js           ✅ DOM-free: manual address and the section per inspector tab; openHelp() (E-016)
     ├── menu-nav.js       ✅ DOM-free: keyboard movement and type-ahead in menus (I-102)
+    ├── table-values.js   ✅ DOM-free: table values for the table editor (grid, columns, paste, CSV to inline, steps; I-104)
     ├── glossary-model.js ✅ DOM-free: deck-aware word completion, candidates scanner, usage inspection and filtering (I-088)
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
@@ -71,6 +72,7 @@ editor/
         ├── show-settings.js ✅ "Settings" tab: meta, settings; chapters, profiles, glossary and reading routes with usage, reorder and explained deletes (E-009)
         ├── preview.js       ✅ live render: audience slide, or reader view as profile X at depth N, plus warnings
         ├── preview-dialog.js ✅ enlarged preview (I-103): a second preview pane in a modal dialog, with the overlay section beside it
+        ├── table-fields.js  ✅ table editor for the table slot and block: grid, paste, CSV file, columns, options, steps (I-104)
         ├── overlay-editor.js ✅ extra images on the audience preview: select, drag, corner resize, keyboard (I-083)
         ├── overlay-list.js  ✅ the Slide tab's "Extra images" section (I-083)
         ├── picture-style.js ✅ picture style picker (live previews with the template's classes) and opacity slider, for every image field (I-084)

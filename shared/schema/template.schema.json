@@ -104,7 +104,7 @@
       "additionalProperties": false,
       "properties": {
         "name": { "$ref": "#/$defs/id" },
-        "type": { "enum": ["text", "richtext", "list", "image", "code", "quote", "chart", "diagram", "web", "pdf", "graph", "map", "cards"] },
+        "type": { "enum": ["text", "richtext", "list", "image", "code", "quote", "chart", "diagram", "web", "pdf", "graph", "map", "table", "cards"] },
         "label": { "type": "string", "description": "Field label in the editor." },
         "help": { "type": "string", "description": "Help text in the editor." },
         "required": { "type": "boolean" },

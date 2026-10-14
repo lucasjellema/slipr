@@ -252,3 +252,170 @@
   .slipr-embed-consent { display: none !important; }
   .slipr-embed[data-embed-print="fallback"] > .slipr-embed-fallback { display: contents !important; }
 }
+
+/* ---------- tables (I-104) ---------- */
+/* Colours come from the template's --slipr-table-* tokens, with defaults from
+   its primary colour and surfaces; sizes are in em, so the same rules work on a
+   scaled slide and in reader mode. See shared/embeds/table.js. */
+.slipr-embed--table {
+  --_t-header-bg: var(--slipr-table-header-bg, var(--slipr-color-primary, #1f3a5f));
+  --_t-header-text: var(--slipr-table-header-text, #fff);
+  --_t-stripe: var(--slipr-table-stripe, var(--slipr-color-surface, #f4f6f9));
+  --_t-border: var(--slipr-table-border, var(--slipr-color-surface, #e5e7eb));
+  --_t-strong: var(--slipr-table-strong, var(--slipr-color-primary, #1f3a5f));
+  --_t-positive: var(--slipr-table-positive, #1a7f37);
+  --_t-negative: var(--slipr-table-negative, #c8553d);
+  --_t-highlight: var(--slipr-table-highlight, var(--slipr-color-accent, #f2a900));
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+  color: var(--slipr-color-text, #1e2329);
+}
+.slipr-embed--table > .slipr-embed-live { display: flex; flex-direction: column; min-height: 0; }
+/* On a slide the layout sizes the table; it scrolls inside that space. */
+[data-slot].slipr-embed--table > .slipr-embed-live,
+[data-slot].slipr-embed--table > .slipr-embed-fallback[data-fallback="table"] { flex: 1; min-height: 0; }
+/* The static table until the live one is ready (then the shared rule hides it). */
+.slipr-embed--table:not([data-embed-state="ready"]) > .slipr-embed-fallback[data-fallback="table"] { display: flex; flex-direction: column; }
+.slipr-table-scroll {
+  overflow: auto;
+  min-height: 0;
+  max-width: 100%;
+  border: 1px solid var(--_t-border);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-bg, #fff);
+}
+/* About maxRows rows, plus the header (rows are roughly 2.3em high). */
+.slipr-embed--table[style*="--slipr-table-max-rows"] .slipr-table-scroll { max-height: calc((var(--slipr-table-max-rows) + 1) * 2.3em); }
+/* On a slide: as tall as the table, at most the space the layout gives. */
+[data-slot].slipr-embed--table .slipr-table-scroll { flex: 0 1 auto; }
+.slipr-table-scroll:focus-visible { outline: 2px solid var(--_t-highlight); outline-offset: 2px; }
+.slipr-table-grid {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9em;
+  line-height: 1.35;
+  font-variant-numeric: tabular-nums;
+}
+.slipr-table-grid :is(th, td) {
+  padding: 0.45em 0.75em;
+  border-bottom: 1px solid var(--_t-border);
+  text-align: start;
+  vertical-align: top;
+  white-space: nowrap;
+  background-color: var(--slipr-color-bg, #fff);
+}
+.slipr-table-grid tbody tr:nth-child(even) > :is(th, td) { background-color: var(--_t-stripe); }
+.slipr-table-grid tbody th { font-weight: 600; }
+.slipr-table-grid .is-center { text-align: center; }
+.slipr-table-grid .is-end { text-align: end; }
+/* The header stays in place while the rows scroll; the totals at the bottom. */
+.slipr-table-grid thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--_t-header-bg);
+  color: var(--_t-header-text);
+  font-weight: 700;
+  border-bottom: 0;
+}
+.slipr-table-grid tfoot :is(th, td) {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  font-weight: 700;
+  border-top: 2px solid var(--_t-header-bg);
+  border-bottom: 0;
+}
+.slipr-table-grid .is-pinned { position: sticky; left: 0; z-index: 1; box-shadow: 1px 0 0 var(--_t-border); }
+.slipr-table-grid thead .is-pinned,
+.slipr-table-grid tfoot .is-pinned { z-index: 3; }
+.slipr-table-sort {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.slipr-table-grid .is-end .slipr-table-sort { flex-direction: row-reverse; }
+.slipr-table-sort:focus-visible { outline: 2px solid var(--_t-highlight); outline-offset: 2px; border-radius: 2px; }
+.slipr-table-sort-icon { font-size: 0.75em; opacity: 0.75; }
+[aria-sort="none"] .slipr-table-sort-icon { opacity: 0.4; }
+/* Visuals: a colour scale, a data bar, negative and positive values. */
+.slipr-table-grid tbody tr:nth-child(n) > .is-scale {
+  background-color: color-mix(in srgb, var(--_t-strong) calc(var(--slipr-table-level) * 45%), var(--slipr-color-bg, #fff));
+}
+.slipr-table-grid tbody .is-bar {
+  background-image: linear-gradient(to left, color-mix(in srgb, var(--_t-strong) 28%, transparent), color-mix(in srgb, var(--_t-strong) 28%, transparent));
+  background-repeat: no-repeat;
+  background-position: left 0.2em center;
+  background-size: calc(var(--slipr-table-level) * (100% - 0.4em)) 70%;
+}
+.slipr-table-grid tbody .is-bar.is-negative {
+  background-image: linear-gradient(to left, color-mix(in srgb, var(--_t-negative) 30%, transparent), color-mix(in srgb, var(--_t-negative) 30%, transparent));
+}
+.slipr-table-bar-value { position: relative; }
+.slipr-table-grid .is-negative:not(.is-bar) { color: var(--_t-negative); font-weight: 600; }
+.slipr-table-grid .is-positive { color: var(--_t-positive); font-weight: 600; }
+/* Highlight steps: the row, column or cell stands out, the rest steps back. */
+.slipr-table-grid :is(th, td) { transition: opacity 0.3s, box-shadow 0.3s; }
+.slipr-table-grid.has-highlight tbody tr:not(.is-highlight) > :not(.is-highlight) { opacity: 0.35; }
+.slipr-table-grid tbody tr.is-highlight > :is(th, td),
+.slipr-table-grid tbody .is-highlight { box-shadow: inset 0 0 0 9999px color-mix(in srgb, var(--_t-highlight) 22%, transparent); font-weight: 700; }
+.slipr-table-grid thead th.is-highlight { box-shadow: inset 0 -0.25em 0 var(--_t-highlight); }
+.slipr-table-empty td { text-align: center; color: var(--slipr-color-muted, #5b6573); font-style: italic; white-space: normal; }
+/* Toolbar: filter, Columns, Copy, Download CSV, and how many rows are on show. */
+.slipr-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4em;
+  margin-bottom: 0.4em;
+  font-size: 0.8em;
+  color: var(--slipr-color-muted, #5b6573);
+}
+.slipr-table-filter,
+.slipr-table-btn {
+  font: inherit;
+  padding: 0.25em 0.6em;
+  border: 1px solid var(--_t-border);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-bg, #fff);
+  color: var(--slipr-color-text, #1e2329);
+}
+.slipr-table-filter { min-width: 10em; flex: 0 1 16em; }
+.slipr-table-btn { cursor: pointer; }
+:is(.slipr-table-filter, .slipr-table-btn):focus-visible { outline: 2px solid var(--_t-highlight); outline-offset: 1px; }
+.slipr-table-status { margin-left: auto; }
+.slipr-table-columns { position: relative; }
+.slipr-table-columns > summary { list-style: none; }
+.slipr-table-columns > summary::-webkit-details-marker { display: none; }
+.slipr-table-columns > summary::after { content: ' ▾'; }
+.slipr-table-columns-list {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.3em);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2em;
+  min-width: 12em;
+  max-height: 16em;
+  overflow: auto;
+  padding: 0.5em 0.7em;
+  border: 1px solid var(--_t-border);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-bg, #fff);
+  color: var(--slipr-color-text, #1e2329);
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.15);
+}
+.slipr-table-columns-item { display: flex; gap: 0.4em; align-items: center; white-space: nowrap; cursor: pointer; }
+.slipr-table-step { display: none; }
+@media print {
+  .slipr-table-scroll { max-height: none !important; overflow: visible; }
+  .slipr-table-toolbar { display: none; }
+}

@@ -20,6 +20,9 @@ export const GRAPH_HELP = `${HELP_PAGE}#graphs`;
 /** Manual section on writing maps in show.json (I-075): linked from read-only map fields. */
 export const MAP_HELP = `${HELP_PAGE}#maps`;
 
+/** Manual section on tables (I-104): linked from the table fields. */
+export const TABLE_HELP = `${HELP_PAGE}#tables`;
+
 /**
  * Address of the manual, at the section for the given inspector tab.
  * @param {string | null} [activeTab]  'slide', 'reader' or 'settings'; anything else opens the start.

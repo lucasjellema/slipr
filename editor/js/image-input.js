@@ -9,6 +9,7 @@
 import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath, shortHash } from './io/images.js';
 import { canOpenFolders, ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
+import { parseCsv } from '../../shared/csv.js';
 import { imageValue } from './slot-values.js';
 import { cardsValue, withCardField } from './card-values.js';
 import { withFallback } from './block-values.js';
@@ -311,29 +312,34 @@ export async function addPdf(store, { file, fallbackName, write }) {
 }
 
 /**
- * Copy a JSON data file into the show's data/ folder and hand its path and a
+ * Copy a data file into the show's data/ folder and hand its path and a
  * title (from the file name) to `write`. `check` says what is wrong with the
- * parsed JSON, or null. Shows without a folder keep it in memory for this
- * session, like added pictures. Used for map layers (E-021) and graph data (E-020).
+ * parsed JSON (or, with `text`, with the file's text), or null. Shows without
+ * a folder keep it in memory for this session, like added pictures. Used for
+ * map layers (E-021), graph data (E-020) and table data (I-104, CSV).
  * @param {import('./store.js').EditorStore} store
- * @param {{ file: File, extensions: RegExp, kind: string, check: (json: any) => string | null, write: (path: string, title: string) => void }} target
+ * @param {{ file: File, extensions: RegExp, kind: string, check: (data: any) => string | null, write: (path: string, title: string) => void, text?: boolean }} target
  */
-async function addDataFile(store, { file, extensions, kind, check, write }) {
+async function addDataFile(store, { file, extensions, kind, check, write, text = false }) {
   const name = file.name || 'data.json';
   if (!extensions.test(name)) throw new Error(`"${name}" is not a ${kind} file.`);
   const bytes = await file.arrayBuffer();
-  let json;
-  try {
-    json = JSON.parse(new TextDecoder().decode(bytes));
-  } catch {
-    throw new Error(`"${name}" is not valid JSON.`);
+  const decoded = new TextDecoder().decode(bytes);
+  let data = decoded;
+  if (!text) {
+    try {
+      data = JSON.parse(decoded);
+    } catch {
+      throw new Error(`"${name}" is not valid JSON.`);
+    }
   }
-  const problem = check(json);
+  const problem = check(data);
   if (problem) throw new Error(`"${name}": ${problem}`);
   const ext = /\.([a-z]+)$/i.exec(name)?.[1]?.toLowerCase() ?? 'json';
   const base = name.replace(/\.[a-z]+$/i, '');
   const path = `data/${slugify(base).slice(0, 40).replace(/-+$/, '') || 'data'}-${await shortHash(bytes)}.${ext}`;
-  const blob = new Blob([bytes], { type: ext === 'geojson' ? 'application/geo+json' : 'application/json' });
+  const type = text ? 'text/csv' : ext === 'geojson' ? 'application/geo+json' : 'application/json';
+  const blob = new Blob([bytes], { type });
   const handle = store.state.folderHandle;
   if (handle) {
     if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
@@ -357,6 +363,18 @@ export function addLayerFile(store, { file, write }) {
   return addDataFile(store, {
     file, write, extensions: /\.(geo)?json$/i, kind: 'GeoJSON (.geojson or .json)',
     check: (json) => (GEOJSON_TYPES.includes(json?.type) ? null : 'this is JSON, but not GeoJSON (no "type": "FeatureCollection" or a geometry).'),
+  });
+}
+
+/**
+ * Copy a CSV file into data/ (a table's data, I-104): a header line and at least one row.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, write: (path: string, title: string) => void }} target
+ */
+export function addTableDataFile(store, { file, write }) {
+  return addDataFile(store, {
+    file, write, text: true, extensions: /\.(csv|tsv|txt)$/i, kind: 'CSV (.csv)',
+    check: (text) => (parseCsv(String(text)).length >= 1 ? null : 'the file is empty.'),
   });
 }
 

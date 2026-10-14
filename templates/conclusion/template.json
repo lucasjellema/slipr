@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -463,6 +463,17 @@
         { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
         { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
         { "name": "map", "type": "map", "label": "Map", "required": true }
+      ]
+    },
+    {
+      "id": "table",
+      "name": "Table",
+      "description": "Title with a data table (sortable, filterable, totals; rows revealed step by step in audience mode) in the content area.",
+      "file": "layouts/table.html",
+      "slots": [
+        { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
+        { "name": "table", "type": "table", "label": "Table", "required": true }
       ]
     },
     {

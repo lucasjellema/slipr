@@ -42,6 +42,16 @@
   --slipr-graph-4: #7B5EA7;
   --slipr-graph-5: #C8553D;
   --slipr-graph-6: #5B6573;
+
+  /* Data tables (I-104) */
+  --slipr-table-header-bg: #1F3A5F;
+  --slipr-table-header-text: #FFFFFF;
+  --slipr-table-stripe: #F4F6F9;
+  --slipr-table-border: #DDE2E8;
+  --slipr-table-strong: #2A9D8F;
+  --slipr-table-positive: #1A7F37;
+  --slipr-table-negative: #B3412C;
+  --slipr-table-highlight: #F2A900;
 }
 
 /* ---------- Slide frame ---------- */
@@ -272,6 +282,12 @@
 .slipr-layout--graph { padding-bottom: 3cqw; gap: 1.4cqw; }
 .slipr-figure--graph { align-items: stretch; }
 .slipr-graph { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
+/* ---------- Layout: table (I-104) ---------- */
+
+.slipr-layout--table { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--table { align-items: stretch; min-height: 0; }
+.slipr-layout--table .slipr-table { flex: 1; min-height: 0; width: 100%; font-size: 1.6cqw; }
 
 /* ---------- Layout: map (I-075) ---------- */
 

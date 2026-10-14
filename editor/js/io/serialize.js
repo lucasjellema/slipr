@@ -8,6 +8,7 @@
  * indentation (json.dumps, indent=2). DOM-free.
  */
 import showSchema from '../../../shared/schema/show.schema.json' with { type: 'json' };
+import { isTable } from '../../../shared/embeds/table.js';
 
 const defs = /** @type {Record<string, any>} */ (showSchema.$defs);
 
@@ -49,6 +50,17 @@ const map = (def) => ({
   },
 });
 
+/** A table value or block (I-104): its keys, and those of columns, sort and steps. @param {any} def @returns {Shape} */
+const table = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    columns: { items: { keys: keysOf(defs.tableColumn) } },
+    sort: { keys: ['column', 'order'] },
+    steps: { items: { keys: keysOf(defs.tableStep), fields: { highlight: { keys: ['row', 'column'] } } } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -58,6 +70,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
   if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
+  if (isTable(value)) return table(defs.table);
   if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
   if ('markers' in value || 'center' in value || 'layers' in value) return map(defs.map);
   if ('kind' in value) return { keys: keysOf(defs.chart) };
@@ -71,6 +84,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
   const def = defs[name];
   if (value?.type === 'graph') return graph(def);
   if (value?.type === 'map') return map(def);
+  if (value?.type === 'table') return table(def);
   return {
     keys: keysOf(def),
     fields: {

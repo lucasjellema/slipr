@@ -18,6 +18,7 @@ import { foldText } from './glossary.js';
 import { pdfEntries } from './embeds/pdf.js';
 import { isGraph } from './embeds/graph.js';
 import { isMap, tileSource } from './embeds/map.js';
+import { isCsvPath, isTable, tableModel } from './embeds/table.js';
 import { isShown, normalCrop, toShown } from './crop.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
@@ -78,6 +79,7 @@ export function validateShow(show, options = {}) {
     checkEmbeds(slide, at, show.slipr, errors, warnings, options.imageExists);
     checkGraphs(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
     checkMaps(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
+    checkTables(slide, at, show.slipr, errors, warnings, options.imageExists);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -232,6 +234,8 @@ export function collectImagePaths(show) {
     for (const { value } of mapEntries(slide, '')) {
       for (const layer of arrayOf(value.layers)) if (typeof layer?.data === 'string' && !/^[a-z][a-z0-9+.-]*:|^\//i.test(layer.data)) found.push(layer.data);
     }
+    // Table data files (I-104): the same.
+    for (const { value } of tableEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
     // PDF files in the show folder (I-072): checked, embedded and opened like images.
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
@@ -648,6 +652,68 @@ function mapEntries(slide, at) {
 }
 
 /**
+ * The tables of a slide (I-104): slot values and table blocks, with their path.
+ * @param {any} slide @param {string} at
+ * @returns {{ value: any, path: string, block: boolean }[]}
+ */
+function tableEntries(slide, at) {
+  /** @type {{ value: any, path: string, block: boolean }[]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isTable(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type === 'table' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
+  });
+  return found;
+}
+
+/**
+ * Tables (I-104): format 0.2; the data file exists (with a file check);
+ * unique column keys; rows no longer than the columns; sort, steps and
+ * highlights name a column there is; totals and visuals on numeric columns
+ * (inline rows: a file's columns are only known once it is read).
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
+ */
+function checkTables(slide, at, version, errors, warnings, fileExists) {
+  for (const { value, path, block } of tableEntries(slide, at)) {
+    if (version === '0.1') {
+      errors.push({ path, code: 'format-version', message: `a table ${block ? 'block' : 'slot'} needs show format 0.2: set "slipr" to "0.2"` });
+    }
+    const fromFile = isCsvPath(value.data);
+    if (fromFile && fileExists && !fileExists(value.data)) {
+      warnings.push({ path: `${path}.data`, code: 'missing-file', message: `table data file "${value.data}" not found` });
+    }
+    const keys = new Set();
+    arrayOf(value.columns).forEach((c, k) => {
+      if (!isObject(c) || typeof c.key !== 'string') return;
+      if (keys.has(c.key)) warnings.push({ path: `${path}.columns[${k}].key`, code: 'duplicate-column', message: `column "${c.key}" is listed twice; the first one is used` });
+      keys.add(c.key);
+    });
+    if (fromFile) continue; // the file's own columns are only known once it is read
+    arrayOf(value.rows).forEach((row, r) => {
+      if (Array.isArray(row) && row.length > keys.size) {
+        warnings.push({ path: `${path}.rows[${r}]`, code: 'extra-cells', message: `row ${r + 1} has ${row.length} cells for ${keys.size} columns; the extra cells are not shown` });
+      }
+    });
+    const unknown = (/** @type {unknown} */ key, /** @type {string} */ where) => {
+      if (typeof key === 'string' && !keys.has(key)) warnings.push({ path: where, code: 'unknown-column', message: `unknown column "${key}"` });
+    };
+    unknown(value.sort?.column, `${path}.sort.column`);
+    arrayOf(value.steps).forEach((step, k) => unknown(step?.highlight?.column, `${path}.steps[${k}].highlight.column`));
+    const model = tableModel(value);
+    arrayOf(value.columns).forEach((c, k) => {
+      const col = model.columns.find((m) => m.key === c?.key);
+      if (!col || col.numeric) return;
+      if (c.total && c.total !== 'count') warnings.push({ path: `${path}.columns[${k}].total`, code: 'not-numeric', message: `column "${c.key}" has no numbers: no ${c.total} is shown` });
+      if (c.visual) warnings.push({ path: `${path}.columns[${k}].visual`, code: 'not-numeric', message: `column "${c.key}" has no numbers: the ${c.visual} is not shown` });
+    });
+  }
+}
+
+/**
  * Maps (I-075): format 0.2; unique marker ids; steps and marker slides that
  * point somewhere; layer files exist (with a file check); tiles from another
  * server than OpenStreetMap name their attribution.
@@ -718,6 +784,13 @@ function forEachMarkdown(show, fn) {
     for (const { value, path } of mapEntries(slide, at)) {
       arrayOf(value.markers).forEach((m, k) => visit(m?.md, `${path}.markers[${k}].md`));
     }
+    // Markdown cells of tables (I-104), inline rows only.
+    for (const { value, path } of tableEntries(slide, at)) {
+      const columns = arrayOf(value.columns);
+      arrayOf(value.rows).forEach((row, r) => arrayOf(row).forEach((cell, c) => {
+        if (columns[c]?.format === 'markdown') visit(cell, `${path}.rows[${r}][${c}]`);
+      }));
+    }
     arrayOf(slide?.reader?.blocks).forEach((block, j) => {
       const bat = `${at}.reader.blocks[${j}]`;
       visit(block?.md, `${bat}.md`);
@@ -765,6 +838,7 @@ function matchesSlotType(value, type) {
     case 'pdf': return isObject(value) && typeof value.pdf === 'string';
     case 'graph': return isGraph(value);
     case 'map': return isMap(value);
+    case 'table': return isTable(value);
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -785,6 +859,7 @@ function slotTypeLabel(type) {
     pdf: 'a PDF object { "pdf": ..., "title": ... }',
     graph: 'a graph object { "nodes": [...], "edges": [...] } or { "data": "data/....json" }',
     map: 'a map object { "center": {...}, "markers": [...] }',
+    table: 'a table object { "columns": [...], "rows": [...] } or { "data": "data/....csv" }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

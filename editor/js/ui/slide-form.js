@@ -5,16 +5,17 @@
  */
 
 import { h, isTypingEcho, rerenderKeepingFocus } from '../dom.js';
-import { GRAPH_HELP, MAP_HELP } from '../help.js';
+import { GRAPH_HELP, MAP_HELP, TABLE_HELP } from '../help.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
-import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addPdf, imageFileFrom } from '../image-input.js';
+import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addPdf, addTableDataFile, imageFileFrom } from '../image-input.js';
 import { pdfValue, webValue } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
 import { mapFields } from './map-fields.js';
 import { graphFields } from './graph-fields.js';
+import { tableFields } from './table-fields.js';
 import { readShowFile } from '../io/show-files.js';
 import { imageField, runImage } from './image-field.js';
 import { cardsEditor, codeEditor, quoteEditor } from './field-editors.js';
@@ -413,6 +414,21 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       slides: store.state.show?.slides ?? [],
       currentSlideId: slideId,
     }))];
+  } else if (kind === 'table') {
+    // A table (I-104): the same fields as the Table block, plus the steps while presenting.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    inputs = [h('div', { class: 'slipr-embed-editor slipr-table-fields' }, tableFields({
+      key: `slot:${slideId}:${slotName}`,
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: (next, typing) => {
+        current = next;
+        store.dispatch('setSlot', { slideId, slot: slotName, value: next }, typing ? { coalesceKey: `${coalesceKey}-table` } : {});
+      },
+      readFile: (path) => readShowFile(store.state, path),
+      addDataFile: (file, write) => addTableDataFile(store, { file, write }),
+    }))];
   } else if (kind === 'readonly') {
     inputs = [
       h('div', { class: 'slipr-readonly', title: 'No editor for this slot type yet' }, [
@@ -436,6 +452,8 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
     ? h('span', { class: 'slipr-help' }, [h('a', { href: GRAPH_HELP, target: 'slipr-help', rel: 'noopener' }, ['How graphs work']), ': nodes, links, the build-up while presenting and data files.'])
     : kind === 'map'
       ? h('span', { class: 'slipr-help' }, [h('a', { href: MAP_HELP, target: 'slipr-help', rel: 'noopener' }, ['How maps work']), ': places, the tour while presenting, layers and offline maps.'])
+    : kind === 'table'
+      ? h('span', { class: 'slipr-help' }, [h('a', { href: TABLE_HELP, target: 'slipr-help', rel: 'noopener' }, ['How tables work']), ': typing or pasting rows, CSV files, column formats, totals and steps.'])
     : help ? h('span', { class: 'slipr-help' }, [help]) : null;
   // A cards slot is a group of card editors: its help goes above them.
   if (kind === 'cards') {

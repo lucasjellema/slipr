@@ -134,21 +134,13 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - **Import & Export**: clone any existing template (`default`, `conclusion`), import from PPTX mapping (pairs with `I-043`), and save/export as a folder or `.zip` template package (`template.json`, `theme.css`, `reader.css`, `layouts/`, `assets/`). · todo · —
 
 ### Rich embeds & visualizations
-- [ ] **I-104** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
-  - **Data source**: external `.csv` file in `data/` (e.g. `data/sales.csv`) or inline CSV string; parsed client-side with zero external runtime dependencies (D-001/D-002); packaged in single-file HTML exports and zip archives.
-  - **Presentation & styling**: clean layout styled with `--slipr-*` template tokens, zebra striping, sticky header row, and auto-alignment (numbers right-aligned, text left-aligned, dates/codes centered).
-  - **Scrollable & pinned**: scrollbars when rows exceed visible limit (`maxRows` or container height) and when columns exceed container width; sticky header stays fixed while scrolling rows; optional pinned first column stays fixed while scrolling horizontally.
-  - **Sorting & filtering**: optional interactive sorting (click column header to toggle ascending / descending / original order) and text filter / search box to instantly filter rows.
-  - **Aggregates & totals**: optional summary footer row with calculated totals (sum, average, min, max, count) for numeric columns.
-  - **Column controls**: hide specific columns (via author config or interactive toggle), customize display headers, and specify column formatting (currency, percentage, decimals, date).
-  - **Audience mode**: clean slide layout; optional step-by-step row reveals or highlighting on clicks (Reveal fragments).
-  - **Reader mode**: full interactivity with search, column sorting, pagination/filter, "Copy to clipboard", and "Download CSV"; cell text is indexed for reader full-text search (`/`). · todo · —
 - [ ] **I-105** [format/viewer/editor] **Tag cloud / word cloud from CSV data (`tag-cloud` slot and block)**:
   - **Data source**: external `.csv` file in `data/` (e.g. `data/keywords.csv`) or inline CSV block with terms and optional weights or frequencies (`term, weight`), parsed client-side with zero external runtime dependencies (D-001/D-002).
   - **Layout & visual design**: font sizes scaled proportionally to weight/frequency; colors styled with template tokens (`--slipr-graph-*` or accent palette); clean spatial packing that stays legible and fits the slide aspect ratio.
   - **Glossary integration (D-015)**: tags matching glossary entries (`show.glossary[term]`) automatically link to their glossary definitions. In **Reader mode**, clicking a tag opens its glossary popover with term details, aliases, markdown notes, and related slides.
   - **Audience mode**: clean presentation view for key themes, survey results, or audience keywords; optional steps to pulse, highlight or reveal top terms on clicks.
   - **Reader mode**: fully interactive with glossary popovers, click-to-filter related slides, and inclusion of terms in the reader full-text search index (`/`). · todo · —
+- [ ] **I-107** [format/viewer/editor] **More for data tables** (left out of I-104): group rows by a column with a subtotal per group (collapsible in reader mode); filters per column (a value list or a range); pagination as an alternative to scrolling; a remote CSV address (click-to-load, like web pages); editing a CSV file's cells from the editor (now: *Move into the slide*); charts from the same data (`chart`, planned) · todo · —
 
 ### AI authoring
 
@@ -180,6 +172,15 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-104** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
+  - **Data source**: external `.csv` file in `data/` (e.g. `data/sales.csv`) or inline CSV string; parsed client-side with zero external runtime dependencies (D-001/D-002); packaged in single-file HTML exports and zip archives.
+  - **Presentation & styling**: clean layout styled with `--slipr-*` template tokens, zebra striping, sticky header row, and auto-alignment (numbers right-aligned, text left-aligned, dates/codes centered).
+  - **Scrollable & pinned**: scrollbars when rows exceed visible limit (`maxRows` or container height) and when columns exceed container width; sticky header stays fixed while scrolling rows; optional pinned first column stays fixed while scrolling horizontally.
+  - **Sorting & filtering**: optional interactive sorting (click column header to toggle ascending / descending / original order) and text filter / search box to instantly filter rows.
+  - **Aggregates & totals**: optional summary footer row with calculated totals (sum, average, min, max, count) for numeric columns.
+  - **Column controls**: hide specific columns (via author config or interactive toggle), customize display headers, and specify column formatting (currency, percentage, decimals, date).
+  - **Audience mode**: clean slide layout; optional step-by-step row reveals or highlighting on clicks (Reveal fragments).
+  - **Reader mode**: full interactivity with search, column sorting, pagination/filter, "Copy to clipboard", and "Download CSV"; cell text is indexed for reader full-text search (`/`). Spec with Lucas's decisions: `docs/specs/I-104-table.md`. Built with the full editor, CSV or inline rows, sorting and filter in both modes, row reveal / highlight steps, colour scales / bars / sign colours and Markdown cells; not the converter (I-040). `shared/csv.js`, `shared/embeds/table.js`, `editor/js/table-values.js`, `editor/js/ui/table-fields.js` · done 2026-10-14 · claude
 - [x] **I-103** [editor] **Enlarged preview in a near-full-page dialog**, for easier editing of text elements, extra images and other things placed on the slide:
   - A **⤢ Enlarge** button in the preview header (and a shortcut, e.g. `F11` or `Ctrl+Shift+E`) opens the slide preview in a modal dialog that fills almost the whole window (e.g. 96 vw × 92 vh, the slide scaled to fit at 16:9); **Esc**, ✕ or the button again closes it.
   - Same renderer and the same editing as the side pane: select, drag, resize and keyboard-move extra images and text elements (`mountOverlayEditor`), double-click a text element to edit its text; every change is one undo step, and the side pane and form follow while the dialog is open.

@@ -278,8 +278,10 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       break;
 
     case 'graph':
-    case 'map': {
-      // A graph (I-074) or a map (I-075): a list now, the drawing from hydrateEmbeds().
+    case 'map':
+    case 'table': {
+      // A graph (I-074), a map (I-075) or a table (I-104): a list or the table now,
+      // the drawing (or the data file and controls) from hydrateEmbeds().
       fillEmbedElement(el, type, value, ctx, { mode: /** @type {any} */ (options.mode) });
       if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
         const figcaption = doc.createElement('figcaption');

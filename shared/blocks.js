@@ -146,6 +146,14 @@ export function renderBlock(block, slideId, ctx) {
         + `${embedHtml('map', block, ctx)}${caption}</figure></div>`;
     }
 
+    case 'table': {
+      // A data table (I-104): the table now, sorting, filter and the data file from hydrateEmbeds().
+      const title = block.title ? `<p class="slipr-block-title">${escape(block.title)}</p>` : '';
+      const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
+      return `<div ${attrs}>${badges}${title}<figure class="slipr-figure slipr-figure--table">`
+        + `${embedHtml('table', block, ctx)}${caption}</figure></div>`;
+    }
+
     default:
       return ''; // unknown block types are reported by validation, not rendered
   }

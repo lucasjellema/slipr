@@ -17,8 +17,8 @@ function validateVariant(mutate) {
 
 /** Remove every show-format 0.2 feature (overlays, picture style / opacity / crop, glossary aliases, embeds, graphs). */
 function withoutFormat02(s) {
-  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map');
-  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map');
+  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map' && x.layout !== 'table');
+  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map' && b.type !== 'table');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
@@ -405,8 +405,8 @@ describe('robustness', () => {
 });
 
 describe('helpers', () => {
-  test('collectImagePaths lists unique image sources, local PDFs, graph data files and map layers', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['data/netherlands.geojson', 'data/route.geojson', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
+  test('collectImagePaths lists unique image sources, local PDFs, graph data files, map layers and table data files', () => {
+    assert.deepEqual(collectImagePaths(demo).sort(), ['data/netherlands.geojson', 'data/route.geojson', 'data/sales.csv', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {
@@ -416,5 +416,45 @@ describe('helpers', () => {
     for (const [v, r] of yes) assert.equal(satisfies(v, r), true, `${v} should satisfy ${r}`);
     for (const [v, r] of no) assert.equal(satisfies(v, r), false, `${v} should not satisfy ${r}`);
     assert.equal(satisfies('1.0.0', 'weird||range'), true, 'unknown syntax is not an alarm');
+  });
+});
+
+describe('table validation (I-104)', () => {
+  /** @param {(table: any) => void} change @param {string} [version] */
+  const withTable = (change, version = '0.2') => validateVariant((s) => {
+    s.slipr = version;
+    change(s.slides.find((x) => x.id === 's-table').content.table);
+  });
+
+  test('the demo table slide and CSV block are valid; a table in a 0.1 show is an error', () => {
+    assert.deepEqual(withTable(() => {}).errors, []);
+    assert.ok(codes(withTable(() => {}, '0.1').errors).includes('format-version'));
+  });
+
+  test('a missing data file is a warning (with a file check)', () => {
+    const show = clone(demo);
+    const { warnings } = validateShow(show, { template, imageExists: (src) => src !== 'data/sales.csv' });
+    assert.ok(warnings.some((w) => w.code === 'missing-file' && w.message.includes('sales.csv')));
+  });
+
+  test('unknown formats, a column without key and a non-CSV data file are errors', () => {
+    assert.equal(withTable((t) => { t.columns[1].format = 'money'; }).ok, false);
+    assert.equal(withTable((t) => { t.columns[1].visual = 'heat'; }).ok, false);
+    assert.equal(withTable((t) => { delete t.columns[0].key; }).ok, false);
+    assert.equal(withTable((t) => { t.steps.push({ rows: -1 }); }).ok, false);
+    assert.equal(validateVariant((s) => { s.slides.find((x) => x.id === 's-table').content.table = { data: 'data/x.json' }; }).ok, false);
+  });
+
+  test('duplicate columns, extra cells, unknown columns and totals on text are warnings', () => {
+    assert.ok(codes(withTable((t) => { t.columns.push({ key: 'readers' }); }).warnings).includes('duplicate-column'));
+    assert.ok(codes(withTable((t) => { t.rows[0].push('extra'); }).warnings).includes('extra-cells'));
+    assert.ok(codes(withTable((t) => { t.sort = { column: 'nope' }; }).warnings).includes('unknown-column'));
+    assert.ok(codes(withTable((t) => { t.steps.push({ highlight: { column: 'nope' } }); }).warnings).includes('unknown-column'));
+    assert.ok(codes(withTable((t) => { t.columns[0].total = 'sum'; }).warnings).includes('not-numeric'));
+    assert.deepEqual(withTable((t) => { t.columns[0].total = 'count'; }).warnings, []);
+  });
+
+  test('Markdown cells are checked like other Markdown (unknown glossary ids)', () => {
+    assert.ok(withTable((t) => { t.rows[0][0] = 'See [[no-such-term]]'; }).warnings.some((w) => w.path.includes('.rows[0][0]')));
   });
 });

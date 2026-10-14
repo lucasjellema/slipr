@@ -14,9 +14,11 @@ import { markdownToolbar } from './markdown-toolbar.js';
 import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
-import { addGraphDataFile, addLayerFile, addPdf } from '../image-input.js';
+import { addGraphDataFile, addLayerFile, addPdf, addTableDataFile } from '../image-input.js';
 import { graphFields } from './graph-fields.js';
 import { GRAPH_FIELDS } from '../graph-values.js';
+import { TABLE_FIELDS, tableSummary } from '../table-values.js';
+import { tableFields } from './table-fields.js';
 import { mapFields } from './map-fields.js';
 import { MAP_FIELDS } from '../map-values.js';
 import { readShowFile } from '../io/show-files.js';
@@ -36,6 +38,7 @@ const BLOCK_TYPES = [
   { type: 'pdf', label: 'PDF Document' },
   { type: 'graph', label: 'Graph' },
   { type: 'map', label: 'Map' },
+  { type: 'table', label: 'Table' },
 ];
 
 /** Block ids whose "For" picker is open, so a re-render keeps it open. */
@@ -266,6 +269,8 @@ export function mountReaderForm(container, store) {
         bodyEl.append(mapBlockEditor(store, slide.id, block));
       } else if (block.type === 'graph') {
         bodyEl.append(graphBlockEditor(store, slide.id, block));
+      } else if (block.type === 'table') {
+        bodyEl.append(tableBlockEditor(store, slide.id, block));
       } else if (block.type === 'slide-ref') {
         bodyEl.append(slideRefEditor(store, slide, block));
       } else if (block.type !== 'text') {
@@ -404,6 +409,7 @@ function describeBlock(block) {
   if (block.type === 'pdf') return `${block.title || 'PDF document'}: ${block.pdf || '(no file yet)'}`;
   if (block.type === 'graph') return `${block.title ? `${block.title}. ` : ''}${graphSummary(block)}`;
   if (block.type === 'map') return `${block.title ? `${block.title}. ` : ''}${mapSummary(block)}`;
+  if (block.type === 'table') return `${block.title ? `${block.title}. ` : ''}${tableSummary(block)}`;
   return block.type;
 }
 
@@ -689,6 +695,43 @@ function graphBlockEditor(store, slideId, block) {
       resolveAsset: store.state.resolveAsset,
       slides: store.state.show?.slides ?? [],
       currentSlideId: slideId,
+    }),
+  ]);
+}
+
+/**
+ * Table (I-104): title, then the table editor (data, columns, options).
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function tableBlockEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
+  /** @param {any} next @param {boolean} [typing] */
+  const write = (next, typing = false) => {
+    const patch = Object.fromEntries(TABLE_FIELDS.map((k) => [k, next?.[k]]));
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, typing ? { coalesceKey: `block-table-${block.id}` } : {});
+  };
+  return h('div', { class: 'slipr-embed-editor slipr-table-fields' }, [
+    h('input', {
+      type: 'text',
+      class: 'slipr-input slipr-input-sm',
+      placeholder: 'Title (optional, above the table)',
+      'aria-label': 'Table: title',
+      value: block.title ?? '',
+      oninput: (/** @type {Event} */ e) => store.dispatch('updateBlock', {
+        slideId, blockId: block.id, patch: { title: /** @type {HTMLInputElement} */ (e.target).value || undefined },
+      }, { coalesceKey: `block-title-${block.id}` }),
+    }),
+    ...tableFields({
+      key: `block:${slideId}:${block.id}`,
+      label: 'Table',
+      kind: 'block',
+      read,
+      write,
+      readFile: (path) => readShowFile(store.state, path),
+      addDataFile: (file, done) => addTableDataFile(store, { file, write: done }),
     }),
   ]);
 }

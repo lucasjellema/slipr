@@ -47,6 +47,22 @@ function mapText(value) {
 }
 
 /**
+ * The searchable text of a table (I-104): headers and inline cells. Rows in a
+ * CSV file are not indexed: the index is built before files are read.
+ * @param {any} value
+ * @param {Record<string, any>} [glossary]  Term names for [[id]] in Markdown cells.
+ */
+function tableText(value, glossary) {
+  if (!Array.isArray(value?.columns) && !Array.isArray(value?.rows)) return '';
+  const columns = Array.isArray(value.columns) ? value.columns : [];
+  const head = columns.map((/** @type {any} */ c) => c?.label ?? c?.key).filter(Boolean).join(' ');
+  const rows = (Array.isArray(value.rows) ? value.rows : []).map((/** @type {any} */ r) => (Array.isArray(r)
+    ? r.map((cell, i) => (typeof cell === 'string' && columns[i]?.format === 'markdown' ? markdownToText(cell, { glossary }) : cell ?? '')).join(' ')
+    : '')).join('\n');
+  return [head, rows].filter(Boolean).join('\n');
+}
+
+/**
  * @param {any} show
  * @returns {SearchDoc[]}
  */
@@ -66,7 +82,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v)].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary)].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     // Text elements on the slide (I-089) are slide content too.
@@ -86,7 +102,7 @@ export function buildSearchIndex(show) {
         block.image?.alt, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.label ?? n?.id),
         ...(block.markers ?? []).map((/** @type {any} */ m) => m?.title ?? m?.id)].filter(Boolean).join(' · ');
       const body = [block.md, block.mermaid, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.md), ...(block.markers ?? []).map((/** @type {any} */ m) => m?.md), ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
-        .filter(Boolean).map(text).join('\n');
+        .filter(Boolean).map(text).join('\n') + (block.type === 'table' ? `\n${tableText(block, glossary)}` : '');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,
         title: block.title ? `${title} › ${block.title}` : title, order: order++,

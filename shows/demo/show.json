@@ -842,6 +842,172 @@
       }
     },
     {
+      "id": "s-table",
+      "layout": "table",
+      "chapter": "how",
+      "tags": [
+        "embed"
+      ],
+      "content": {
+        "title": "A table that tells a story",
+        "table": {
+          "columns": [
+            {
+              "key": "chapter",
+              "label": "Chapter",
+              "format": "markdown"
+            },
+            {
+              "key": "readers",
+              "label": "Readers",
+              "format": "integer",
+              "total": "sum",
+              "visual": "bar"
+            },
+            {
+              "key": "minutes",
+              "label": "Minutes",
+              "format": "number",
+              "decimals": 1,
+              "total": "avg"
+            },
+            {
+              "key": "share",
+              "label": "Read to the end",
+              "format": "percent",
+              "visual": "scale"
+            },
+            {
+              "key": "change",
+              "label": "Change",
+              "format": "percent",
+              "decimals": 1,
+              "visual": "sign"
+            }
+          ],
+          "rows": [
+            [
+              "[Why](#s-problem)",
+              412,
+              3.4,
+              0.81,
+              0.052
+            ],
+            [
+              "[How](#s-how): the [[reader-layer]]",
+              368,
+              6.8,
+              0.64,
+              0.124
+            ],
+            [
+              "[What is next](#s-next)",
+              251,
+              2.1,
+              0.47,
+              -0.038
+            ],
+            [
+              "Backup slides",
+              96,
+              4.5,
+              0.22,
+              -0.11
+            ]
+          ],
+          "sortable": true,
+          "steps": [
+            {
+              "rows": 2
+            },
+            {
+              "rows": "all"
+            },
+            {
+              "highlight": {
+                "column": "change"
+              }
+            },
+            {
+              "highlight": {
+                "row": "Backup slides"
+              }
+            }
+          ]
+        },
+        "caption": "Rows appear click by click, then a column and a row are highlighted. Click a header to sort."
+      },
+      "reader": {
+        "summary": "Slides and reader blocks can hold data tables.",
+        "blocks": [
+          {
+            "id": "table-how",
+            "type": "text",
+            "md": "A **table** comes from a CSV file or is typed in. It takes its colours from the template, scrolls when it is long or wide, and can sort, filter and add up a column. While presenting, rows can appear one by one and a row, a column or a cell can be highlighted."
+          },
+          {
+            "id": "table-sales",
+            "type": "table",
+            "title": "Sales per region (from a CSV file)",
+            "data": "data/sales.csv",
+            "columns": [
+              {
+                "key": "region",
+                "label": "Region"
+              },
+              {
+                "key": "quarter",
+                "label": "Quarter",
+                "align": "center"
+              },
+              {
+                "key": "revenue",
+                "label": "Revenue",
+                "format": "currency",
+                "decimals": 0,
+                "currency": "EUR",
+                "total": "sum",
+                "visual": "bar"
+              },
+              {
+                "key": "growth",
+                "label": "Growth",
+                "format": "percent",
+                "decimals": 1,
+                "total": "avg",
+                "visual": "sign"
+              },
+              {
+                "key": "customers",
+                "label": "Customers",
+                "format": "integer",
+                "total": "sum"
+              },
+              {
+                "key": "country",
+                "label": "Country",
+                "hidden": true
+              },
+              {
+                "key": "note",
+                "label": "Note",
+                "hidden": true
+              }
+            ],
+            "sortable": true,
+            "sort": {
+              "column": "revenue",
+              "order": "desc"
+            },
+            "filter": true,
+            "maxRows": 6,
+            "pinFirst": true,
+            "caption": "Semicolons and decimal commas, as Excel writes them in Dutch. Country and Note are hidden: show them with Columns."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

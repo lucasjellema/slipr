@@ -38,7 +38,9 @@ export const TEXT_SIZE = 18;
  */
 export function isGraph(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value)
-    && (Array.isArray(value.nodes) || typeof value.data === 'string'));
+    && (Array.isArray(value.nodes)
+      // A data file of its own (JSON), not a table's (I-104: rows, columns or a CSV file).
+      || (typeof value.data === 'string' && !Array.isArray(value.rows) && !Array.isArray(value.columns) && !/\.(csv|tsv|txt)$/i.test(value.data.trim()))));
 }
 
 /**

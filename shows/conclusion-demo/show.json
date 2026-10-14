@@ -203,6 +203,34 @@
       }
     },
     {
+      "id": "s-table",
+      "layout": "table",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Table",
+        "title": "Projects per business line",
+        "table": {
+          "columns": [
+            { "key": "line", "label": "Business line" },
+            { "key": "projects", "label": "Projects", "format": "integer", "total": "sum", "visual": "bar" },
+            { "key": "revenue", "label": "Revenue (M)", "format": "currency", "currency": "EUR", "decimals": 1, "total": "sum" },
+            { "key": "growth", "label": "Growth", "format": "percent", "decimals": 1, "visual": "sign" },
+            { "key": "satisfaction", "label": "Satisfaction", "format": "number", "decimals": 1, "visual": "scale" }
+          ],
+          "rows": [
+            ["Data & AI", 42, 18.4, 0.124, 8.6],
+            ["Cloud", 37, 15.2, 0.081, 8.1],
+            ["Security", 21, 9.7, 0.153, 8.4],
+            ["Business applications", 55, 22.9, -0.021, 7.6],
+            ["Digital workplace", 18, 6.3, 0.034, 7.9]
+          ],
+          "sortable": true,
+          "pinFirst": true,
+          "steps": [{ "highlight": { "column": "growth" } }, { "highlight": { "row": "Security" } }]
+        }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",

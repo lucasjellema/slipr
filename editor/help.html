@@ -44,6 +44,7 @@
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
         <li><a href="#graphs">Graphs</a></li>
         <li><a href="#maps">Maps</a></li>
+        <li><a href="#tables">Tables</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
         <li><a href="#glossary">Glossary</a></li>
@@ -305,6 +306,7 @@
           <dt>Web page</dt><dd>On the <strong>Web page</strong> layout: the address (https, or a file in the show folder) and a title. <strong>While presenting</strong>: <em>show the live page</em> (clickable on the slide, no Load button) or <em>show the fallback image</em> (a screenshot; nothing is loaded, good for offline talks). In reader mode a page from another site waits for the reader's <strong>Load</strong> unless you tick <strong>In reader mode, load straight away</strong>. <strong>Allow the page to…</strong> gives extra permissions; see <a href="#reader-tab">Embedded Page</a>.</dd>
           <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links, edited with a mini graph (add nodes, click two nodes to link them), plus the build-up while presenting, layout, data file and fallback image. See <a href="#graphs">Graphs</a>.</dd>
           <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map, edited with a mini map (click to add, drag to move), plus the tour while presenting, layers, background and fallback image. See <a href="#maps">Maps</a>.</dd>
+          <dt>Table</dt><dd>On the <strong>Table</strong> layout: rows typed in, pasted from a spreadsheet or read from a CSV file, with per-column formats, totals and colours, sorting and a filter box, and the steps while presenting (show rows, highlight a row, column or cell). See <a href="#tables">Tables</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
         <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
@@ -482,6 +484,7 @@
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
             <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>A mini graph (+ Node, 🔗 Connect, snapshot), nodes, links, layout, data file, caption, fallback image (see <a href="#graphs">Graphs</a>)</td></tr>
             <tr><td><strong>Map</strong></td><td>Places on a map readers explore: drag, zoom, click a place for its text and slide, filter by tag</td><td>A mini map (click to add places, drag to move, use the current view, snapshot), places, layers, background, caption, fallback image (see <a href="#maps">Maps</a>)</td></tr>
+            <tr><td><strong>Table</strong></td><td>A data table readers sort, filter, show or hide columns of, copy and download</td><td>A grid to type or paste rows in, or a CSV file; column formats, totals and colours; sorting, filter, rows before scrolling, caption (see <a href="#tables">Tables</a>)</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
@@ -695,6 +698,54 @@
         <h3>Colors and checks</h3>
         <p>As for graphs, the template chooses the colors: every tag gets the next color of its palette. Warnings: a place id used twice, a step that names a place without that id, a <code>slide</code> that doesn't exist, a layer file that isn't there, and a tile server without an attribution. The demo show has an example on the slide <em>A map on a slide</em>, with an offline map block below it: an outline of the Netherlands as background (Natural Earth, free to use), a route and three places.</p>
         <p class="note">Map pictures in the show folder (<code>tiles/…</code>) work everywhere: in shows opened with <strong>Open folder…</strong> or from a zip, served shows, and <strong>Export as one HTML file…</strong> (which packs every tile into the file, so keep a tile set to the area and zoom levels you need). A show opened by its web address cannot be listed, so its export leaves the tiles out and says so: open the show folder instead. OpenStreetMap's tiles may not be downloaded in bulk: make offline tiles with a tool that respects its tile usage policy (<em>operations.osmfoundation.org/policies/tiles</em>), or use <code>"tiles": "none"</code>.</p>
+      </section>
+
+      <section id="tables">
+        <h2>Tables</h2>
+        <p>A <strong>table</strong> shows data in rows and columns, in the template's colours: figures per region, a comparison, a planning. Long tables scroll with their header in place; readers (and you, while presenting) can sort and filter them; numbers can get a total, a colour scale, a bar or red / green colours.</p>
+        <p>To add one, give a slide the <strong>Table</strong> layout, or add a <strong>Table</strong> block in the <a href="#reader-tab">Reader tab</a>. On an empty table slot, <strong>Start a table (2 × 2)</strong> gives you a grid to type in.</p>
+
+        <h3>The data</h3>
+        <ul>
+          <li><strong>Type it in</strong>: the grid has a header row and one row per data row. <strong>+ Row</strong> and <strong>+ Column</strong> add more; ▲ ▼ move a row, 🗑 removes it. A cell with only a number (<code>1200</code>, <code>12.5</code>) is stored as a number.</li>
+          <li><strong>Paste from a spreadsheet</strong>: copy cells in Excel or Google Sheets, open <strong>Paste from a spreadsheet</strong>, paste them and click <strong>Replace the table</strong>. The first row becomes the headers; columns with the same header keep their settings. Pasting several cells <em>into a cell of the grid</em> fills them from that cell on, as in a spreadsheet, and adds rows and columns where needed.</li>
+          <li><strong>A CSV file</strong>: <strong>Use a CSV file…</strong> copies a <code>.csv</code> file into the show's <code>data/</code> folder; the table then reads its rows. The first line holds the headers; commas, semicolons and tabs all work, and a Dutch Excel file (semicolons, <code>1234,5</code>, <code>12,5%</code>) is read correctly. The editor shows the first rows. <strong>Move into the slide</strong> copies the rows into the slide so you can edit them here (the file stays in <code>data/</code>). A CSV file is the better choice for a large table, or for data you update outside Slipr: replace the file and the show follows.</li>
+        </ul>
+
+        <h3>Columns</h3>
+        <p>Each column has its own settings (for a CSV file: the header shown, as the file's own header may be a short code):</p>
+        <ul>
+          <li><strong>Format</strong>: <em>Automatic</em> shows text as text and numbers as written; <em>Number</em> and <em>Whole number</em> group thousands (1,200); <em>Percent</em> shows 0.125 as 12.5 % (a CSV cell <code>12,5%</code> works too); <em>Currency</em> adds the currency (EUR, USD, …); <em>Date</em> writes <code>2026-10-14</code> as a date in the show's language; <em>Markdown</em> allows links, <code>[[glossary terms]]</code> and links to slides in the cells. Number, percent and currency can have a fixed number of <strong>decimals</strong>.</li>
+          <li><strong>Align</strong>: automatic puts numbers on the right and text on the left.</li>
+          <li><strong>Total</strong>: a footer row with the sum, average, lowest, highest or count of the rows on show (after filtering, and while presenting, of the rows revealed so far).</li>
+          <li><strong>Colours</strong> (numbers only): a <em>colour scale</em> colours each cell from light to strong by its value, a <em>data bar</em> draws a bar in the cell, <em>red / green</em> colours negative and positive numbers. The colours come from the template.</li>
+          <li><strong>Hidden</strong>: the column is not shown. Readers can show it again from the table's <strong>Columns</strong> menu: handy for details such as notes or codes.</li>
+          <li>◀ ▶ move a column; 🗑 removes it with its cells (typed-in tables).</li>
+        </ul>
+
+        <h3>Options</h3>
+        <ul>
+          <li><strong>Sortable</strong>: clicking a header sorts by that column (ascending, descending, back to the original order). It also works while presenting.</li>
+          <li><strong>Filter box</strong>: a search box above the table that keeps the rows containing the text. Also while presenting; every time the slide comes back, the table starts from your own sort and an empty filter.</li>
+          <li><strong>Pin first column</strong>: the first column stays in place while a wide table scrolls sideways.</li>
+          <li><strong>Start sorted by</strong>: the order the table starts in.</li>
+          <li><strong>Rows before scrolling</strong>: about how many rows show before the table scrolls (on a slide the layout's space also limits it).</li>
+          <li><strong>Number format</strong>: the language and region for numbers and dates, for example <code>nl-NL</code> (1.200,50) or <code>en-GB</code>; empty uses the show's language.</li>
+          <li><strong>Caption</strong>: a line below the table.</li>
+        </ul>
+
+        <h3>While presenting (slides only)</h3>
+        <p>Steps make a table tell a story, one click at a time:</p>
+        <ul>
+          <li><strong>+ Show rows</strong>: show the first rows, for example 2, then 4, then all (leave the number empty for all). With such a step the table starts with only its header.</li>
+          <li><strong>+ Highlight</strong>: highlight a <em>column</em>, a <em>row</em> (its number, 1 for the first row of the data, or the text in its first column, such as <code>North</code>) or a <em>cell</em> (both). The rest dims until the next step.</li>
+          <li><strong>+ Clear highlight</strong> ends a highlight; a <em>show rows</em> step does too.</li>
+        </ul>
+        <p>The preview and the slide thumbnails show the table with all its rows; the steps play in audience mode. Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>; typing in a cell or field counts as one step.</p>
+
+        <h3>For readers</h3>
+        <p>In reader mode a table also has a <strong>Columns</strong> menu (show or hide columns), <strong>Copy</strong> (pastes into a spreadsheet) and <strong>Download CSV</strong> (the rows on show), and a line saying how many rows are on show. Reader search finds the headers and typed-in cells (not the rows of a CSV file).</p>
+        <p>In <code>show.json</code> a table is a <code>table</code> value with <code>columns</code> and <code>rows</code>, or <code>data</code> for a CSV file; see the show format (<code>docs/show-format.md</code>, <em>Tables</em>).</p>
       </section>
 
       <section id="markdown">

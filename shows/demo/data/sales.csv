@@ -1,0 +1,11 @@
+region;country;quarter;revenue;growth;customers;note
+North;Netherlands;Q1;1200,50;12,5%;48;"New office in Groningen"
+North;Netherlands;Q2;1340;11,2%;52;
+South;Netherlands;Q1;800;-5%;31;"Lost one large customer"
+South;Netherlands;Q2;910;13,8%;35;
+East;Germany;Q1;1500;20%;61;"Best quarter so far"
+East;Germany;Q2;1460;-2,7%;60;
+West;Belgium;Q1;640;4%;22;
+West;Belgium;Q2;700;9,4%;25;"Joint campaign with the ""Ghent"" team"
+Central;Netherlands;Q1;980;7,1%;40;
+Central;Netherlands;Q2;1015;3,6%;41;

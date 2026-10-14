@@ -233,12 +233,13 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `pdf` | `pdf`, `title`, `page?`, `pages?`, `load?`, `fallback?` | (0.2) A PDF document with page navigation, zoom and searchable text; see *PDF documents* below |
 | `graph` | `nodes` and / or `data`, `edges?`, `layout?`, `title?`, `caption?`, `fallback?` | (0.2) A graph to explore: pan, zoom, select a node, filter by tag; see *Graphs* below |
 | `map` | `center` / `markers` / `layers`, `zoom?`, `tiles?`, `load?`, `title?`, `caption?`, `fallback?` | (0.2) An interactive map: pan, zoom, select a place, filter by tag; see *Maps* below |
+| `table` | `columns` and `rows`, or `data`, plus `sortable?`, `sort?`, `filter?`, `maxRows?`, `pinFirst?`, `locale?`, `title?`, `caption?`, `fallback?` | (0.2) A data table: sort, filter, show or hide columns, copy, download; see *Tables* below |
 
 *Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
 
 ### Embeds (I-070, D-011)
 
-Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071), PDF documents (`pdf` slot and block, I-072), graphs (`graph` slot and block, I-074) and maps (`map` slot and block, I-075). Embeds share two optional fields (format 0.2):
+Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071), PDF documents (`pdf` slot and block, I-072), graphs (`graph` slot and block, I-074), maps (`map` slot and block, I-075) and tables (`table` slot and block, I-104; no library, but a data file). Embeds share two optional fields (format 0.2):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -323,6 +324,42 @@ Places on an interactive map, drawn with the vendored Leaflet (D-011), loaded on
 
 The map block also has `title` (and `id`, `type: "map"`, `for`, `depth`); it has no `steps` or `present`. A map needs a `center`, `markers` or `layers`. **Colors come from the template**, from the graph palette: a marker's first tag (or a layer's `tag`) picks `--slipr-graph-1` … `6` in order of first use. **Reader mode**: drag to pan, **+ / −**, **Fit**, click or tap a pin (or choose it in the **Place…** list) to show its text and **Go to slide**; the tag buttons filter the places; Esc clears. Reader search finds place titles and text.
 
+#### Tables (`table` slot and block; I-104, format 0.2)
+
+A table of data from a **CSV file** in the show folder or typed in as **inline rows**: colours from the template, a header that stays in place while long tables scroll, and optionally sorting, a filter box, totals, colour scales, data bars and red / green numbers. Spec: `docs/specs/I-104-table.md`. For authors, the editor manual explains it step by step (`editor/help.html#tables`).
+
+```json
+"table": {
+  "columns": [
+    { "key": "region", "label": "Region" },
+    { "key": "revenue", "label": "Revenue", "format": "currency", "decimals": 0, "currency": "EUR", "total": "sum", "visual": "bar" },
+    { "key": "growth", "label": "Growth", "format": "percent", "decimals": 1, "visual": "sign" }
+  ],
+  "rows": [["North", 1200, 0.125], ["South", 800, -0.05]],
+  "sortable": true,
+  "steps": [{ "rows": 1 }, { "rows": "all" }, { "highlight": { "column": "growth" } }]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `data` | A CSV file in the show folder (`data/…csv`, `.tsv` or `.txt`). The first line holds the column keys. Comma, semicolon or tab separated (detected from the first line); quotes as in RFC 4180; with semicolons, `1234,5` and `12,5%` are read with a decimal comma |
+| `rows` | Instead of `data`: the rows inline, each an array of cells (string, number or `null`) in the order of `columns` |
+| `columns` | Column settings by `key` (required). For inline rows they define the columns; for a CSV file they configure them: listed columns in the given order, then the file's others in file order |
+| `sortable` | Click a header to sort: ascending, descending, the original order. In both modes |
+| `sort` | Initial sort: `{ "column": key, "order": "asc" \| "desc" }` |
+| `filter` | A search box that keeps the rows containing the text in a shown column. In both modes |
+| `maxRows` | About this many rows are visible before the table scrolls (reader blocks; on a slide the layout's space limits it too) |
+| `pinFirst` | The first shown column stays in place while the table scrolls sideways |
+| `locale` | Number and date formatting (`nl-NL`); default the show's `meta.language` |
+| `steps` | Slots, audience mode: one per click, after the slide's own fragments. `{ "rows": n \| "all" }` shows the first n rows in data order (once a `rows` step exists the table starts with none); `{ "highlight": { "row": n \| "first-column text", "column": key } }` highlights a row, a column or a cell and dims the rest until the next step (a `rows` step ends it); `{ "highlight": null }` clears. Print, thumbnails and the editor show every row |
+| `caption` | Below the table, when the layout has no caption slot of its own |
+| `fallback` | As for every embed. Without it, the static content is the table itself (for a CSV file: its header and a note) |
+
+Column fields: `key` (required), `label` (default the key), `format` (`text` · `number` · `integer` · `percent`, where 0.125 shows as 12.5 % · `currency` · `date`, for `2026-10-14` · `markdown`, for inline Markdown with links, `[[glossary]]` terms and slide links; default: a column whose filled cells are all numbers is numeric and shown as written, else text), `decimals`, `currency` (ISO code, default `EUR`), `align` (`start` · `center` · `end`; default numbers at the end), `hidden` (readers can show it from the **Columns** menu), `total` (`sum` · `avg` · `min` · `max` · `count`: a footer row over the rows on show), `visual` (numeric columns: `scale` colours the cells from light to the template's strong colour, `bar` draws a bar in the cell, `sign` colours negative and positive numbers).
+
+The table block also has `title` (and `id`, `type: "table"`, `for`, `depth`); it has no `steps`. **Colours come from the template**: `--slipr-table-header-bg`, `-header-text`, `-stripe`, `-border`, `-strong` (scales and bars), `-positive`, `-negative`, `-highlight`. **Reader mode** adds **Columns** (show or hide), **Copy** (tab separated, pastes into a spreadsheet) and **Download CSV** (the rows on show). Reader search finds headers and inline cells; rows in a CSV file are not in the search index.
+
 #### Web pages (`web` slot, `embed` block; I-071, format 0.2)
 
 | Field | Where | Meaning |
@@ -379,6 +416,7 @@ The template defines which slots a layout has and the type of each slot.
 | `pdf` | object | (0.2) `{ "pdf": "docs/report.pdf", "title": "...", "page": 3 }` or `"pages": [3, 7]`: a PDF on the slide, see *PDF documents* above |
 | `graph` | object | (0.2) `{ "nodes": [...], "edges": [...], "steps": [...] }` or `{ "data": "data/graph.json" }`: a graph, see *Graphs* above |
 | `map` | object | (0.2) `{ "markers": [...], "layers": [...], "tiles": ..., "steps": [...] }`: a map, see *Maps* above |
+| `table` | object | (0.2) `{ "columns": [...], "rows": [...], "steps": [...] }` or `{ "data": "data/sales.csv" }`: a data table, see *Tables* above |
 | `web` | object | (0.2) `{ "url": "https://…", "title": "...", "allow": [...], "present": "live" \| "static", "load": "click" \| "auto", "fallback": {...} }`: a web page on the slide, see *Web pages* above |
 
 ## Template references
@@ -395,11 +433,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `graph` / `map` slot value or `pdf` / `graph` / `map` block in a 0.1 show; an unsafe web page or PDF address; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `graph` / `map` / `table` slot value or `pdf` / `graph` / `map` / `table` block in a 0.1 show; an unsafe web page or PDF address; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block; a table without `rows`, `columns` or `data`, a column without `key`, an unknown column `format`, `total`, `visual` or `align`, a table `data` address that is not a CSV file in the show folder, `steps` on a table block.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, a duplicate table column key, a table row with more cells than columns, a table sort or highlight naming an unknown column, a total (other than `count`) or visual on a column without numbers, a table data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), and the `map` slot and block types (I-075, 2026-10-13). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), the `map` slot and block types (I-075, 2026-10-13), and the `table` slot and block types (I-104, 2026-10-14). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

@@ -1,7 +1,8 @@
 // @ts-check
 /**
  * Rich embeds (I-070, D-011): the shared foundation for content that needs a
- * library or another server: diagrams, web pages, PDFs, graphs and maps.
+ * library or another server (or a data file): diagrams, web pages, PDFs,
+ * graphs, maps and tables.
  * Every kind is available as an audience slot type and a reader block
  * type, and has one module `shared/embeds/<kind>.js`:
  *
@@ -10,7 +11,7 @@
  *   errorLabel   heading of the error box
  *   attributes(value, ctx, options)  data attributes for the embed element
  *                            (options: { mode, slot }, see EmbedOptions)
- *   staticHtml(value, ctx)   { html, fallback } when the value has no fallback image
+ *   staticHtml(value, ctx, options)  { html, fallback } when the value has no fallback image
  *   afterHtml(value, options) optional: markup after the fallback (e.g. Reveal fragments)
  *   hydrate(el, live, options)  render the live content into `live` (async, may throw);
  *                            options.readAsset reads a show file (shows from a folder or zip)
@@ -45,6 +46,7 @@ import * as diagram from './diagram.js';
 import * as graph from './graph.js';
 import * as map from './map.js';
 import * as pdf from './pdf.js';
+import * as table from './table.js';
 import * as web from './web.js';
 
 /**
@@ -53,7 +55,7 @@ import * as web from './web.js';
  * @property {boolean} thumbnail
  * @property {string} errorLabel
  * @property {(value: any, ctx: EmbedContext, options?: EmbedOptions) => Record<string, string>} attributes
- * @property {(value: any, ctx: EmbedContext) => { html: string, fallback: string }} staticHtml
+ * @property {(value: any, ctx: EmbedContext, options?: EmbedOptions) => { html: string, fallback: string }} staticHtml
  * @property {(el: HTMLElement, live: HTMLElement, options?: { readAsset?: (path: string) => Promise<Blob | null> }) => Promise<void>} hydrate
  * @property {(value: any, options?: EmbedOptions) => string} [afterHtml]
  */
@@ -65,12 +67,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf, graph, map };
+export const EMBED_KINDS = { diagram, web, pdf, graph, map, table };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -104,6 +106,7 @@ export function usedEmbedKinds(show) {
       if (pdf.isPdf(value)) kinds.add('pdf');
       if (graph.isGraph(value)) kinds.add('graph');
       if (map.isMap(value)) kinds.add('map');
+      if (table.isTable(value)) kinds.add('table');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);
@@ -145,7 +148,7 @@ export function embedInnerHtml(kind, value, ctx, options = {}) {
     return `<div class="slipr-embed-fallback" data-fallback="image">`
       + `<img src="${escape(ctx.resolveAsset(image.src))}" alt="${escape(String(image.alt ?? ''))}"${pictureAttributes(image)} loading="lazy" decoding="async"></div>${after}`;
   }
-  const { html, fallback } = def ? def.staticHtml(value, ctx) : { html: '', fallback: 'none' };
+  const { html, fallback } = def ? def.staticHtml(value, ctx, options) : { html: '', fallback: 'none' };
   return `<div class="slipr-embed-fallback" data-fallback="${escape(fallback)}">${html}</div>${after}`;
 }
 

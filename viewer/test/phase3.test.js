@@ -157,6 +157,13 @@ describe('text-quote anchoring', () => {
 describe('search', () => {
   const docs = buildSearchIndex(demo);
 
+  test('table headers and inline cells are searchable (I-104)', () => {
+    const hits = search(docs, 'backup slides').results.map((x) => x.doc.slideId);
+    assert.ok(hits.includes('s-table'));
+    assert.ok(search(docs, 'read to the end').results.some((x) => x.doc.slideId === 's-table'));
+    assert.match(docs.find((d) => d.slideId === 's-table' && d.kind === 'slide').fields[2].text, /the reader layer/);
+  });
+
   test('fold() strips accents and keeps an index map', () => {
     const f = fold('Café É');
     assert.equal(f.text, 'cafe e');
