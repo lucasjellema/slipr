@@ -83,6 +83,16 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-034** [viewer] Show my pins and notes in audience mode too (presenter's private view, e.g. in the speaker window), and pins on reader-block images (hotspot-style)
 
 ### Editor
+- [ ] **I-102** [editor] **One-row top bar, grouped by task** (proposal 2026-10-14; the bar now has 17 controls on two rows). Saves a row of height (about 45 px) for the form and preview:
+  - **File ▾** menu next to the show title: New show…, Open folder… (new shortcut `Ctrl+O`), Open zip…, the recent shows (the start screen's remembered folders), Save (`Ctrl+S`), Export as one HTML file…, Export as zip…. Replaces six buttons; the two exports get clear names.
+  - Show title with the unsaved-changes dot, then **Save** as the one visible primary button.
+  - **Undo, Redo, Find** as icon buttons with tooltips (`Ctrl+Z`, `Ctrl+Y`, `Ctrl+F`).
+  - **Grid, Glossary, Library** keep their labels (editor views).
+  - Right side: **Read** and **Present ▶** (Present the more prominent), then **⋯ More**: theme (System / Light / Dark), Help (`F1`), keyboard shortcuts.
+  - Narrow windows: Grid, Glossary and Library move into ⋯ instead of wrapping to a second row.
+  - Menus follow the menu-button pattern (arrow keys, Enter, Esc, `aria-haspopup` / `aria-expanded`), vanilla JS; theme tokens only (`theme-contrast` test).
+  - Update `editor/help.html` (the screen, toolbar, shortcuts) and the README table.
+  - Questions for Lucas: keep **Save** visible (recommended) or only in File + `Ctrl+S`? Theme in ⋯ (recommended) or still a visible control? · todo · —
 - [ ] **I-021** [editor] Text-overflow detection: warn when content does not fit the layout at 1920×1080
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
