@@ -8,7 +8,7 @@
   "additionalProperties": false,
   "properties": {
     "$schema": { "type": "string", "description": "Optional pointer to this schema, for editor autocomplete." },
-    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays (extra images and text elements), graph, map, table, tag cloud and video slots and blocks, picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
+    "slipr": { "enum": ["0.1", "0.2"], "description": "Show format version. 0.2 adds slide overlays (extra images and text elements), chart, graph, map, table, tag cloud and video slots and blocks, picture style / opacity and glossary aliases; a 0.1 show without them is still valid." },
     "id": { "$ref": "#/$defs/kebabId", "description": "Stable show identifier (kebab-case)." },
     "meta": { "$ref": "#/$defs/meta" },
     "template": { "$ref": "#/$defs/templateRef" },
@@ -318,11 +318,69 @@
     },
     "chart": {
       "type": "object",
-      "required": ["kind", "data"],
-      "description": "(planned) Data-driven chart.",
+      "additionalProperties": false,
+      "description": "(0.2) A data chart from a CSV file or inline data (I-109): bar chart, accessible tooltips, legend toggle, audience steps. Needs rows, columns or a data file.",
+      "anyOf": [{ "required": ["rows"] }, { "required": ["columns"] }, { "required": ["data"] }],
       "properties": {
-        "kind": { "type": "string" },
-        "data": { "type": "object" }
+        "kind": { "enum": ["bar"], "description": "Chart kind; 'bar' for bar charts." },
+        "data": { "type": "string", "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!/).+\\.(csv|tsv|txt)$", "description": "A CSV file in the show folder (comma, semicolon or tab separated; the first line holds the column keys)." },
+        "columns": { "type": "array", "description": "Column settings by key: they define inline columns, and configure (and order) a file's columns.", "items": { "$ref": "#/$defs/tableColumn" } },
+        "rows": { "type": "array", "description": "Instead of data: the rows inline, each an array of cells in the order of columns.", "items": { "type": "array", "items": { "$ref": "#/$defs/tableCell" } } },
+        "category": { "type": "string", "minLength": 1, "description": "The column key for category labels; default the first column." },
+        "series": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "The column keys for value series; default every numeric column except the category." },
+        "orientation": { "enum": ["vertical", "horizontal"], "description": "Bar direction: vertical (default) or horizontal." },
+        "horizontal": { "type": "boolean", "description": "Alternative flag for horizontal bars." },
+        "stacked": { "type": "boolean", "description": "Stacked bars (default false: grouped bars)." },
+        "values": { "type": "boolean", "description": "Show value labels on or above bars." },
+        "min": { "type": "number", "description": "Custom minimum value for the value axis." },
+        "max": { "type": "number", "description": "Custom maximum value for the value axis." },
+        "sort": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "enum": ["asc", "desc", "none"] }
+          ],
+          "description": "Sort by value: 'asc' (lowest first), 'desc' or true (highest first), or 'none' / false (data order)."
+        },
+        "highlight": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }],
+          "description": "Category name to highlight (dimming others)."
+        },
+        "reference": { "$ref": "#/$defs/chartReference" },
+        "steps": {
+          "type": "array",
+          "description": "Audience mode, slots only: one per click; reveal categories or series, or highlight a category.",
+          "items": { "$ref": "#/$defs/chartStep" }
+        },
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when rendering fails (I-070)." }
+      }
+    },
+    "chartReference": {
+      "anyOf": [
+        { "type": "number", "description": "Reference line at this value." },
+        { "const": "average", "description": "Reference line at the average of all values." },
+        {
+          "type": "object",
+          "required": ["value"],
+          "additionalProperties": false,
+          "properties": {
+            "value": { "anyOf": [{ "type": "number" }, { "const": "average" }] },
+            "label": { "type": "string" }
+          }
+        }
+      ]
+    },
+    "chartStep": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "bars": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "const": "all" }], "description": "Show the first n bars or categories." },
+        "categories": { "anyOf": [{ "type": "integer", "minimum": 0 }, { "const": "all" }], "description": "Show the first n categories." },
+        "series": { "anyOf": [{ "type": "integer", "minimum": 1 }, { "type": "string" }, { "const": "all" }], "description": "Show the first n series or named series." },
+        "highlight": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }],
+          "description": "Highlight a category until the next step; null clears."
+        }
       }
     },
     "web": {
@@ -726,7 +784,8 @@
         { "$ref": "#/$defs/blockGraph" },
         { "$ref": "#/$defs/blockMap" },
         { "$ref": "#/$defs/blockTable" },
-        { "$ref": "#/$defs/blockTagCloud" }
+        { "$ref": "#/$defs/blockTagCloud" },
+        { "$ref": "#/$defs/blockChart" }
       ]
     },
     "for": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/id" }, "description": "Profile ids that see this block; absent = everyone." },
@@ -924,6 +983,46 @@
         "order": { "enum": ["cloud", "weight", "alphabetical", "none"], "description": "cloud (default): the heaviest terms in the middle; weight: heaviest first; alphabetical; none: as written." },
         "maxTerms": { "type": "integer", "minimum": 1, "description": "Show only the heaviest n terms." },
         "weightLabel": { "type": "string", "minLength": 1, "description": "What a weight counts, e.g. mentions: readers see '12 mentions' (default 'weight 12')." },
+        "caption": { "type": "string" },
+        "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when rendering fails (I-070)." }
+      }
+    },
+    "blockChart": {
+      "type": "object",
+      "required": ["id", "type"],
+      "additionalProperties": false,
+      "description": "(0.2) A data chart in the reader layer (I-109): bar chart, accessible tooltips, legend toggle, and show as table.",
+      "anyOf": [{ "required": ["rows"] }, { "required": ["columns"] }, { "required": ["data"] }],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "type": { "const": "chart" },
+        "for": { "$ref": "#/$defs/for" },
+        "depth": { "$ref": "#/$defs/depth" },
+        "title": { "type": "string" },
+        "kind": { "enum": ["bar"], "description": "Chart kind; 'bar' for bar charts." },
+        "data": { "type": "string", "pattern": "^(?![A-Za-z][A-Za-z0-9+.-]*:)(?!/).+\\.(csv|tsv|txt)$", "description": "A CSV file in the show folder (comma, semicolon or tab separated; the first line holds the column keys)." },
+        "columns": { "type": "array", "description": "Column settings by key: they define inline columns, and configure (and order) a file's columns.", "items": { "$ref": "#/$defs/tableColumn" } },
+        "rows": { "type": "array", "description": "Instead of data: the rows inline, each an array of cells in the order of columns.", "items": { "type": "array", "items": { "$ref": "#/$defs/tableCell" } } },
+        "category": { "type": "string", "minLength": 1, "description": "The column key for category labels; default the first column." },
+        "series": { "type": "array", "items": { "type": "string", "minLength": 1 }, "description": "The column keys for value series; default every numeric column except the category." },
+        "orientation": { "enum": ["vertical", "horizontal"], "description": "Bar direction: vertical (default) or horizontal." },
+        "horizontal": { "type": "boolean", "description": "Alternative flag for horizontal bars." },
+        "stacked": { "type": "boolean", "description": "Stacked bars (default false: grouped bars)." },
+        "values": { "type": "boolean", "description": "Show value labels on or above bars." },
+        "min": { "type": "number", "description": "Custom minimum value for the value axis." },
+        "max": { "type": "number", "description": "Custom maximum value for the value axis." },
+        "sort": {
+          "anyOf": [
+            { "type": "boolean" },
+            { "enum": ["asc", "desc", "none"] }
+          ],
+          "description": "Sort by value: 'asc' (lowest first), 'desc' or true (highest first), or 'none' / false (data order)."
+        },
+        "highlight": {
+          "anyOf": [{ "type": "string" }, { "type": "null" }],
+          "description": "Category name to highlight (dimming others)."
+        },
+        "reference": { "$ref": "#/$defs/chartReference" },
         "caption": { "type": "string" },
         "fallback": { "$ref": "#/$defs/image", "description": "Static image shown for print, thumbnails and when rendering fails (I-070)." }
       }

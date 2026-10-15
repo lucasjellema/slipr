@@ -16,6 +16,7 @@ import {
   pasteIntoGrid, removeColumn, removeRow, removeStep, setCell, setColumn, setColumnLabel, setStep,
   tableFromPaste, tableValue, withFileColumns,
 } from '../table-values.js';
+import { chartFromTable } from '../chart-values.js';
 import { runImage } from './image-field.js';
 
 /**

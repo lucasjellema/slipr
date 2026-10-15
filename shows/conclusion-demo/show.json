@@ -273,6 +273,40 @@
       }
     },
     {
+      "id": "s-chart",
+      "layout": "chart",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Chart",
+        "title": "Revenue and target by business line",
+        "chart": {
+          "kind": "bar",
+          "columns": [
+            { "key": "line", "label": "Business line" },
+            { "key": "revenue", "label": "Revenue (M€)" },
+            { "key": "target", "label": "Target (M€)" }
+          ],
+          "rows": [
+            ["Data & AI", 18.4, 16.0],
+            ["Cloud", 15.2, 14.5],
+            ["Security", 9.7, 8.5],
+            ["Business applications", 22.9, 21.0],
+            ["Digital workplace", 6.3, 7.0]
+          ],
+          "category": "line",
+          "series": ["revenue", "target"],
+          "orientation": "vertical",
+          "values": true,
+          "reference": { "value": 15.0, "label": "Threshold" },
+          "steps": [
+            { "bars": 2 },
+            { "bars": "all" },
+            { "highlight": "Data & AI" }
+          ]
+        }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",

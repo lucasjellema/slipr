@@ -25,9 +25,10 @@ describe('slot values: editor kind per slot type (E-010)', () => {
     assert.equal(slotEditorKind('image'), 'image');
   });
 
-  test('chart and unknown types are read-only (quote, code, cards have editors since I-035; diagram since E-019)', () => {
+  test('unknown types are read-only (chart has an editor since I-109)', () => {
     assert.equal(slotEditorKind('diagram', { mermaid: 'flowchart LR' }), 'diagram');
-    for (const type of ['chart', 'something-new']) {
+    assert.equal(slotEditorKind('chart', {}), 'chart');
+    for (const type of ['something-new', 'unsupported']) {
       assert.equal(slotEditorKind(type, {}), 'readonly', type);
     }
   });

@@ -1220,6 +1220,64 @@
       }
     },
     {
+      "id": "s-chart",
+      "layout": "chart",
+      "chapter": "how",
+      "tags": [
+        "embed"
+      ],
+      "content": {
+        "title": "Bar charts that breathe life into numbers",
+        "chart": {
+          "kind": "bar",
+          "columns": [
+            { "key": "chapter", "label": "Chapter" },
+            { "key": "readers", "label": "Readers (k)" },
+            { "key": "completed", "label": "Completed (k)" }
+          ],
+          "rows": [
+            ["Why Slipr", 48, 41],
+            ["How it works", 36, 28],
+            ["What is next", 24, 21],
+            ["Appendix", 12, 10]
+          ],
+          "category": "chapter",
+          "series": ["readers", "completed"],
+          "orientation": "vertical",
+          "values": true,
+          "reference": "average",
+          "caption": "Audience mode reveals bars step by step; reader mode adds exact tooltips, legend toggles and a switch to table view.",
+          "steps": [
+            { "bars": 2 },
+            { "bars": "all" },
+            { "highlight": "How it works" }
+          ]
+        }
+      },
+      "reader": {
+        "summary": "Bar charts can be placed in slides or as reader blocks.",
+        "blocks": [
+          {
+            "id": "chart-how-it-works",
+            "type": "text",
+            "md": "A **bar chart** (`chart` slot or block) turns numbers into responsive SVG. It supports vertical and horizontal bars, grouped and stacked layouts, value labels, reference lines, and audience reveal steps."
+          },
+          {
+            "id": "chart-sales-block",
+            "type": "chart",
+            "title": "Revenue by region (from CSV)",
+            "data": "data/sales.csv",
+            "category": "region",
+            "series": ["revenue"],
+            "orientation": "horizontal",
+            "values": true,
+            "sort": "desc",
+            "caption": "Horizontal bars from data/sales.csv sorted by revenue."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

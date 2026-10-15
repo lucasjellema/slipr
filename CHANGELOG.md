@@ -6,6 +6,12 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-15: Embedded bar charts (I-109)
+- **Added** to show format 0.2: the `chart` slot and block types (inline `columns` + `rows` or a CSV `data` file; `kind: "bar"`, `category`, `series`, `orientation`, `horizontal`, `stacked`, `values`, `min`, `max`, `sort`, `highlight`, `reference`, `caption`, `fallback`; slots also `steps`: `{ bars?: number | "all", categories?: number | "all", series?: number | string | "all", highlight?: string | null }`; blocks also `title`). Schema definitions `$defs/chart`, `$defs/chartReference`, `$defs/chartStep`, `$defs/blockChart`. Validation: format 0.2, valid CSV path, numeric series columns, reference configuration, step bounds. CSV files join `collectImagePaths()`.
+- **Added** `shared/embeds/chart.js` (no library, D-001/D-002, D-011): responsive plain SVG bar charts, vertical or horizontal, grouped or stacked, value labels, reference lines (average, target value or labeled reference), category highlighting; audience reveal and highlight steps on hidden Reveal fragments; reader mode interactive tooltips (hover, tap, keyboard focus), click legend to toggle series, and "Show as table" switch toggle to table view with Copy & Download CSV.
+- **Added** chart editor (`editor/js/ui/chart-fields.js`, `editor/js/chart-values.js`) with live preview, data grid / CSV file upload, category & series pickers, orientation/stacked/sort/highlight/reference controls, audience steps manager, and two-way conversion ("Make a chart" in table editor, "Convert to table" in chart editor).
+- **Changed** templates: `chart` layout in `templates/default` (bumped to 1.9.0) and `templates/conclusion` (bumped to 0.1.10), `--slipr-chart-*` tokens falling back to the template palette. Demo shows in both templates exercise the bar chart feature. Spec `docs/specs/I-109-bar-chart.md`.
+
 ### 2026-10-15: Layout composer in the template editor (I-111)
 - **Added** composed layouts (D-019): the template editor makes and arranges layouts box by box on a 100 × 100 grid. A composed layout is an ordinary layout fragment (root class `slipr-composed`, boxes with `data-box`) placed by a marked `slipr-composer` block at the end of `theme.css`; hand-written layouts are never rearranged. No template-format change: viewers, the show editor and exports render them as any layout. `docs/template-format.md` describes them. Spec `docs/specs/I-111-layout-composer.md`.
 

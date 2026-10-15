@@ -10,6 +10,7 @@
 import showSchema from '../../../shared/schema/show.schema.json' with { type: 'json' };
 import { isTable } from '../../../shared/embeds/table.js';
 import { isTagCloud } from '../../../shared/embeds/tag-cloud.js';
+import { isChart } from '../../../shared/embeds/chart.js';
 
 const defs = /** @type {Record<string, any>} */ (showSchema.$defs);
 
@@ -82,6 +83,17 @@ const video = (def) => ({
   },
 });
 
+/** A chart value or block (I-109): its keys, and those of columns, reference, steps. @param {any} def @returns {Shape} */
+const chart = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    columns: { items: { keys: keysOf(defs.tableColumn) } },
+    reference: { keys: ['value', 'label'] },
+    steps: { items: { keys: keysOf(defs.chartStep) } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -94,9 +106,10 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('video' in value) return video(defs.video);
   if (isTagCloud(value)) return tagCloud(defs.tagCloud);
   if (isTable(value)) return table(defs.table);
+  if (isChart(value)) return chart(defs.chart);
   if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
   if ('markers' in value || 'center' in value || 'layers' in value) return map(defs.map);
-  if ('kind' in value) return { keys: keysOf(defs.chart) };
+  if ('kind' in value) return chart(defs.chart);
   if ('text' in value) return { keys: keysOf(defs.quote) };
   return {};
 });
@@ -110,6 +123,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
   if (value?.type === 'table') return table(def);
   if (value?.type === 'tag-cloud') return tagCloud(def);
   if (value?.type === 'video') return video(def);
+  if (value?.type === 'chart') return chart(def);
   return {
     keys: keysOf(def),
     fields: {

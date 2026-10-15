@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Bar chart editor (I-109)
+- **Added** a chart editor for the `chart` slot and the **Chart** reader block type (`ui/chart-fields.js`, value helpers `chart-values.js` with tests): data input via a spreadsheet grid (+ Row, + Column, move, remove, paste from spreadsheet) or CSV file upload into `data/`; category and series column pickers; options for orientation (vertical / horizontal), grouping (grouped / stacked), value labels, axis min/max, sort order, category highlight, reference line (average or target value), and caption; for slots, step manager (+ Show bars, + Show series, + Highlight, + Clear highlight).
+- **Added** "Make a chart" in the table editor to convert an existing table into a chart, and "Convert to table" in the chart editor to convert a chart to a table.
+- **Changed** `withFallback()` handles chart slots; `slotEditorKind('chart')` opens the chart editor; canonical serializer preserves and orders chart properties according to schema.
+
 ### 2026-10-15: Diagram editor (E-019)
 - **Added** a diagram editor for the `diagram` slot and the **Diagram (Mermaid)** reader block type (`ui/diagram-fields.js`, value helper `diagramValue()` in `block-values.js` with tests): the Mermaid source (monospace, Tab indents, a note while it is empty), caption, fallback image, and a link to the manual. Each typed field is one undo step. A block switched to Diagram starts with a two-node flowchart. The slot and block were read-only before.
 - **Changed** `withFallback()` keeps a diagram a diagram (a fallback pasted on a diagram slot used to get web page fields).

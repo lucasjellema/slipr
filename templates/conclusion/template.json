@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -512,6 +512,17 @@
         { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
         { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
         { "name": "cloud", "type": "tag-cloud", "label": "Tag cloud", "required": true }
+      ]
+    },
+    {
+      "id": "chart",
+      "name": "Chart",
+      "description": "Title with a bar chart (grouped, stacked, vertical, horizontal; bars revealed step by step in audience mode) in the content area.",
+      "file": "layouts/chart.html",
+      "slots": [
+        { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
+        { "name": "chart", "type": "chart", "label": "Chart", "required": true }
       ]
     },
     {

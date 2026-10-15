@@ -21,6 +21,7 @@ import { isGraph } from './embeds/graph.js';
 import { isMap, tileSource } from './embeds/map.js';
 import { isCsvPath, isTable, tableModel } from './embeds/table.js';
 import { isTagCloud, tagKey } from './embeds/tag-cloud.js';
+import { isChart } from './embeds/chart.js';
 import { isShown, normalCrop, toShown } from './crop.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
@@ -83,6 +84,7 @@ export function validateShow(show, options = {}) {
     checkMaps(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
     checkTables(slide, at, show.slipr, errors, warnings, options.imageExists);
     checkTagClouds(slide, at, show.slipr, errors, warnings, options.imageExists, glossaryIds);
+    checkCharts(slide, at, show.slipr, errors, warnings, options.imageExists);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -242,6 +244,8 @@ export function collectImagePaths(show) {
     for (const { value } of tableEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
     // Tag cloud data files (I-105): the same.
     for (const { value } of tagCloudEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
+    // Chart data files (I-109): the same.
+    for (const { value } of chartEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
     // PDF files in the show folder (I-072): checked, embedded and opened like images.
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
@@ -724,7 +728,7 @@ function tableEntries(slide, at) {
   /** @type {{ value: any, path: string, block: boolean }[]} */
   const found = [];
   for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
-    if (isTable(value) && !isTagCloud(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+    if (isTable(value) && !isTagCloud(value) && !isChart(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
   }
   arrayOf(slide?.reader?.blocks).forEach((block, j) => {
     if (block?.type === 'table' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
@@ -830,6 +834,64 @@ function checkTagClouds(slide, at, version, errors, warnings, fileExists, glossa
         }
       });
     });
+  }
+}
+
+/**
+ * The charts of a slide (I-109): slot values and chart blocks, with their path.
+ * @param {any} slide @param {string} at
+ * @returns {{ value: any, path: string, block: boolean }[]}
+ */
+export function chartEntries(slide, at) {
+  /** @type {{ value: any, path: string, block: boolean }[]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isChart(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type === 'chart' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
+  });
+  return found;
+}
+
+/**
+ * Charts (I-109): format 0.2; the data file exists (with a file check);
+ * columns, category and series references exist.
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
+ */
+function checkCharts(slide, at, version, errors, warnings, fileExists) {
+  for (const { value, path, block } of chartEntries(slide, at)) {
+    if (version === '0.1') {
+      errors.push({ path, code: 'format-version', message: `a chart ${block ? 'block' : 'slot'} needs show format 0.2: set "slipr" to "0.2"` });
+    }
+    const fromFile = isCsvPath(value.data);
+    if (fromFile && fileExists && !fileExists(value.data)) {
+      warnings.push({ path: `${path}.data`, code: 'missing-file', message: `chart data file "${value.data}" not found` });
+    }
+    const keys = new Set();
+    arrayOf(value.columns).forEach((c, k) => {
+      if (!isObject(c) || typeof c.key !== 'string') return;
+      if (keys.has(c.key)) warnings.push({ path: `${path}.columns[${k}].key`, code: 'duplicate-column', message: `column "${c.key}" is listed twice; the first one is used` });
+      keys.add(c.key);
+    });
+    if (fromFile) continue;
+    if (typeof value.category === 'string' && keys.size > 0 && !keys.has(value.category)) {
+      warnings.push({ path: `${path}.category`, code: 'unknown-column', message: `category column "${value.category}" not found in columns` });
+    }
+    arrayOf(value.series).forEach((s, k) => {
+      if (typeof s === 'string' && keys.size > 0 && !keys.has(s)) {
+        warnings.push({ path: `${path}.series[${k}]`, code: 'unknown-column', message: `series column "${s}" not found in columns` });
+      }
+    });
+    if (typeof value.highlight === 'string' && value.highlight.trim() && Array.isArray(value.rows)) {
+      const want = value.highlight.trim().toLowerCase();
+      const hasCat = value.rows.some((r) => Array.isArray(r) && String(r[0] ?? '').trim().toLowerCase() === want);
+      if (!hasCat && value.rows.length > 0) {
+        warnings.push({ path: `${path}.highlight`, code: 'unknown-category', message: `highlight category "${value.highlight}" not found in data rows` });
+      }
+    }
   }
 }
 
@@ -952,7 +1014,6 @@ function matchesSlotType(value, type) {
     case 'image': return isImage(value);
     case 'code': return isObject(value) && typeof value.code === 'string';
     case 'quote': return isObject(value) && typeof value.text === 'string';
-    case 'chart': return isObject(value) && typeof value.kind === 'string';
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
     case 'web': return isObject(value) && typeof value.url === 'string';
     case 'pdf': return isObject(value) && typeof value.pdf === 'string';
@@ -961,6 +1022,7 @@ function matchesSlotType(value, type) {
     case 'map': return isMap(value);
     case 'table': return isTable(value);
     case 'tag-cloud': return isObject(value) && (Array.isArray(value.terms) || isCsvPath(value.data));
+    case 'chart': return isChart(value);
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -975,7 +1037,7 @@ function slotTypeLabel(type) {
     image: 'an image object { "src": ..., "alt": ... }',
     code: 'a code object { "language": ..., "code": ... }',
     quote: 'a quote object { "text": ..., "source": ... }',
-    chart: 'a chart object { "kind": ..., "data": ... }',
+    chart: 'a chart object { "columns": [...], "rows": [...] } or { "data": "data/....csv" }',
     diagram: 'a diagram object { "mermaid": ... }',
     web: 'a web page object { "url": ..., "title": ... }',
     pdf: 'a PDF object { "pdf": ..., "title": ... }',

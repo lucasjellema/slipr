@@ -54,6 +54,7 @@ const NUMERIC_FORMATS = new Set(['number', 'integer', 'percent', 'currency']);
  * @returns {boolean}
  */
 export function isTable(value) {
+  if (value && (value.kind === 'bar' || value.type === 'chart')) return false;
   return Boolean(value && typeof value === 'object' && !Array.isArray(value)
     && (Array.isArray(value.rows) || Array.isArray(value.columns) || isCsvPath(value.data)));
 }

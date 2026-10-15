@@ -96,7 +96,7 @@ describe('embed registry (I-070)', () => {
     const show = showWith([{ id: 'w', type: 'embed', url: 'https://example.com', title: 'Ex' }]);
     show.slides[0].content = { title: 'no diagram' };
     assert.deepEqual([...usedEmbedKinds(show)], ['web']);
-    assert.deepEqual([...usedEmbedKinds(readJson('shows/conclusion-demo/show.json'))].sort(), ['graph', 'map', 'pdf', 'table', 'tag-cloud', 'video', 'web']);
+    assert.deepEqual([...usedEmbedKinds(readJson('shows/conclusion-demo/show.json'))].sort(), ['chart', 'graph', 'map', 'pdf', 'table', 'tag-cloud', 'video', 'web']);
   });
 
   test('diagram markup: kind class, template hook, escaped source as fallback', () => {

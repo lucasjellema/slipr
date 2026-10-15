@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "default",
   "name": "Slipr Default",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Clean, neutral template used for samples and tests. Uses system fonts, so it needs no font files.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -169,6 +169,17 @@
       "file": "layouts/tag-cloud.html",
       "slots": [
         { "name": "cloud", "type": "tag-cloud", "label": "Tag cloud", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
+    },
+    {
+      "id": "chart",
+      "name": "Chart",
+      "description": "A bar chart from a CSV file or typed in (grouped, stacked, vertical, horizontal, with values and reference lines; bars revealed step by step in audience mode), with optional title and caption.",
+      "file": "layouts/chart.html",
+      "slots": [
+        { "name": "chart", "type": "chart", "label": "Chart", "required": true },
         { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
         { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
       ]

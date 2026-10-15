@@ -25,6 +25,7 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 | `map` | Title with an interactive map in the content area; pins and GeoJSON layers in the brand palette (by tag). Not in the PowerPoint template (I-075) | kicker, title, map (`map`) |
 | `tag-cloud` | Title with a cloud of terms sized by weight in the content area: grey to magenta by weight, yellow highlights, heading font. Not in the PowerPoint template (I-105) | kicker, title, cloud (`tag-cloud`) |
 | `table` | Title with a data table in the content area: magenta header, grey stripes, brand blue for colour scales and bars, yellow highlights. Not in the PowerPoint template (I-104) | kicker, title, table (`table`) |
+| `chart` | Title with a bar chart in the content area: brand palette series, yellow highlights. Not in the PowerPoint template (I-109) | kicker, title, chart (`chart`) |
 | `columns-4` | Four white columns (Textbox 4x) | kicker, title, cards ≤ 4 × (title ≤ 18, text) |
 | `boxes-9` | Nine numbered boxes (Textbox 9x) | kicker, title, cards ≤ 9 × (title ≤ 24, text ≤ 210) |
 | `facts` | Key figures over a photo (Facts & figures); the right column is mirrored | kicker, title, cards ≤ 6 × (value ≤ 8, label ≤ 42, icon), image |

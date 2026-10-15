@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Embedded bar charts (I-109)
+- **Added** bar charts on slides and in the reader layer (`shared/embeds/chart.js`): responsive plain SVG charts from inline data or CSV files in `data/`. In audience mode, bars grow in and step-by-step reveal options show categories or series or highlight a category. In reader mode, interactive tooltips show exact values on hover, tap and keyboard navigation; clicking legend items toggles series visibility; and a "Show as table" switch toggles to an interactive table with Copy and Download CSV. Search indexes chart titles, captions, column/series headers, and inline category labels.
+
 ### 2026-10-15: Videos (I-110)
 - **Added** videos on slides and in the reader layer (`shared/embeds/video.js`): files from the show folder (offline, with captions), YouTube (youtube-nocookie.com) and Vimeo (no tracking), and https video files. In audience mode a video pauses when you leave its slide, and can start on a click, when the slide appears, or on a step; with chapter steps each click jumps to the next chapter, ← jumps back. In reader mode videos from other servers wait behind **Load**; a block lists its chapters (a click jumps there, the playing chapter is marked) and a collapsible transcript, a slot gets a chapter menu and a Transcript dialog. Search finds chapter titles and transcripts; a chapter result plays the video from there.
 

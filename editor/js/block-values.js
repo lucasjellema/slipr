@@ -17,6 +17,8 @@ import { graphValue } from './graph-values.js';
 import { isVideo } from '../../shared/embeds/video.js';
 import { videoValue } from './video-values.js';
 import { isDiagram } from '../../shared/embeds/diagram.js';
+import { isChart } from '../../shared/embeds/chart.js';
+import { chartValue } from './chart-values.js';
 
 /**
  * @param {any} tabs
@@ -211,6 +213,7 @@ export function withFallback(current, image) {
   if (isMap(current)) return mapValue(current, { fallback: image });
   if (isTagCloud(current)) return tagCloudValue(current, { fallback: image });
   if (isTable(current)) return tableValue(current, { fallback: image });
+  if (isChart(current)) return chartValue(current, { fallback: image });
   if (isGraph(current)) return graphValue(current, { fallback: image });
   if (current && typeof current.pdf === 'string') return pdfValue(current, { fallback: image });
   if (isVideo(current)) return videoValue(current, { fallback: image });

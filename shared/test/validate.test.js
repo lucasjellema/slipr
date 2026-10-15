@@ -17,8 +17,8 @@ function validateVariant(mutate) {
 
 /** Remove every show-format 0.2 feature (overlays, picture style / opacity / crop, glossary aliases, embeds, graphs). */
 function withoutFormat02(s) {
-  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map' && x.layout !== 'table' && x.layout !== 'tag-cloud' && x.layout !== 'video');
-  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map' && b.type !== 'table' && b.type !== 'tag-cloud' && b.type !== 'video');
+  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map' && x.layout !== 'table' && x.layout !== 'tag-cloud' && x.layout !== 'video' && x.layout !== 'chart');
+  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map' && b.type !== 'table' && b.type !== 'tag-cloud' && b.type !== 'video' && b.type !== 'chart');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;

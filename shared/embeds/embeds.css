@@ -583,3 +583,139 @@ button.slipr-tag-cloud-term:focus-visible { outline: 2px solid var(--_c-highligh
 @media (prefers-reduced-motion: reduce) {
   .slipr-tag-cloud-item, .slipr-tag-cloud-term { transition: none; }
 }
+
+/* ---------- bar charts (I-109) ---------- */
+.slipr-embed--chart {
+  --_c-ch1: var(--slipr-chart-1, var(--slipr-color-primary, #1f3a5f));
+  --_c-ch2: var(--slipr-chart-2, var(--slipr-color-accent, #f2a900));
+  --_c-ch3: var(--slipr-chart-3, var(--slipr-graph-3, #2a9d8f));
+  --_c-ch4: var(--slipr-chart-4, var(--slipr-graph-4, #7b5ea7));
+  --_c-ch5: var(--slipr-chart-5, var(--slipr-graph-5, #c8553d));
+  --_c-ch6: var(--slipr-chart-6, var(--slipr-graph-6, #5b6573));
+  --_c-ch-grid: var(--slipr-chart-grid, var(--slipr-table-border, rgba(0, 0, 0, 0.12)));
+  --_c-ch-text: var(--slipr-chart-text, var(--slipr-color-muted, #5b6573));
+  --_c-ch-highlight: var(--slipr-chart-highlight, var(--slipr-color-accent, #f2a900));
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+}
+.slipr-embed--chart > .slipr-embed-live {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+[data-slot].slipr-embed--chart > :is(.slipr-embed-live, .slipr-embed-fallback[data-fallback="chart"]) {
+  flex: 1;
+  min-height: 0;
+}
+.slipr-chart-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+.slipr-chart-frame {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+.slipr-chart-svg {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  display: block;
+}
+.slipr-chart-group {
+  transition: opacity 0.35s ease, visibility 0.35s ease;
+}
+.slipr-chart-group.is-hidden {
+  visibility: hidden;
+  opacity: 0;
+}
+.slipr-chart-svg.has-highlight .slipr-chart-group:not(.is-highlight) {
+  opacity: 0.28;
+}
+.slipr-chart-group.is-highlight .slipr-chart-bar-rect {
+  filter: drop-shadow(0 0 4px color-mix(in srgb, var(--_c-ch-highlight) 50%, transparent));
+}
+.slipr-chart-bar {
+  cursor: pointer;
+  outline: none;
+}
+.slipr-chart-bar:focus-visible .slipr-chart-bar-rect {
+  stroke: var(--_c-ch-highlight);
+  stroke-width: 2.5px;
+}
+.slipr-chart-bar:hover .slipr-chart-bar-rect {
+  filter: brightness(1.12);
+}
+.slipr-chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+  margin-bottom: 0.4em;
+  font-size: 0.8em;
+}
+.slipr-chart-btn {
+  font: inherit;
+  padding: 0.25em 0.6em;
+  border: 1px solid var(--slipr-table-border, #d1d5db);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-bg, #fff);
+  color: var(--slipr-color-text, #1e2329);
+  cursor: pointer;
+}
+.slipr-chart-btn:hover {
+  background: var(--slipr-color-surface, #f4f6f9);
+}
+.slipr-chart-tooltip {
+  position: absolute;
+  z-index: 1000;
+  padding: 0.35em 0.65em;
+  background: var(--slipr-color-text, #1e2329);
+  color: #fff;
+  border-radius: var(--slipr-radius, 0.3rem);
+  font-size: 0.85em;
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  white-space: nowrap;
+}
+.slipr-chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25em;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.9em 1em;
+  border: 1px solid var(--slipr-color-surface, #e5e7eb);
+  border-radius: var(--slipr-radius, 0.4rem);
+  background: var(--slipr-color-surface, #f4f6f9);
+  color: var(--slipr-color-text, #1e2329);
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+}
+.slipr-chart-card-title { font-weight: 600; }
+.slipr-chart-card-note { color: var(--slipr-color-muted, #5b6573); font-size: 0.875em; }
+.slipr-chart-legend-item {
+  cursor: pointer;
+  user-select: none;
+}
+.slipr-chart-legend-item.is-hidden {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+.slipr-chart-step { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .slipr-chart-group, .slipr-chart-bar-rect { transition: none; animation: none; }
+}
+

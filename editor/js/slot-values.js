@@ -8,7 +8,7 @@
  */
 
 /** Slot types with an editable input in the slide form. */
-const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 'cards', 'web', 'pdf', 'video', 'map', 'graph', 'table', 'tag-cloud', 'diagram']);
+const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 'cards', 'web', 'pdf', 'video', 'map', 'graph', 'table', 'tag-cloud', 'diagram', 'chart']);
 
 /**
  * Decide how the slide form edits a slot.
@@ -16,14 +16,14 @@ const EDITABLE = new Set(['text', 'richtext', 'list', 'image', 'quote', 'code', 
  * anything else is read-only.
  * @param {string | undefined} slotType
  * @param {any} [value]
- * @returns {'text' | 'textarea' | 'image' | 'quote' | 'code' | 'cards' | 'web' | 'pdf' | 'video' | 'map' | 'graph' | 'table' | 'tag-cloud' | 'diagram' | 'readonly'}
+ * @returns {'text' | 'textarea' | 'image' | 'quote' | 'code' | 'cards' | 'web' | 'pdf' | 'video' | 'map' | 'graph' | 'table' | 'tag-cloud' | 'diagram' | 'chart' | 'readonly'}
  */
 export function slotEditorKind(slotType, value) {
   if (slotType === undefined) {
     return value === undefined || typeof value === 'string' ? 'text' : 'readonly';
   }
   if (!EDITABLE.has(slotType)) return 'readonly';
-  if (slotType === 'image' || slotType === 'quote' || slotType === 'code' || slotType === 'cards' || slotType === 'web' || slotType === 'pdf' || slotType === 'video' || slotType === 'map' || slotType === 'graph' || slotType === 'table' || slotType === 'tag-cloud' || slotType === 'diagram') return slotType;
+  if (slotType === 'image' || slotType === 'quote' || slotType === 'code' || slotType === 'cards' || slotType === 'web' || slotType === 'pdf' || slotType === 'video' || slotType === 'map' || slotType === 'graph' || slotType === 'table' || slotType === 'tag-cloud' || slotType === 'diagram' || slotType === 'chart') return slotType;
   return slotType === 'text' ? 'text' : 'textarea';
 }
 

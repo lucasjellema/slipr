@@ -16,7 +16,9 @@ import { isGraph } from '../../shared/embeds/graph.js';
 import { isTable } from '../../shared/embeds/table.js';
 import { isTagCloud } from '../../shared/embeds/tag-cloud.js';
 import { isVideo, videoSource } from '../../shared/embeds/video.js';
+import { isChart } from '../../shared/embeds/chart.js';
 import { NEW_DIAGRAM } from './block-values.js';
+import { newChart, chartFromTable, tableFromChart } from './chart-values.js';
 
 /**
  * Generate a random short identifier.
@@ -256,9 +258,9 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, value);
-  // A web page (I-071), PDF (I-072), graph (I-074), map (I-075), table (I-104), tag cloud (I-105) or video (I-110) slot, or an embed fallback (I-070), needs format 0.2.
+  // A web page (I-071), PDF (I-072), graph (I-074), map (I-075), table (I-104), tag cloud (I-105), chart (I-109) or video (I-110) slot, or an embed fallback (I-070), needs format 0.2.
   const embed02 = value && typeof value === 'object' && !Array.isArray(value)
-    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value) || isGraph(value) || isTable(value) || isTagCloud(value) || isVideo(value));
+    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value) || isGraph(value) || isTable(value) || isTagCloud(value) || isVideo(value) || isChart(value));
   if (embed02 && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
@@ -562,7 +564,7 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
 }
 
 /** Block types and the order of the type picker. */
-export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'diagram', 'embed', 'slide-ref', 'pdf', 'video', 'graph', 'map', 'table', 'tag-cloud'];
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'diagram', 'embed', 'slide-ref', 'pdf', 'video', 'graph', 'map', 'table', 'tag-cloud', 'chart'];
 
 /**
  * A block converted to another type, in a valid shape for that type (see the
@@ -662,16 +664,29 @@ export function convertBlock(block, type, defaults = {}) {
         ...(block.caption ? { caption: block.caption } : {}),
         ...(block.fallback ? { fallback: block.fallback } : {}),
       };
-    case 'table':
-      // A new table (I-104) starts with two columns and two empty rows; the table editor does the rest.
+    case 'table': {
+      // A new table (I-104) starts with two columns and two empty rows; from a chart preserves columns/data.
+      const fromChart = isChart(block) ? tableFromChart(block) : {};
       return {
         ...base, ...(title ? { title } : {}),
         ...(typeof block.data === 'string' && /\.(csv|tsv|txt)$/i.test(block.data) ? { data: block.data } : {}),
         ...(Array.isArray(block.columns) ? { columns: block.columns } : { columns: [{ key: 'column-1', label: 'Column 1' }, { key: 'column-2', label: 'Column 2' }] }),
         ...(Array.isArray(block.rows) ? { rows: block.rows } : typeof block.data === 'string' && /\.(csv|tsv|txt)$/i.test(block.data) ? {} : { rows: [[null, null], [null, null]] }),
+        ...fromChart,
         ...(block.caption ? { caption: block.caption } : {}),
         ...(block.fallback ? { fallback: block.fallback } : {}),
       };
+    }
+    case 'chart': {
+      // A new chart (I-109); from a table converts columns/data, otherwise starts with 3 categories and 2 series.
+      const initial = isTable(block) ? chartFromTable(block) : newChart();
+      return {
+        ...base, ...(title ? { title } : {}),
+        ...initial,
+        ...(block.caption ? { caption: block.caption } : {}),
+        ...(block.fallback ? { fallback: block.fallback } : {}),
+      };
+    }
     case 'tag-cloud':
       // A new tag cloud (I-105) starts with three terms to type over; a table's CSV file is kept.
       return {
@@ -697,8 +712,8 @@ export function setBlockType(show, { slideId, blockId, type }) {
   if (!Array.isArray(show.slides)) return show;
   const index = show.slides.findIndex((/** @type {any} */ s) => s.id === slideId);
   const neighbour = show.slides[index + 1] ?? show.slides[index - 1];
-  // A PDF (I-072), video (I-110), graph (I-074), map (I-075), table (I-104) or tag cloud (I-105) block needs show format 0.2.
-  if ((type === 'pdf' || type === 'video' || type === 'graph' || type === 'map' || type === 'table' || type === 'tag-cloud') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
+  // A PDF (I-072), video (I-110), graph (I-074), map (I-075), table (I-104), tag cloud (I-105) or chart (I-109) block needs show format 0.2.
+  if ((type === 'pdf' || type === 'video' || type === 'graph' || type === 'map' || type === 'table' || type === 'tag-cloud' || type === 'chart') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   return mapBlock(show, slideId, blockId, (b) => (b.type === type ? b : convertBlock(b, type, { slideId: neighbour?.id })));
 }
 

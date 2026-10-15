@@ -42,6 +42,7 @@ import { escape } from '../markdown.js';
 import { pictureAttributes } from '../picture.js';
 import { grantConsent, hasConsent } from './consent.js';
 import { applyCropFallback } from '../crop.js';
+import * as chart from './chart.js';
 import * as diagram from './diagram.js';
 import * as graph from './graph.js';
 import * as map from './map.js';
@@ -69,12 +70,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf, graph, map, table, 'tag-cloud': tagCloud, video };
+export const EMBED_KINDS = { chart, diagram, web, pdf, graph, map, table, 'tag-cloud': tagCloud, video };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ chart: 'chart', diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ chart: 'chart', diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -110,6 +111,7 @@ export function usedEmbedKinds(show) {
       if (graph.isGraph(value)) kinds.add('graph');
       if (map.isMap(value)) kinds.add('map');
       if (tagCloud.isTagCloud(value)) kinds.add('tag-cloud');
+      else if (chart.isChart(value)) kinds.add('chart');
       else if (table.isTable(value)) kinds.add('table');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {

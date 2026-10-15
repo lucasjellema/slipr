@@ -236,12 +236,13 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `map` | `center` / `markers` / `layers`, `zoom?`, `tiles?`, `load?`, `title?`, `caption?`, `fallback?` | (0.2) An interactive map: pan, zoom, select a place, filter by tag; see *Maps* below |
 | `table` | `columns` and `rows`, or `data`, plus `sortable?`, `sort?`, `filter?`, `maxRows?`, `pinFirst?`, `locale?`, `title?`, `caption?`, `fallback?` | (0.2) A data table: sort, filter, show or hide columns, copy, download; see *Tables* below |
 | `tag-cloud` | `terms` or `data`, plus `termColumn?`, `weightColumn?`, `order?`, `maxTerms?`, `weightLabel?`, `title?`, `caption?`, `fallback?` | (0.2) A tag cloud: a click on a term shows its glossary definition and the slides that mention it; see *Tag clouds* below |
+| `chart` | `columns` and `rows`, or `data`, plus `kind?`, `category?`, `series?`, `orientation?`, `stacked?`, `values?`, `min?`, `max?`, `sort?`, `highlight?`, `reference?`, `title?`, `caption?`, `fallback?` | (0.2) A data chart (`kind: "bar"`): accessible tooltips, legend toggle, show as table; see *Charts* below |
 
-*Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
+*Planned block types (backlog):* `quiz` (self-check question).
 
 ### Embeds (I-070, D-011)
 
-Content that needs a library or another server is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071), PDF documents (`pdf` slot and block, I-072), videos (`video` slot and block, I-110; no library), graphs (`graph` slot and block, I-074), maps (`map` slot and block, I-075) and tables (`table` slot and block, I-104; no library, but a data file). Embeds share two optional fields (format 0.2):
+Content that needs a library or another server (or a data file) is an **embed**: today `diagram` (slot and block), web pages (`web` slot and `embed` block, I-071), PDF documents (`pdf` slot and block, I-072), videos (`video` slot and block, I-110; no library), graphs (`graph` slot and block, I-074), maps (`map` slot and block, I-075), tables (`table` slot and block, I-104; no library, but a data file) and charts (`chart` slot and block, I-109; no library). Embeds share two optional fields (format 0.2):
 
 | Field | Type | Meaning |
 |---|---|---|
@@ -424,6 +425,43 @@ The tag cloud block also has `title` (and `id`, `type: "tag-cloud"`, `for`, `dep
 
 A value with only `data` (a CSV file) has the same shape as a table's; the slot type in the template (or the block `type`) tells them apart.
 
+#### Charts (`chart` slot and block; I-109, format 0.2)
+
+A data chart from a **CSV file** in the show folder or typed in as **inline rows**: responsive SVG rendered directly with template tokens (`--slipr-chart-*`, falling back to the template palette). The first concrete chart kind of I-007 (`kind: "bar"`). Spec: `docs/specs/I-109-bar-chart.md`.
+
+```json
+"chart": {
+  "kind": "bar",
+  "data": "data/sales.csv",
+  "category": "region",
+  "series": ["revenue", "customers"],
+  "orientation": "vertical",
+  "values": true,
+  "reference": { "value": "average", "label": "Average" },
+  "steps": [{ "categories": 2 }, { "highlight": "East" }]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `kind` | `"bar"` (default `"bar"`). Future kinds: line, pie, scatter |
+| `data` | A CSV file in the show folder (`data/…csv`, `.tsv` or `.txt`, first line headers) |
+| `columns`, `rows` | Instead of `data`: inline column configurations and rows of cells in column order (as for tables) |
+| `category` | The column key for category labels (default: the first column) |
+| `series` | Array of column keys for value series (default: every numeric column except the category) |
+| `orientation` | `"vertical"` (default) or `"horizontal"` (or `horizontal: true`) |
+| `stacked` | `true` for stacked bars; `false` (default) for grouped bars |
+| `values` | `true` to display formatted value labels directly on or above bars (default `false`) |
+| `min`, `max` | Custom minimum and maximum values for the value axis |
+| `sort` | `"asc"` (lowest first), `"desc"` or `true` (highest first), or `"none"` / `false` (default: preserve data order) |
+| `highlight` | Category name to highlight (dimming other categories) |
+| `reference` | A number, `"average"`, or `{ "value": number \| "average", "label": string }` |
+| `steps` | Slots, audience mode: `{ "categories": n \| "all" }` or `{ "bars": n }`, `{ "series": n \| key \| "all" }`, `{ "highlight": name \| null }` |
+| `caption` | Below the chart |
+| `fallback` | As for every embed. Without it, the static content is the chart itself (for a CSV file: a summary card) |
+
+**Reader mode**: tooltips with exact values on hover, tap and keyboard focus; clicking a legend item toggles visibility of that series; **Show as table** switches smoothly to the I-104 table of the same data (with Copy and Download CSV). Reader search indexes category names, title and series labels.
+
 #### Web pages (`web` slot, `embed` block; I-071, format 0.2)
 
 | Field | Where | Meaning |
@@ -475,7 +513,7 @@ The template defines which slots a layout has and the type of each slot.
 | `code` | object | `{ "language": "js", "code": "..." }` |
 | `quote` | object | `{ "text": "...", "source": "..." }` |
 | `cards` | array of objects | One object per card: field name → value. The template's slot definition lists the fields and their types (`text`, `richtext`, `list` as strings, `image` as an image object). Example: `[{ "title": "Analyse", "text": "Read the **template**." }, { "title": "Map" }]`. Empty or missing fields are allowed; the layout leaves them out |
-| `chart` | object | *(planned)* `{ "kind": "bar", "data": {...} }` rendered as an animatable SVG |
+| `chart` | object | (0.2) `{ "kind": "bar", "columns": [...], "rows": [...], "steps": [...] }` or `{ "data": "data/sales.csv" }`: a data chart, see *Charts* above |
 | `diagram` | object | `{ "mermaid": "flowchart LR; A-->B", "caption": "...", "fallback": { "src": "images/flow.png", "alt": "..." } }` rendered as an SVG diagram; `fallback` (0.2) as for embeds |
 | `pdf` | object | (0.2) `{ "pdf": "docs/report.pdf", "title": "...", "page": 3 }` or `"pages": [3, 7]`: a PDF on the slide, see *PDF documents* above |
 | `video` | object | (0.2) `{ "video": "media/clip.mp4", "title": "...", "play": "step", "chapters": [...] }` or a YouTube / Vimeo link in `video`: a video on the slide, see *Videos* above |
@@ -499,11 +537,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `video` / `graph` / `map` / `table` slot value or `pdf` / `video` / `graph` / `map` / `table` block in a 0.1 show; an unsafe web page, PDF or video address (a video that is not in the show folder nor at an http(s) address); video `captions` that are not a `.vtt` file in the show folder, a video chapter without a numeric `time` or a `title`; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block; a table without `rows`, `columns` or `data`, a column without `key`, an unknown column `format`, `total`, `visual` or `align`, a table `data` address that is not a CSV file in the show folder, `steps` on a table block; a tag cloud without `terms` or `data`, a term without `text`, a negative weight, an unknown `order` or step, a tag cloud `data` address that is not a CSV file in the show folder, `steps` on a tag cloud block.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a video file or captions file not found, an `https:` video address that is neither YouTube, Vimeo nor a video file, a video `end` not after `start`, video chapters out of order, captions on a YouTube or Vimeo video, a video presented `static` without a poster, `chapterSteps` without chapters, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, a duplicate table column key, a table row with more cells than columns, a table sort or highlight naming an unknown column, a total (other than `count`) or visual on a column without numbers, a table data file not found, a tag cloud highlight naming a term it does not have (inline terms), an unknown glossary id on a tag cloud term, a tag cloud data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `video` / `graph` / `map` / `table` / `chart` slot value or `pdf` / `video` / `graph` / `map` / `table` / `chart` block in a 0.1 show; an unsafe web page, PDF or video address (a video that is not in the show folder nor at an http(s) address); video `captions` that are not a `.vtt` file in the show folder, a video chapter without a numeric `time` or a `title`; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block; a table without `rows`, `columns` or `data`, a column without `key`, an unknown column `format`, `total`, `visual` or `align`, a table `data` address that is not a CSV file in the show folder, `steps` on a table block; a tag cloud without `terms` or `data`, a term without `text`, a negative weight, an unknown `order` or step, a tag cloud `data` address that is not a CSV file in the show folder, `steps` on a tag cloud block; a chart without `rows`, `columns` or `data`, an unknown `kind`, a chart `data` address that is not a CSV file in the show folder, `steps` on a chart block.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a video file or captions file not found, an `https:` video address that is neither YouTube, Vimeo nor a video file, a video `end` not after `start`, video chapters out of order, captions on a YouTube or Vimeo video, a video presented `static` without a poster, `chapterSteps` without chapters, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, a duplicate table column key, a table row with more cells than columns, a table sort or highlight naming an unknown column, a total (other than `count`) or visual on a column without numbers, a table data file not found, a tag cloud highlight naming a term it does not have (inline terms), an unknown glossary id on a tag cloud term, a tag cloud data file not found, a chart category or series naming an unknown column, a chart highlight naming a category not found in data, a chart data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), the `map` slot and block types (I-075, 2026-10-13), the `table` slot and block types (I-104, 2026-10-14), the `tag-cloud` slot and block types (I-105, 2026-10-15), and the `video` slot and block types (I-110, 2026-10-15). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), the `map` slot and block types (I-075, 2026-10-13), the `table` slot and block types (I-104, 2026-10-14), the `tag-cloud` slot and block types (I-105, 2026-10-15), the `video` slot and block types (I-110, 2026-10-15), and the `chart` slot and block types (I-109, 2026-10-15). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

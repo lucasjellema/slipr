@@ -103,6 +103,7 @@ Every slide uses one layout; its `content` holds the slots listed. **Required** 
 - `video`: needs a video file or address
 - `graph`: needs a network of nodes and links
 - `map`: needs coordinates and map tiles
+- `chart`: needs data or a chart configuration
 
 **Slot values by type:**
 - `text`: a plain string, one line, no Markdown

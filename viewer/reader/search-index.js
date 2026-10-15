@@ -76,6 +76,31 @@ function tagCloudText(value) {
 }
 
 /**
+ * The searchable text of a chart (I-109): title, caption, series labels, and inline category names.
+ * @param {any} value
+ */
+function chartText(value) {
+  if (!value || typeof value !== 'object') return '';
+  const parts = [];
+  if (value.title) parts.push(value.title);
+  if (value.caption) parts.push(value.caption);
+  if (Array.isArray(value.columns)) {
+    parts.push(...value.columns.map((/** @type {any} */ c) => c?.label ?? c?.key).filter(Boolean));
+  }
+  if (Array.isArray(value.series)) {
+    parts.push(...value.series.filter(Boolean));
+  }
+  if (Array.isArray(value.rows)) {
+    for (const r of value.rows) {
+      if (Array.isArray(r) && r.length > 0 && r[0] !== null && r[0] !== undefined) {
+        parts.push(String(r[0]));
+      }
+    }
+  }
+  return parts.join(' · ');
+}
+
+/**
  * The searchable text of a video (I-110): chapter titles and the transcript.
  * @param {any} value
  * @param {Record<string, any>} [glossary]
@@ -124,7 +149,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary), tagCloudText(v), videoText(v, glossary)].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary), tagCloudText(v), chartText(v), videoText(v, glossary)].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     // Text elements on the slide (I-089) are slide content too.
@@ -147,6 +172,7 @@ export function buildSearchIndex(show) {
       const body = [block.md, block.mermaid, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.md), ...(block.markers ?? []).map((/** @type {any} */ m) => m?.md), ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
         .filter(Boolean).map(text).join('\n') + (block.type === 'table' ? `\n${tableText(block, glossary)}` : '')
         + (block.type === 'tag-cloud' ? `\n${tagCloudText(block)}` : '')
+        + (block.type === 'chart' ? `\n${chartText(block)}` : '')
         + (block.type === 'video' ? `\n${videoText(block, glossary)}` : '');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,

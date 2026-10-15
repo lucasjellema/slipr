@@ -32,7 +32,7 @@ const LEFT_OUT_SLOTS = /** @type {Record<string, string>} */ ({
   video: 'needs a video file or address',
   graph: 'needs a network of nodes and links',
   map: 'needs coordinates and map tiles',
-  chart: 'not available yet',
+  chart: 'needs data or a chart configuration',
 });
 
 /**

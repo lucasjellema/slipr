@@ -19,6 +19,7 @@ import { videoValue } from '../video-values.js';
 import { mapFields } from './map-fields.js';
 import { graphFields } from './graph-fields.js';
 import { tableFields } from './table-fields.js';
+import { chartFields } from './chart-fields.js';
 import { tagCloudFields } from './tag-cloud-fields.js';
 import { readShowFile } from '../io/show-files.js';
 import { imageField, runImage } from './image-field.js';
@@ -471,6 +472,21 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       write: (next, typing) => {
         current = next;
         store.dispatch('setSlot', { slideId, slot: slotName, value: next }, typing ? { coalesceKey: `${coalesceKey}-table` } : {});
+      },
+      readFile: (path) => readShowFile(store.state, path),
+      addDataFile: (file, write) => addTableDataFile(store, { file, write }),
+    }))];
+  } else if (kind === 'chart') {
+    // A chart (I-109): the same fields as the Chart block, plus the steps while presenting.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    inputs = [h('div', { class: 'slipr-embed-editor slipr-table-fields slipr-chart-fields' }, chartFields({
+      key: `slot:${slideId}:${slotName}`,
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: (next, typing) => {
+        current = next;
+        store.dispatch('setSlot', { slideId, slot: slotName, value: next }, typing ? { coalesceKey: `${coalesceKey}-chart` } : {});
       },
       readFile: (path) => readShowFile(store.state, path),
       addDataFile: (file, write) => addTableDataFile(store, { file, write }),

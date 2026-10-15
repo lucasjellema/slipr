@@ -117,6 +117,17 @@
   --slipr-tag-cloud-min-size: 0.9em;
   --slipr-tag-cloud-max-size: 3em;
   --slipr-tag-cloud-font: var(--cnc-font-heading);
+
+  /* Bar charts (I-109): series colors from brand palette, yellow highlights */
+  --slipr-chart-1: var(--cnc-magenta);
+  --slipr-chart-2: var(--cnc-blue);
+  --slipr-chart-3: var(--cnc-cyan);
+  --slipr-chart-4: var(--cnc-green);
+  --slipr-chart-5: var(--cnc-purple);
+  --slipr-chart-6: #555555;
+  --slipr-chart-grid: #DDDDDD;
+  --slipr-chart-text: #555555;
+  --slipr-chart-highlight: var(--cnc-yellow);
 }
 
 /* ---------- slide frame ---------- */
@@ -218,7 +229,7 @@
 .cnc-decor--section { left: 0; top: 17.7%; width: 100%; height: 64.6%; object-fit: fill; }
 .cnc-illustration { object-fit: contain; object-position: left top; }
 .cnc-web, .cnc-pdf, .cnc-video, .cnc-graph, .cnc-map { display: flex; flex-direction: column; font-size: var(--cnc-size-body); }
-.cnc-table { display: flex; flex-direction: column; font-size: calc(13 * var(--cnc-pt)); }
+.cnc-table, .cnc-chart { display: flex; flex-direction: column; font-size: calc(13 * var(--cnc-pt)); }
 .cnc-tag-cloud { display: flex; flex-direction: column; font-size: calc(26 * var(--cnc-pt)); }
 
 /* ---------- quotes ---------- */

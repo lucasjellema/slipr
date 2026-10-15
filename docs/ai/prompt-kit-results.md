@@ -17,9 +17,10 @@ How well chatbots write a valid `show.json` from the prompt kit (`docs/ai/prompt
 | 2026-10-15 | Claude (Opus 5.5, the session that built the kit) | 1 | full | yes | 0 | 0 | 1 | — | Used `diagram`, `table`, `two-column`, `image-full` layouts; glossary aliases, profiles, a path |
 | 2026-10-15 | Claude (Opus 5.5, the session that built the kit) | 2 | full | yes | 0 | 0 | 3 | — | Rendered in reader mode; used `agenda`, `boxes-9`, `people-2`, `quote-box`; Dutch text within the slot limits |
 | 2026-10-15 | Claude (Opus 5.5, the session that built the kit) | 3 | compact | yes | 0 | 0 | 0 | — | `table` and `tag-cloud` slides; summaries only, as asked |
-| | ChatGPT | 1 | full | | | | | | *Lucas* |
+| 2026-10-15 | ChatGPT | 1 | full | yes | 0 | 0 | | — | Tried by Lucas: no warnings |
 | | ChatGPT | 2 | full | | | | | | *Lucas* |
 | | ChatGPT | 3 | compact | | | | | | *Lucas* |
+| 2026-10-15 | Copilot | own brief | | yes | 0 | 0 | | — | Tried by Lucas: opened straight away, nothing odd |
 | | Copilot | 1 | full | | | | | | *Lucas* |
 | | Copilot | 2 | full | | | | | | *Lucas* |
 | | Copilot | 3 | compact | | | | | | *Lucas* |

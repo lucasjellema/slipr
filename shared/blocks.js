@@ -172,6 +172,14 @@ export function renderBlock(block, slideId, ctx) {
         + `${embedHtml('tag-cloud', block, ctx)}${caption}</figure></div>`;
     }
 
+    case 'chart': {
+      // A data chart (I-109): the chart now, controls and tooltip from hydrateEmbeds().
+      const title = block.title ? `<p class="slipr-block-title">${escape(block.title)}</p>` : '';
+      const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
+      return `<div ${attrs}>${badges}${title}<figure class="slipr-figure slipr-figure--chart">`
+        + `${embedHtml('chart', block, ctx)}${caption}</figure></div>`;
+    }
+
     default:
       return ''; // unknown block types are reported by validation, not rendered
   }

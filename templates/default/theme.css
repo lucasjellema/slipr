@@ -61,6 +61,17 @@
   --slipr-tag-cloud-highlight: #F2A900;
   --slipr-tag-cloud-min-size: 0.9em;
   --slipr-tag-cloud-max-size: 3em;
+
+  /* Bar charts (I-109) */
+  --slipr-chart-1: #1F3A5F;
+  --slipr-chart-2: #F2A900;
+  --slipr-chart-3: #2A9D8F;
+  --slipr-chart-4: #7B5EA7;
+  --slipr-chart-5: #C8553D;
+  --slipr-chart-6: #5B6573;
+  --slipr-chart-grid: #DDE2E8;
+  --slipr-chart-text: #5B6573;
+  --slipr-chart-highlight: #F2A900;
 }
 
 /* ---------- Slide frame ---------- */
@@ -309,6 +320,12 @@
 .slipr-layout--tag-cloud { padding-bottom: 3cqw; gap: 1.4cqw; }
 .slipr-figure--tag-cloud { align-items: stretch; min-height: 0; }
 .slipr-layout--tag-cloud .slipr-tag-cloud { flex: 1; min-height: 0; width: 100%; font-size: 2cqw; }
+
+/* ---------- Layout: chart (I-109) ---------- */
+
+.slipr-layout--chart { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--chart { align-items: stretch; min-height: 0; }
+.slipr-layout--chart .slipr-chart { flex: 1; min-height: 0; width: 100%; font-size: 1.6cqw; }
 
 /* ---------- Layout: map (I-075) ---------- */
 
