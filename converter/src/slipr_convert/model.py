@@ -53,6 +53,7 @@ class TextBody:
     width: int = 0
     height: int = 0
     look: TextLook | None = None  # text boxes and shapes only (not placeholders): their look, I-089
+    shape_id: int = 0  # PowerPoint's shape id (animations name shapes by it), I-121
 
     @property
     def plain_length(self) -> int:
@@ -73,6 +74,68 @@ class ImageRef:
     effects: list[str] = field(default_factory=list)  # PowerPoint picture effects (reader.PICTURE_EFFECTS), I-084
     opacity: float | None = None  # from the picture's transparency; None when opaque
     crop: tuple[float, float, float, float] | None = None  # shown part (x, y, w, h), fractions of the picture, I-090
+    shape_id: int = 0  # PowerPoint's shape id (animations name shapes by it), I-121
+    name: str = ""  # the shape's name; "!!name" pairs pictures for Morph, I-121
+
+
+@dataclass
+class ChartData:
+    """A chart's data: categories × series (I-121)."""
+
+    title: str | None
+    categories: list[str]
+    series: list[tuple[str, list[float | None]]]  # (name, one value per category)
+    number_format: str = "General"  # Excel-style format code of the values, e.g. '0.0%'
+
+
+@dataclass
+class DiagramNode:
+    text: str
+    children: list[DiagramNode] = field(default_factory=list)
+
+
+@dataclass
+class DiagramData:
+    """A SmartArt graphic's node tree (I-121).
+
+    kind: 'hierarchy' | 'process' | 'cycle' | 'list', from its layout.
+    """
+
+    kind: str
+    roots: list[DiagramNode]
+
+
+@dataclass
+class VideoData:
+    """A video: embedded (`blob`) or online (`url`), I-121."""
+
+    title: str
+    blob: bytes | None = None
+    ext: str = "mp4"
+    url: str | None = None
+    poster: tuple[bytes, str, str] | None = None  # (blob, ext, sha1) of the poster frame
+    start_ms: int = 0  # PowerPoint's trim from the start
+    end_trim_ms: int = 0  # PowerPoint's trim from the end (the video's length is unknown)
+    bookmarks: list[tuple[int, str]] = field(default_factory=list)  # (ms, name)
+
+
+@dataclass
+class Visual:
+    """A table, chart, SmartArt graphic or video on a slide (I-121).
+
+    kind: 'table' | 'chart' | 'smartArt' | 'video'. Exactly one of the data
+    fields is set: `rows` (table: the first row holds the labels), `chart`,
+    `diagram` or `video`.
+    """
+
+    kind: str
+    top: int = 0
+    left: int = 0
+    idx: int | None = None
+    rows: list[list[str]] | None = None
+    chart: ChartData | None = None
+    diagram: DiagramData | None = None
+    video: VideoData | None = None
 
 
 @dataclass
@@ -91,6 +154,11 @@ class SlideModel:
     notes: str | None = None
     unsupported: list[str] = field(default_factory=list)
     has_build_animations: bool = False
+    visuals: list[Visual] = field(default_factory=list)  # tables, charts, SmartArt, videos (I-121)
+    transition: str | None = None  # PowerPoint transition name ('fade', 'push', 'morph', …); None = none set
+    entrances: dict[int, tuple[int, int]] = field(default_factory=dict)  # shape id → (presetID, presetSubtype)
+    zoom_targets: list[int] = field(default_factory=list)  # PowerPoint slide ids that slide / section zooms open
+    background: ImageRef | None = None  # the slide's own background picture
 
 
 @dataclass
@@ -103,6 +171,7 @@ class DeckModel:
     slides: list[SlideModel]
     slide_width: int = 0  # EMU; 0 when unknown (positions of extra images need it)
     slide_height: int = 0
+    slide_parts: list[str] = field(default_factory=list)  # each slide's part name, for slide links (I-121)
 
 
 @dataclass

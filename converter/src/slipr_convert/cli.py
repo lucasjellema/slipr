@@ -84,7 +84,9 @@ def main(argv: list[str] | None = None) -> int:
 
     r = result.report
     print(f"Converted {len(r.slides)} slides -> {out_dir / 'show.json'}")
-    print(f"  {len(result.assets)} image(s), {r.placed_count} placed on the slide (extra images, text elements), {r.moved_count} item(s) moved to the reader layer, {r.skipped_count} element(s) not converted")
+    media = sum(1 for a in result.assets if a.path.startswith("media/"))
+    files = f"{len(result.assets) - media} image(s)" + (f", {media} video(s)" if media else "")
+    print(f"  {files}, {r.placed_count} placed on the slide (extra images, text elements), {r.moved_count} item(s) moved to the reader layer, {r.skipped_count} element(s) not converted")
     if r.warnings:
         print(f"  WARNING: {len(r.warnings)} validation problem(s), see conversion-report.md")
     print(f"  Report: {out_dir / 'conversion-report.md'}")

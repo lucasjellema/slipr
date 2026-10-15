@@ -111,11 +111,10 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - Pairs with **I-053** (`.slipr` single-file package format) and **I-087** (`?zip=<url>` viewer loader) · 2026-10-13 · ✓
 
 ### Converter
-- [ ] **I-116** [converter] Map PowerPoint videos to the `video` slot or block (I-110): embedded movie files copied into `media/` with their poster frame, online videos (YouTube) as links; start / end from the trim settings · todo · —
-- [ ] **I-040** [converter] Tables → a `table` slot/block type (cheap with python-pptx)
-- [ ] **I-046** [converter] Charts → `chart` slot with the chart's real data (categories, series, values), so it is rendered and animated natively by Slipr
+- [ ] **I-046** [converter] Charts → a native `chart` slot once Slipr has a chart type; until then the converter writes the chart's data as a `table` (I-121)
 - [ ] **I-041** [converter] Charts and SmartArt → image fallback (via LibreOffice headless, optional)
 - [ ] **I-042** [converter] Whole-slide image fallback for slides that cannot be mapped
+- [ ] **I-122** [converter] PowerPoint export: YouTube and Vimeo videos as PowerPoint *online videos* (an external `a:videoFile` link) instead of a link card, so they survive a round trip; the import side reads them since I-121 (from I-121) · todo · —
 - [ ] **I-044** [converter] Batch-convert a folder of decks
 - [ ] **I-117** [converter] PowerPoint export without `--base`: carry the Slipr template's colours and fonts (`theme.css` tokens / `styleguide`) into the deck's theme, so an export on the default layouts looks like the template instead of plain Office (from I-045) · todo · —
 - [ ] **I-118** [converter] PowerPoint export: render diagrams, graphs and maps without a fallback picture to PNG (headless browser, needs Lucas's OK as a dev dependency) instead of a card or a list (from I-045) · todo · —
@@ -157,6 +156,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-121** [converter] **Converter up to date with show format 0.2**: tables → `table` (numbers, percentages, amounts, totals), charts → `table` with their data, SmartArt → Mermaid `diagram` (list SmartArt → a list), videos → `media/` + `video` (poster, start, bookmarks as chapters; YouTube / Vimeo links), transitions, Morph → auto-animate with `morphId` from `!!` names, entrance effects → overlay fragments, slide links, zooms → `related`, background pictures; visuals steer the layout choice; a coverage matrix in `converter/README.md`; round trips of the demo shows. No LibreOffice and no reader-layer guessing (Lucas). Absorbs I-040 and I-116. Spec `docs/specs/I-121-converter-up-to-date.md` · 2026-10-15 · claude
 - [x] **E-019** [editor] Diagram editor: the `diagram` slot and the new **Diagram (Mermaid)** reader block type get the Mermaid source (Tab indents, a note while empty), caption and fallback image; a block switched to Diagram starts with a two-node flowchart. `editor/js/ui/diagram-fields.js`, `diagramValue()` in `editor/js/block-values.js` · 2026-10-15 · claude
 - [x] **I-026** [editor] **Shrink pictures to WebP and set their focal point**: **Shrink…** next to Crop… on PNG, JPEG, WebP and AVIF pictures (longest side 2400 px and quality 85 % by default, the result's size shown first; a new `images/<slug>-<hash8>.webp` with the original kept, one undo step), offered when a picture over 1 MB or 2400 px is added. **Focal point…** (click, drag or arrow keys on the cropped picture, with wide and tall sample frames) writes the existing `focus` as `"x% y%"`. No format change. Spec `docs/specs/I-026-image-shrink-focus.md` · 2026-10-15 · claude
 - [x] **I-045** [converter] **Export a Slipr show to PowerPoint** (`slipr-export`, D-018): editable slides on the layouts of a base deck (e.g. the company template) or PowerPoint's default, `pptxMapping` and placeholder roles read backwards, outline levels chosen by style, SVG kept, tables, tag clouds and local videos native, fallback pictures / lists / link cards for other rich slots, overlays, sections, hidden slides, the reader layer in the notes, an export report. Spec `docs/specs/I-045-pptx-export.md` · 2026-10-15 · ✓

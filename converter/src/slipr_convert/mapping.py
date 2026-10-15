@@ -16,8 +16,14 @@ Layout choice, in order:
   3. Best fit: the layout whose slots match the slide's text blocks and
      pictures with the least content left over or slots left empty.
 
-Nothing is lost: text or pictures that do not fit the chosen layout go to
-the slide's READER LAYER (text / image blocks), so readers still see them.
+Tables, charts, SmartArt and videos (visuals, I-121) count like pictures:
+they want a slot of their type (`table`, `diagram`, `video`), and a layout
+mapped by name yields to best fit when it has no such slot while another
+layout has.
+
+Nothing is lost: text, pictures or visuals that do not fit the chosen layout
+go to the slide's READER LAYER (text / image / table / diagram / video
+blocks), so readers still see them.
 When the slide size is known, pictures become extra images (D-013) and text
 boxes become text elements (D-016) at their PowerPoint place instead; text
 boxes and shapes with a visible box (badges, callouts) always do.
@@ -25,11 +31,16 @@ boxes and shapes with a visible box (badges, callouts) always do.
 from __future__ import annotations
 
 import re
+from collections import Counter
 from dataclasses import dataclass, field, replace
 
-from .model import ImageRef, SlideModel, TextBody, TextLook
+from . import visuals as vis
+from .model import ImageRef, SlideModel, TextBody, TextLook, Visual
 
 LIST_TYPES = {"list", "richtext"}
+VISUAL_TYPES = {"table", "diagram", "video"}
+# Slot types the converter never fills; a layout that requires one is a poor fit.
+_NEVER_FILLED = {"web", "pdf", "graph", "map", "tag-cloud"}
 _NUMBER_ONLY = re.compile(r"^\d{1,2}[.)]?$")
 
 
@@ -39,6 +50,8 @@ class Capacity:
     text_slots: list[str]  # names of 'text' slots other than the title
     body_slots: list[dict]  # 'list' / 'richtext' slots, in order
     image_slots: list[str]
+    visual_slots: dict[str, list[str]] = field(default_factory=dict)  # 'table' / 'diagram' / 'video' → slot names
+    unfillable: int = 0  # required slots of a type the converter never fills
 
 
 def capacity(layout: dict, filled: set[str] | frozenset[str] = frozenset()) -> Capacity:
@@ -55,6 +68,9 @@ def capacity(layout: dict, filled: set[str] | frozenset[str] = frozenset()) -> C
         text_slots=rest,
         body_slots=[s for s in slots if s["type"] in LIST_TYPES],
         image_slots=[s["name"] for s in slots if s["type"] == "image"],
+        visual_slots={t: [s["name"] for s in slots if s["type"] == t] for t in sorted(VISUAL_TYPES)
+                      if any(s["type"] == t for s in slots)},
+        unfillable=sum(1 for s in slots if s["type"] in _NEVER_FILLED and s.get("required")),
     )
 
 
@@ -89,18 +105,24 @@ def choose_layout(sm: SlideModel, template: dict, mapping: dict | None = None) -
     if not layouts:
         raise ValueError("The template has no layouts")
     any_image_layout = any(capacity(l).image_slots for l in layouts.values())
+    need = Counter(vis.SLOT_TYPE[v.kind] for v in sm.visuals)
+    can_hold = {t for t in need if any(capacity(l).visual_slots.get(t) for l in layouts.values())}
 
     entry = lookup_entry(sm.layout_name, template, mapping)
     if entry.layout in layouts:
         # A plain name mapping yields to best fit when it would push pictures
         # out. A mapping with placeholder roles is the template author's
-        # explicit choice and always wins (extra pictures become extra images).
-        if sm.images and not entry.roles and not capacity(layouts[entry.layout]).image_slots and any_image_layout:
+        # explicit choice and wins for pictures (extra pictures become extra
+        # images), but not for tables, diagrams or videos another layout can hold.
+        mapped = capacity(layouts[entry.layout])
+        if any(not mapped.visual_slots.get(t) for t in can_hold):
+            pass
+        elif sm.images and not entry.roles and not mapped.image_slots and any_image_layout:
             pass
         else:
             return entry.layout, f'PowerPoint layout "{sm.layout_name}" mapped to "{entry.layout}" ({entry.source})'
 
-    if not sm.bodies and not sm.images:
+    if not sm.bodies and not sm.images and not sm.visuals:
         if sm.index == 0 and "title" in layouts:
             return "title", "first slide with only a title"
         if sm.index > 0 and "section" in layouts and not sm.subtitle:
@@ -118,9 +140,13 @@ def choose_layout(sm: SlideModel, template: dict, mapping: dict | None = None) -
         cost += 5 * max(0, n_img - len(cap.image_slots))  # pictures without a slot (extra images)
         cost += max(0, n_slots - n_body) + max(0, len(cap.image_slots) - n_img)  # empty slots
         cost += 2 if (sm.title and not cap.title) else 0
+        cost += sum(4 * max(0, n - len(cap.visual_slots.get(t, []))) for t, n in need.items())  # visuals to the reader layer
+        cost += sum(max(0, len(names) - need.get(t, 0)) for t, names in cap.visual_slots.items())  # empty visual slots
+        cost += 3 * cap.unfillable
         if best_cost is None or cost < best_cost:
             best, best_cost = lid, cost
-    return best, f"best fit for {len(sm.bodies)} text block(s) and {len(sm.images)} picture(s)"
+    extra = f" and {len(sm.visuals)} table(s), diagram(s) or video(s)" if sm.visuals else ""
+    return best, f"best fit for {len(sm.bodies)} text block(s) and {len(sm.images)} picture(s){extra}"
 
 
 @dataclass
@@ -133,6 +159,7 @@ class MappedSlide:
     picture_styles: list[dict] = field(default_factory=list)  # the template's pictureStyles (I-084)
     skipped: list[str] = field(default_factory=list)
     remarks: list[str] = field(default_factory=list)
+    converted_notes: list[str] = field(default_factory=list)  # markers for the speaker notes (charts → tables)
 
 
 def map_slide(
@@ -146,10 +173,16 @@ def map_slide(
     include_notes: bool = True,
     notes_to_reader: bool = False,
     slide_size: tuple[int, int] | None = None,
+    visual_assets: list[tuple[str | None, str | None]] | None = None,
+    related: list[str] | None = None,
+    background: str | None = None,
 ) -> MappedSlide:
     """`images`: the asset path for each of `sm.images`, in the same order.
     `slide_size`: the deck's slide width and height (EMU); with it, pictures that
-    fit no image slot become extra images at their PowerPoint position (D-013)."""
+    fit no image slot become extra images at their PowerPoint position (D-013).
+    `visual_assets`: (video file, poster) paths for each of `sm.visuals`.
+    `related`: slide ids that zooms on this slide open. `background`: the path
+    of the slide's own background picture."""
     entry = lookup_entry(sm.layout_name, template, mapping)
     # An explicit role for this layout wins over the template-wide ignore list
     # (idx numbers mean different things per layout, e.g. 91 = logo or a text box).
@@ -241,13 +274,43 @@ def map_slide(
         if free_images:
             content[free_images.pop(0)] = value
         elif (overlay := _overlay_value(ref, value, slide_size)) is not None:
+            if (fragment := _fragment(sm.entrances.get(ref.shape_id))) is not None:
+                overlay["fragment"] = fragment
             overlays.append(overlay)
             result.placed.append(f"picture {n}")
         else:
             blocks.append({"id": f"converted-image-{n}", "type": "image", "image": value})
             result.moved.append(f"picture {n}")
     # Text elements in front of the extra images (labels on pictures), in reading order.
-    overlays += [o for _, o in sorted(text_overlays, key=lambda pair: (pair[0].top, pair[0].left))]
+    for body, overlay in sorted(text_overlays, key=lambda pair: (pair[0].top, pair[0].left)):
+        if (fragment := _fragment(sm.entrances.get(body.shape_id))) is not None:
+            overlay["fragment"] = fragment
+        overlays.append(overlay)
+
+    # Tables, charts, SmartArt and videos → a slot of their type (by placeholder
+    # role first), else a reader block of the same type (I-121).
+    roles = entry.roles if entry.layout == layout_id else {}
+    free_visual = {t: list(names) for t, names in capacity(layout, set(content)).visual_slots.items()}
+    counts: Counter = Counter()
+    for v, (video_path, poster_path) in zip(sm.visuals, visual_assets or [(None, None)] * len(sm.visuals)):
+        slot_type = vis.SLOT_TYPE[v.kind]
+        counts[v.kind] += 1
+        label = f"{_VISUAL_LABEL[v.kind]} {counts[v.kind]}"
+        value = _visual_value(v, video_path, poster_path, result, label)
+        if value is None:
+            result.skipped.append(label)
+            continue
+        free = free_visual.get(slot_type, [])
+        slot = roles.get(v.idx) if v.idx is not None else None
+        if not (slot and slot in free):
+            slot = free[0] if free else None
+        if slot:
+            free.remove(slot)
+            content[slot] = value
+        else:
+            counts[f"block-{slot_type}"] += 1
+            blocks.append({"id": f"converted-{slot_type}-{counts[f'block-{slot_type}']}", "type": slot_type, **value})
+            result.moved.append(f"{label} (the layout has no free {slot_type} slot)")
 
     if not had_title:
         result.remarks.append("no title found on this slide")
@@ -264,6 +327,8 @@ def map_slide(
         result.skipped.extend(sm.unsupported)
         warning = f"_[Converter] Not converted from PowerPoint: {kinds}._"
         notes = f"{notes}\n\n{warning}" if notes else warning
+    for marker in result.converted_notes:
+        notes = f"{notes}\n\n{marker}" if notes else marker
     if notes:
         result.slide["notes"] = notes
     if notes_to_reader and include_notes and sm.notes:
@@ -274,11 +339,80 @@ def map_slide(
         audience["hidden"] = True
     if sm.has_build_animations and any(content.get(s["name"]) for s in layout.get("slots", []) if s["type"] in LIST_TYPES):
         audience["fragments"] = True
+    if background:
+        audience["background"] = background
     if audience:
         result.slide["audience"] = audience
+    reader: dict = {}
     if blocks:
-        result.slide["reader"] = {"blocks": blocks}
+        reader["blocks"] = blocks
+    if related:
+        reader["related"] = list(related)
+        result.remarks.append(f"zoom to {', '.join(related)} → related slides (reader mode)")
+    if reader:
+        result.slide["reader"] = reader
     return result
+
+
+_VISUAL_LABEL = {"table": "table", "chart": "chart", "smartArt": "SmartArt", "video": "video"}
+
+
+def _visual_value(v: Visual, video_path: str | None, poster_path: str | None, result: MappedSlide, label: str) -> dict | None:
+    """The Slipr value of a visual (I-121), with its remarks in the report."""
+    if v.kind == "table":
+        value, remarks = vis.table_value(v.rows or [])
+        result.remarks.extend(remarks)
+        return value
+    if v.kind == "chart":
+        title = f" “{v.chart.title}”" if v.chart.title else ""
+        result.remarks.append(f"{label}{title} converted to a table with its data")
+        result.converted_notes.append(f"_[Converter] A PowerPoint chart{title} was converted to a table._")
+        return vis.chart_value(v.chart)
+    if v.kind == "smartArt":
+        result.remarks.append(f"{label} ({v.diagram.kind}) converted to a Mermaid diagram")
+        return vis.diagram_value(v.diagram)
+    value, remarks = vis.video_value(v.video, video_path, poster_path)
+    result.remarks.extend(remarks)
+    return value
+
+
+# PowerPoint entrance effects (presetID) → Reveal fragment styles; Fly In by direction (presetSubtype).
+_FLY_IN = {1: "fade-down", 2: "fade-left", 4: "fade-up", 8: "fade-right"}
+
+
+def _fragment(effect: tuple[int, int] | None):
+    """An overlay's `fragment` for a PowerPoint entrance effect, or None."""
+    if effect is None:
+        return None
+    preset, subtype = effect
+    if preset == 10:
+        return "fade-in"
+    if preset == 2:
+        return _FLY_IN.get(subtype, True)
+    if preset in (23, 31, 53):  # Zoom, Grow & Turn, Grow
+        return "grow"
+    return True
+
+
+# PowerPoint transitions → Slipr transitions (I-121); others become "fade".
+_TRANSITIONS = {
+    "fade": "fade", "dissolve": "fade", "flash": "fade",
+    "push": "slide", "wipe": "slide", "cover": "slide", "pull": "slide", "split": "slide", "reveal": "slide",
+    "uncover": "slide", "pan": "slide", "conveyor": "slide", "ferris": "slide",
+    "zoom": "zoom", "vortex": "zoom", "ripple": "zoom", "warp": "zoom", "flythrough": "zoom",
+    "prism": "convex", "cube": "convex", "gallery": "convex", "flip": "convex", "switch": "convex",
+    "doors": "concave", "window": "concave",
+    "cut": "none", "none": "none", "morph": "none",
+}
+
+
+def slipr_transition(name: str | None) -> str | None:
+    """The Slipr transition for a PowerPoint one; None when the slide has none.
+    Morph becomes auto-animate (emit) without a transition of its own;
+    other effects become a fade."""
+    if name is None:
+        return None
+    return _TRANSITIONS.get(name, "fade")
 
 
 def _drop_ignored(sm: SlideModel, paths: list[str], ignore: set[int]) -> tuple[SlideModel, list[str]]:
@@ -427,6 +561,9 @@ def _image_value(ref: ImageRef, path: str, result: MappedSlide, n: int) -> dict:
     if ref.crop is not None:
         x, y, w, h = ref.crop
         value["crop"] = {"x": x, "y": y, "w": w, "h": h}
+    # Morph pairs shapes named "!!name" (I-121 → morphId, I-091).
+    if ref.name.startswith("!!") and (morph_id := re.sub(r"[^A-Za-z0-9_-]+", "-", ref.name[2:]).strip("-")):
+        value["morphId"] = morph_id
     return value
 
 

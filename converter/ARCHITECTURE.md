@@ -28,19 +28,26 @@ converter/
 │   ├── __init__.py           exposes convert(), write_show(), ConversionResult
 │   ├── cli.py                argparse, template + mapping loading, relative refs, write output, summary
 │   ├── convert.py            convert(source, template, …) → ConversionResult (the pure core)
-│   ├── model.py              dataclasses: TextBody, ImageRef, SlideModel, DeckModel, Asset, ConversionResult
-│   ├── reader.py             open the deck; raw-XML helpers (sections, hidden, alt text, builds,
-│   │                         graphic kinds, line breaks, explicit + inherited bullets). The ONLY module touching XML
-│   ├── extract.py            python-pptx objects → DeckModel / SlideModel
-│   ├── text.py               paragraphs/runs → Slipr Markdown (levels, bold, italic, links, escaping)
+│   ├── model.py              dataclasses: TextBody, ImageRef, Visual (+ ChartData, DiagramData, VideoData), SlideModel,
+│   │                         DeckModel, Asset, ConversionResult
+│   ├── reader.py             open the deck; raw-XML helpers (sections, hidden, alt text, builds, graphic kinds, line
+│   │                         breaks, explicit + inherited bullets, videos, SmartArt, transitions, entrance effects,
+│   │                         zooms, slide links, backgrounds). The ONLY module touching XML
+│   ├── extract.py            python-pptx objects → DeckModel / SlideModel (tables and charts through the public API)
+│   ├── text.py               paragraphs/runs → Slipr Markdown (levels, bold, italic, links, slide links, escaping)
+│   ├── visuals.py            tables, charts, SmartArt, videos → `table` / `diagram` / `video` values (I-121)
 │   ├── mapping.py            SlideModel → Slipr slide dict (layout choice + slot filling + reader-layer leftovers)
-│   ├── emit.py               show dict (meta, settings, chapters, slides), image assets, report; write_show()
+│   ├── emit.py               show dict (meta, settings, chapters, slides), image and video assets, transitions and
+│   │                         Morph, slide links, report; write_show()
 │   ├── report.py             per-slide decisions and losses → conversion-report.md
 │   └── validate.py           jsonschema validation against <repo>/shared/schema/*.schema.json
 └── tests/
     ├── conftest.py           builds the sample deck *in code* (python-pptx default layouts, generated PNGs,
-    │                         injected sections, alt text, build animation, hidden slide, table)
+    │                         injected sections, alt text, build animation, hidden slide, table), the feature deck
+    │                         (I-121: chart, videos, SmartArt, links, zoom, transitions, Morph, entrance effect,
+    │                         background, as PowerPoint writes the XML) and js_validate()
     ├── test_convert.py       end-to-end: slide by slide
+    ├── test_features.py      I-121: numbers and tables, the feature deck, the Conclusion template, round trips
     ├── test_mapping.py       layout choice and slot filling on hand-made models
     └── test_cli.py           CLI behaviour + cross-check with the JavaScript validator (shared/validate.js)
 ```
@@ -54,7 +61,15 @@ converter/
   - **Hidden slides**: attribute `show="0"` on the slide element.
   - **Alt text**: the `descr` attribute on the shape's `p:cNvPr`. A bare file name ("image.png") is treated as no alt text: tools fill that in automatically.
   - **Build animations**: `p:timing//p:bldP`.
-  - **Graphic frames**: `a:graphicData/@uri` → table, chart, SmartArt, OLE.
+  - **Graphic frames**: `a:graphicData/@uri` → table, chart (and the newer *chartex* kinds), SmartArt, OLE.
+  - **Videos** (`media_kind`, `video_of`): `a:videoFile` in the shape's `p:nvPr` marks a video (also in a placeholder, where python-pptx sees a picture: the poster). The file is the `p14:media r:embed` part, else the `a:videoFile r:link` target; an external link is an online video. Poster frame from the `a:blip`, trim and bookmarks from `p14:trim` / `p14:bmkLst` (milliseconds).
+  - **Charts**: data through python-pptx's public chart API (`extract._chart_data`); only the values' number format (`c:formatCode`) is read here.
+  - **SmartArt** (`smartart`): the data part (`dgm:relIds/@r:dm`): points without a type (or `node` / `asst`) are nodes, `dgm:cxn` without a type (`parOf`) the tree, ordered by `srcOrd`; the kind (hierarchy / process / cycle / list) from the document point's `loTypeId`.
+  - **Transitions**: the first child of `p:transition`, also inside `mc:AlternateContent/mc:Choice` (Morph: `p159:morph`).
+  - **Entrance effects**: `p:timing//p:cTn[@presetClass='entr']` → the `p:spTgt` shape id with `presetID` / `presetSubtype`; targets with `p:txEl` (paragraph builds) are left out.
+  - **Zooms**: `sldZmObj/@sldId` and `sectionZmObj/@sectionId` anywhere in the slide (they sit in `mc:AlternateContent`, which python-pptx does not list as shapes).
+  - **Slide links**: `a:hlinkClick` with `action="ppaction://hlinksldjump"` → the target slide's part name.
+  - **Background picture**: `p:cSld/p:bg/p:bgPr/a:blipFill/a:blip`, the slide's own only.
   - **Line breaks**: `paragraph_parts()` yields runs, fields and `<a:br>` in order (python-pptx's `runs` drops breaks).
   - **Paragraph styles**: `paragraph_style()` resolves bullet (`buNone` / `buChar` / `buAutoNum` type), bold, caps and serif font along the chain *paragraph → layout placeholder → master placeholder* (`lstStyle/lvlNpPr`, via python-pptx's `_base_placeholder`) *→ master body style* (`p:txStyles/p:bodyStyle`). This matters: a "Section Header" description has *no bullets* by layout, and corporate templates use outline levels as text styles (intro, subheading, serif line, A. and 1. lists).
 - Keeping all private (`_element`) access in this one module limits the damage when python-pptx changes.
@@ -92,12 +107,16 @@ Layout choice (template-agnostic: it only looks at slot *types*):
    The cheapest layout wins, with ties going to template order.
 
 Slot filling: title → `title`, subtitle → `subtitle` / `caption` / `byline`. Text blocks fill the list/richtext slots in order, and extra blocks are merged into the last one. Short one-line leftovers can fill remaining text slots (e.g. a caption). Pictures fill image slots.
-**Picture effects** (I-084): `reader.picture_effects()` reads a picture's shadow, soft edges, rounded geometry and outline, and its transparency; `_image_value()` gives the picture the first template picture style whose `pptxEffect` matches, and the transparency as `opacity`. **Pictures without a slot become extra images** (`slide.overlays`, D-013): `_overlay_value()` turns the picture's position and size into fractions of the slide (`DeckModel.slide_width` / `slide_height`, passed as `slide_size`), kept inside it, and the report lists them under `placed`. **Everything else goes to the reader layer** (`converted-text-N` blocks, and `converted-image-N` when a picture's size is unknown), so readers still see it, and it is listed in the report. `emit.py` writes `"slipr": "0.2"` only when a slide has extra images. Unsupported elements get a marker line in the speaker notes and an entry in the report.
+**Picture effects** (I-084): `reader.picture_effects()` reads a picture's shadow, soft edges, rounded geometry and outline, and its transparency; `_image_value()` gives the picture the first template picture style whose `pptxEffect` matches, and the transparency as `opacity`. **Pictures without a slot become extra images** (`slide.overlays`, D-013): `_overlay_value()` turns the picture's position and size into fractions of the slide (`DeckModel.slide_width` / `slide_height`, passed as `slide_size`), kept inside it, and the report lists them under `placed`. **Everything else goes to the reader layer** (`converted-text-N` blocks, and `converted-image-N` when a picture's size is unknown), so readers still see it, and it is listed in the report. `emit.py` writes `"slipr": "0.2"` only when a slide needs it (extra images, picture styles, opacity, crop, morph ids, tables, videos). Unsupported elements get a marker line in the speaker notes and an entry in the report.
+
+**Visuals** (I-121): tables, charts, SmartArt and videos are `Visual`s in the model. `visuals.SLOT_TYPE` names the slot type each becomes (chart → `table`, SmartArt → `diagram`). Layout choice: a mapped layout yields to best fit when it has no slot for a visual type that another layout has (even with placeholder roles), and best fit adds +4 per visual without a slot, +1 per empty visual slot and +3 per required slot of a type the converter never fills (`web`, `pdf`, `graph`, `map`, `tag-cloud`). Filling: a placeholder role naming a free slot of the right type, else the first free one, else a reader block of the same type (`converted-table-N`, …). `visuals.py` builds the values: `table_value` (labels → keys, `parse_number` per column for numbers, percentages and amounts with decimal comma or point, years kept as text, a summing *Total* row → `total: "sum"`), `chart_value` (category column + a column per series with `visual: "bar"`), `diagram_value` (Mermaid flowchart TD / LR, cycles closed), `video_value` (start, chapters from bookmarks, poster as `fallback`; YouTube / Vimeo links normalised). List-type SmartArt becomes a text body in `extract.py`.
+
+**Motion and links** (I-121): an entrance effect on a picture or text box placed as an overlay becomes its `fragment` (`_fragment`). Pictures named `!!name` get `morphId`. `emit._apply_motion` maps transitions (`mapping.slipr_transition`): the most common becomes `settings.transition` (`fade` when the deck has none), others `audience.transition`; Morph sets `audience.autoAnimate` on its slide and the one before. `text.py` writes slide links as `#pptx-slide:<part name>`, and `emit._resolve_slide_links` turns them into `#s-NN` (or plain text). Zooms become `reader.related`, the slide's background picture `audience.background`.
 
 ### 5. `emit.py`: output
 - Slide ids are `s-01`, `s-02`, …, with zero-padding sized to the deck.
 - Chapters come from section names (slugified, made unique). `meta.title` is the deck title, else the first slide title. `template.version` becomes `^major.minor` of the template.
-- Assets are deduplicated by sha1: `images/slideNN-K.ext`.
+- Assets are deduplicated by sha1: `images/slideNN-K.ext`, video posters `images/slideNN-videoK.ext`, videos `media/slideNN-K.ext`, background pictures `images/slideNN-background.ext`.
 - `validate.py` checks the result against the shared JSON Schema, and any problems go into `report.warnings`.
 - `write_show()` (CLI only) refuses a non-empty folder without `--force`. It writes `show.json` (UTF-8, 2-space indent, LF), `images/` and `conversion-report.md`.
 - The CLI writes `template.ref` and `$schema` **relative to the output folder** (forward slashes).
@@ -150,7 +169,8 @@ src/slipr_convert/
 
 - `pytest` from `converter/` (with the venv active, or `.venv\Scripts\python -m pytest`).
 - The sample deck is **generated in `conftest.py`**: Title Slide, bullets with levels/bold/italic/link/literal Markdown characters, notes and a build animation, Section Header, Two Content, Picture with Caption (with alt text), a Blank slide with a text box and a picture without alt text, a table, a hidden slide, and two sections. There are no binary fixtures in the repo.
-- **Contract test**: the converted show is fed to the JavaScript validator (`shared/validate.js`, via `node`) together with the default template. It must give no errors and only the expected warning. The test is skipped when Node.js is not installed.
+- **Contract test**: the converted show is fed to the JavaScript validator (`shared/validate.js`, via `node`) together with the default template. It must give no errors and only the expected warning. The test is skipped when Node.js is not installed. The feature deck must pass without warnings, and with the Conclusion template without errors.
+- **Round trip** (`test_features.py`): `shows/demo` and `shows/conclusion-demo` are exported with `slipr-export` and converted back; every table slot and local video comes back, and the result passes the JavaScript validator.
 
 ## Relation to the rest of Slipr
 

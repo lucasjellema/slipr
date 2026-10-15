@@ -28,7 +28,8 @@ def test_writes_show_folder(tmp_path, deck_file, capsys):
     show = json.loads((out / "show.json").read_text(encoding="utf-8"))
     assert show["id"] == "my-deck"
     assert (out / "images" / "slide05-1.png").exists()
-    assert "Not converted: table" in (out / "conversion-report.md").read_text(encoding="utf-8")
+    assert "converted to a table" not in (out / "conversion-report.md").read_text(encoding="utf-8")
+    assert show["slides"][6]["layout"] == "table"
     assert "Converted 8 slides" in capsys.readouterr().out
 
 

@@ -15,7 +15,7 @@ from pptx import Presentation
 from pptx.enum.shapes import PP_PLACEHOLDER
 from pptx.presentation import Presentation as PresentationType
 
-from .model import TextLook
+from .model import DiagramData, DiagramNode, TextLook, VideoData
 
 _TITLE_TYPES = {PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE, PP_PLACEHOLDER.VERTICAL_TITLE}
 
@@ -24,7 +24,14 @@ NS = {
     "p": "http://schemas.openxmlformats.org/presentationml/2006/main",
     "a": "http://schemas.openxmlformats.org/drawingml/2006/main",
     "p14": P14,
+    "r": "http://schemas.openxmlformats.org/officeDocument/2006/relationships",
+    "mc": "http://schemas.openxmlformats.org/markup-compatibility/2006",
+    "dgm": "http://schemas.openxmlformats.org/drawingml/2006/diagram",
+    "c": "http://schemas.openxmlformats.org/drawingml/2006/chart",
 }
+_R_ID = f"{{{NS['r']}}}id"
+_R_EMBED = f"{{{NS['r']}}}embed"
+_R_LINK = f"{{{NS['r']}}}link"
 
 Source = str | Path | bytes | BinaryIO
 
@@ -50,6 +57,13 @@ def sections(prs: PresentationType) -> list[tuple[str, list[int]]]:
         ids = [int(s.get("id")) for s in section.findall(f".//{{{P14}}}sldId")]
         result.append((section.get("name") or "Section", ids))
     return result
+
+
+def section_slides(prs: PresentationType) -> dict[str, list[int]]:
+    """Section id ('{GUID}') → its slide ids, for section zooms (I-121)."""
+    root = prs.part._element  # noqa: SLF001
+    return {(s.get("id") or "").upper(): [int(x.get("id")) for x in s.findall(f".//{{{P14}}}sldId")]
+            for s in root.findall(f".//{{{P14}}}section")}
 
 
 def is_hidden(slide) -> bool:
@@ -136,6 +150,8 @@ def graphic_kind(shape) -> str | None:
         return "table"
     if uri.endswith("/chart"):
         return "chart"
+    if uri.endswith("/chartex"):
+        return "chart (newer kind: treemap, sunburst, waterfall, …)"
     if "diagram" in uri:
         return "smartArt"
     if "ole" in uri:
@@ -410,3 +426,211 @@ def _color(holder, theme: _Theme) -> tuple[str | None, float | None]:
         hex_ = "#" + "".join(f"{round(min(1, max(0, c)) * 255):02X}" for c in (r, g, b))
         return hex_, (round(alpha, 2) if alpha is not None else None)
     return None, None
+
+
+# ---------------------------------------------------------------------------
+# Videos, charts, SmartArt, motion, links and backgrounds (I-121)
+
+def _sha1(blob: bytes) -> str:
+    import hashlib
+
+    return hashlib.sha1(blob).hexdigest()  # noqa: S324 - a content key, not security
+
+
+def media_kind(shape) -> str | None:
+    """'video' or 'audio' for a media shape (also a video in a placeholder), else None."""
+    nv_pr = shape._element.find(".//p:nvPr", NS)  # noqa: SLF001
+    if nv_pr is None:
+        return None
+    if nv_pr.find("a:videoFile", NS) is not None:
+        return "video"
+    if nv_pr.find("a:audioFile", NS) is not None or nv_pr.find("a:wavAudioFile", NS) is not None:
+        return "audio"
+    return None
+
+
+def video_of(shape) -> VideoData | None:
+    """A video shape as VideoData: the embedded file (p14:media r:embed) or
+    the online address (a:videoFile r:link, external), the poster frame, the
+    trim and the bookmarks. None when neither file nor address is found."""
+    el = shape._element  # noqa: SLF001
+    rels = shape.part.rels
+    data = VideoData(title=alt_text(shape) or "Video")
+    media = el.find(".//p14:media", NS)
+    rid = media.get(_R_EMBED) if media is not None else None
+    if rid and rid in rels and not rels[rid].is_external:
+        part = rels[rid].target_part
+        data.blob = part.blob
+        data.ext = str(part.partname).rsplit(".", 1)[-1].lower()
+    else:
+        video_file = el.find(".//p:nvPr/a:videoFile", NS)
+        link = video_file.get(_R_LINK) if video_file is not None else None
+        if link and link in rels:
+            rel = rels[link]
+            if rel.is_external:
+                data.url = rel.target_ref
+            else:
+                part = rel.target_part
+                data.blob = part.blob
+                data.ext = str(part.partname).rsplit(".", 1)[-1].lower()
+    if data.blob is None and data.url is None:
+        return None
+    blip = el.find(".//a:blip", NS)
+    if blip is not None and blip.get(_R_EMBED) in rels:
+        part = rels[blip.get(_R_EMBED)].target_part
+        blob = part.blob
+        data.poster = (blob, str(part.partname).rsplit(".", 1)[-1].lower(), _sha1(blob))
+    if media is not None:
+        trim = media.find("p14:trim", NS)
+        if trim is not None:
+            data.start_ms = int(float(trim.get("st") or 0))
+            data.end_trim_ms = int(float(trim.get("end") or 0))
+        for bmk in media.findall("p14:bmkLst/p14:bmk", NS):
+            if bmk.get("time") is not None:
+                data.bookmarks.append((int(float(bmk.get("time"))), (bmk.get("name") or "").strip()))
+    return data
+
+
+def chart_number_format(chart) -> str:
+    """The number format code of a chart's first series' values ('General' when none)."""
+    code = chart._chartSpace.find(".//c:ser/c:val/c:numRef/c:numCache/c:formatCode", NS)  # noqa: SLF001
+    return (code.text or "General") if code is not None else "General"
+
+
+_DIAGRAM_KINDS = (
+    ("hierarchy", ("hierarchy", "orgchart", "org chart", "hierarchical")),
+    ("cycle", ("cycle", "circular", "radial")),
+    ("process", ("process", "chevron", "arrow", "step", "timeline", "funnel", "gear")),
+)
+
+
+def smartart(shape) -> DiagramData | None:
+    """A SmartArt graphic's node tree, read from its data part (dgm:dataModel).
+
+    Nodes are `dgm:pt` without a type (or type 'node' / 'asst'); the tree is the
+    'parOf' connections (`dgm:cxn` without a type) ordered by `srcOrd`. The
+    kind comes from the layout id on the document point (`loTypeId`).
+    """
+    from lxml import etree
+
+    el = shape._element  # noqa: SLF001
+    rel_ids = el.find(".//dgm:relIds", NS)
+    rid = rel_ids.get(f"{{{NS['r']}}}dm") if rel_ids is not None else None
+    if not rid:
+        return None
+    try:
+        root = etree.fromstring(shape.part.related_part(rid).blob)
+    except (KeyError, etree.XMLSyntaxError):
+        return None
+    points = {}
+    doc_id, layout_id = None, ""
+    for pt in root.findall("dgm:ptLst/dgm:pt", NS):
+        kind = pt.get("type") or "node"
+        if kind == "doc":
+            doc_id = pt.get("modelId")
+            pr_set = pt.find("dgm:prSet", NS)
+            layout_id = (pr_set.get("loTypeId") or "") if pr_set is not None else ""
+        elif kind in ("node", "asst"):
+            paras = [" ".join(t.text or "" for t in p.iter(f"{{{NS['a']}}}t")).strip()
+                     for p in pt.findall("dgm:t/a:p", NS)]
+            points[pt.get("modelId")] = re.sub(r"\s+", " ", " ".join(p for p in paras if p)).strip()
+    if doc_id is None:
+        return None
+    children: dict[str, list[tuple[int, str]]] = {}
+    for cxn in root.findall("dgm:cxnLst/dgm:cxn", NS):
+        if (cxn.get("type") or "parOf") != "parOf":
+            continue
+        children.setdefault(cxn.get("srcId"), []).append((int(cxn.get("srcOrd") or 0), cxn.get("destId")))
+
+    def build(model_id: str, depth: int = 0) -> list[DiagramNode]:
+        nodes = []
+        for _, child in sorted(children.get(model_id, [])):
+            if child not in points or depth > 20:
+                continue
+            sub = build(child, depth + 1)
+            if points[child]:
+                nodes.append(DiagramNode(points[child], sub))
+            else:
+                nodes.extend(sub)  # an empty node: keep its children
+        return nodes
+
+    roots = build(doc_id)
+    if not roots:
+        return None
+    lowered = layout_id.lower()
+    kind = next((k for k, words in _DIAGRAM_KINDS if any(w in lowered for w in words)), "list")
+    return DiagramData(kind=kind, roots=roots)
+
+
+def transition(slide) -> str | None:
+    """The slide's transition effect: the local name of the first child of
+    p:transition ('fade', 'push', 'morph', …), 'none' for an empty one, or
+    None when the slide has no transition. For newer effects PowerPoint wraps
+    the transition in mc:AlternateContent; its first choice counts (Morph)."""
+    el = slide._element  # noqa: SLF001
+    trans = el.find("p:transition", NS)
+    if trans is None:
+        trans = el.find("mc:AlternateContent/mc:Choice/p:transition", NS)
+    if trans is None:
+        return None
+    for child in trans:
+        tag = child.tag.rsplit("}", 1)[-1]
+        if tag not in ("sndAc", "extLst"):
+            return tag
+    return "none"
+
+
+def entrance_effects(slide) -> dict[int, tuple[int, int]]:
+    """Shape id → (presetID, presetSubtype) of its first entrance effect on the
+    whole shape. Effects on single paragraphs (text builds) are left out."""
+    el = slide._element  # noqa: SLF001
+    found: dict[int, tuple[int, int]] = {}
+    for ctn in el.iterfind(".//p:timing//p:cTn[@presetClass='entr']", NS):
+        target = ctn.find(".//p:spTgt", NS)
+        if target is None or target.find("p:txEl", NS) is not None:
+            continue
+        spid = int(target.get("spid") or 0)
+        found.setdefault(spid, (int(ctn.get("presetID") or 0), int(ctn.get("presetSubtype") or 0)))
+    return found
+
+
+def zoom_targets(slide) -> list[tuple[str, str]]:
+    """Slide, summary and section zooms on the slide: ('slide', slide id) or
+    ('section', section id). They sit in mc:AlternateContent, which
+    python-pptx does not list as shapes."""
+    found = []
+    for node in slide._element.iter():  # noqa: SLF001
+        if not isinstance(node.tag, str):
+            continue
+        tag = node.tag.rsplit("}", 1)[-1]
+        if tag == "sldZmObj" and node.get("sldId"):
+            found.append(("slide", node.get("sldId")))
+        elif tag == "sectionZmObj" and node.get("sectionId"):
+            found.append(("section", node.get("sectionId").upper()))
+    return found
+
+
+def slide_link(run) -> str | None:
+    """The part name of the slide a run links to (`ppaction://hlinksldjump`),
+    or None. Jumps to next / previous / first / last slide are not links."""
+    click = run._r.find("a:rPr/a:hlinkClick", NS)  # noqa: SLF001
+    if click is None or "hlinksldjump" not in (click.get("action") or ""):
+        return None
+    try:
+        return str(run.part.related_part(click.get(_R_ID)).partname)
+    except (KeyError, AttributeError):
+        return None
+
+
+def background_image(slide) -> tuple[bytes, str, str] | None:
+    """(blob, ext, sha1) of the slide's own background picture, or None
+    (colours, gradients and backgrounds from the layout or master)."""
+    blip = slide._element.find("p:cSld/p:bg/p:bgPr/a:blipFill/a:blip", NS)  # noqa: SLF001
+    if blip is None or not blip.get(_R_EMBED):
+        return None
+    try:
+        part = slide.part.related_part(blip.get(_R_EMBED))
+    except KeyError:
+        return None
+    blob = part.blob
+    return blob, str(part.partname).rsplit(".", 1)[-1].lower(), _sha1(blob)

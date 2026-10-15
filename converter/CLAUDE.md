@@ -32,7 +32,8 @@ From `converter/`:
 
 ## Invariants
 
-- **Never lose content silently.** Placeholder text that doesn't fit the chosen layout goes to the slide's **reader layer** (`converted-*` blocks) and the report; pictures that don't fit become **extra images** (`overlays`) at their PowerPoint place, and text boxes that don't fit (and shapes with a fill or line, always) **text elements**, or reader blocks when the slide size is unknown. Unsupported elements (tables, charts, SmartArt, …) get a marker in the speaker notes and the report.
+- **Never lose content silently.** Placeholder text that doesn't fit the chosen layout goes to the slide's **reader layer** (`converted-*` blocks) and the report; pictures that don't fit become **extra images** (`overlays`) at their PowerPoint place, and text boxes that don't fit (and shapes with a fill or line, always) **text elements**, or reader blocks when the slide size is unknown. Tables, charts, SmartArt and videos without a slot become reader blocks of their type (I-121). Unsupported elements (audio, OLE objects, newer chart kinds, …) get a marker in the speaker notes and the report.
+- `converter/README.md` has a **coverage matrix** of the show format (I-121). Update it with every converter change.
 - Never carry PowerPoint styling (colours, fonts, positions) into the show. The template owns the looks. The exceptions are the position and size of pictures that fit no slot (extra images, D-013), and the position, size and look of text elements (D-016: `reader.text_look()` → `mapping._text_style()`, fonts matched to the template's first). Write `"slipr": "0.2"` only when a show has them.
 - Output must validate against `../shared/schema/show.schema.json` **and** pass `shared/validate.js` with the template (the contract test in `test_cli.py`). Never copy the schema into this package.
 - Never overwrite an existing output folder without `--force`.
@@ -51,7 +52,10 @@ From `converter/`:
 - Tables / charts inside content placeholders are `PlaceholderGraphicFrame`s. `reader.graphic_kind()` detects them via `a:graphicData/@uri`.
 - Filling a picture placeholder (`insert_picture`) replaces its element: the old proxy's `_element` becomes `None`. Look placeholders up again afterwards.
 - python-pptx's `add_slide` does not copy date, footer and slide-number placeholders; the export clones them from a base-deck slide (`xml.clone_shape`).
-- Tables: `shape.has_table` → `shape.table.rows[i].cells[j].text`. Charts: `shape.has_chart` → `chart.plots[0].categories`, `series.values` (for I-040 / I-046).
+- Tables: `shape.has_table` → `shape.table.rows[i].cells[j].text`. Charts: `shape.has_chart` → `chart.plots[0].categories`, `series.values` (`extract._chart_data`).
+- **A video in a placeholder looks like a picture** (`shape.image` returns its poster). Check `reader.media_kind()` before `_image_of()`.
+- **python-pptx does not list shapes inside `mc:AlternateContent`** (slide zooms) and reads Morph only from there too: search the slide XML (`reader.zoom_targets`, `reader.transition`).
+- SmartArt, online videos, zooms, transitions and entrance effects can't be made with python-pptx: `tests/conftest.py` writes their XML as PowerPoint does (`add_smartart`, `set_transition`, `add_entrance`, …). Build test XML with `pptx.oxml.parse_xml`, so the elements get python-pptx's classes.
 
 ## Testing
 

@@ -91,11 +91,22 @@ def test_picture_without_a_slot_becomes_an_extra_image(converted):
     assert "Placed as an extra image: picture 2" in converted.report.to_markdown()
 
 
-def test_unsupported_table_is_reported_and_flagged_in_notes(converted):
+def test_table_becomes_a_table_slot(converted):
     s = slide(converted, 7)
-    assert s["layout"] == "bullets"  # template pptxMapping: "Title Only" → bullets
-    assert "table" in s["notes"]
-    assert converted.report.slides[6].skipped == ["table"]
+    # The template maps "Title Only" to bullets, which has no table slot: the table layout wins (I-121).
+    assert s["layout"] == "table"
+    assert s["content"]["title"] == "A table"
+    assert s["content"]["table"] == {
+        "columns": [
+            {"key": "region", "label": "Region"},
+            {"key": "revenue", "label": "Revenue", "format": "currency", "currency": "EUR", "decimals": 0, "total": "sum"},
+            {"key": "growth", "label": "Growth", "format": "percent", "decimals": 1},
+        ],
+        "rows": [["North", 1200, 0.125], ["South", 800, -0.05]],
+    }
+    assert "notes" not in s
+    assert converted.report.slides[6].skipped == []
+    assert "table: the totals row became column totals" in converted.report.slides[6].notes
 
 
 def test_hidden_slide_becomes_backup(converted):
@@ -113,7 +124,7 @@ def test_report_markdown(converted):
     md = converted.report.to_markdown()
     assert md.startswith("# Conversion report")
     assert "### 2. Highlights → `s-02`" in md
-    assert "⚠ Not converted: table" in md
+    assert "Not converted" not in md
 
 
 def test_notes_options(sample_deck, template):

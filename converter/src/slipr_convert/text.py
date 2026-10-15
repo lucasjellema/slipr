@@ -1,7 +1,8 @@
 """DrawingML text → Slipr Markdown (see docs/show-format.md → Markdown subset).
 
 - Bullet levels become nested `- ` items (two spaces per level).
-- Bold / italic runs become **…** / *…*; hyperlinks become [text](url).
+- Bold / italic runs become **…** / *…*; hyperlinks become [text](url), links
+  to other slides [text](#<slide id>).
 - Characters that mean something in Slipr Markdown are escaped.
 """
 from __future__ import annotations
@@ -10,6 +11,8 @@ import re
 
 from . import reader
 
+# Slide links point at the target slide's part name until emit knows its id.
+SLIDE_LINK = "#pptx-slide:"
 _SPECIAL = re.compile(r"([\\`*_\[\]])")
 
 
@@ -38,10 +41,14 @@ def runs_markdown(paragraph, *, breaks_as: str = "\n") -> str:
         text = run.text or ""
         if not text:
             continue
-        try:
-            link = run.hyperlink.address
-        except Exception:  # fields have no hyperlink support
-            link = None
+        target = reader.slide_link(run)
+        if target:
+            link = SLIDE_LINK + target  # resolved to the slide's id by emit (I-121)
+        else:
+            try:
+                link = run.hyperlink.address
+            except Exception:  # fields have no hyperlink support
+                link = None
         fmt = (run.font.bold is True, run.font.italic is True, link)
         # Merge neighbours with identical formatting, so we never emit "**a****b**".
         if segments and segments[-1][0] == "text" and segments[-1][2:] == fmt:
@@ -63,7 +70,7 @@ def runs_markdown(paragraph, *, breaks_as: str = "\n") -> str:
                 core = f"*{core}*"
             if bold:
                 core = f"**{core}**"
-            if link and re.match(r"^(https?:|mailto:)", link, re.I):
+            if link and (re.match(r"^(https?:|mailto:)", link, re.I) or link.startswith(SLIDE_LINK)):
                 core = f"[{core}]({link})"
         out.append(f"{lead}{core}{trail}")
     return re.sub(r"[ \t]+\n", "\n", "".join(out)).strip()

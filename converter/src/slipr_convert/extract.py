@@ -2,8 +2,10 @@
 
 What is extracted per slide: title, subtitle, text bodies (placeholders and
 text boxes, in reading order), pictures with alt text, speaker notes, the
-hidden flag, the section, build animations, and a list of elements that
-cannot be converted (tables, charts, SmartArt, media, …).
+hidden flag, the section, build animations, tables, charts, SmartArt and
+videos (I-121), the transition, entrance effects, zooms, the slide's own
+background picture, and a list of elements that cannot be converted
+(audio, OLE objects, newer chart kinds, …).
 
 Pictures and shapes from the slide layout / master (logos, decorations) are
 not part of `slide.shapes` and are therefore ignored, as intended: the Slipr
@@ -14,7 +16,7 @@ from __future__ import annotations
 from pptx.enum.shapes import MSO_SHAPE_TYPE, PP_PLACEHOLDER
 
 from . import reader, text
-from .model import DeckModel, ImageRef, SlideModel, TextBody
+from .model import ChartData, DeckModel, ImageRef, SlideModel, TextBody, Visual
 
 _TITLE = {PP_PLACEHOLDER.TITLE, PP_PLACEHOLDER.CENTER_TITLE, PP_PLACEHOLDER.VERTICAL_TITLE}
 _SUBTITLE = {PP_PLACEHOLDER.SUBTITLE}
@@ -31,6 +33,12 @@ def extract_deck(prs) -> DeckModel:
             section_of[sid] = name
 
     slides = [extract_slide(slide, i, section_of.get(slide.slide_id)) for i, slide in enumerate(prs.slides)]
+    # Section zooms open the first slide of their section.
+    section_slides = reader.section_slides(prs)
+    for sm, slide in zip(slides, prs.slides):
+        for kind, target in reader.zoom_targets(slide):
+            ids = [int(target)] if kind == "slide" and target.isdigit() else section_slides.get(target, [])[:1]
+            sm.zoom_targets.extend(i for i in ids if i not in sm.zoom_targets)
 
     core = prs.core_properties
     stamp = core.modified or core.created
@@ -44,6 +52,7 @@ def extract_deck(prs) -> DeckModel:
         slides=slides,
         slide_width=int(prs.slide_width or 0),
         slide_height=int(prs.slide_height or 0),
+        slide_parts=[str(slide.part.partname) for slide in prs.slides],
     )
 
 
@@ -55,12 +64,18 @@ def extract_slide(slide, index: int, section: str | None) -> SlideModel:
         hidden=reader.is_hidden(slide),
         section=section,
         has_build_animations=reader.has_build_animations(slide),
+        transition=reader.transition(slide),
+        entrances=reader.entrance_effects(slide),
     )
+    if (background := reader.background_image(slide)) is not None:
+        blob, ext, sha1 = background
+        model.background = ImageRef(blob=blob, ext=ext, sha1=sha1, alt="")
     for shape in _walk(slide.shapes):
         _extract_shape(shape, model)
 
     model.bodies.sort(key=lambda b: (b.top, b.left))
     model.images.sort(key=lambda im: (im.top, im.left))
+    model.visuals.sort(key=lambda v: (v.top, v.left))
 
     if slide.has_notes_slide:  # NB: accessing slide.notes_slide would create one
         frame = slide.notes_slide.notes_text_frame
@@ -86,6 +101,15 @@ def _extract_shape(shape, model: SlideModel) -> None:
         return
     top, left = int(shape.top or 0), int(shape.left or 0)
 
+    # Videos (also in a placeholder, where the poster frame looks like a picture)
+    media = reader.media_kind(shape)
+    if media == "video" and (video := reader.video_of(shape)) is not None:
+        model.visuals.append(Visual(kind="video", top=top, left=left, idx=idx, video=video))
+        return
+    if media is not None:
+        model.unsupported.append("audio" if media == "audio" else "linked video")
+        return
+
     # Pictures (plain pictures and filled picture placeholders)
     image = _image_of(shape)
     if image is not None:
@@ -94,11 +118,25 @@ def _extract_shape(shape, model: SlideModel) -> None:
         model.images.append(ImageRef(
             blob=blob, ext=ext, sha1=sha1, alt=reader.alt_text(shape),
             top=top, left=left, width=int(shape.width or 0), height=int(shape.height or 0), idx=idx,
-            effects=effects, opacity=opacity, crop=_crop_of(shape),
+            effects=effects, opacity=opacity, crop=_crop_of(shape), shape_id=shape.shape_id, name=shape.name or "",
         ))
         return
 
     kind = reader.graphic_kind(shape)  # tables, charts, SmartArt, OLE (also inside placeholders)
+    if kind == "table" and getattr(shape, "has_table", False):
+        model.visuals.append(Visual(kind="table", top=top, left=left, idx=idx, rows=_table_rows(shape.table)))
+        return
+    if kind == "chart" and getattr(shape, "has_chart", False) and (chart := _chart_data(shape.chart)) is not None:
+        model.visuals.append(Visual(kind="chart", top=top, left=left, idx=idx, chart=chart))
+        return
+    if kind == "smartArt" and (diagram := reader.smartart(shape)) is not None:
+        if diagram.kind == "list":  # list SmartArt is just text: a Markdown list
+            markdown = "\n".join(_list_lines(diagram.roots, 0))
+            model.bodies.append(TextBody(markdown=markdown, is_list=True, placeholder="smartart", top=top, left=left, idx=idx,
+                                         width=int(shape.width or 0), height=int(shape.height or 0)))
+        else:
+            model.visuals.append(Visual(kind="smartArt", top=top, left=left, idx=idx, diagram=diagram))
+        return
     if shape.shape_type == MSO_SHAPE_TYPE.MEDIA or kind:
         model.unsupported.append(kind or "media")
         return
@@ -124,7 +162,46 @@ def _extract_shape(shape, model: SlideModel) -> None:
         look = None if shape.is_placeholder else reader.text_look(shape)
         model.bodies.append(TextBody(markdown=markdown, is_list=markdown.lstrip().startswith("- "),
                                      placeholder=placeholder, top=top, left=left, idx=idx,
-                                     width=int(shape.width or 0), height=int(shape.height or 0), look=look))
+                                     width=int(shape.width or 0), height=int(shape.height or 0), look=look,
+                                     shape_id=shape.shape_id))
+
+
+def _table_rows(table) -> list[list[str]]:
+    """A table's cell texts, row by row (merged cells: the text stays in the first cell)."""
+    rows = []
+    for row in table.rows:
+        cells = []
+        for cell in row.cells:
+            cells.append("" if cell.is_spanned else " ".join(cell.text.split()))
+        rows.append(cells)
+    return rows
+
+
+def _chart_data(chart) -> ChartData | None:
+    """Categories × series of a chart, or None when it has no readable data."""
+    try:
+        plot = chart.plots[0]
+        categories = [str(c) if c is not None else "" for c in plot.categories]
+        series = [(s.name or f"Series {n}", [None if v is None else float(v) for v in s.values])
+                  for n, s in enumerate(chart.series, 1)]
+    except (IndexError, KeyError, TypeError, ValueError, AttributeError):
+        return None
+    if not series:
+        return None
+    if not categories:
+        categories = [str(n) for n in range(1, max(len(v) for _, v in series) + 1)]
+    title = None
+    if chart.has_title and chart.chart_title.has_text_frame:
+        title = " ".join(chart.chart_title.text_frame.text.split()) or None
+    return ChartData(title=title, categories=categories, series=series, number_format=reader.chart_number_format(chart))
+
+
+def _list_lines(nodes, depth: int) -> list[str]:
+    lines = []
+    for node in nodes:
+        lines.append(f"{'  ' * min(depth, 3)}- {text.escape_markdown(node.text)}")
+        lines.extend(_list_lines(node.children, depth + 1))
+    return lines
 
 
 def _crop_of(shape) -> tuple[float, float, float, float] | None:

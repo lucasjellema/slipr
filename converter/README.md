@@ -41,7 +41,7 @@ slipr-convert "C:\talks\cloud-native.pptx" --template ..\templates\default --out
 
 Then open the result with the dev server running: `http://localhost:8080/viewer/?show=../shows/cloud-native/show.json`.
 
-The output folder contains `show.json`, `images/`, and `conversion-report.md`. The `template.ref` and `$schema` paths in `show.json` are written relative to the output folder, so the show works wherever it sits in the Slipr folder.
+The output folder contains `show.json`, `images/`, `media/` (videos, when the deck has any), and `conversion-report.md`. The `template.ref` and `$schema` paths in `show.json` are written relative to the output folder, so the show works wherever it sits in the Slipr folder.
 
 ## What gets converted
 
@@ -65,15 +65,49 @@ The output folder contains `show.json`, `images/`, and `conversion-report.md`. T
 | Pictures that don't fit the chosen layout | **extra images** on the slide (`overlays`, show format 0.2) at their PowerPoint position and size | ✅ |
 | Text boxes and shapes with a fill or outline (badges, pills, callouts); text boxes that don't fit the chosen layout | **text elements** on the slide (`overlays` with `text`, show format 0.2) at their place, with font (the template's heading / body font when it matches), size, capitals, alignment, text color, fill and its transparency, outline, rounded corners and inner margin (theme colors resolved) | ✅ |
 | Placeholder text that doesn't fit the chosen layout | **reader layer** text blocks, so it is never lost | ✅ |
-| Tables | *(next)* `table` block/slot (I-040). Now: reported, plus a warning in the slide notes | ❌ |
-| Charts | *(next)* `chart` slot with the **chart's real data** (I-046). Now: reported | ❌ |
-| SmartArt, diagrams, OLE objects, video | *(later)* image fallback via LibreOffice (I-041). Now: reported | ❌ |
+| Tables | a `table` slot (or reader block) with inline columns and rows. Numbers, percentages and amounts (€, $, £; decimal comma or point) become numeric columns with a format; a last *Total* / *Totaal* row that adds up becomes column totals | ✅ |
+| Charts | a `table` with the chart's data: a category column and one column per series with data bars; the chart title as caption, and a marker in the speaker notes. (Slipr has no chart type yet; I-046) | ✅ |
+| SmartArt | a **Mermaid diagram** (`diagram` slot or block): org charts and hierarchies top-down, processes and cycles left to right (sub-points in the box). List-type SmartArt becomes a Markdown list | ✅ |
+| Videos | embedded videos → `media/` and a `video` slot (or block) with the poster frame, the start trim and bookmarks as chapters; YouTube and Vimeo videos → their link. The end trim is reported (set `end` by hand) | ✅ |
+| Transitions | `settings.transition` (the most common one) and `audience.transition` on slides that differ: fade, slide (push, wipe, cover…), zoom, convex, concave, none. A deck without transitions keeps `fade` | ✅ |
+| Morph | `audience.autoAnimate` on the slide and the one before; pictures named `!!name` get the `morphId` `name` | ✅ |
+| Entrance animations on pictures and text elements on the slide | `fragment` on the overlay: Fade → `fade-in`, Fly In → `fade-up` / `-down` / `-left` / `-right`, Zoom / Grow → `grow`, others → appear | ✅ |
+| Links to other slides | slide links `[text](#s-07)`; jumps to the next / previous slide stay plain text | ✅ |
+| Slide, section and summary zooms | `reader.related` (the slides they open) | ✅ |
+| A slide's own background picture | `audience.background` | ✅ |
+| Audio, OLE objects, equations, newer chart kinds (treemap, sunburst, waterfall…), linked videos | reported, plus a marker in the slide notes. A picture fallback via LibreOffice is I-041 | ❌ |
 | Logos and decorations from the master | ignored on purpose: the template provides them | n/a |
-| Colours, fonts, positions | ignored on purpose, because the template decides (except the place of extra pictures, D-013, and the place and look of text elements, D-016) | n/a |
+| Colours, fonts, positions, background colours | ignored on purpose, because the template decides (except the place of extra pictures, D-013, and the place and look of text elements, D-016) | n/a |
+
+### Coverage of the show format
+
+Every feature of show format 0.2 and what the converter does with it (I-121). Keep this table current with every converter change.
+
+| Show format feature | Converter |
+|---|---|
+| `meta` (title, author, date, language), `settings.aspectRatio`, `settings.slideNumbers` | converted (`language` from `--lang`) |
+| `settings.transition`, `audience.transition`, `audience.autoAnimate`, `morphId` | converted (transitions, Morph) |
+| `settings.agenda` | no PowerPoint counterpart |
+| `chapters` | converted (sections) |
+| `glossary`, `profiles`, `paths`, `[[term]]`, `^[popup]` | no PowerPoint counterpart |
+| `slide.content`: `text`, `richtext`, `list`, `image`, `cards` | converted |
+| `slide.content`: `table`, `diagram`, `video` | converted (tables and charts, SmartArt, videos) |
+| `slide.content`: `code`, `quote` | partly: their text lands in text slots or the reader layer |
+| `slide.content`: `web`, `pdf`, `graph`, `map`, `tag-cloud` | no PowerPoint counterpart |
+| `overlays`: extra images (`fragment` included), text elements | converted |
+| Image `crop`, `style`, `opacity`, `morphId`, `alt`; `fit` / `focus` | converted; `fit` / `focus` are the template's (a crop carries the focus) |
+| `notes`, `audience.hidden`, `audience.fragments`, `audience.background` (picture) | converted; background colours stay with the template |
+| `reader.blocks`: `text`, `image`, `table`, `diagram`, `video` | converted (content that doesn't fit the layout) |
+| `reader.blocks`: `details`, `callout`, `tabs`, `embed`, `slide-ref`, `pdf`, `graph`, `map`, `tag-cloud` | no PowerPoint counterpart |
+| `reader.related` | converted (zooms) |
+| `reader.summary`, `reader.showSlide`, `reader.hidden`, block `for` / `depth`, `slide.tags` | no PowerPoint counterpart |
+| Slide links `[text](#id)` | converted |
+| Video `captions`, `transcript`, `play`, `chapterSteps` | no PowerPoint counterpart (chapters come from bookmarks) |
+| Table `sortable`, `filter`, `steps`, `visual` (except chart bars) | no PowerPoint counterpart |
 
 ## How layouts are chosen
 
-1. **By name:** if the PowerPoint layout name is in `--mapping` or in the template's `pptxMapping` (e.g. "Title and Content" → `bullets`), that layout is used. The exception: if the slide has pictures and the mapped layout can't hold any, the best fit is used instead.
+1. **By name:** if the PowerPoint layout name is in `--mapping` or in the template's `pptxMapping` (e.g. "Title and Content" → `bullets`), that layout is used. The exceptions: if the slide has pictures and the mapped layout can't hold any, or a table, chart, SmartArt or video and the mapped layout has no slot for it while another layout has, the best fit is used instead.
    - A template can also give **placeholder roles** (template format 0.2): which PowerPoint placeholder fills which slot, card or card field, and which placeholders are decoration to ignore (footer, logo, overlays). With roles the mapping always wins, and the content lands exactly where the template expects it. The Conclusion template maps all 20 of its PowerPoint layouts this way. See `docs/template-format.md`.
 2. **Title-only slides:** the first one becomes `title`, later ones `section`.
 3. **Best fit:** otherwise, the layout whose slots match the slide's text blocks and pictures with the least left over.
