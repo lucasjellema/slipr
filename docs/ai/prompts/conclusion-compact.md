@@ -151,6 +151,7 @@ Every slide uses one layout; its `content` holds the slots listed. **Required** 
 **Do not use** these layouts:
 - `web`: needs a live web page
 - `pdf`: needs a PDF file
+- `video`: needs a video file or address
 - `graph`: needs a network of nodes and links
 - `map`: needs coordinates and map tiles
 

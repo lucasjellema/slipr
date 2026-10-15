@@ -20,7 +20,7 @@ def test_meta_settings_and_chapters(converted):
     assert show["meta"]["author"] == "Test Author"
     assert len(show["meta"]["date"]) == 10
     assert show["settings"]["aspectRatio"] == "16:9"
-    assert show["template"] == {"ref": "../../templates/default", "version": "^1.7"}
+    assert show["template"] == {"ref": "../../templates/default", "version": "^1.8"}
     assert show["chapters"] == [{"id": "intro", "title": "Intro"}, {"id": "main-part", "title": "Main part"}]
     assert [s["id"] for s in show["slides"]] == [f"s-0{n}" for n in range(1, 9)]
     assert slide(converted, 1)["chapter"] == "intro"

@@ -32,6 +32,9 @@ const MIME_TYPES = {
   '.webp': 'image/webp',
   '.gif': 'image/gif',
   '.pdf': 'application/pdf',
+  '.mp4': 'video/mp4',
+  '.webm': 'video/webm',
+  '.vtt': 'text/vtt; charset=utf-8',
   '.woff2': 'font/woff2',
 };
 

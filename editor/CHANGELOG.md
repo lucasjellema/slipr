@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Video editor (I-110)
+- **Added** a video editor for the `video` slot and a new **Video** reader block type (`ui/video-fields.js`, value helpers `video-values.js` with tests): **Choose video…** copies an MP4 / WebM file into `media/` (a note above 25 MB: an exported file leaves it out), or type a path or a YouTube / Vimeo / video file address (the line below names the source or the problem); title; play from / to (`90` or `1:30`); muted, loop, controls; while presenting (play on a click, when the slide appears or on the next click; video or poster only; each click jumps to the next chapter); chapters (time and title, + Chapter, ✕); transcript; captions (**Choose .vtt…**, label, language; video files only); load straight away (other servers); poster image.
+- **Added** *Turn into a video block* on an Embedded Page block with a YouTube or Vimeo address.
+- **Changed** the save order knows video keys; a block switched to Video keeps an Embedded Page's YouTube or Vimeo address, and a video on another server switched to Embedded Page keeps its address.
+
 ### 2026-10-15: Tag cloud editor (I-105)
 - **Added** a tag cloud editor for the `tag-cloud` slot and a new **Tag cloud** reader block type (`ui/tag-cloud-fields.js`, value helpers `tag-cloud-values.js` with tests): terms with weight and glossary term (automatic by name, or picked), + Term, move, remove, **Paste a list** (one term per line, optional weight after a comma, semicolon or tab), **Use a CSV file…** (copied into `data/`; term and weight column, the heaviest terms as the cloud reads them) and **Move into the slide** (merged, heaviest first); options for the order, how many terms, what a weight counts and the caption; for slots the steps while presenting (+ Show terms, + Highlight, + Clear highlight). Every change is one undo step. The manual has a *Tag clouds* part.
 - **Changed** the save order knows tag cloud keys; a text block switched to Tag cloud gets three terms to type over (a table's CSV file is kept).

@@ -29,6 +29,7 @@ export const CORE_BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 
 const LEFT_OUT_SLOTS = /** @type {Record<string, string>} */ ({
   web: 'needs a live web page',
   pdf: 'needs a PDF file',
+  video: 'needs a video file or address',
   graph: 'needs a network of nodes and links',
   map: 'needs coordinates and map tiles',
   chart: 'not available yet',
@@ -269,7 +270,7 @@ function structure(full) {
   });
   for (const type of blockTypes) lines.push(`- ${blocks[type]}`);
   if (full) {
-    lines.push('', 'Do not use other block types or fields (no `embed`, `pdf`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.');
+    lines.push('', 'Do not use other block types or fields (no `embed`, `pdf`, `video`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.');
     lines.push('', tablesAndClouds());
   } else {
     lines.push('Tables: `{ "columns": [{ "key", "label"?, "format"? }], "rows": [[cell, …], …] }`, cells in column order. Tag clouds: `{ "terms": [{ "text", "weight"? }] }`. No CSV `data` files, no other block types.');

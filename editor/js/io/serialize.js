@@ -72,6 +72,16 @@ const tagCloud = (def) => ({
   },
 });
 
+/** A video value or block (I-110): its keys, and those of captions and chapters. @param {any} def @returns {Shape} */
+const video = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    captions: { keys: keysOf(defs.videoCaptions) },
+    chapters: { items: { keys: keysOf(defs.videoChapters.items) } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -81,6 +91,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
   if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
+  if ('video' in value) return video(defs.video);
   if (isTagCloud(value)) return tagCloud(defs.tagCloud);
   if (isTable(value)) return table(defs.table);
   if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
@@ -98,6 +109,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
   if (value?.type === 'map') return map(def);
   if (value?.type === 'table') return table(def);
   if (value?.type === 'tag-cloud') return tagCloud(def);
+  if (value?.type === 'video') return video(def);
   return {
     keys: keysOf(def),
     fields: {

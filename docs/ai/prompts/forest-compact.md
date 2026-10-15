@@ -10,7 +10,7 @@ Keep slides short and put the depth in the reader layer.
 
 ## Output rules
 1. Answer with **one** ```json code block holding the complete show.json. Write nothing after the code block; a short sentence before it is fine.
-2. Start with `"slipr": "0.2"` and use exactly `"template": {"ref":"/templates/forest","version":"^0.1"}`.
+2. Start with `"slipr": "0.2"` and use exactly `"template": {"ref":"/templates/forest","version":"^0.2"}`.
 3. Use only the fields, layouts, slot names and block types described here. Unknown fields are errors.
 4. Ids: the show `id` is lower-case kebab-case (`quiet-mornings`). Slide, chapter, profile, path, block and glossary ids use letters, digits, `-` and `_`, preferably kebab-case, and are unique (block ids within their slide). Make slide ids describe the slide (`what-changes`, not `s1`).
 5. Valid JSON: double quotes, no comments, no trailing commas; newlines inside strings as `\n`.
@@ -89,6 +89,7 @@ Every slide uses one layout; its `content` holds the slots listed. **Required** 
 **Do not use** these layouts:
 - `web`: needs a live web page
 - `pdf`: needs a PDF file
+- `video`: needs a video file or address
 - `graph`: needs a network of nodes and links
 - `map`: needs coordinates and map tiles
 

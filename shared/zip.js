@@ -44,7 +44,7 @@ const MIME = /** @type {Record<string, string>} */ ({
   js: 'text/javascript', mjs: 'text/javascript', json: 'application/json', css: 'text/css', html: 'text/html',
   svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
   avif: 'image/avif', woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf', otf: 'font/otf', ico: 'image/x-icon',
-  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', mp4: 'video/mp4', webm: 'video/webm',
+  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg', mov: 'video/quicktime', m4v: 'video/mp4', vtt: 'text/vtt',
 });
 
 /**

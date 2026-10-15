@@ -726,6 +726,98 @@
       }
     },
     {
+      "id": "s-video",
+      "layout": "video",
+      "chapter": "how",
+      "tags": [
+        "embed",
+        "video"
+      ],
+      "content": {
+        "title": "A video, chapter by chapter",
+        "video": {
+          "video": "media/slipr-clip.webm",
+          "title": "Slipr in nine seconds",
+          "play": "step",
+          "chapterSteps": true,
+          "captions": {
+            "src": "media/slipr-clip.en.vtt",
+            "label": "English",
+            "lang": "en"
+          },
+          "chapters": [
+            {
+              "time": 0,
+              "title": "The audience layer"
+            },
+            {
+              "time": 3,
+              "title": "The reader layer"
+            },
+            {
+              "time": 6,
+              "title": "One show"
+            }
+          ],
+          "transcript": "Every slide has a short **audience layer**, for the room.\n\nReaders get the **reader layer**: the depth, tailored to them.\n\nOne show, two experiences.",
+          "fallback": {
+            "src": "media/slipr-clip-poster.png",
+            "alt": "The first frame of the clip: \"Audience layer\" on dark blue"
+          }
+        },
+        "caption": "The first click plays the clip; each next click jumps to the next chapter."
+      },
+      "reader": {
+        "summary": "Slides and the reader layer can play videos: files in the show folder, YouTube or Vimeo.",
+        "blocks": [
+          {
+            "id": "video-how",
+            "type": "text",
+            "md": "A **video** slot plays a file from the show folder (offline, with captions) or a YouTube or Vimeo video. In audience mode it can start on a click, when the slide appears, or step through its chapters. In reader mode a video block lists its chapters and transcript, and search finds them."
+          },
+          {
+            "id": "video-clip",
+            "type": "video",
+            "video": "media/slipr-clip.webm",
+            "title": "The clip, with chapters and a transcript",
+            "captions": {
+              "src": "media/slipr-clip.en.vtt",
+              "label": "English",
+              "lang": "en"
+            },
+            "chapters": [
+              {
+                "time": 0,
+                "title": "The audience layer"
+              },
+              {
+                "time": 3,
+                "title": "The reader layer"
+              },
+              {
+                "time": 6,
+                "title": "One show"
+              }
+            ],
+            "transcript": "Every slide has a short **audience layer**, for the room.\n\nReaders get the **reader layer**: the depth, tailored to them.\n\nOne show, two experiences.",
+            "fallback": {
+              "src": "media/slipr-clip-poster.png",
+              "alt": "The first frame of the clip: \"Audience layer\" on dark blue"
+            }
+          },
+          {
+            "id": "video-youtube",
+            "type": "video",
+            "depth": 3,
+            "video": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+            "title": "Big Buck Bunny (Blender Foundation) on YouTube",
+            "start": 10,
+            "caption": "A YouTube video waits behind Load until the reader agrees to contact YouTube."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-map",
       "layout": "map",
       "chapter": "how",

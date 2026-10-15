@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Videos (I-110)
+- **Added** videos on slides and in the reader layer (`shared/embeds/video.js`): files from the show folder (offline, with captions), YouTube (youtube-nocookie.com) and Vimeo (no tracking), and https video files. In audience mode a video pauses when you leave its slide, and can start on a click, when the slide appears, or on a step; with chapter steps each click jumps to the next chapter, ← jumps back. In reader mode videos from other servers wait behind **Load**; a block lists its chapters (a click jumps there, the playing chapter is marked) and a collapsible transcript, a slot gets a chapter menu and a Transcript dialog. Search finds chapter titles and transcripts; a chapter result plays the video from there.
+
 ### 2026-10-15: Create a show with AI (I-080)
 - **Added** `create-with-ai.html` (`js/create-with-ai.js`), linked from the start page and the manual: pick a template and a length (full or compact), describe the show (topic, audience, number of slides, reader layer, profiles, language, source material), then **Copy instruction** or **Download .md** for an AI chatbot. The page fetches the generated prompts from `docs/ai/prompts/` and sends nothing anywhere.
 - **Added** **Copy fix-up prompt** on the "This show can't be shown yet" page: the errors and warnings (without missing images) as a message asking the chatbot for a corrected `show.json`.

@@ -11,7 +11,7 @@ You write the whole `show.json` from the content brief at the end of this messag
 
 ## Output rules
 1. Answer with **one** ```json code block holding the complete show.json. Write nothing after the code block; a short sentence before it is fine.
-2. Start with `"slipr": "0.2"` and use exactly `"template": {"ref":"/templates/forest","version":"^0.1"}`.
+2. Start with `"slipr": "0.2"` and use exactly `"template": {"ref":"/templates/forest","version":"^0.2"}`.
 3. Use only the fields, layouts, slot names and block types described here. Unknown fields are errors.
 4. Ids: the show `id` is lower-case kebab-case (`quiet-mornings`). Slide, chapter, profile, path, block and glossary ids use letters, digits, `-` and `_`, preferably kebab-case, and are unique (block ids within their slide). Make slide ids describe the slide (`what-changes`, not `s1`).
 5. Valid JSON: double quotes, no comments, no trailing commas; newlines inside strings as `\n`.
@@ -49,7 +49,7 @@ Reader blocks: every block has `id` and `type`; optional `for: ["profile-id"]` (
 - `table`: `columns`, `rows`, `title`? (see *Tables* below)
 - `tag-cloud`: `terms`, `title`? (see *Tag clouds* below)
 
-Do not use other block types or fields (no `embed`, `pdf`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.
+Do not use other block types or fields (no `embed`, `pdf`, `video`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.
 
 **Tables** (block, or a `table` slot) hold their data inline:
 ```json
@@ -100,6 +100,7 @@ Every slide uses one layout; its `content` holds the slots listed. **Required** 
 **Do not use** these layouts:
 - `web`: needs a live web page
 - `pdf`: needs a PDF file
+- `video`: needs a video file or address
 - `graph`: needs a network of nodes and links
 - `map`: needs coordinates and map tiles
 
@@ -148,7 +149,7 @@ A small show for this template (yours will be longer and about the brief):
     "date": "2026-10-15",
     "language": "en"
   },
-  "template": { "ref": "/templates/forest", "version": "^0.1" },
+  "template": { "ref": "/templates/forest", "version": "^0.2" },
   "chapters": [{ "id": "why", "title": "Why" }, { "id": "how", "title": "How" }],
   "glossary": {
     "focus-time": {

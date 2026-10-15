@@ -6,7 +6,7 @@
  * `{ src, alt }`, and the alt-text dialog opens. Undo restores the previous
  * image; the copied file stays (images are never deleted automatically).
  */
-import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isPdfFile, LARGE_IMAGE_BYTES, pdfPath, shortHash } from './io/images.js';
+import { contentSuffix, imagePath, imageType, IMAGE_TYPES, isCaptionsFile, isPdfFile, isVideoFile, LARGE_IMAGE_BYTES, mediaPath, pdfPath, shortHash } from './io/images.js';
 import { canOpenFolders, ensurePermission, findImageBySuffix, writeImage } from './io/fs-access.js';
 import { slugify } from './io/new-show.js';
 import { parseCsv } from '../../shared/csv.js';
@@ -309,6 +309,34 @@ export async function addPdf(store, { file, fallbackName, write }) {
   await writeImage(handle, path, blob); // writes any file; keeps an existing one
   store.state.registerAsset?.(path, blob);
   write(path);
+}
+
+/**
+ * Copy a video file, or captions for one, into the show folder's media/
+ * (I-110) and hand its path to `write`. The same file (same content hash) is
+ * written once. Needs the show folder: videos are too large to keep in memory.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ file: File, kind: 'video' | 'captions', fallbackName: string, write: (path: string) => void }} target
+ */
+export async function addMediaFile(store, { file, kind, fallbackName, write }) {
+  const handle = store.state.folderHandle;
+  if (!handle) {
+    showBanner(`To add a ${kind === 'video' ? 'video' : 'captions file'}, Slipr needs to write to the show folder. Choose it, then add the file again.`, 'info', { timeout: 6000 });
+    askForShowFolder(store);
+    return;
+  }
+  if (kind === 'video' && !isVideoFile(file)) throw new Error(`"${file.name || 'This file'}" is not a video file (MP4, WebM).`);
+  if (kind === 'captions' && !isCaptionsFile(file)) throw new Error(`"${file.name || 'This file'}" is not a WebVTT (.vtt) captions file.`);
+  if (!(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
+  const bytes = await file.arrayBuffer();
+  const blob = new Blob([bytes], { type: file.type || (kind === 'captions' ? 'text/vtt' : 'video/mp4') });
+  const path = await mediaPath({ name: file.name, type: file.type, bytes }, fallbackName);
+  await writeImage(handle, path, blob); // writes any file; keeps an existing one
+  store.state.registerAsset?.(path, blob);
+  write(path);
+  if (kind === 'video' && bytes.byteLength > 25 * 1024 * 1024) {
+    showBanner(`This video is ${Math.round(bytes.byteLength / 1048576)} MB. It plays from the show folder, but an exported HTML file leaves out videos over 25 MB.`, 'info', { timeout: 8000 });
+  }
 }
 
 /**

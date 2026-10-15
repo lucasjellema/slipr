@@ -277,6 +277,18 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
       else fillEmbedElement(el, 'pdf', value, ctx, { mode: /** @type {any} */ (options.mode) });
       break;
 
+    case 'video':
+      // A video (I-110): poster or card now, the player from hydrateEmbeds().
+      if (isBlockedUrl(value.video)) el.innerHTML = '<p class="slipr-placeholder">[video blocked: unsupported URL]</p>';
+      else fillEmbedElement(el, 'video', value, ctx, { mode: /** @type {any} */ (options.mode) });
+      if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
+        const figcaption = doc.createElement('figcaption');
+        figcaption.className = 'slipr-caption';
+        figcaption.textContent = value.caption;
+        el.parentElement?.append(figcaption);
+      }
+      break;
+
     case 'graph':
     case 'map':
     case 'table':

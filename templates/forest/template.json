@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "forest",
   "name": "Slipr Forest",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A forest atmosphere: deep greens on parchment, ochre accents, pine-forest illustrations on the title and section slides, and classic serif type (Palatino headings, Georgia body). Based on Slipr Default 1.7.0; uses fonts installed on nearly every computer, so it needs no font files.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -114,6 +114,17 @@
       "file": "layouts/pdf.html",
       "slots": [
         { "name": "document", "type": "pdf", "label": "PDF document", "required": true },
+        { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
+        { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
+      ]
+    },
+    {
+      "id": "video",
+      "name": "Video",
+      "description": "A video file, or a YouTube or Vimeo video (played on the slide, on a click or step by step through its chapters), with optional title and caption.",
+      "file": "layouts/video.html",
+      "slots": [
+        { "name": "video", "type": "video", "label": "Video", "required": true },
         { "name": "title", "type": "text", "label": "Title", "maxLength": 70 },
         { "name": "caption", "type": "text", "label": "Caption", "maxLength": 120 }
       ]

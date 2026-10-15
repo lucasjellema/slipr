@@ -20,6 +20,7 @@ A Slipr template in the Conclusion house style, derived from the official Conclu
 | `title-only` | Title with a free illustration or diagram | kicker, title, image (shown in full) |
 | `web` | Title with a live web page (or its screenshot) in the content area. Not in the PowerPoint template (I-071) | kicker, title, page (`web`) |
 | `pdf` | Title with a page (or a range, one page per click) of a PDF in the content area. Not in the PowerPoint template (I-072) | kicker, title, document (`pdf`) |
+| `video` | Title with a video file, or a YouTube or Vimeo video, in the content area; played on a click, when the slide appears or step by step through its chapters. Not in the PowerPoint template (I-110) | kicker, title, video (`video`) |
 | `graph` | Title with a graph in the content area; node colors from the brand palette (magenta, blue, cyan, green, purple, red). Not in the PowerPoint template (I-074) | kicker, title, graph (`graph`) |
 | `map` | Title with an interactive map in the content area; pins and GeoJSON layers in the brand palette (by tag). Not in the PowerPoint template (I-075) | kicker, title, map (`map`) |
 | `tag-cloud` | Title with a cloud of terms sized by weight in the content area: grey to magenta by weight, yellow highlights, heading font. Not in the PowerPoint template (I-105) | kicker, title, cloud (`tag-cloud`) |

@@ -10,6 +10,7 @@
 import { markdownToText, escape } from '../../shared/markdown.js';
 import { slideTitle } from '../../shared/render.js';
 import { findTerms, foldText } from '../../shared/glossary.js';
+import { formatTime, isVideo, videoChapters } from '../../shared/embeds/video.js';
 
 /**
  * @typedef {object} SearchDoc
@@ -20,6 +21,7 @@ import { findTerms, foldText } from '../../shared/glossary.js';
  * @property {number} order      Position in the show (for stable sorting).
  * @property {{ name: string, text: string, weight: number }[]} fields
  * @property {number} [page]   A PDF page (I-072): the result opens the PDF at it.
+ * @property {number} [time]   A video chapter (I-110): the result plays the video from it.
  */
 
 /**
@@ -74,6 +76,35 @@ function tagCloudText(value) {
 }
 
 /**
+ * The searchable text of a video (I-110): chapter titles and the transcript.
+ * @param {any} value
+ * @param {Record<string, any>} [glossary]
+ */
+function videoText(value, glossary) {
+  if (!isVideo(value)) return '';
+  const chapters = videoChapters(value).map((c) => c.title).join(' · ');
+  const transcript = typeof value.transcript === 'string' ? markdownToText(value.transcript, { glossary }) : '';
+  return [chapters, transcript].filter(Boolean).join('\n');
+}
+
+/**
+ * One search document per video chapter (I-110), so a result plays the video
+ * from that chapter. `blockId` is the block's id, or `slot:<name>` for a slot.
+ * @param {any} value @param {string} slideId @param {string} blockId
+ * @param {string} title  The slide title.
+ * @param {() => number} next  The next order number.
+ * @returns {SearchDoc[]}
+ */
+function videoChapterDocs(value, slideId, blockId, title, next) {
+  if (!isVideo(value)) return [];
+  return videoChapters(value).map((c) => ({
+    kind: /** @type {'block'} */ ('block'), slideId, blockId,
+    title: `${title} › ${value.title} › ${formatTime(c.time)} ${c.title}`, order: next(), time: c.time,
+    fields: [{ name: 'chapter', text: c.title, weight: 3 }],
+  }));
+}
+
+/**
  * @param {any} show
  * @returns {SearchDoc[]}
  */
@@ -93,7 +124,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary), tagCloudText(v)].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary), tagCloudText(v), videoText(v, glossary)].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     // Text elements on the slide (I-089) are slide content too.
@@ -106,6 +137,7 @@ export function buildSearchIndex(show) {
         { name: 'content', text: overlayText ? `${content}\n${overlayText}` : content, weight: 2 },
       ],
     });
+    for (const [name, value] of Object.entries(slide.content ?? {})) docs.push(...videoChapterDocs(value, slide.id, `slot:${name}`, title, () => order++));
     for (const block of slide.reader?.blocks ?? []) {
       const labels = [block.title, block.caption, block.label,
         ...(block.tabs ?? []).map((/** @type {any} */ t) => t.label),
@@ -114,12 +146,14 @@ export function buildSearchIndex(show) {
         ...(block.markers ?? []).map((/** @type {any} */ m) => m?.title ?? m?.id)].filter(Boolean).join(' · ');
       const body = [block.md, block.mermaid, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.md), ...(block.markers ?? []).map((/** @type {any} */ m) => m?.md), ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
         .filter(Boolean).map(text).join('\n') + (block.type === 'table' ? `\n${tableText(block, glossary)}` : '')
-        + (block.type === 'tag-cloud' ? `\n${tagCloudText(block)}` : '');
+        + (block.type === 'tag-cloud' ? `\n${tagCloudText(block)}` : '')
+        + (block.type === 'video' ? `\n${videoText(block, glossary)}` : '');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,
         title: block.title ? `${title} › ${block.title}` : title, order: order++,
         fields: [{ name: 'label', text: labels, weight: 3 }, { name: 'body', text: body, weight: 1 }],
       });
+      if (block.type === 'video') docs.push(...videoChapterDocs(block, slide.id, block.id, title, () => order++));
     }
     if (slide.notes) {
       docs.push({

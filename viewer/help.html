@@ -53,7 +53,7 @@
           <dt>Audience mode</dt>
           <dd>A polished, linear presentation for a room and big screen. High-level, punchy slides with step-by-step builds, smooth auto-animate transitions, dual-screen presenter view, and phone remote control.</dd>
           <dt>Reader mode</dt>
-          <dd>An interactive, self-paced reading experience for individuals. Contains the slide visuals alongside a rich <strong>reader layer</strong>: deep explanations, code tabs, interactive diagrams, image hotspots, web embeds, and PDF documents, tailored to the reader's role and preferred detail level.</dd>
+          <dd>An interactive, self-paced reading experience for individuals. Contains the slide visuals alongside a rich <strong>reader layer</strong>: deep explanations, code tabs, interactive diagrams, image hotspots, web embeds, videos and PDF documents, tailored to the reader's role and preferred detail level.</dd>
         </dl>
         <div class="tip">
           <strong>Key advantage:</strong> You author and maintain a single deck. When presenting live to stakeholders, use Audience mode. When sharing notes, follow-up briefings, or onboarding materials, share Reader mode.
@@ -266,6 +266,9 @@ Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private</code>
         <h3>PDF documents</h3>
         <p>Embedded PDF documents rendered via vendored <strong>PDF.js</strong>. Readers can page through documents, zoom in and out, copy text, and search across PDF page contents directly from Slipr's search index.</p>
 
+        <h3>Videos</h3>
+        <p>Video files from the show (they play offline, with captions), and YouTube and Vimeo videos in their privacy-friendly players. A YouTube or Vimeo video, or a video file from another site, waits behind a <strong>Load</strong> button until you agree to contact that site. Below a video in the reader layer you find its <strong>chapters</strong> (click one to jump there; the one playing is marked) and its <strong>transcript</strong>; on a slide, the <em>Chapter…</em> menu and the <strong>Transcript</strong> button. Search finds chapter titles and transcripts, and a chapter result plays the video from there. While presenting, a video pauses when you leave its slide; it can start on a click, when the slide appears or on the next click, and each click can jump to the next chapter.</p>
+
         <h3>Graphs</h3>
         <p>Networks of ideas, parts or people, drawn with vendored <strong>Cytoscape.js</strong>. Drag to move around, use <strong>+</strong>, <strong>−</strong> and <strong>Fit</strong> to zoom, and click or tap a node (or choose it in the <em>Node…</em> list) to highlight its links and read about it; <strong>Go to slide</strong> jumps to its slide. The coloured tag buttons show what the colours mean and hide or show those nodes. <kbd>Esc</kbd> clears the selection. While presenting, a graph can grow click by click.</p>
 
@@ -319,7 +322,7 @@ Set-NetConnectionProfile -InterfaceAlias "Wi-Fi" -NetworkCategory Private</code>
         <h2>Full-text search</h2>
         <p>Press <kbd>/</kbd> or <kbd>Ctrl + K</kbd> anywhere in Reader mode (or click the <strong>⌕ Search</strong> button in the top bar) to open the instant search modal.</p>
         <ul>
-          <li><strong>Comprehensive index:</strong> Searches across slide titles, slide body copy, reader blocks, tabs, cards, image alt texts, glossary terms and aliases, and embedded PDF documents.</li>
+          <li><strong>Comprehensive index:</strong> Searches across slide titles, slide body copy, reader blocks, tabs, cards, image alt texts, glossary terms and aliases, video chapters and transcripts, and embedded PDF documents.</li>
           <li><strong>Instant &amp; fuzzy:</strong> Matches word beginnings (e.g. typing <em>"arch"</em> finds <em>"architecture"</em>) and ignores accents and letter casing.</li>
           <li><strong>On-page highlighting:</strong> Selecting a result jumps directly to the target block and highlights the matching words on screen using the CSS Custom Highlight API.</li>
           <li><strong>Tailoring awareness:</strong> If matching content is hidden by your current profile or depth setting, the search dialog reports the count of hidden matches with a one-click <strong>"show everything"</strong> option.</li>

@@ -70,6 +70,12 @@ export async function startReader(app, ctx) {
         if (pdf instanceof HTMLElement) pdf.dataset.pdfGoto = String(doc.page); // for a PDF that is not loaded yet
         pdf?.dispatchEvent(new CustomEvent('slipr:pdf-page', { detail: doc.page }));
       }
+      // A video chapter (I-110): play the video from that time.
+      if (doc.time !== undefined && target) {
+        const video = slot ? target.querySelector(`[data-slot="${CSS.escape(String(doc.blockId).slice(5))}"][data-embed="video"]`) : target.querySelector('[data-embed="video"]');
+        if (video instanceof HTMLElement) video.dataset.videoGoto = String(doc.time); // for a video that is not loaded yet
+        video?.dispatchEvent(new CustomEvent('slipr:video-seek', { detail: doc.time }));
+      }
       return target;
     },
     onShowEverything: () => setPrefs({ profile: null, depth: 3, path: null }),

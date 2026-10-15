@@ -92,3 +92,38 @@ export async function pdfPath(file, fallbackName = 'document') {
 export function isPdfFile(file) {
   return file.type === 'application/pdf' || /\.pdf$/i.test(file.name ?? '');
 }
+
+/** Video files the editor copies into a show (I-110): extension → MIME type. */
+export const VIDEO_TYPES = /** @type {Record<string, string>} */ ({ mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg', mov: 'video/quicktime', m4v: 'video/mp4' });
+
+/**
+ * Is this file a video the browser can play (by name or type)?
+ * @param {{ name?: string, type?: string }} file
+ */
+export function isVideoFile(file) {
+  const ext = /\.([a-z0-9]+)$/i.exec(file.name ?? '')?.[1]?.toLowerCase();
+  return Boolean((ext && VIDEO_TYPES[ext]) || /^video\/(mp4|webm|ogg|quicktime)$/.test(file.type ?? ''));
+}
+
+/**
+ * Is this file WebVTT captions (by name or type)?
+ * @param {{ name?: string, type?: string }} file
+ */
+export function isCaptionsFile(file) {
+  return file.type === 'text/vtt' || /\.vtt$/i.test(file.name ?? '');
+}
+
+/**
+ * Path (relative to show.json) for a video or captions file (I-110):
+ * `media/<slug>-<hash8>.<ext>`.
+ * @param {{ name?: string, type?: string, bytes: ArrayBuffer | Uint8Array }} file
+ * @param {string} [fallbackName]
+ * @returns {Promise<string>}
+ */
+export async function mediaPath(file, fallbackName = 'video') {
+  const match = /^(.*)\.([a-z0-9]+)$/i.exec(file.name ?? '');
+  const fromType = Object.entries(VIDEO_TYPES).find(([, type]) => type === file.type)?.[0];
+  const ext = (match?.[2] ?? (file.type === 'text/vtt' ? 'vtt' : fromType ?? 'mp4')).toLowerCase();
+  const slug = slugify(match?.[1] || fallbackName).slice(0, 40).replace(/-+$/, '') || 'video';
+  return `media/${slug}-${await shortHash(file.bytes)}.${ext}`;
+}

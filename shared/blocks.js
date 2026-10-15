@@ -126,6 +126,16 @@ export function renderBlock(block, slideId, ctx) {
       return `<div ${attrs}>${badges}<p class="slipr-block-title">${escape(block.title)}</p>${embedHtml('pdf', block, ctx)}</div>`;
     }
 
+    case 'video': {
+      // A video (I-110): poster or card, chapters and transcript now, the player from hydrateEmbeds().
+      if (isBlockedUrl(block.video)) {
+        return `<div ${attrs}><p class="slipr-block-body">[video blocked: unsupported URL]</p></div>`;
+      }
+      const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
+      return `<div ${attrs}>${badges}<p class="slipr-block-title">${escape(block.title)}</p><figure class="slipr-figure slipr-figure--video">`
+        + `${embedHtml('video', block, ctx)}${caption}</figure></div>`;
+    }
+
     case 'diagram': {
       const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
       return `<div ${attrs}>${badges}<figure class="slipr-figure slipr-figure--diagram">`

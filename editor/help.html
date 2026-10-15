@@ -46,6 +46,7 @@
         <li><a href="#maps">Maps</a></li>
         <li><a href="#tables">Tables</a></li>
         <li><a href="#tag-clouds">Tag clouds</a></li>
+        <li><a href="#videos">Videos</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
         <li><a href="#glossary">Glossary</a></li>
@@ -309,6 +310,7 @@
           <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map, edited with a mini map (click to add, drag to move), plus the tour while presenting, layers, background and fallback image. See <a href="#maps">Maps</a>.</dd>
           <dt>Table</dt><dd>On the <strong>Table</strong> layout: rows typed in, pasted from a spreadsheet or read from a CSV file, with per-column formats, totals and colours, sorting and a filter box, and the steps while presenting (show rows, highlight a row, column or cell). See <a href="#tables">Tables</a>.</dd>
           <dt>Tag cloud</dt><dd>On the <strong>Tag cloud</strong> layout: terms sized by their weight, typed in, pasted as a list or read from a CSV file, with the order, how many terms, what a weight counts, and the steps while presenting (show the heaviest terms, highlight terms). See <a href="#tag-clouds">Tag clouds</a>.</dd>
+          <dt>Video</dt><dd>On the <strong>Video</strong> layout: a video file copied into the show, or a YouTube or Vimeo link, with start and end, chapters, captions, a transcript, a poster and what happens while presenting. See <a href="#videos">Videos</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
         <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
@@ -482,6 +484,7 @@
             <tr><td><strong>Image with Hotspots</strong></td><td>An image with numbered markers that open popups</td><td>Image, alt text, optional caption, <a href="#hotspots">hotspots</a></td></tr>
             <tr><td><strong>Embedded Page</strong></td><td>Another web page inside the reader view. A page from another site first shows a card with a <strong>Load</strong> button</td><td>Address (https, or a file in the show folder), a title, <strong>Size</strong> (a fixed height, or an aspect ratio that scales with the page), <strong>Load straight away</strong>, <strong>Allow the page to…</strong>, an optional fallback image</td></tr>
             <tr><td><strong>PDF Document</strong></td><td>A PDF with page buttons and zoom; its text turns up in search</td><td><strong>Choose PDF…</strong> (or a path / https address), a title, optional pages (one, or a range readers can page through), a fallback image</td></tr>
+            <tr><td><strong>Video</strong></td><td>A video with its chapters (click to jump) and a transcript; from YouTube or Vimeo after the reader's <strong>Load</strong></td><td><strong>Choose video…</strong> (or a path, a YouTube / Vimeo link or a video file address), a title, start and end, chapters, transcript, captions, caption, poster (see <a href="#videos">Videos</a>)</td></tr>
             <tr><td><strong>Link to Slide</strong></td><td>A card that takes the reader to another slide</td><td>The slide, an optional label</td></tr>
             <tr><td><strong>Diagram</strong></td><td>A responsive SVG diagram rendered client-side from Mermaid code</td><td>Mermaid definition, optional caption (see <a href="#diagrams">Diagrams</a>)</td></tr>
             <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>A mini graph (+ Node, 🔗 Connect, snapshot), nodes, links, layout, data file, caption, fallback image (see <a href="#graphs">Graphs</a>)</td></tr>
@@ -783,6 +786,39 @@
         <h3>For readers</h3>
         <p>In reader mode every term is a button. Clicking it (or <kbd>Enter</kbd> on it) opens a popup with the term's glossary definition, if it has one, its weight (when you said what a weight counts) and links to the other slides that mention the term. Reader search finds typed-in terms (not those of a CSV file).</p>
         <p>In <code>show.json</code> a tag cloud is a <code>tag-cloud</code> value with <code>terms</code>, or <code>data</code> for a CSV file; see the show format (<code>docs/show-format.md</code>, <em>Tag clouds</em>).</p>
+      </section>
+
+      <section id="videos">
+        <h2>Videos</h2>
+        <p>A <strong>video</strong> plays on a slide or in the reader layer: a video file in the show folder (it plays offline, also in an exported HTML file up to 25 MB), a <strong>YouTube</strong> or <strong>Vimeo</strong> video, or a video file on another site. For other video sites, use an <strong>Embedded Page</strong> block.</p>
+        <p>To add one, give a slide the <strong>Video</strong> layout, or add a <strong>Video</strong> block in the <a href="#reader-tab">Reader tab</a>. An Embedded Page block with a YouTube or Vimeo address offers <strong>Turn into a video block</strong>.</p>
+
+        <h3>The video</h3>
+        <ul>
+          <li><strong>Choose video…</strong> copies an MP4 or WebM file into the show's <code>media/</code> folder (the show needs its folder). Or type its path, or paste a YouTube or Vimeo link in any form (<code>youtu.be/…</code>, <code>watch?v=…</code>, <code>shorts/…</code>, <code>vimeo.com/…</code>). The line below says what Slipr recognised, or what is wrong.</li>
+          <li><strong>Title</strong>: names the video for screen readers, the card and search.</li>
+          <li><strong>Play from … to …</strong>: in seconds (<code>90</code>) or minutes and seconds (<code>1:30</code>). Vimeo plays on after the end.</li>
+          <li><strong>Muted</strong>, <strong>Loop</strong>, <strong>Show controls</strong>. Without controls a click, <kbd>Space</kbd> or <kbd>Enter</kbd> on the video plays or pauses it.</li>
+        </ul>
+
+        <h3>Chapters, transcript and captions</h3>
+        <ul>
+          <li><strong>Chapters</strong>: a time and a title each; <strong>+ Chapter</strong> adds one a minute after the last, ✕ removes one. Readers see them below a video block (a click jumps there) or in the <em>Chapter…</em> menu of a slide; search finds them.</li>
+          <li><strong>Transcript</strong>: what is said, in <a href="#markdown">Markdown</a>. Readers can open it; search finds it.</li>
+          <li><strong>Captions</strong> (video files only; YouTube and Vimeo bring their own): <strong>Choose .vtt…</strong> copies a WebVTT file into <code>media/</code>, with a label (<em>English</em>) and a language code (<code>en</code>). They are on by default.</li>
+        </ul>
+
+        <h3>While presenting (slides only)</h3>
+        <ul>
+          <li><strong>While presenting</strong>: <em>play when I press play</em>, <em>play when the slide appears</em> (muted when the browser refuses sound) or <em>play on the next click</em>.</li>
+          <li><strong>Each click jumps to the next chapter</strong>: every further chapter becomes a step. Going back jumps back.</li>
+          <li><strong>Show</strong> <em>the poster only</em>: nothing plays and nothing is loaded, good for an offline talk.</li>
+        </ul>
+        <p>A video pauses when you leave its slide. In audience mode a YouTube or Vimeo video loads without asking; in reader mode it waits for the reader's <strong>Load</strong> unless you tick <strong>load straight away</strong>.</p>
+
+        <h3>Poster</h3>
+        <p>An optional picture shown before the video plays, in print, in thumbnails and while a video waits for <strong>Load</strong>. Without one, Slipr shows a card with the title, where the video comes from and <em>Watch ↗</em>.</p>
+        <p>Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>; typing in a field counts as one step. In <code>show.json</code> a video is a <code>video</code> value; see the show format (<code>docs/show-format.md</code>, <em>Videos</em>).</p>
       </section>
 
       <section id="markdown">

@@ -15,6 +15,7 @@
 import { collectImagePaths } from '../validate.js';
 import { EMBED_KINDS, usedEmbedKinds } from '../embeds/index.js';
 import { localTileTemplates, tileFolder, tilePattern } from '../embeds/map.js';
+import { EXPORT_VIDEO_LIMIT, videoEntries } from '../embeds/video.js';
 
 export const VIRTUAL_ROOT = 'https://slipr.invalid/';
 
@@ -30,7 +31,7 @@ const MIME = /** @type {Record<string, string>} */ ({
   js: 'text/javascript', mjs: 'text/javascript', json: 'application/json', css: 'text/css', html: 'text/html',
   svg: 'image/svg+xml', png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', gif: 'image/gif', webp: 'image/webp',
   avif: 'image/avif', woff2: 'font/woff2', woff: 'font/woff', ttf: 'font/ttf', otf: 'font/otf', ico: 'image/x-icon',
-  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', geojson: 'application/geo+json', mp4: 'video/mp4', webm: 'video/webm',
+  txt: 'text/plain', md: 'text/markdown', pdf: 'application/pdf', geojson: 'application/geo+json', mp4: 'video/mp4', webm: 'video/webm', ogv: 'video/ogg', mov: 'video/quicktime', m4v: 'video/mp4', vtt: 'text/vtt',
 });
 const TEXT_TYPES = new Set(['text/javascript', 'application/json', 'application/geo+json', 'text/css', 'text/html', 'image/svg+xml', 'text/plain', 'text/markdown']);
 
@@ -294,11 +295,17 @@ export async function packShow({ readFile, listFiles, showDir, templateDir, entr
   };
 
   addFile('show/show.json', JSON.stringify({ ...show, template: { ...show.template, ref: '../template' } }));
+  // Video files (I-110) go in up to EXPORT_VIDEO_LIMIT; larger ones show their poster.
+  const videos = new Set(videoEntries(show).map(({ value }) => String(value.video).trim()));
   for (const rel of showFiles(show)) {
     const path = normalizePath(`${dir}/${rel}`);
     const bytes = path ? await readFile(path) : null;
     if (!bytes) {
       warnings.push(`show: ${rel} not found; left out`);
+      continue;
+    }
+    if (videos.has(rel) && bytes.length > EXPORT_VIDEO_LIMIT) {
+      warnings.push(`show: video ${rel} is ${Math.round(bytes.length / 1048576)} MB, over the ${EXPORT_VIDEO_LIMIT / 1048576} MB limit; left out (the export shows its poster)`);
       continue;
     }
     // Keep the path exactly as the show writes it, so resolveAsset finds it.

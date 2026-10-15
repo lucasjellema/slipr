@@ -14,6 +14,8 @@ import { tagCloudValue } from './tag-cloud-values.js';
 import { tableValue } from './table-values.js';
 import { mapValue } from './map-values.js';
 import { graphValue } from './graph-values.js';
+import { isVideo } from '../../shared/embeds/video.js';
+import { videoValue } from './video-values.js';
 
 /**
  * @param {any} tabs
@@ -176,7 +178,7 @@ export function pdfPagesPatch(firstText, lastText) {
 
 /**
  * An embed slot value with a new fallback image (I-070), keeping the value's
- * own shape: a map (I-075), a tag cloud (I-105), a table (I-104), a graph (I-074), a PDF (I-072) or a web page (I-071).
+ * own shape: a map (I-075), a tag cloud (I-105), a table (I-104), a graph (I-074), a PDF (I-072), a video (I-110) or a web page (I-071).
  * @param {any} current @param {any} image  The fallback image value, or undefined to remove it.
  * @returns {any}
  */
@@ -186,5 +188,6 @@ export function withFallback(current, image) {
   if (isTable(current)) return tableValue(current, { fallback: image });
   if (isGraph(current)) return graphValue(current, { fallback: image });
   if (current && typeof current.pdf === 'string') return pdfValue(current, { fallback: image });
+  if (isVideo(current)) return videoValue(current, { fallback: image });
   return webValue(current, { fallback: image });
 }

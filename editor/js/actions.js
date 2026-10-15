@@ -15,6 +15,7 @@ import { isMap } from '../../shared/embeds/map.js';
 import { isGraph } from '../../shared/embeds/graph.js';
 import { isTable } from '../../shared/embeds/table.js';
 import { isTagCloud } from '../../shared/embeds/tag-cloud.js';
+import { isVideo, videoSource } from '../../shared/embeds/video.js';
 
 /**
  * Generate a random short identifier.
@@ -254,9 +255,9 @@ export function setLayout(show, { slideId, layout, templateLayouts }) {
 export function setSlot(show, { slideId, slot, value }) {
   if (!Array.isArray(show.slides)) return show;
   show = withPictureFormat(show, value);
-  // A web page (I-071), PDF (I-072), graph (I-074), map (I-075), table (I-104) or tag cloud (I-105) slot, or an embed fallback (I-070), needs format 0.2.
+  // A web page (I-071), PDF (I-072), graph (I-074), map (I-075), table (I-104), tag cloud (I-105) or video (I-110) slot, or an embed fallback (I-070), needs format 0.2.
   const embed02 = value && typeof value === 'object' && !Array.isArray(value)
-    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value) || isGraph(value) || isTable(value) || isTagCloud(value));
+    && (typeof value.url === 'string' || typeof value.pdf === 'string' || value.fallback !== undefined || isMap(value) || isGraph(value) || isTable(value) || isTagCloud(value) || isVideo(value));
   if (embed02 && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   const slides = show.slides.map((s) => {
     if (s.id !== slideId) return s;
@@ -560,7 +561,7 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
 }
 
 /** Block types and the order of the type picker. */
-export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf', 'graph', 'map', 'table', 'tag-cloud'];
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf', 'video', 'graph', 'map', 'table', 'tag-cloud'];
 
 /**
  * A block converted to another type, in a valid shape for that type (see the
@@ -601,7 +602,8 @@ export function convertBlock(block, type, defaults = {}) {
       };
     case 'embed':
       return {
-        ...base, url: block.url ?? '', title: title ?? 'Embedded page',
+        // A video on another server (I-110) keeps its address.
+        ...base, url: block.url ?? (/^https?:/i.test(String(block.video ?? '')) ? block.video : ''), title: title ?? 'Embedded page',
         ...(block.height ? { height: block.height } : {}),
         ...(block.aspect ? { aspect: block.aspect } : {}),
         ...(block.allow ? { allow: block.allow } : {}),
@@ -618,6 +620,15 @@ export function convertBlock(block, type, defaults = {}) {
         ...(block.load ? { load: block.load } : {}),
         ...(block.fallback ? { fallback: block.fallback } : {}),
       };
+    case 'video': {
+      // A video (I-110); an Embedded Page with a YouTube or Vimeo address keeps it.
+      const url = typeof block.url === 'string' && videoSource(block.url).kind !== 'file' ? block.url : undefined;
+      return {
+        ...base, video: block.video ?? url ?? '', title: title ?? 'Video',
+        ...Object.fromEntries(['start', 'end', 'muted', 'loop', 'controls', 'captions', 'chapters', 'transcript', 'caption', 'load', 'fallback']
+          .filter((k) => block[k] !== undefined).map((k) => [k, block[k]])),
+      };
+    }
     case 'graph':
       // A new graph (I-074, E-020) starts with one node; the graph editor adds the rest.
       return {
@@ -678,8 +689,8 @@ export function setBlockType(show, { slideId, blockId, type }) {
   if (!Array.isArray(show.slides)) return show;
   const index = show.slides.findIndex((/** @type {any} */ s) => s.id === slideId);
   const neighbour = show.slides[index + 1] ?? show.slides[index - 1];
-  // A PDF (I-072), graph (I-074), map (I-075), table (I-104) or tag cloud (I-105) block needs show format 0.2.
-  if ((type === 'pdf' || type === 'graph' || type === 'map' || type === 'table' || type === 'tag-cloud') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
+  // A PDF (I-072), video (I-110), graph (I-074), map (I-075), table (I-104) or tag cloud (I-105) block needs show format 0.2.
+  if ((type === 'pdf' || type === 'video' || type === 'graph' || type === 'map' || type === 'table' || type === 'tag-cloud') && (show.slipr === '0.1' || !show.slipr)) show = { ...show, slipr: '0.2' };
   return mapBlock(show, slideId, blockId, (b) => (b.type === type ? b : convertBlock(b, type, { slideId: neighbour?.id })));
 }
 

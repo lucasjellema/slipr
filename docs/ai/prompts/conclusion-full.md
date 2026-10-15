@@ -49,7 +49,7 @@ Reader blocks: every block has `id` and `type`; optional `for: ["profile-id"]` (
 - `table`: `columns`, `rows`, `title`? (see *Tables* below)
 - `tag-cloud`: `terms`, `title`? (see *Tag clouds* below)
 
-Do not use other block types or fields (no `embed`, `pdf`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.
+Do not use other block types or fields (no `embed`, `pdf`, `video`, `graph`, `map`, `data` files, `overlays`, or styling): they need files or settings a chatbot cannot provide.
 
 **Tables** (block, or a `table` slot) hold their data inline:
 ```json
@@ -162,6 +162,7 @@ Every slide uses one layout; its `content` holds the slots listed. **Required** 
 **Do not use** these layouts:
 - `web`: needs a live web page
 - `pdf`: needs a PDF file
+- `video`: needs a video file or address
 - `graph`: needs a network of nodes and links
 - `map`: needs coordinates and map tiles
 

@@ -158,6 +158,21 @@
       }
     },
     {
+      "id": "s-video",
+      "layout": "video",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Video",
+        "title": "A video on a slide",
+        "video": {
+          "video": "https://youtu.be/aqz-KE-bpKQ",
+          "title": "Big Buck Bunny (Blender Foundation)",
+          "start": 10,
+          "chapters": [{ "time": 10, "title": "Opening" }, { "time": 60, "title": "The meadow" }]
+        }
+      }
+    },
+    {
       "id": "s-graph",
       "layout": "graph",
       "chapter": "sections",

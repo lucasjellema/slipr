@@ -47,6 +47,7 @@ editor/
     ├── menu-nav.js       ✅ DOM-free: keyboard movement and type-ahead in menus (I-102)
     ├── table-values.js   ✅ DOM-free: table values for the table editor (grid, columns, paste, CSV to inline, steps; I-104)
     ├── tag-cloud-values.js ✅ DOM-free: tag cloud values (terms, pasted lists, CSV to inline, steps; I-105)
+    ├── video-values.js   ✅ DOM-free: video values (source note, times as typed, chapters, captions; I-110)
     ├── glossary-model.js ✅ DOM-free: deck-aware word completion, candidates scanner, usage inspection and filtering (I-088)
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
@@ -75,6 +76,7 @@ editor/
         ├── preview-dialog.js ✅ enlarged preview (I-103): a second preview pane in a modal dialog, with the overlay section beside it
         ├── table-fields.js  ✅ table editor for the table slot and block: grid, paste, CSV file, columns, options, steps (I-104)
         ├── tag-cloud-fields.js ✅ tag cloud editor for the tag-cloud slot and block: terms, paste, CSV file, options, steps (I-105)
+        ├── video-fields.js  ✅ video editor for the video slot and block: file or address, times, options, while presenting, chapters, transcript, captions, poster (I-110)
         ├── overlay-editor.js ✅ extra images on the audience preview: select, drag, corner resize, keyboard (I-083)
         ├── overlay-list.js  ✅ the Slide tab's "Extra images" section (I-083)
         ├── picture-style.js ✅ picture style picker (live previews with the template's classes) and opacity slider, for every image field (I-084)

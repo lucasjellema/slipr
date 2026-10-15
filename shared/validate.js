@@ -16,6 +16,7 @@
 import { checkSchema } from './schema-check.js';
 import { foldText } from './glossary.js';
 import { pdfEntries } from './embeds/pdf.js';
+import { isVideo, looksLikeVideoFile, parseTime, videoEntries, videoFiles, videoSource } from './embeds/video.js';
 import { isGraph } from './embeds/graph.js';
 import { isMap, tileSource } from './embeds/map.js';
 import { isCsvPath, isTable, tableModel } from './embeds/table.js';
@@ -208,7 +209,8 @@ export function validateTemplate(template) {
 
 /**
  * Collect every image src used by a show (slots, image blocks, extra images,
- * embed fallbacks) and every PDF in the show folder (I-072), e.g. to check that
+ * embed fallbacks) and every PDF (I-072) and video file with its captions
+ * (I-110) in the show folder, e.g. to check that
  * the files exist, embed them in an export, or open them from a folder.
  * @param {any} show
  * @returns {string[]}
@@ -244,6 +246,8 @@ export function collectImagePaths(show) {
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
     }
+    // Video files and captions in the show folder (I-110): the same.
+    for (const { value } of videoEntries({ slides: [slide] })) found.push(...videoFiles(value));
   }
   return [...new Set(found)];
 }
@@ -490,6 +494,11 @@ function embedFallbacks(slide, at) {
  * show folder (ignored there), are warnings.
  * PDFs (I-072): the same address rules, a missing local file, and `page`
  * with `pages` or a reversed range are warnings.
+ * Videos (I-110): the same address rules; captions must be a .vtt file in the
+ * show folder and chapters need a time and a title (errors); a missing file,
+ * an https page that is no video, `end` before `start`, chapters out of order,
+ * captions on YouTube / Vimeo, static without a poster and chapter steps
+ * without chapters are warnings.
  * @param {any} slide @param {string} at @param {unknown} version
  * @param {Issue[]} errors @param {Issue[]} warnings
  * @param {((src: string) => boolean) | undefined} fileExists
@@ -520,10 +529,57 @@ function checkEmbeds(slide, at, version, errors, warnings, fileExists) {
       warnings.push({ path: `${path}.pages`, code: 'pdf-pages-order', message: 'the first page comes after the last; the range is shown in order' });
     }
   };
+  /** @param {any} value @param {string} path @param {boolean} slot */
+  const checkVideo = (value, path, slot) => {
+    const src = String(value.video ?? '').trim();
+    const source = videoSource(src);
+    if (/^\s*(javascript|data|vbscript):/i.test(src)) {
+      errors.push({ path: `${path}.video`, code: 'unsafe-url', message: 'this kind of address cannot be embedded' });
+    } else if (!source.origin && /^[a-z][a-z0-9+.-]*:/i.test(src)) {
+      errors.push({ path: `${path}.video`, code: 'unsafe-url', message: 'a video is a file in the show folder or an http(s) address' });
+    } else if (!source.origin && fileExists && !fileExists(src)) {
+      warnings.push({ path: `${path}.video`, code: 'missing-file', message: `video file "${src}" not found` });
+    } else if (source.kind === 'file' && source.origin && !looksLikeVideoFile(src)) {
+      warnings.push({ path: `${path}.video`, code: 'video-not-a-file', message: 'this address is not YouTube, Vimeo or a video file (.mp4, .webm, …): use an Embedded Page block for other video sites' });
+    }
+    const start = parseTime(value.start) ?? 0;
+    if (typeof value.end === 'number' && value.end <= start) {
+      warnings.push({ path: `${path}.end`, code: 'video-end-before-start', message: '"end" is not after "start"; the video plays to its end' });
+    }
+    if (isObject(value.captions)) {
+      const captions = String(value.captions.src ?? '');
+      if (/^[a-z][a-z0-9+.-]*:|^\//i.test(captions) || !/\.vtt$/i.test(captions)) {
+        errors.push({ path: `${path}.captions.src`, code: 'video-captions', message: 'captions must be a WebVTT (.vtt) file in the show folder' });
+      } else if (source.kind !== 'file') {
+        warnings.push({ path: `${path}.captions`, code: 'video-captions-ignored', message: `captions are ignored for a ${source.label} video (it brings its own)` });
+      } else if (fileExists && !fileExists(captions)) {
+        warnings.push({ path: `${path}.captions.src`, code: 'missing-file', message: `captions file "${captions}" not found` });
+      }
+    }
+    let previous = -1;
+    arrayOf(value.chapters).forEach((chapter, k) => {
+      const time = isObject(chapter) ? parseTime(chapter.time) : null;
+      if (time === null || typeof chapter?.time !== 'number' || typeof chapter?.title !== 'string' || !chapter.title.trim()) {
+        errors.push({ path: `${path}.chapters[${k}]`, code: 'video-chapter', message: 'a chapter needs a "time" (seconds) and a "title"' });
+        return;
+      }
+      if (time < previous) warnings.push({ path: `${path}.chapters[${k}]`, code: 'video-chapters-order', message: 'chapters are out of time order; they are shown in order' });
+      previous = Math.max(previous, time);
+    });
+    if (slot && value.present === 'static' && !isImage(value.fallback)) {
+      warnings.push({ path: `${path}.present`, code: 'static-without-fallback', message: 'presented as a poster, but there is no fallback image: the slide shows a card' });
+    }
+    if (slot && value.chapterSteps && !arrayOf(value.chapters).length) {
+      warnings.push({ path: `${path}.chapterSteps`, code: 'video-steps-without-chapters', message: '"chapterSteps" is set, but the video has no chapters' });
+    }
+  };
   for (const [name, value] of Object.entries(isObject(slide.content) ? slide.content : {})) {
     if (!isObject(value)) continue;
     const path = `${at}.content.${name}`;
-    if (typeof value.pdf === 'string') {
+    if (isVideo(value)) {
+      if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a video slot needs show format 0.2: set "slipr" to "0.2"' });
+      checkVideo(value, path, true);
+    } else if (typeof value.pdf === 'string') {
       if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a PDF slot needs show format 0.2: set "slipr" to "0.2"' });
       checkPdf(value, path);
     } else if (typeof value.url === 'string') {
@@ -547,6 +603,10 @@ function checkEmbeds(slide, at, version, errors, warnings, fileExists) {
     if (block?.type === 'pdf') {
       if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a PDF block needs show format 0.2: set "slipr" to "0.2"' });
       checkPdf(block, path);
+    }
+    if (block?.type === 'video') {
+      if (version === '0.1') errors.push({ path, code: 'format-version', message: 'a video block needs show format 0.2: set "slipr" to "0.2"' });
+      checkVideo(block, path, false);
     }
   });
 }
@@ -896,6 +956,7 @@ function matchesSlotType(value, type) {
     case 'diagram': return isObject(value) && typeof value.mermaid === 'string';
     case 'web': return isObject(value) && typeof value.url === 'string';
     case 'pdf': return isObject(value) && typeof value.pdf === 'string';
+    case 'video': return isVideo(value);
     case 'graph': return isGraph(value);
     case 'map': return isMap(value);
     case 'table': return isTable(value);
@@ -918,6 +979,7 @@ function slotTypeLabel(type) {
     diagram: 'a diagram object { "mermaid": ... }',
     web: 'a web page object { "url": ..., "title": ... }',
     pdf: 'a PDF object { "pdf": ..., "title": ... }',
+    video: 'a video object { "video": ..., "title": ... }',
     graph: 'a graph object { "nodes": [...], "edges": [...] } or { "data": "data/....json" }',
     map: 'a map object { "center": {...}, "markers": [...] }',
     table: 'a table object { "columns": [...], "rows": [...] } or { "data": "data/....csv" }',

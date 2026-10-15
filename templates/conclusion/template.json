@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -439,6 +439,33 @@
           "name": "document",
           "type": "pdf",
           "label": "PDF document",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "video",
+      "name": "Video",
+      "description": "Title with a video file, or a YouTube or Vimeo video, in the content area (played on the slide, on a click or step by step through its chapters).",
+      "file": "layouts/video.html",
+      "slots": [
+        {
+          "name": "kicker",
+          "type": "text",
+          "label": "Subtitle",
+          "maxLength": 60
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "label": "Title",
+          "required": true,
+          "maxLength": 46
+        },
+        {
+          "name": "video",
+          "type": "video",
+          "label": "Video",
           "required": true
         }
       ]

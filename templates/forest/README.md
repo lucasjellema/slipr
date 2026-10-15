@@ -2,7 +2,7 @@
 
 A forest atmosphere for Slipr shows: deep forest greens on warm parchment, ochre accents, a moonlit pine forest on the title slide and a tree line along the bottom of section slides, and classic serif type.
 
-Based on **Slipr Default 1.7.0**: the same 12 layouts and slots, the same picture styles, so a show can switch between `default` and `forest` without changes (`"template": { "ref": "/templates/forest" }`, or `../../templates/forest` inside this repository).
+Based on **Slipr Default 1.8.0**: the same 13 layouts and slots, the same picture styles, so a show can switch between `default` and `forest` without changes (`"template": { "ref": "/templates/forest" }`, or `../../templates/forest` inside this repository).
 
 ## Style guide
 

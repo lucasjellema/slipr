@@ -3874,3 +3874,63 @@ body.is-screen #slipr-editor-banners {
   flex: 1 1 10em;
   width: auto;
 }
+
+/* ---------- Video fields (I-110) ---------- */
+.slipr-video-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+}
+
+.slipr-input.slipr-video-time {
+  width: 5.5rem;
+  flex: none;
+}
+
+.slipr-input.slipr-video-lang {
+  width: 4rem;
+  flex: none;
+}
+
+.slipr-video-chapters-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 10px 10px;
+  border: 1px solid var(--slipr-editor-border);
+  border-radius: 6px;
+}
+
+.slipr-video-chapters-editor > legend {
+  padding: 0 4px;
+  color: var(--slipr-editor-muted);
+  font-size: 0.85em;
+}
+
+.slipr-video-chapters-editor > .slipr-btn {
+  align-self: flex-start;
+}
+
+.slipr-video-chapter-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.slipr-video-chapter-row .slipr-input:not(.slipr-video-time) {
+  flex: 1;
+  min-width: 0;
+}
+
+.slipr-video-transcript-editor,
+.slipr-video-captions-editor,
+.slipr-video-hint {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.slipr-video-hint > .slipr-btn {
+  align-self: flex-start;
+}

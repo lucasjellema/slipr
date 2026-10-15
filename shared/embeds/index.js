@@ -2,7 +2,7 @@
 /**
  * Rich embeds (I-070, D-011): the shared foundation for content that needs a
  * library or another server (or a data file): diagrams, web pages, PDFs,
- * graphs, maps, tables and tag clouds.
+ * graphs, maps, tables, tag clouds and videos.
  * Every kind is available as an audience slot type and a reader block
  * type, and has one module `shared/embeds/<kind>.js`:
  *
@@ -48,6 +48,7 @@ import * as map from './map.js';
 import * as pdf from './pdf.js';
 import * as table from './table.js';
 import * as tagCloud from './tag-cloud.js';
+import * as video from './video.js';
 import * as web from './web.js';
 
 /**
@@ -68,12 +69,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf, graph, map, table, 'tag-cloud': tagCloud };
+export const EMBED_KINDS = { diagram, web, pdf, graph, map, table, 'tag-cloud': tagCloud, video };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud', video: 'video' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -105,6 +106,7 @@ export function usedEmbedKinds(show) {
       if (diagram.isDiagram(value)) kinds.add('diagram');
       if (web.isWeb(value)) kinds.add('web');
       if (pdf.isPdf(value)) kinds.add('pdf');
+      if (video.isVideo(value)) kinds.add('video');
       if (graph.isGraph(value)) kinds.add('graph');
       if (map.isMap(value)) kinds.add('map');
       if (tagCloud.isTagCloud(value)) kinds.add('tag-cloud');

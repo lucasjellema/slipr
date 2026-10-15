@@ -26,8 +26,8 @@ describe('changing a block type keeps the show valid', () => {
       assert.equal(block.type, type);
       assert.equal(block.depth, 3, 'depth survives');
       const errors = validateShow(next, { template }).errors;
-      if (type === 'image' || type === 'embed' || type === 'pdf') {
-        // A new image block has no image yet, a new embed no URL, a new PDF no file: the user fills those in.
+      if (type === 'image' || type === 'embed' || type === 'pdf' || type === 'video') {
+        // A new image block has no image yet, a new embed no URL, a new PDF or video no file: the user fills those in.
         assert.ok(errors.length > 0 && errors.every((e) => e.path.startsWith('slides[0].reader.blocks')), JSON.stringify(errors));
         assert.equal(block.md, undefined, 'no stray md on an image block');
       } else {
@@ -113,6 +113,25 @@ test('embed load and fallback (I-070): a 0.1 show becomes 0.2, removal keeps it 
   assert.equal(actions.updateBlock(old, { ...ids, patch: { height: 300 } }).slipr, '0.1', 'other fields keep the version');
   next = actions.updateBlock(next, { ...ids, patch: { load: undefined } });
   assert.ok(!('load' in next.slides.find((s) => s.id === slide.id).reader.blocks.find((b) => b.id === embed.id)));
+});
+
+test('video blocks (I-110): a 0.1 show becomes 0.2; an Embedded Page with a YouTube address keeps it', () => {
+  const slide = demo.slides.find((s) => s.reader?.blocks?.length);
+  const block = slide.reader.blocks[0];
+  const old = { ...demo, slipr: '0.1' };
+  const next = actions.setBlockType(old, { slideId: slide.id, blockId: block.id, type: 'video' });
+  assert.equal(next.slipr, '0.2');
+  const video = next.slides.find((s) => s.id === slide.id).reader.blocks.find((b) => b.id === block.id);
+  assert.deepEqual([video.type, video.video, video.title], ['video', '', 'Video']);
+  const embed = { id: 'e', type: 'embed', url: 'https://youtu.be/aqz-KE-bpKQ', title: 'Bunny', load: 'auto', depth: 2 };
+  assert.deepEqual(actions.convertBlock(embed, 'video'), { id: 'e', type: 'video', depth: 2, video: 'https://youtu.be/aqz-KE-bpKQ', title: 'Bunny', load: 'auto' });
+  assert.equal(actions.convertBlock({ ...embed, url: 'https://example.org' }, 'video').video, '');
+  assert.equal(actions.convertBlock({ id: 'v', type: 'video', video: 'https://youtu.be/aqz-KE-bpKQ', title: 'B' }, 'embed').url, 'https://youtu.be/aqz-KE-bpKQ');
+  assert.equal(actions.convertBlock({ id: 'v', type: 'video', video: 'media/a.mp4', title: 'B' }, 'embed').url, '');
+  const back = actions.convertBlock({ ...video, video: 'media/a.mp4', chapters: [{ time: 0, title: 'A' }], transcript: 'T' }, 'video');
+  assert.deepEqual([back.video, back.chapters, back.transcript], ['media/a.mp4', [{ time: 0, title: 'A' }], 'T']);
+  const withSlot = actions.setSlot(old, { slideId: slide.id, slot: 'video', value: { video: 'media/a.mp4', title: 'A' } });
+  assert.equal(withSlot.slipr, '0.2');
 });
 
 test('PDF blocks (I-072): conversion keeps fields, a 0.1 show becomes 0.2', () => {

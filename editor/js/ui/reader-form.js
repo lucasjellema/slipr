@@ -14,7 +14,9 @@ import { markdownToolbar } from './markdown-toolbar.js';
 import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
-import { addGraphDataFile, addLayerFile, addPdf, addTableDataFile } from '../image-input.js';
+import { TYPED_VIDEO_FIELDS, videoFields } from './video-fields.js';
+import { isVideoSiteUrl, videoSummary } from '../video-values.js';
+import { addGraphDataFile, addLayerFile, addMediaFile, addPdf, addTableDataFile } from '../image-input.js';
 import { graphFields } from './graph-fields.js';
 import { GRAPH_FIELDS } from '../graph-values.js';
 import { TABLE_FIELDS, tableSummary } from '../table-values.js';
@@ -38,6 +40,7 @@ const BLOCK_TYPES = [
   { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
   { type: 'pdf', label: 'PDF Document' },
+  { type: 'video', label: 'Video' },
   { type: 'graph', label: 'Graph' },
   { type: 'map', label: 'Map' },
   { type: 'table', label: 'Table' },
@@ -268,6 +271,8 @@ export function mountReaderForm(container, store) {
         bodyEl.append(embedEditor(store, slide.id, block));
       } else if (block.type === 'pdf') {
         bodyEl.append(pdfBlockEditor(store, slide.id, block));
+      } else if (block.type === 'video') {
+        bodyEl.append(videoBlockEditor(store, slide.id, block));
       } else if (block.type === 'map') {
         bodyEl.append(mapBlockEditor(store, slide.id, block));
       } else if (block.type === 'graph') {
@@ -412,6 +417,7 @@ function describeBlock(block) {
   if (block.type === 'embed') return `${block.title || 'Embedded page'}: ${block.url || '(no URL yet)'}`;
   if (block.type === 'slide-ref') return `Link to slide ${block.slide || '(none)'}${block.label ? `: ${block.label}` : ''}`;
   if (block.type === 'pdf') return `${block.title || 'PDF document'}: ${block.pdf || '(no file yet)'}`;
+  if (block.type === 'video') return videoSummary(block);
   if (block.type === 'graph') return `${block.title ? `${block.title}. ` : ''}${graphSummary(block)}`;
   if (block.type === 'map') return `${block.title ? `${block.title}. ` : ''}${mapSummary(block)}`;
   if (block.type === 'table') return `${block.title ? `${block.title}. ` : ''}${tableSummary(block)}`;
@@ -604,6 +610,15 @@ function embedEditor(store, slideId, block) {
   };
   return h('div', { class: 'slipr-embed-editor' }, [
     ...webAddressFields(options),
+    // A YouTube or Vimeo address plays better as a video (I-110): chapters, steps, a poster.
+    ...(isVideoSiteUrl(block.url) ? [h('div', { class: 'slipr-video-hint' }, [
+      h('span', { class: 'slipr-help' }, ['This is a video. As a video block it gets chapters, a transcript and a poster, and plays in the site’s privacy-friendly player.']),
+      h('button', {
+        type: 'button',
+        class: 'slipr-btn slipr-btn-sm',
+        onclick: () => store.dispatch('setBlockType', { slideId, blockId: block.id, type: 'video' }),
+      }, ['Turn into a video block']),
+    ])] : []),
     h('div', { class: 'slipr-embed-height' }, [
       h('label', {}, [
         'Size ',
@@ -657,6 +672,44 @@ function pdfBlockEditor(store, slideId, block) {
       file,
       fallbackName: block.title || 'document',
       write: (path) => write({ pdf: path, ...(read()?.title && read()?.title !== 'PDF document' ? {} : { title: file.name.replace(/\.pdf$/i, '') }) }, 'file'),
+    }),
+    addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
+    resolveAsset: store.state.resolveAsset,
+  }));
+}
+
+/**
+ * Video (I-110): video, title, times, options, chapters, transcript, caption,
+ * captions, click-to-load and poster.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function videoBlockEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
+  /** @param {Record<string, any>} patch @param {string} field */
+  const write = (patch, field) => {
+    // An empty title is ignored, like the PDF block's.
+    if ('title' in patch && !String(patch.title ?? '').trim()) return;
+    store.dispatch('updateBlock', { slideId, blockId: block.id, patch }, TYPED_VIDEO_FIELDS.has(field) ? { coalesceKey: `block-${field}-${block.id}` } : {});
+  };
+  return h('div', { class: 'slipr-embed-editor' }, videoFields({
+    label: 'Video',
+    kind: 'block',
+    read,
+    write,
+    addVideo: (file) => addMediaFile(store, {
+      file,
+      kind: 'video',
+      fallbackName: block.title || 'video',
+      write: (path) => write({ video: path, ...(read()?.title && read()?.title !== 'Video' ? {} : { title: file.name.replace(/\.[a-z0-9]+$/i, '') }) }, 'file'),
+    }),
+    addCaptions: (file) => addMediaFile(store, {
+      file,
+      kind: 'captions',
+      fallbackName: block.title || 'video',
+      write: (path) => write({ captions: { ...(read()?.captions ?? {}), src: path } }, 'captions'),
     }),
     addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
     resolveAsset: store.state.resolveAsset,

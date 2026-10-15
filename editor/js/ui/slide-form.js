@@ -9,10 +9,12 @@ import { GRAPH_HELP, MAP_HELP, TABLE_HELP, TAG_CLOUD_HELP } from '../help.js';
 import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
-import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addPdf, addTableDataFile, imageFileFrom } from '../image-input.js';
+import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addMediaFile, addPdf, addTableDataFile, imageFileFrom } from '../image-input.js';
 import { pdfValue, webValue } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
+import { TYPED_VIDEO_FIELDS, videoFields } from './video-fields.js';
+import { videoValue } from '../video-values.js';
 import { mapFields } from './map-fields.js';
 import { graphFields } from './graph-fields.js';
 import { tableFields } from './table-fields.js';
@@ -373,6 +375,34 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
         file,
         fallbackName: slotName,
         write: (path) => writePdf({ pdf: path, ...(readSlot()?.title ? {} : { title: file.name.replace(/\.pdf$/i, '') }) }, 'file'),
+      }),
+      addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
+      resolveAsset: store.state.resolveAsset,
+    }))];
+  } else if (kind === 'video') {
+    // A video (I-110): the same fields as the Video block, plus what happens while presenting.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    /** @param {Record<string, any>} patch @param {string} field */
+    const writeVideo = (patch, field) => {
+      current = videoValue(readSlot(), patch);
+      store.dispatch('setSlot', { slideId, slot: slotName, value: current }, TYPED_VIDEO_FIELDS.has(field) ? { coalesceKey: `${coalesceKey}-${field}` } : {});
+    };
+    inputs = [h('div', { class: 'slipr-embed-editor' }, videoFields({
+      label: labelText,
+      kind: 'slot',
+      read: readSlot,
+      write: writeVideo,
+      addVideo: (file) => addMediaFile(store, {
+        file,
+        kind: 'video',
+        fallbackName: slotName,
+        write: (path) => writeVideo({ video: path, ...(readSlot()?.title && readSlot()?.title !== 'Video' ? {} : { title: file.name.replace(/\.[a-z0-9]+$/i, '') }) }, 'file'),
+      }),
+      addCaptions: (file) => addMediaFile(store, {
+        file,
+        kind: 'captions',
+        fallbackName: slotName,
+        write: (path) => writeVideo({ captions: { ...(readSlot()?.captions ?? {}), src: path } }, 'captions'),
       }),
       addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
       resolveAsset: store.state.resolveAsset,
