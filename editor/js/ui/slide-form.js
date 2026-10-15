@@ -10,7 +10,8 @@ import { buildOverlaySection } from './overlay-list.js';
 import { pictureStyleControls } from './picture-style.js';
 import { describeValue, imageValue, listValue, slotEditorKind, textareaText, textValue } from '../slot-values.js';
 import { addFallbackToSlot, addGraphDataFile, addImageToSlot, addLayerFile, addMediaFile, addPdf, addTableDataFile, imageFileFrom } from '../image-input.js';
-import { pdfValue, webValue } from '../block-values.js';
+import { diagramValue, pdfValue, webValue } from '../block-values.js';
+import { diagramFields, TYPED_DIAGRAM_FIELDS } from './diagram-fields.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
 import { TYPED_VIDEO_FIELDS, videoFields } from './video-fields.js';
@@ -359,6 +360,19 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
       resolveAsset: store.state.resolveAsset,
     };
     inputs = [h('div', { class: 'slipr-embed-editor' }, [...webAddressFields(options), ...webOptionFields(options)])];
+  } else if (kind === 'diagram') {
+    // A Mermaid diagram (E-019): the same fields as the Diagram block.
+    const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];
+    inputs = [h('div', { class: 'slipr-embed-editor' }, diagramFields({
+      label: labelText,
+      read: readSlot,
+      write: (patch, field) => {
+        current = diagramValue(readSlot(), patch);
+        store.dispatch('setSlot', { slideId, slot: slotName, value: current }, TYPED_DIAGRAM_FIELDS.has(field) ? { coalesceKey: `${coalesceKey}-${field}` } : {});
+      },
+      addFallback: (file) => addFallbackToSlot(store, { slideId, slot: slotName, file }),
+      resolveAsset: store.state.resolveAsset,
+    }))];
   } else if (kind === 'pdf') {
     // A PDF document (I-072): the same fields as the PDF block.
     const readSlot = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)?.content?.[slotName];

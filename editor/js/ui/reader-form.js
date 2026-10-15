@@ -14,6 +14,7 @@ import { markdownToolbar } from './markdown-toolbar.js';
 import { addTab, embedHeight, moveTab, removeTab, setTab, tabsArray, WEB_ASPECTS } from '../block-values.js';
 import { webAddressFields, webOptionFields } from './web-fields.js';
 import { pdfFields } from './pdf-fields.js';
+import { diagramFields, TYPED_DIAGRAM_FIELDS } from './diagram-fields.js';
 import { TYPED_VIDEO_FIELDS, videoFields } from './video-fields.js';
 import { isVideoSiteUrl, videoSummary } from '../video-values.js';
 import { addGraphDataFile, addLayerFile, addMediaFile, addPdf, addTableDataFile } from '../image-input.js';
@@ -37,6 +38,7 @@ const BLOCK_TYPES = [
   { type: 'callout', label: 'Callout Box' },
   { type: 'tabs', label: 'Tabs' },
   { type: 'image', label: 'Image with Hotspots' },
+  { type: 'diagram', label: 'Diagram (Mermaid)' },
   { type: 'embed', label: 'Embedded Page' },
   { type: 'slide-ref', label: 'Link to Slide' },
   { type: 'pdf', label: 'PDF Document' },
@@ -267,6 +269,8 @@ export function mountReaderForm(container, store) {
         bodyEl.append(imageBlockEditor(store, slide.id, block));
       } else if (block.type === 'tabs') {
         bodyEl.append(tabsEditor(store, slide.id, block));
+      } else if (block.type === 'diagram') {
+        bodyEl.append(diagramBlockEditor(store, slide.id, block));
       } else if (block.type === 'embed') {
         bodyEl.append(embedEditor(store, slide.id, block));
       } else if (block.type === 'pdf') {
@@ -651,6 +655,26 @@ function embedEditor(store, slideId, block) {
     ]),
     ...webOptionFields(options),
   ]);
+}
+
+/**
+ * Diagram (I-073, E-019): Mermaid source, caption, fallback image.
+ * @param {import('../store.js').EditorStore} store
+ * @param {string} slideId
+ * @param {any} block
+ */
+function diagramBlockEditor(store, slideId, block) {
+  const read = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
+    ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id);
+  return h('div', { class: 'slipr-embed-editor' }, diagramFields({
+    label: 'Diagram',
+    read,
+    // updateBlock removes a field patched to undefined; an empty caption is removed too.
+    write: (patch, field) => store.dispatch('updateBlock', { slideId, blockId: block.id, patch: 'caption' in patch && !patch.caption ? { caption: undefined } : patch },
+      TYPED_DIAGRAM_FIELDS.has(field) ? { coalesceKey: `block-${field}-${block.id}` } : {}),
+    addFallback: (file) => addImageToBlock(store, { slideId, blockId: block.id, file, field: 'fallback' }),
+    resolveAsset: store.state.resolveAsset,
+  }));
 }
 
 /**

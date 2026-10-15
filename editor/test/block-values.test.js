@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readJson } from '../../shared/test/helpers.js';
 import { validateShow } from '../../shared/validate.js';
 import * as actions from '../js/actions.js';
-import { addTab, embedHeight, embedUrlProblem, moveTab, removeTab, setTab, tabsArray } from '../js/block-values.js';
+import { addTab, diagramValue, embedHeight, embedUrlProblem, moveTab, NEW_DIAGRAM, removeTab, setTab, tabsArray, withFallback } from '../js/block-values.js';
 
 const demo = readJson('shows/demo/show.json');
 const template = readJson('templates/default/template.json');
@@ -88,4 +88,48 @@ test('pdfPath puts PDFs in docs/ with a content hash (I-072)', async () => {
   assert.equal(isPdfFile({ name: 'x.PDF' }), true);
   assert.equal(isPdfFile({ name: 'x.png', type: 'image/png' }), false);
   await assert.rejects(() => pdfPath({ name: 'x.png', type: 'image/png', bytes }));
+});
+
+describe('diagrams (E-019)', () => {
+  const image = { src: 'images/flow.png', alt: 'A flow' };
+
+  test('diagramValue always has mermaid, removes emptied fields', () => {
+    assert.deepEqual(diagramValue(undefined, {}), { mermaid: '' });
+    assert.deepEqual(diagramValue({ mermaid: 'a' }, { caption: 'Flow' }), { mermaid: 'a', caption: 'Flow' });
+    assert.deepEqual(diagramValue({ mermaid: 'a', caption: 'Flow' }, { caption: '' }), { mermaid: 'a' });
+    assert.deepEqual(diagramValue({ mermaid: 'a' }, { mermaid: '' }), { mermaid: '' }, 'an emptied source stays (a validation error until typed)');
+  });
+
+  test('withFallback keeps a diagram a diagram', () => {
+    assert.deepEqual(withFallback({ mermaid: 'a' }, image), { mermaid: 'a', fallback: image });
+    assert.deepEqual(withFallback({ mermaid: 'a', fallback: image }, undefined), { mermaid: 'a' });
+  });
+
+  test('a text block switched to Diagram is valid and keeps a 0.1 show 0.1', () => {
+    const slide = demo.slides.find((/** @type {any} */ s) => s.reader?.blocks?.some((/** @type {any} */ b) => b.type === 'text'));
+    const block = slide.reader.blocks.find((/** @type {any} */ b) => b.type === 'text');
+    const show = actions.setBlockType({ ...demo, slipr: '0.1' }, { slideId: slide.id, blockId: block.id, type: 'diagram' });
+    const converted = show.slides.find((/** @type {any} */ s) => s.id === slide.id).reader.blocks.find((/** @type {any} */ b) => b.id === block.id);
+    assert.deepEqual(Object.keys(converted).filter((k) => !['id', 'type', 'for', 'depth'].includes(k)), ['mermaid']);
+    assert.equal(converted.mermaid, NEW_DIAGRAM);
+    assert.equal(show.slipr, '0.1');
+    assert.ok(actions.BLOCK_TYPES.includes('diagram'));
+  });
+
+  test('a diagram keeps source, caption and fallback through another type and back', () => {
+    const block = { id: 'b1', type: 'diagram', mermaid: 'flowchart LR\n  A --> B', caption: 'Flow', fallback: image };
+    assert.deepEqual(actions.convertBlock(block, 'diagram'), block);
+    assert.deepEqual(actions.convertBlock({ id: 'b1', type: 'text', md: 'x' }, 'diagram'), { id: 'b1', type: 'diagram', mermaid: NEW_DIAGRAM });
+  });
+
+  test('a fallback on a diagram slot or block raises the show to 0.2, and the show validates', () => {
+    const slide = demo.slides.find((/** @type {any} */ s) => s.content?.diagram);
+    const slot = actions.setSlot({ ...demo, slipr: '0.1' }, { slideId: slide.id, slot: 'diagram', value: withFallback(slide.content.diagram, image) });
+    assert.equal(slot.slipr, '0.2');
+    const blockSlide = demo.slides.find((/** @type {any} */ s) => s.reader?.blocks?.some((/** @type {any} */ b) => b.type === 'diagram'));
+    const block = blockSlide.reader.blocks.find((/** @type {any} */ b) => b.type === 'diagram');
+    const both = actions.updateBlock(slot, { slideId: blockSlide.id, blockId: block.id, patch: { fallback: image, caption: 'Who does what' } });
+    const result = validateShow(both, template);
+    assert.deepEqual(result.errors, []);
+  });
 });

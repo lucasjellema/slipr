@@ -14,6 +14,9 @@ export const HELP_SECTIONS = Object.freeze({
   settings: 'settings',
 });
 
+/** Manual section on Mermaid diagrams (E-019): linked from the diagram fields. */
+export const DIAGRAM_HELP = `${HELP_PAGE}#diagrams`;
+
 /** Manual section on writing graphs in show.json (I-074): linked from read-only graph fields. */
 export const GRAPH_HELP = `${HELP_PAGE}#graphs`;
 

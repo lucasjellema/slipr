@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Diagram editor (E-019)
+- **Added** a diagram editor for the `diagram` slot and the **Diagram (Mermaid)** reader block type (`ui/diagram-fields.js`, value helper `diagramValue()` in `block-values.js` with tests): the Mermaid source (monospace, Tab indents, a note while it is empty), caption, fallback image, and a link to the manual. Each typed field is one undo step. A block switched to Diagram starts with a two-node flowchart. The slot and block were read-only before.
+- **Changed** `withFallback()` keeps a diagram a diagram (a fallback pasted on a diagram slot used to get web page fields).
+
 ### 2026-10-15: Shrink pictures to WebP, focal point (I-026)
 - **Added** **Shrink…** next to Crop… on every PNG, JPEG, WebP and AVIF picture (`ui/shrink-dialog.js`, encoding in `io/shrink.js`): Longest side (default 2400 px) and Quality (default 85 %), with the WebP's size shown before you apply it. Shrink writes `images/<slug>-<hash8>.webp` and changes only `src`, so alt text, crop, focus and style stay. The original file stays in `images/`, and one Ctrl+Z goes back to it. If the result is not smaller, Shrink stays disabled.
 - **Added** an offer to shrink a large picture when it is added (over 1 MB, or over 2400 px): a notice with a **Shrink…** button. GIF and SVG keep the plain notice above 3 MB.

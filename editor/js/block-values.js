@@ -16,6 +16,7 @@ import { mapValue } from './map-values.js';
 import { graphValue } from './graph-values.js';
 import { isVideo } from '../../shared/embeds/video.js';
 import { videoValue } from './video-values.js';
+import { isDiagram } from '../../shared/embeds/diagram.js';
 
 /**
  * @param {any} tabs
@@ -176,13 +177,37 @@ export function pdfPagesPatch(firstText, lastText) {
   return { page: undefined, pages: [Math.min(a, b), Math.max(a, b)] };
 }
 
+/** Mermaid source a new diagram starts with (E-019). */
+export const NEW_DIAGRAM = 'flowchart LR\n  A[Start] --> B[Finish]';
+
+/**
+ * A diagram value (E-019), slot or block, from the previous value and a patch.
+ * Always has `mermaid` (empty while the author has not typed one yet); other
+ * fields patched to undefined (or "") are removed.
+ * @param {any} previous
+ * @param {Record<string, any>} patch
+ * @returns {Record<string, any>}
+ */
+export function diagramValue(previous, patch) {
+  const base = previous && typeof previous === 'object' && !Array.isArray(previous) ? previous : {};
+  /** @type {Record<string, any>} */
+  const next = { mermaid: '', ...base };
+  for (const [key, value] of Object.entries(patch)) {
+    if (key === 'mermaid') next.mermaid = String(value ?? '');
+    else if (value === undefined || value === '') delete next[key];
+    else next[key] = value;
+  }
+  return next;
+}
+
 /**
  * An embed slot value with a new fallback image (I-070), keeping the value's
- * own shape: a map (I-075), a tag cloud (I-105), a table (I-104), a graph (I-074), a PDF (I-072), a video (I-110) or a web page (I-071).
+ * own shape: a diagram (E-019), a map (I-075), a tag cloud (I-105), a table (I-104), a graph (I-074), a PDF (I-072), a video (I-110) or a web page (I-071).
  * @param {any} current @param {any} image  The fallback image value, or undefined to remove it.
  * @returns {any}
  */
 export function withFallback(current, image) {
+  if (isDiagram(current)) return diagramValue(current, { fallback: image });
   if (isMap(current)) return mapValue(current, { fallback: image });
   if (isTagCloud(current)) return tagCloudValue(current, { fallback: image });
   if (isTable(current)) return tableValue(current, { fallback: image });

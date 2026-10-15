@@ -16,6 +16,7 @@ import { isGraph } from '../../shared/embeds/graph.js';
 import { isTable } from '../../shared/embeds/table.js';
 import { isTagCloud } from '../../shared/embeds/tag-cloud.js';
 import { isVideo, videoSource } from '../../shared/embeds/video.js';
+import { NEW_DIAGRAM } from './block-values.js';
 
 /**
  * Generate a random short identifier.
@@ -561,7 +562,7 @@ export function moveBlock(show, { slideId, blockId, toIndex }) {
 }
 
 /** Block types and the order of the type picker. */
-export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'embed', 'slide-ref', 'pdf', 'video', 'graph', 'map', 'table', 'tag-cloud'];
+export const BLOCK_TYPES = ['text', 'details', 'callout', 'tabs', 'image', 'diagram', 'embed', 'slide-ref', 'pdf', 'video', 'graph', 'map', 'table', 'tag-cloud'];
 
 /**
  * A block converted to another type, in a valid shape for that type (see the
@@ -599,6 +600,13 @@ export function convertBlock(block, type, defaults = {}) {
         ...(block.image ? { image: block.image } : {}),
         ...(block.caption ? { caption: block.caption } : {}),
         ...(Array.isArray(block.hotspots) ? { hotspots: block.hotspots } : {}),
+      };
+    case 'diagram':
+      // A new diagram (E-019) starts with a two-step flowchart to type over.
+      return {
+        ...base, mermaid: typeof block.mermaid === 'string' && block.mermaid ? block.mermaid : NEW_DIAGRAM,
+        ...(block.caption ? { caption: block.caption } : {}),
+        ...(block.fallback ? { fallback: block.fallback } : {}),
       };
     case 'embed':
       return {
