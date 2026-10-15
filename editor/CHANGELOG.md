@@ -4,6 +4,12 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Shrink pictures to WebP, focal point (I-026)
+- **Added** **Shrink…** next to Crop… on every PNG, JPEG, WebP and AVIF picture (`ui/shrink-dialog.js`, encoding in `io/shrink.js`): Longest side (default 2400 px) and Quality (default 85 %), with the WebP's size shown before you apply it. Shrink writes `images/<slug>-<hash8>.webp` and changes only `src`, so alt text, crop, focus and style stay. The original file stays in `images/`, and one Ctrl+Z goes back to it. If the result is not smaller, Shrink stays disabled.
+- **Added** an offer to shrink a large picture when it is added (over 1 MB, or over 2400 px): a notice with a **Shrink…** button. GIF and SVG keep the plain notice above 3 MB.
+- **Added** **Focal point…** on image slots, card images and extra images (`ui/focus-dialog.js`). Click, drag or arrow keys place a crosshair on the picture (cropped as on the slide). A wide and a tall frame show the effect, and X % / Y % take exact values. It is stored as `focus: "x% y%"`, and **As the layout decides** removes it. Value helpers are in `shrink-values.js`, with tests. The manual's *Picture styles and cropping* section has *Focal point* and *Shrink*.
+- **Changed** `image-input.js`: one helper stores an image file (in the folder or in memory, reusing an identical file), used by adding and shrinking.
+
 ### 2026-10-15: Video editor (I-110)
 - **Added** a video editor for the `video` slot and a new **Video** reader block type (`ui/video-fields.js`, value helpers `video-values.js` with tests): **Choose video…** copies an MP4 / WebM file into `media/` (a note above 25 MB: an exported file leaves it out), or type a path or a YouTube / Vimeo / video file address (the line below names the source or the problem); title; play from / to (`90` or `1:30`); muted, loop, controls; while presenting (play on a click, when the slide appears or on the next click; video or poster only; each click jumps to the next chapter); chapters (time and title, + Chapter, ✕); transcript; captions (**Choose .vtt…**, label, language; video files only); load straight away (other servers); poster image.
 - **Added** *Turn into a video block* on an Embedded Page block with a YouTube or Vimeo address.

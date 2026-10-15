@@ -387,6 +387,8 @@ function imageBlockEditor(store, slideId, block) {
       image: block.image,
       styles: store.state.template?.pictureStyles ?? [],
       resolveAsset: store.state.resolveAsset,
+      store,
+      focalPoint: false,
       onChange: (patch) => {
         const current = store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId)
           ?.reader?.blocks?.find((/** @type {any} */ b) => b.id === block.id)?.image;

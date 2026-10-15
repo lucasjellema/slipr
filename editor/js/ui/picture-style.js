@@ -2,8 +2,9 @@
 /**
  * Picture style and opacity for an image (D-014, I-084): a row of buttons,
  * "None" plus one per picture style of the template, each showing this
- * picture in that style; an opacity slider; and Crop… (I-090). Used by image
- * slots, card images, reader image blocks and extra images.
+ * picture in that style; an opacity slider; Crop… (I-090); and Focal point…
+ * and Shrink… (I-026). Used by image slots, card images, reader image blocks
+ * and extra images.
  *
  * The template's theme.css is loaded in the editor page, and its
  * `.slipr-picture-<id>` classes are not scoped to slides, so the previews
@@ -11,17 +12,23 @@
  */
 import { h } from '../dom.js';
 import { openCropDialog } from './crop-dialog.js';
+import { openFocusDialog } from './focus-dialog.js';
+import { runImage } from './image-field.js';
+import { shrinkPicture } from '../image-input.js';
+import { canShrink, typeOfPath } from '../shrink-values.js';
 import { pictureStyle } from '../../../shared/picture.js';
 import { cleanMorphId } from '../slot-values.js';
 
 /**
  * @param {{ label: string, image: any, styles: { id: string, label: string, description?: string }[],
- *   resolveAsset?: (src: string) => string,
- *   onChange: (patch: { style?: string | undefined, opacity?: number | undefined, crop?: any }) => void }} options
- *   `onChange` gets `undefined` for "no style", for 100 % opacity and for the whole picture, so the key is removed.
+ *   resolveAsset?: (src: string) => string, store?: import('../store.js').EditorStore, focalPoint?: boolean,
+ *   onChange: (patch: { style?: string | undefined, opacity?: number | undefined, crop?: any, focus?: string | undefined, src?: string }) => void }} options
+ *   `onChange` gets `undefined` for "no style", for 100 % opacity, for the whole picture and for "as the layout decides", so the key is removed.
+ *   With `store`, PNG, JPEG, WebP and AVIF pictures get Shrink… (I-026), which changes `src`.
+ *   `focalPoint: false` leaves out Focal point… (reader image blocks, which are always shown whole).
  * @returns {HTMLElement | null}  Nothing until the image has a picture.
  */
-export function pictureStyleControls({ label, image, styles, resolveAsset, onChange }) {
+export function pictureStyleControls({ label, image, styles, resolveAsset, store, focalPoint = true, onChange }) {
   if (!image?.src) return null;
   const src = resolveAsset?.(image.src) ?? image.src;
   const current = typeof image.style === 'string' ? image.style : '';
@@ -89,6 +96,18 @@ export function pictureStyleControls({ label, image, styles, resolveAsset, onCha
         onclick: () => openCropDialog({ src, alt: image.alt, crop: image.crop, onApply: (crop) => onChange({ crop }) }),
       }, [viewBox ? 'Crop… (cropped)' : 'Crop…']),
       viewBox ? h('button', { type: 'button', class: 'slipr-link-btn', onclick: () => onChange({ crop: undefined }) }, ['Show the whole picture']) : null,
+      focalPoint ? h('button', {
+        type: 'button', class: 'slipr-btn slipr-btn-sm',
+        'aria-label': `${label}: focal point`,
+        title: 'The part of the picture that stays in view when it fills a frame of another shape',
+        onclick: () => openFocusDialog({ src, alt: image.alt, crop: image.crop, focus: image.focus, onApply: (focus) => onChange({ focus }) }),
+      }, [image.focus ? 'Focal point… (set)' : 'Focal point…']) : null,
+      store && canShrink(typeOfPath(image.src)) ? h('button', {
+        type: 'button', class: 'slipr-btn slipr-btn-sm',
+        'aria-label': `${label}: shrink`,
+        title: 'Save a smaller WebP copy of the picture and use it (the original file stays)',
+        onclick: () => runImage(() => shrinkPicture(store, { src: image.src, onDone: (next) => onChange({ src: next }) })),
+      }, ['Shrink…']) : null,
     ]),
     h('label', { class: 'slipr-picture-morph-row', title: 'Pictures with the same morph name on two auto-animate slides morph into each other, even when they are different files. The same file morphs without a name.' }, [
       h('span', { class: 'slipr-label' }, ['Morph name']),

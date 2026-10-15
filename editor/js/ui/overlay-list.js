@@ -66,6 +66,7 @@ export function buildOverlaySection(slide, store, { idPrefix = 'slipr-overlay' }
       image: o.image,
       styles: store.state.template?.pictureStyles ?? [],
       resolveAsset,
+      store,
       onChange: (patch) => store.dispatch('updateOverlay', { slideId, index: i, patch: { image: imageValue(o.image, patch) } }),
     }),
   ];

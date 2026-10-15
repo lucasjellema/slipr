@@ -2343,6 +2343,7 @@ body.is-screen #slipr-editor-banners {
 
 .slipr-picture-crop-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -2392,6 +2393,108 @@ body.is-screen #slipr-editor-banners {
 .slipr-crop-handle.is-ne { right: -8px; top: -8px; cursor: nesw-resize; }
 .slipr-crop-handle.is-sw { left: -8px; bottom: -8px; cursor: nesw-resize; }
 .slipr-crop-handle.is-se { right: -8px; bottom: -8px; cursor: nwse-resize; }
+
+/* ---------- Focal point dialog (I-026) ---------- */
+
+.slipr-focus-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+}
+
+.slipr-focus-stage {
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.slipr-focus-stage:focus-visible {
+  outline: 2px solid var(--slipr-editor-accent);
+  outline-offset: 2px;
+}
+
+.slipr-focus-image { max-height: 50vh; }
+
+.slipr-focus-marker {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  box-sizing: border-box;
+  border: 2px solid var(--slipr-editor-on-color);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--slipr-editor-warning) 45%, transparent);
+  box-shadow: 0 0 0 2px var(--slipr-editor-warning);
+  pointer-events: none;
+}
+
+.slipr-focus-marker::before,
+.slipr-focus-marker::after {
+  content: '';
+  position: absolute;
+  background: var(--slipr-editor-on-color);
+}
+
+.slipr-focus-marker::before { left: 50%; top: -8px; bottom: -8px; width: 2px; margin-left: -1px; }
+.slipr-focus-marker::after { top: 50%; left: -8px; right: -8px; height: 2px; margin-top: -1px; }
+
+.slipr-focus-samples {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.slipr-focus-samples .slipr-label { margin: 0; }
+
+.slipr-focus-sample {
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--slipr-editor-border);
+}
+
+.slipr-focus-sample.is-wide { width: 220px; height: 80px; }
+.slipr-focus-sample.is-tall { width: 90px; height: 150px; }
+
+.slipr-focus-sample-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Shrink dialog (I-026) ---------- */
+
+.slipr-shrink-form { gap: 10px; }
+
+.slipr-shrink-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.slipr-shrink-head .slipr-help { margin: 0; overflow-wrap: anywhere; }
+
+.slipr-shrink-thumb {
+  flex: none;
+  width: 96px;
+  height: 64px;
+  object-fit: contain;
+  border: 1px solid var(--slipr-editor-border);
+}
+
+.slipr-shrink-quality {
+  flex: 1;
+  accent-color: var(--slipr-editor-accent);
+}
+
+.slipr-shrink-result {
+  margin: 0;
+  font-weight: 600;
+  color: var(--slipr-editor-text-strong);
+}
+
+.slipr-shrink-result.is-warning { color: var(--slipr-editor-danger); }
 
 .slipr-picture-opacity-row {
   display: flex;

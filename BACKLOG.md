@@ -17,7 +17,7 @@ This is the shared work list for **Lucas** and **Claude**: features, chores and 
 
 ## Now: Phase 6 (Polish & publish)
 
-Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), maps (I-075), the slide library (I-029), image cropping (I-090), picture morphs (I-091), dedicated glossary editor (I-088) and draft autosave with crash recovery (I-020); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
+Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, I-085), the show grid (I-081), the editor theme (I-082), extra images (I-083), picture styles (I-084), glossary terms in slides (I-086), text elements (I-089), graphs (I-074), maps (I-075), the slide library (I-029), image cropping (I-090), picture morphs (I-091), dedicated glossary editor (I-088), draft autosave with crash recovery (I-020) and shrinking pictures with a focal point (I-026); see ROADMAP.md. Lucas has not yet picked the next item: ask him, or pick from *Ideas* only when he says so.
 
 **Handover notes (state on 2026-10-12, for the next session)**
 - **Waiting for Lucas:**
@@ -90,7 +90,6 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-022** [editor] Outline view: edit the whole show as one Markdown outline
 - [ ] **I-023** [editor] Import a PPTX inside the editor (Python converter via Pyodide, or a small local helper process)
 - [ ] **I-024** [editor] Keyboard-first editing shortcuts
-- [ ] **I-026** [editor] Image handling: resize/compress to WebP, focal point (cropping: I-090)
 - [ ] **I-027** [editor] AI assist (Claude API): draft slides from an outline, tighten bullets, write alt text, **generate a reader layer from speaker notes**, suggest glossary terms
 - [ ] **I-028** [editor] Version history (snapshots, or git commits when the folder is a repo)
 - [ ] **I-033** [editor] Coverage view: which slides lack a reader layer, which profiles see too little
@@ -159,6 +158,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-026** [editor] **Shrink pictures to WebP and set their focal point**: **Shrink…** next to Crop… on PNG, JPEG, WebP and AVIF pictures (longest side 2400 px and quality 85 % by default, the result's size shown first; a new `images/<slug>-<hash8>.webp` with the original kept, one undo step), offered when a picture over 1 MB or 2400 px is added. **Focal point…** (click, drag or arrow keys on the cropped picture, with wide and tall sample frames) writes the existing `focus` as `"x% y%"`. No format change. Spec `docs/specs/I-026-image-shrink-focus.md` · 2026-10-15 · claude
 - [x] **I-045** [converter] **Export a Slipr show to PowerPoint** (`slipr-export`, D-018): editable slides on the layouts of a base deck (e.g. the company template) or PowerPoint's default, `pptxMapping` and placeholder roles read backwards, outline levels chosen by style, SVG kept, tables, tag clouds and local videos native, fallback pictures / lists / link cards for other rich slots, overlays, sections, hidden slides, the reader layer in the notes, an export report. Spec `docs/specs/I-045-pptx-export.md` · 2026-10-15 · ✓
 - [x] **I-110** [format/viewer/editor] **Video from a local MP4 file or from YouTube / another URL (`video` slot and block)**: today a video can only go in a reader `embed` block as a sandboxed iframe; this makes video a proper embed kind (D-011) in both modes:
   - **Sources**: a file in the show folder (`media/clip.mp4`, also WebM; played with the native `<video>` element, works offline and in the single-file export) or a URL: YouTube and Vimeo links (any form, e.g. `youtu.be/…`, `watch?v=…`, `shorts/…`) turned into their privacy-friendly embed address (`youtube-nocookie.com`, Vimeo `dnt=1`), or a direct link to a video file on another server.

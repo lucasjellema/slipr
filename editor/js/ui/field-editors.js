@@ -178,6 +178,7 @@ export function cardsEditor({ store, slideId, slotName, slotDef, label }) {
             image,
             styles: store.state.template?.pictureStyles ?? [],
             resolveAsset: store.state.resolveAsset,
+            store,
             onChange: (patch) => {
               const currentImage = read()[index]?.[field.name];
               if (currentImage?.src) setField(imageValue(currentImage, patch));

@@ -29,10 +29,10 @@ editor/
 │   ├── editor.css        ✅
 │   └── help.css          ✅ manual styles, light and dark
 ├── test/                 ✅ node --test: actions, store, slot-values, card-values, blocks-hotspots, images, io,
-│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style, theme-contrast, export-zip (I-092)
+│                            layout-choice, reader-tab, show-settings, slide-filter, block-values, help, overlays, picture-style, theme-contrast, export-zip (I-092), shrink-values (I-026)
 └── js/
     ├── main.js           ✅ bootstrap: ?folder=<key> (remembered folder), ?show=<url>, or the start screen; create store, mount panels, wire shortcuts
-    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083); in-memory assets for zip/cross-browser (I-092)
+    ├── image-input.js    ✅ add an image to an image slot from a file, a drop or the clipboard; paste target; alt-text dialog (E-006); extra images: addOverlayImage, addImageToOverlay, svgAspect (I-083); in-memory assets for zip/cross-browser (I-092); shrinkPicture() and the offer to shrink a large picture when it is added (I-026)
     ├── export.js         ✅ Export…: the open show as one offline HTML file via shared/export/single-file.js; files from the editor state, the show folder and the server (I-085)
     ├── export-zip.js     ✅ Export Zip…: package open show, show.json, referenced images, data and docs as a .zip or .slipr archive using shared/zip.js (I-092)
     ├── files.js          ✅ Open…, Open Zip… (I-092), New…, Save (Ctrl+S), unsaved-changes guard (E-002); Present / Read (E-007)
@@ -48,6 +48,7 @@ editor/
     ├── table-values.js   ✅ DOM-free: table values for the table editor (grid, columns, paste, CSV to inline, steps; I-104)
     ├── tag-cloud-values.js ✅ DOM-free: tag cloud values (terms, pasted lists, CSV to inline, steps; I-105)
     ├── video-values.js   ✅ DOM-free: video values (source note, times as typed, chapters, captions; I-110)
+    ├── shrink-values.js  ✅ DOM-free: which pictures can be shrunk, the new size and name, when to offer it; the focal point as `focus` ("x% y%") (I-026)
     ├── glossary-model.js ✅ DOM-free: deck-aware word completion, candidates scanner, usage inspection and filtering (I-088)
     ├── show-grid-model.js ✅ DOM-free: chapter runs (as reader mode groups them), empty chapters, range selection, grid keys (I-081)
     ├── theme.js          ✅ light / dark / system theme: choice in localStorage, applied as data-theme on <html> (index.html applies it before the first paint) (I-082)
@@ -58,6 +59,7 @@ editor/
     ├── io/
     │   ├── fs-access.js  ✅ File System Access API: pick folder, permission, write show.json, create a new show, copy an image in (`writeImage`, `findImageBySuffix`)
     │   ├── images.js     ✅ DOM-free: supported image types, `images/<slug>-<hash8>.<ext>` names, content suffix (E-006)
+    │   ├── shrink.js     ✅ picture size and WebP encoding with createImageBitmap + OffscreenCanvas (or a canvas) (I-026)
     │   ├── serialize.js  ✅ DOM-free: show.json text with schema key order and 2-space indent
     │   ├── new-show.js   ✅ DOM-free: show.json for a new show from a template (root-relative ref, D-012)
     │   └── draft-store.js   ✅ IndexedDB drafts for autosave and crash recovery (I-020)
@@ -79,7 +81,10 @@ editor/
         ├── video-fields.js  ✅ video editor for the video slot and block: file or address, times, options, while presenting, chapters, transcript, captions, poster (I-110)
         ├── overlay-editor.js ✅ extra images on the audience preview: select, drag, corner resize, keyboard (I-083)
         ├── overlay-list.js  ✅ the Slide tab's "Extra images" section (I-083)
-        ├── picture-style.js ✅ picture style picker (live previews with the template's classes) and opacity slider, for every image field (I-084)
+        ├── picture-style.js ✅ picture style picker (live previews with the template's classes) and opacity slider, for every image field (I-084); Crop… (I-090), Focal point… and Shrink… (I-026)
+        ├── crop-dialog.js   ✅ the crop dialog (I-090)
+        ├── focus-dialog.js  ✅ the focal point dialog: click, drag or arrow keys; wide and tall sample frames (I-026)
+        ├── shrink-dialog.js ✅ the Shrink dialog: longest side, quality, the WebP's size before applying (I-026)
         ├── block-editors.js    (idea) the block editors moved out of reader-form.js, which has grown large
         ├── hotspot-editor.js ✅ click on an image to place hotspots; drag or arrow keys to move; title + Markdown per hotspot (E-006)
         ├── layout-picker.js ✅ grid of template layouts, each rendering the current slide (or sample text for a new slide), with the effect of switching (E-004)

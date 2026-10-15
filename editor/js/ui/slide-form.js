@@ -328,6 +328,7 @@ function buildSlotField(slotName, slotDef, value, slideId, store) {
         image,
         styles: store.state.template?.pictureStyles ?? [],
         resolveAsset: store.state.resolveAsset,
+        store,
         onChange: (patch) => {
           const next = imageValue(current, patch);
           current = next;

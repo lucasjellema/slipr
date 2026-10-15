@@ -38,7 +38,7 @@
         <li><a href="#images">Images</a></li>
         <li><a href="#extra-images">Extra images</a></li>
         <li><a href="#text-elements">Text elements</a></li>
-        <li><a href="#picture-styles">Picture styles and cropping</a></li>
+        <li><a href="#picture-styles">Picture styles, cropping, focal point and shrinking</a></li>
         <li><a href="#reader-tab">Reader tab</a></li>
         <li><a href="#hotspots">Hotspots</a></li>
         <li><a href="#diagrams">Diagrams (Mermaid)</a></li>
@@ -336,7 +336,7 @@
           <li><strong>Paste</strong> from the clipboard: <kbd>Ctrl</kbd>+<kbd>V</kbd> while the field has focus, or the <strong>Paste</strong> button. <kbd>Ctrl</kbd>+<kbd>V</kbd> anywhere outside a text field puts the image in the slide's first empty image field.</li>
         </ul>
         <p>The editor copies the image into the show's <code>images/</code> folder, named after the file (a pasted image after the slide) plus a short code. The same image added twice is stored once. Then it asks for <strong>alt text</strong>: a short description for people who cannot see the image, read aloud by screen readers and shown when the image cannot load. Leave it empty only for pure decoration. You can always change it later in the field.</p>
-        <p>Supported: PNG, JPEG, GIF, WebP, AVIF and SVG. Images over 3&nbsp;MB get a warning, because they make the show slow to open: use a smaller or compressed version when you can.</p>
+        <p>Supported: PNG, JPEG, GIF, WebP, AVIF and SVG. Large PNG, JPEG, WebP and AVIF images (over 1&nbsp;MB or 2400 pixels) get an offer to <a href="#shrink">shrink</a> them. GIF and SVG images over 3&nbsp;MB get a warning, because they make the show slow to open.</p>
         <p class="note">Undo puts the previous image back. The editor never deletes image files; unused files simply stay in <code>images/</code>.</p>
       </section>
 
@@ -421,7 +421,7 @@
       </section>
 
       <section id="picture-styles">
-        <h2>Picture styles and cropping</h2>
+        <h2>Picture styles, cropping, focal point and shrinking</h2>
         <p>Any picture (in an image field, a card, a reader image block or an extra image) can get a <strong>picture style</strong> and an <strong>opacity</strong>. The styles come from the template, so they match its look; you only choose one.</p>
         <table>
           <thead><tr><th>Style</th><th>What it does</th></tr></thead>
@@ -450,6 +450,24 @@
           <li>The cropped part then fills the picture's place as the layout decides (<em>Fill the frame</em> or <em>Show the whole image</em>).</li>
           <li><a href="#hotspots">Hotspots</a> stay on their spot of the picture. A hotspot outside the crop is not shown; its row in the hotspot editor says so.</li>
           <li>Pictures converted from PowerPoint keep their PowerPoint crop.</li>
+        </ul>
+
+        <h3 id="focal-point">Focal point</h3>
+        <p>When a picture fills a frame of another shape (<em>Fill the frame</em>, card photos, layouts that fill), part of it is cut off. Click <strong>Focal point…</strong> to say which part must stay in view.</p>
+        <ul>
+          <li>Click the picture, or drag the crosshair. The arrow keys move it (<kbd>Shift</kbd>: bigger steps); <strong>X %</strong> and <strong>Y %</strong> set it exactly.</li>
+          <li>The wide and the tall frame beside the picture show what stays in view.</li>
+          <li><strong>Apply</strong> stores it (one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>); the button then reads <em>Focal point… (set)</em>. <strong>As the layout decides</strong> removes it.</li>
+          <li>A cropped picture shows its crop in the dialog: the focal point is a point on the cropped part. A picture shown whole is not changed by it. Reader image blocks are always shown whole, so they have no focal point.</li>
+        </ul>
+
+        <h3 id="shrink">Shrink</h3>
+        <p>Photos from a phone or a stock site are often much larger than a slide needs, and large files make a show slow to open. Click <strong>Shrink…</strong> under a PNG, JPEG, WebP or AVIF picture to save a smaller copy as WebP.</p>
+        <ul>
+          <li><strong>Longest side</strong> (default 2400 pixels, sharp full-screen even on a 4K projector) and <strong>Quality</strong> (default 85 %) decide the result. The dialog shows its size before you apply it.</li>
+          <li><strong>Shrink</strong> saves the copy in <code>images/</code> and the picture uses it. Alt text, crop, focal point and style stay. The original file stays in the folder; <kbd>Ctrl</kbd>+<kbd>Z</kbd> goes back to it.</li>
+          <li>When you add a picture over 1&nbsp;MB or over 2400 pixels, a notice offers <strong>Shrink…</strong> for it.</li>
+          <li>SVG and GIF pictures cannot be shrunk: SVG scales by itself, and a GIF may be animated.</li>
         </ul>
 
         <h3 id="morph">Morph name</h3>

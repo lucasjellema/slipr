@@ -16,6 +16,9 @@ import { withFallback } from './block-values.js';
 import { newOverlayBox } from './actions.js';
 import { askForShowFolder } from './files.js';
 import { openAltTextDialog, showBanner } from './ui/dialogs.js';
+import { openShrinkDialog } from './ui/shrink-dialog.js';
+import { pictureSize } from './io/shrink.js';
+import { canShrink, formatBytes, shouldOfferShrink, shrunkBaseName, typeOfPath } from './shrink-values.js';
 
 /**
  * The first image file in a drop or paste, or null.
@@ -76,29 +79,31 @@ export function pasteTargetSlot(template, slide) {
 }
 
 /**
- * Copy an image into the show folder, store it with `write`, then ask for alt text.
+ * When the show has no folder to write to (opened by URL) but the browser can
+ * open folders, ask for it and return true: the caller stops.
  * @param {import('./store.js').EditorStore} store
- * @param {{ slideId: string, file: File, fallbackName: string,
- *   read: (slide: any) => any, write: (image: any) => void }} target
- *   `read` returns the current image value of the target, `write` stores a new one.
+ * @param {string} doing  e.g. "To add images".
  */
-async function addImage(store, { slideId, file, fallbackName, read, write, defaultAlt }) {
+function needsShowFolder(store, doing) {
+  if (store.state.folderHandle || store.state.zipSource || !canOpenFolders()) return false;
+  showBanner(`${doing}, Slipr needs to write to the show folder. Choose it, then try again.`, 'info', { timeout: 6000 });
+  askForShowFolder(store);
+  return true;
+}
+
+/**
+ * Store an image file in the show: in the folder's images/ (named by content
+ * hash; an identical file already there is reused), or in memory for a show
+ * without a folder. Returns its path relative to show.json.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ blob: Blob, type: string, name?: string, fallbackName: string }} file
+ * @returns {Promise<string>}
+ */
+async function storeImageFile(store, { blob, type, name, fallbackName }) {
   const handle = store.state.folderHandle;
-  if (!handle && !store.state.zipSource && canOpenFolders()) {
-    showBanner('To add images, Slipr needs to write to the show folder. Choose it, then add the image again.', 'info', { timeout: 6000 });
-    askForShowFolder(store);
-    return;
-  }
-  const type = imageType(file);
-  if (!type) throw new Error(`"${file.name || 'This file'}" is not a supported image (PNG, JPEG, GIF, WebP, AVIF or SVG).`);
   if (handle && !(await ensurePermission(handle))) throw new Error(`No permission to write to the folder "${handle.name}".`);
-
-  const slideOf = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
-  if (!slideOf()) return;
-  const bytes = await file.arrayBuffer();
-  const blob = file.type === type ? file : new Blob([bytes], { type });
-  const newPath = await imagePath({ name: file.name, type, bytes }, fallbackName);
-
+  const bytes = await blob.arrayBuffer();
+  const newPath = await imagePath({ name, type, bytes }, fallbackName);
   let path = newPath;
   if (handle) {
     // The same image may already be in the folder under another name: reuse it.
@@ -111,12 +116,98 @@ async function addImage(store, { slideId, file, fallbackName, read, write, defau
     store.state.inMemoryAssets.set(path, blob);
   }
   store.state.registerAsset?.(path, blob);
+  return path;
+}
+
+/**
+ * Run a shrink and report failures as a banner.
+ * @param {() => Promise<void>} action
+ */
+function runShrink(action) {
+  action().catch((err) => showBanner(err instanceof Error ? err.message : String(err), 'error'));
+}
+
+/**
+ * Shrink a picture of the show to WebP (I-026): open the Shrink dialog for the
+ * file at `src`; on Shrink the new file is stored next to the original (which
+ * stays) and `onDone` gets its path, to put in the image value's `src`.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ src: string, onDone: (src: string) => void }} target
+ */
+export async function shrinkPicture(store, { src, onDone }) {
+  if (needsShowFolder(store, 'To shrink a picture')) return;
+  const type = typeOfPath(src);
+  if (!canShrink(type)) throw new Error('Only PNG, JPEG, WebP and AVIF pictures can be shrunk.');
+  const blob = await loadPicture(store, src);
+  openShrinkDialog({
+    src,
+    blob,
+    save: (webp) => storeImageFile(store, { blob: webp, type: 'image/webp', name: `${shrunkBaseName(src)}.webp`, fallbackName: 'image' }),
+    onDone,
+  });
+}
+
+/**
+ * After adding a large PNG, JPEG, WebP or AVIF picture (over 1 MB, or over
+ * 2400 px), a notice offers to shrink it. Does not wait: the alt-text dialog
+ * opens meanwhile.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ blob: Blob, type: string, path: string, apply: (src: string) => void }} added
+ */
+function offerShrink(store, { blob, type, path, apply }) {
+  pictureSize(blob).then((size) => {
+    if (!shouldOfferShrink({ type, bytes: blob.size, ...size })) return;
+    const dims = size ? `, ${size.width} × ${size.height} px` : '';
+    showBanner(`This picture is ${formatBytes(blob.size)}${dims}. Shrink it to WebP to make the show faster to open; the original stays in images/.`, 'info', {
+      timeout: 30000,
+      actions: [{ label: 'Shrink…', run: () => runShrink(() => shrinkPicture(store, { src: path, onDone: apply })) }],
+    });
+  });
+}
+
+/**
+ * The bytes of a picture of the show: from memory, else from its address.
+ * @param {import('./store.js').EditorStore} store
+ * @param {string} src
+ * @returns {Promise<Blob>}
+ */
+async function loadPicture(store, src) {
+  const inMemory = store.state.inMemoryAssets?.get(src);
+  if (inMemory) return inMemory;
+  const url = store.state.resolveAsset?.(src) ?? src;
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Could not read "${src}".`);
+  return response.blob();
+}
+
+/**
+ * Copy an image into the show folder, store it with `write`, then ask for alt text.
+ * @param {import('./store.js').EditorStore} store
+ * @param {{ slideId: string, file: File, fallbackName: string,
+ *   read: (slide: any) => any, write: (image: any) => void }} target
+ *   `read` returns the current image value of the target, `write` stores a new one.
+ */
+async function addImage(store, { slideId, file, fallbackName, read, write, defaultAlt }) {
+  if (needsShowFolder(store, 'To add images')) return;
+  const type = imageType(file);
+  if (!type) throw new Error(`"${file.name || 'This file'}" is not a supported image (PNG, JPEG, GIF, WebP, AVIF or SVG).`);
+
+  const slideOf = () => store.state.show?.slides?.find((/** @type {any} */ s) => s.id === slideId);
+  if (!slideOf()) return;
+  const blob = file.type === type ? file : new Blob([await file.arrayBuffer()], { type });
+  const path = await storeImageFile(store, { blob, type, name: file.name, fallbackName });
 
   const previous = read(slideOf());
   const keepAlt = previous?.src === path;
   write(imageValue(keepAlt ? previous : { ...previous, alt: defaultAlt || undefined }, { src: path }));
 
-  if (file.size > LARGE_IMAGE_BYTES) {
+  // A large photo: offer to shrink it (I-026). GIF and SVG keep the plain notice.
+  if (canShrink(type)) {
+    offerShrink(store, { blob, type, path, apply: (src) => {
+      const current = read(slideOf());
+      if (current?.src === path) write(imageValue(current, { src }));
+    } });
+  } else if (file.size > LARGE_IMAGE_BYTES) {
     showBanner(`This image is ${(file.size / 1024 / 1024).toFixed(1)} MB. Large images make shows slow to open; consider a smaller or compressed version.`, 'info', { timeout: 8000 });
   }
 
