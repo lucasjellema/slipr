@@ -163,6 +163,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **T-005** [templates] `templates/forest/`: a forest atmosphere (greens on parchment, ochre, pine illustrations on title and section slides) with classic serif type (Palatino, Georgia); Default's layouts; all contrast checks pass · done 2026-10-15 · claude
 - [x] **I-106** [template-editor] **Template editor, phase 1: theme designer** (Lucas's decisions 2026-10-15: a new app `template-editor/`; token values rewritten in place, D-017; only the tokens a template declares). Start from a template or open a template folder; colours with links between tokens and WCAG AA checks, fonts with `.woff2` upload, sizes; the Template tab (name, id, version, description, style guide fonts); live audience and reader preview in an iframe (demo shows or a generated slide per layout, 16:9 / 4:3); undo / redo; Save, Save as folder…, Download .zip; `template.json` keeps its formatting and its style guide colours follow their tokens. The other parts of the original idea are I-111 … I-115; contrast findings in the shipped templates are C-009. Spec `docs/specs/I-106-template-editor.md` · done 2026-10-15 · claude
 - [x] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
   - **Contents of the instruction:**

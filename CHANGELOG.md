@@ -6,6 +6,9 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-15: Forest template (T-005)
+- **Added** `templates/forest/` (0.1.0), based on Slipr Default 1.7.0 (same 12 layouts and slots, so shows can switch): deep forest greens on parchment, ochre accents, a moonlit pine forest on the title slide and a tree line on section slides (`assets/illustrations/forest.svg`, `ridge.svg`, drawn for it), the Slipr logo in forest colours, and classic serif type (Palatino headings, Georgia body; installed fonts, no font files). All 25 contrast checks of the template editor pass. Listed in `templates/index.json`; prompt kit `docs/ai/prompts/forest-*.md`.
+
 ### 2026-10-15: Template editor, phase 1 (I-106)
 - **Added** a fourth app, `template-editor/` (D-017): make a template from one in `templates/index.json` or open a template folder, edit the values of its `:root` tokens (colours with WCAG AA checks, fonts with `.woff2` upload, sizes) with a live audience and reader preview, and save the folder or a `.zip`. Token values are rewritten in place and `template.json` keeps its formatting; no format change. Spec `docs/specs/I-106-template-editor.md`; the rest of I-106 is I-111 … I-115. Component docs in `template-editor/`.
 - **Added** chore C-009: the contrast checks found pairs below AA in both shipped templates (left for Lucas to decide).

@@ -20,7 +20,7 @@ templates/default/
 └── preview/             thumbnails per layout (used by the editor's layout picker)
 ```
 
-Every template folder is listed in **`templates/index.json`** (`{ "templates": ["default", "conclusion"] }`). The editor offers these templates for a new show, because a static server can't list folders. A test fails if the list and the folders differ.
+Every template folder is listed in **`templates/index.json`** (`{ "templates": ["default", "conclusion", "forest"] }`). The editor offers these templates for a new show, because a static server can't list folders. A test fails if the list and the folders differ.
 
 ## `template.json`: example
 

@@ -1,0 +1,377 @@
+/*
+ * Slipr Forest template: theme (style guide + layout styles).
+ * Based on Slipr Default 1.7.0: deep forest greens on parchment, ochre accents,
+ * classic serif type (Palatino headings, Georgia body; installed on nearly
+ * every computer, so no font files). Illustrations: assets/illustrations/.
+ *
+ * Sizing model: the renderer wraps every layout fragment like this:
+ *   <div class="slipr-slide slipr-mode-audience|slipr-mode-reader" data-layout="…" data-aspect="16:9">
+ *     <div class="slipr-canvas"> …layout fragment… </div>
+ *   </div>
+ * .slipr-slide is a CSS inline-size container; .slipr-canvas is the 16:9 box.
+ * All slide measurements use container query units (cqw = 1% of the slide
+ * width), so the same CSS works on the 1920×1080 Reveal.js canvas, in the
+ * reader's slide frame, and in editor thumbnails. At 1920px wide: 1cqw = 19.2px.
+ */
+
+:root {
+  /* Style guide: keep in sync with "styleguide" in template.json */
+  --slipr-color-primary: #1E3A2A;
+  --slipr-color-accent: #8C6A1C;
+  --slipr-color-text: #24261F;
+  --slipr-color-muted: #575C4C;
+  --slipr-color-bg: #F7F4EA;
+  --slipr-color-surface: #E9EDE0;
+  --slipr-color-on-primary: #F7F4EA;
+
+  --slipr-font-heading: "Palatino Linotype", "Book Antiqua", Palatino, "URW Palladio L", P052, Georgia, serif;
+  --slipr-font-body: Georgia, "Iowan Old Style", "Times New Roman", Times, serif;
+  --slipr-font-code: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+
+  /* Slide metrics (in cqw) */
+  --slipr-pad-x: 6cqw;
+  --slipr-pad-y: 5cqw;
+  --slipr-size-title: 3.6cqw;
+  --slipr-size-title-hero: 5.2cqw;
+  --slipr-size-subtitle: 2.1cqw;
+  --slipr-size-body: 2.2cqw;
+  --slipr-size-small: 1.2cqw;
+  --slipr-radius: 0.3cqw;
+
+  /* Graph node colors, by tag (I-074) */
+  --slipr-graph-1: #1E3A2A;
+  --slipr-graph-2: #7A5530;
+  --slipr-graph-3: #3D7349;
+  --slipr-graph-4: #8C6A1C;
+  --slipr-graph-5: #4B6A78;
+  --slipr-graph-6: #9A4729;
+
+  /* Data tables (I-104) */
+  --slipr-table-header-bg: #1E3A2A;
+  --slipr-table-header-text: #F7F4EA;
+  --slipr-table-stripe: #EEF0E6;
+  --slipr-table-border: #D3D9C6;
+  --slipr-table-strong: #3D7349;
+  --slipr-table-positive: #2E6636;
+  --slipr-table-negative: #9A3A24;
+  --slipr-table-highlight: #D9B44A;
+
+  /* Tag clouds (I-105): colours by weight, light to strong; sizes in em */
+  --slipr-tag-cloud-1: #575C4C;
+  --slipr-tag-cloud-2: #7A5530;
+  --slipr-tag-cloud-3: #3D7349;
+  --slipr-tag-cloud-4: #1E3A2A;
+  --slipr-tag-cloud-highlight: #D9B44A;
+  --slipr-tag-cloud-min-size: 0.9em;
+  --slipr-tag-cloud-max-size: 3em;
+}
+
+/* ---------- Slide frame ---------- */
+
+.slipr-slide {
+  container-type: inline-size;
+  width: 100%;
+  color: var(--slipr-color-text);
+  font-family: var(--slipr-font-body);
+  text-align: left;
+  line-height: 1.3;
+}
+.slipr-canvas {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--slipr-color-bg);
+}
+.slipr-slide[data-aspect="4:3"] .slipr-canvas { aspect-ratio: 4 / 3; }
+
+.slipr-slide *,
+.slipr-slide *::before,
+.slipr-slide *::after { box-sizing: border-box; }
+
+.slipr-layout {
+  position: absolute;
+  inset: 0;
+  padding: var(--slipr-pad-y) var(--slipr-pad-x);
+  display: flex;
+  flex-direction: column;
+  gap: 2.2cqw;
+}
+
+/* Restore text semantics: host pages (e.g. Reveal.js's reset.css) may set
+   `font: inherit` on everything. */
+.slipr-slide :is(h1, h2, h3, h4, h5, h6, strong, b, th) { font-weight: 700; }
+.slipr-slide :is(em, i, cite) { font-style: italic; }
+
+/* Optional slots left empty by the show */
+.slipr-slide [data-empty] { display: none !important; }
+
+/* ---------- Typography ---------- */
+
+.slipr-title {
+  margin: 0;
+  font-family: var(--slipr-font-heading);
+  font-size: var(--slipr-size-title);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--slipr-color-primary);
+  text-transform: none;
+}
+.slipr-subtitle {
+  margin: 0;
+  font-size: var(--slipr-size-subtitle);
+  color: var(--slipr-color-muted);
+}
+.slipr-kicker,
+.slipr-byline {
+  margin: 0;
+  font-size: var(--slipr-size-small);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slipr-color-accent);
+}
+.slipr-body {
+  margin: 0;
+  font-size: var(--slipr-size-body);
+}
+.slipr-body p { margin: 0 0 0.6em; }
+.slipr-slide ul,
+.slipr-slide ol { margin: 0; padding-left: 1.2em; }
+.slipr-slide li { margin: 0.35em 0; }
+.slipr-slide li::marker { color: var(--slipr-color-accent); }
+.slipr-slide li li { font-size: 0.85em; }
+.slipr-slide strong { color: var(--slipr-color-primary); }
+.slipr-slide code {
+  font-family: var(--slipr-font-code);
+  font-size: 0.9em;
+  background: var(--slipr-color-surface);
+  padding: 0.05em 0.3em;
+  border-radius: 0.2em;
+}
+.slipr-slide a { color: var(--slipr-color-primary); text-decoration-color: var(--slipr-color-accent); }
+
+.slipr-logo {
+  position: absolute;
+  right: var(--slipr-pad-x);
+  bottom: 3cqw;
+  height: 2.2cqw;
+  width: auto;
+}
+
+/* ---------- Layout: title ---------- */
+
+.slipr-layout--title {
+  justify-content: center;
+  background: linear-gradient(160deg, var(--slipr-color-primary) 0%, color-mix(in srgb, var(--slipr-color-primary) 70%, #000) 100%);
+  color: var(--slipr-color-on-primary);
+}
+.slipr-layout--title .slipr-stack { display: flex; flex-direction: column; gap: 1.6cqw; max-width: 70%; position: relative; }
+.slipr-layout--title .slipr-title { font-size: var(--slipr-size-title-hero); color: var(--slipr-color-on-primary); letter-spacing: 0.01em; }
+/* The gold of the moon: ochre is too dark on the green title slide. */
+.slipr-layout--title .slipr-byline { font-style: italic; color: #D9B44A; }
+.slipr-layout--title .slipr-subtitle { color: color-mix(in srgb, var(--slipr-color-on-primary) 80%, transparent); }
+.slipr-layout--title .slipr-decor {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  opacity: 1;
+  pointer-events: none;
+}
+.slipr-layout--title .slipr-logo { filter: brightness(0) invert(1); }
+
+/* ---------- Layout: section ---------- */
+
+.slipr-layout--section {
+  justify-content: center;
+  background:
+    url("assets/illustrations/ridge.svg") bottom / 100% auto no-repeat,
+    linear-gradient(90deg, var(--slipr-color-accent) 0 1.2cqw, var(--slipr-color-surface) 1.2cqw);
+}
+.slipr-layout--section .slipr-stack { margin-bottom: 6cqw; }
+.slipr-layout--section .slipr-stack { display: flex; flex-direction: column; gap: 1.4cqw; }
+.slipr-layout--section .slipr-title { font-size: 4.6cqw; }
+
+/* ---------- Layout: bullets ---------- */
+
+.slipr-layout--bullets .slipr-title {
+  padding-bottom: 1.2cqw;
+  border-bottom: 0.25cqw solid var(--slipr-color-accent);
+  align-self: flex-start;
+}
+.slipr-layout--bullets .slipr-body { max-width: 80%; }
+
+/* ---------- Layout: two-column ---------- */
+
+.slipr-layout--two-column .slipr-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: 4cqw;
+  min-height: 0;
+}
+.slipr-layout--two-column .slipr-column {
+  background: var(--slipr-color-surface);
+  border-radius: var(--slipr-radius);
+  border-top: 0.35cqw solid var(--slipr-color-primary);
+  padding: 2.2cqw 2.6cqw;
+}
+.slipr-layout--two-column .slipr-column + .slipr-column { border-top-color: var(--slipr-color-accent); }
+.slipr-column-title {
+  margin: 0 0 1cqw;
+  font-family: var(--slipr-font-heading);
+  font-size: 2.2cqw;
+  color: var(--slipr-color-primary);
+}
+.slipr-layout--two-column .slipr-body { font-size: 1.7cqw; }
+
+/* ---------- Layout: image-full ---------- */
+
+.slipr-layout--image-full { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure {
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1cqw;
+}
+.slipr-image {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+.slipr-image[data-fit="cover"] { object-fit: cover; border-radius: var(--slipr-radius); }
+.slipr-caption {
+  font-size: var(--slipr-size-small);
+  color: var(--slipr-color-muted);
+  text-align: center;
+}
+
+/* ---------- Layout: diagram ---------- */
+
+.slipr-layout--diagram { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--diagram {
+  margin: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1cqw;
+}
+.slipr-diagram {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.slipr-diagram svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- Layout: web (I-071) ---------- */
+
+.slipr-layout--web { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--web { align-items: stretch; }
+.slipr-web { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
+/* ---------- Layout: pdf (I-072) ---------- */
+
+.slipr-layout--pdf { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--pdf { align-items: stretch; }
+.slipr-pdf { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
+/* ---------- Layout: graph (I-074) ---------- */
+
+.slipr-layout--graph { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--graph { align-items: stretch; }
+.slipr-graph { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
+/* ---------- Layout: table (I-104) ---------- */
+
+.slipr-layout--table { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--table { align-items: stretch; min-height: 0; }
+.slipr-layout--table .slipr-table { flex: 1; min-height: 0; width: 100%; font-size: 1.6cqw; }
+
+/* ---------- Layout: tag cloud (I-105) ---------- */
+
+.slipr-layout--tag-cloud { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--tag-cloud { align-items: stretch; min-height: 0; }
+.slipr-layout--tag-cloud .slipr-tag-cloud { flex: 1; min-height: 0; width: 100%; font-size: 2cqw; }
+
+/* ---------- Layout: map (I-075) ---------- */
+
+.slipr-layout--map { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--map { align-items: stretch; }
+.slipr-layout--map .slipr-map { flex: 1; min-height: 0; width: 100%; font-size: var(--slipr-size-small); }
+
+/* ---------- Reader mode: reflow on narrow screens ----------
+ * Below ~640px the slide stops being a scaled 16:9 picture and becomes
+ * ordinary flowing content with rem-based type.
+ */
+@container (max-width: 640px) {
+  .slipr-mode-reader .slipr-canvas { aspect-ratio: auto; }
+  .slipr-mode-reader .slipr-layout {
+    position: static;
+    padding: 1.25rem;
+    gap: 0.75rem;
+  }
+  .slipr-mode-reader .slipr-title { font-size: 1.5rem; }
+  .slipr-mode-reader .slipr-layout--title .slipr-title { font-size: 1.9rem; }
+  .slipr-mode-reader .slipr-layout--section .slipr-title { font-size: 1.7rem; }
+  .slipr-mode-reader .slipr-subtitle { font-size: 1.05rem; }
+  .slipr-mode-reader .slipr-kicker,
+  .slipr-mode-reader .slipr-byline,
+  .slipr-mode-reader .slipr-caption { font-size: 0.8rem; }
+  .slipr-mode-reader .slipr-body { font-size: 1rem; max-width: none; }
+  .slipr-mode-reader .slipr-column-title { font-size: 1.1rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-columns { grid-template-columns: 1fr; gap: 0.75rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-column { padding: 0.9rem 1rem; }
+  .slipr-mode-reader .slipr-layout--two-column .slipr-body { font-size: 1rem; }
+  .slipr-mode-reader .slipr-layout--title .slipr-stack { max-width: none; }
+  .slipr-mode-reader .slipr-decor,
+  .slipr-mode-reader .slipr-logo { display: none; }
+  .slipr-mode-reader .slipr-image { max-height: 60vh; }
+  .slipr-mode-reader .slipr-web { flex: none; height: 70vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-pdf { flex: none; height: 70vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-graph { flex: none; height: 60vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-layout--map .slipr-map { flex: none; height: 60vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-layout--tag-cloud .slipr-tag-cloud { flex: none; font-size: 0.8rem; }
+}
+
+/* ---------- Picture styles (template format 0.3, D-014, I-084) ----------
+ * One class per entry in template.json's pictureStyles: slipr-picture-<id>.
+ * Not scoped under .slipr-slide, so the same class styles a slide image, a
+ * reader image block and the editor's style preview. Effects on the picture
+ * only (never layout); sizes in em, so they scale with the slide's type.
+ */
+.slipr-picture-shadow {
+  filter: drop-shadow(0 0.35em 0.6em rgb(0 0 0 / 0.28));
+}
+.slipr-picture-soft {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent), linear-gradient(to bottom, transparent, #000 9%, #000 91%, transparent);
+  mask-composite: intersect;
+}
+.slipr-picture-rounded {
+  border-radius: 0.9em;
+}
+.slipr-picture-frame {
+  box-sizing: border-box;
+  border: 0.4em solid var(--slipr-color-bg, #FFFFFF);
+  background: var(--slipr-color-bg, #FFFFFF);
+  box-shadow: 0 0.15em 0.6em rgb(0 0 0 / 0.25);
+}

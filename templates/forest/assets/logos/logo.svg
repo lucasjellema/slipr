@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 132 40" role="img" aria-label="Slipr">
+  <path d="M4 32 L16 8 H26 L14 32 Z" fill="#8C6A1C"/>
+  <path d="M16 32 L28 8 H34 L22 32 Z" fill="#1E3A2A" opacity="0.55"/>
+  <text x="40" y="30" font-family="system-ui, 'Segoe UI', Roboto, Arial, sans-serif" font-size="26" font-weight="700" fill="#1E3A2A" letter-spacing="-0.5">slipr</text>
+</svg>
