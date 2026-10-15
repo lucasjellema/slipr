@@ -9,19 +9,26 @@
 import { createStore } from './store.js';
 import {
   openTemplate, catalogOf, sheetTexts, setToken, setMeta, setStyleguideFont, addFont,
-  outputFiles, changedPaths, markSaved, asClone,
+  outputFiles, changedPaths, deletedPaths, markSaved, asClone,
 } from './actions.js';
+import {
+  layoutDef, composedOf, looksOf, textFile, addLayout, removeLayout, addSlotBox, addPictureBox, addImageFile,
+  layoutIdProblem, setBox,
+} from './layout-actions.js';
+import { rootClasses, looksFor, freeName, typeLabel, templateImages, isSlotName, SLOT_TYPES } from './composer/layout-model.js';
 import { TABS } from './token-catalog.js';
 import { checkContrast } from './contrast-pairs.js';
 import { fontFaceFamilies, cleanFamily } from './css-tokens.js';
 import { cloneTemplateJson, cloneReadme, idFromName, isTemplateId, syncStyleguide, familyFromFileName, supportsFourThree } from './template-files.js';
 import { SAMPLE_SHOWS, generatedSample, fitSample, bestSample, withAspect } from './sample-show.js';
 import {
-  listBuiltInTemplates, readTemplateFromUrl, readTemplateFromFolder, writeTemplateFiles,
+  listBuiltInTemplates, readTemplateFromUrl, readTemplateFromFolder, writeTemplateFiles, removeTemplateFiles,
   pickFolder, canUseFolders, ensureWritable, templateZip, download,
 } from './source.js';
 import { renderTokenPanel, flashRow } from './ui/token-panel.js';
 import { renderTemplateTab } from './ui/template-tab.js';
+import { renderLayoutsTab } from './ui/layouts-tab.js';
+import { createStageOverlay } from './ui/stage-overlay.js';
 import { createPreview } from './ui/preview-frame.js';
 import { validateTemplate } from '../../shared/validate.js';
 
@@ -54,9 +61,27 @@ const el = {
   cloneForm: /** @type {HTMLFormElement} */ ($('te-clone-form')),
   fontDialog: /** @type {HTMLDialogElement} */ ($('te-font-dialog')),
   fontForm: /** @type {HTMLFormElement} */ ($('te-font-form')),
+  layoutDialog: /** @type {HTMLDialogElement} */ ($('te-layout-dialog')),
+  layoutForm: /** @type {HTMLFormElement} */ ($('te-layout-form')),
+  slotDialog: /** @type {HTMLDialogElement} */ ($('te-slot-dialog')),
+  slotForm: /** @type {HTMLFormElement} */ ($('te-slot-form')),
+  pictureDialog: /** @type {HTMLDialogElement} */ ($('te-picture-dialog')),
+  pictureForm: /** @type {HTMLFormElement} */ ($('te-picture-form')),
 };
 
 const preview = createPreview(el.frame);
+const overlay = createStageOverlay($('te-stage-overlay'), {
+  getRect: () => preview.canvasRect(),
+  onSelect: (id) => selectBox(id, false),
+  onChange: (boxId, area, gesture) => {
+    if (view.layout) update((s) => setBox(s, /** @type {string} */ (view.layout), boxId, { area }), `${gesture}:${view.layout}`);
+  },
+});
+// The frame lays out its slide after the observer fires: follow the frame's own resize too.
+new ResizeObserver(() => requestAnimationFrame(() => overlay.reposition())).observe(el.frame);
+const followFrame = () => el.frame.contentWindow?.addEventListener('resize', () => overlay.reposition());
+if (el.frame.contentDocument?.readyState === 'complete') followFrame();
+el.frame.addEventListener('load', followFrame);
 
 /** @type {ReturnType<typeof createStore<TemplateState>> | null} */
 let store = null;
@@ -76,6 +101,10 @@ const view = {
   /** @type {string} */ sample: 'generated',
   /** Panel rebuilds wait while a colour picker is dragged. */
   swatchActive: false,
+  /** The layout selected on the Layouts tab (I-111): the preview stages it. */
+  /** @type {string | null} */ layout: null,
+  /** The selected box of a composed layout. */
+  /** @type {string | null} */ box: null,
 };
 
 // ---------------------------------------------------------------------------
@@ -159,12 +188,15 @@ async function openWorkspace(state) {
   el.workspace.hidden = false;
   el.actions.hidden = false;
   preview.clear();
+  view.layout = null;
+  view.box = null;
   if (!store) {
     store = createStore(state);
     store.subscribe(onChange);
   } else {
     store.replace(state);
   }
+  previous = state;
   await loadSamples();
   view.sample = bestSample(state.template, samples);
   setAspectChoice(state);
@@ -183,9 +215,39 @@ async function openWorkspace(state) {
  */
 function onChange(state, info) {
   updateChrome();
-  if (info.kind !== 'replace') preview.setStyles(state);
+  const before = previous;
+  previous = state;
+  if (info.kind === 'replace') return;
+  // Undo may take a selected layout or box away.
+  if (view.layout && !layoutDef(state, view.layout)) view.layout = view.box = null;
+  if (view.layout && view.box && !composedOf(state, view.layout)?.boxes.some((b) => b.id === view.box)) view.box = null;
+  if (before && layoutsChanged(before, state)) {
+    if (renderTabsNeeded(before, state)) renderTabs();
+    run(renderPreview);
+  } else {
+    preview.setStyles(state);
+    updateOverlay();
+  }
   // While a colour picker is dragged the panel waits (a rebuild would close the picker).
-  if (!view.swatchActive && info.kind !== 'replace') renderPanel();
+  if (!view.swatchActive) renderPanel();
+}
+
+/** The state the subscribers saw last (to tell what a change touched). */
+/** @type {TemplateState | null} */
+let previous = null;
+
+/**
+ * Did the layouts change in a way that needs a new render (not just CSS)?
+ * @param {TemplateState} a @param {TemplateState} b
+ */
+function layoutsChanged(a, b) {
+  if (a.template.layouts !== b.template.layouts) return true;
+  return (b.template.layouts ?? []).some((/** @type {any} */ l) => a.files.get(l.file) !== b.files.get(l.file));
+}
+
+/** @param {TemplateState} a @param {TemplateState} b */
+function renderTabsNeeded(a, b) {
+  return (a.template.layouts ?? []).length !== (b.template.layouts ?? []).length;
 }
 
 function updateChrome() {
@@ -206,7 +268,11 @@ function updateChrome() {
 function renderTabs() {
   if (!store) return;
   const catalog = catalogOf(store.get());
-  const tabs = [...TABS.map((t) => ({ id: t.id, label: t.label, count: catalog.filter((x) => x.kind === t.id).length })), { id: 'template', label: 'Template', count: null }];
+  const tabs = [
+    ...TABS.map((t) => ({ id: t.id, label: t.label, count: /** @type {number | null} */ (catalog.filter((x) => x.kind === t.id).length) })),
+    { id: 'layouts', label: 'Layouts', count: (store.get().template.layouts ?? []).length },
+    { id: 'template', label: 'Template', count: null },
+  ];
   el.tabs.replaceChildren(...tabs.map((t) => {
     const tab = document.createElement('button');
     tab.type = 'button';
@@ -229,7 +295,9 @@ function renderTabs() {
 
 /** @param {string} id */
 function selectTab(id) {
+  const staged = stageActive();
   view.tab = id;
+  if (staged !== stageActive()) run(renderPreview);
   for (const tab of el.tabs.querySelectorAll('[role="tab"]')) {
     const selected = /** @type {HTMLElement} */ (tab).dataset.tab === id;
     tab.setAttribute('aria-selected', String(selected));
@@ -252,7 +320,30 @@ function renderPanel() {
   if (!store) return;
   const state = store.get();
   el.body.setAttribute('aria-labelledby', `te-tab-${view.tab}`);
-  el.filterRow.hidden = view.tab === 'template';
+  el.filterRow.hidden = view.tab === 'template' || view.tab === 'layouts';
+  if (view.tab === 'layouts') {
+    const readText = (/** @type {string} */ p) => textFile(state, p);
+    renderLayoutsTab(el.body, {
+      state,
+      layout: view.layout,
+      box: view.box,
+      colors: catalogOf(state).filter((t) => t.kind === 'color').map((t) => ({ name: t.name, label: t.label })),
+      variants: rootClasses(state.template, readText).variants,
+      update,
+      onSelectLayout: (id) => selectLayout(id),
+      onSelectBox: (id) => selectBox(id, true),
+      onNewLayout: (from) => run(() => newLayout(from)),
+      onAddSlot: () => run(addSlot),
+      onAddPicture: () => run(addPicture),
+      onRemoveLayout: (id) => {
+        const def = layoutDef(state, id);
+        if (!def || !confirm(`Remove the layout "${def.name ?? id}"? Shows that use it can no longer show those slides. Its file ${def.file} is deleted when you save.`)) return;
+        view.layout = view.box = null;
+        update((s) => removeLayout(s, id));
+      },
+    });
+    return;
+  }
   if (view.tab === 'template') {
     renderTemplateTab(el.body, {
       template: syncStyleguide(state.template, state.links, catalogOf(state)),
@@ -304,6 +395,152 @@ function update(change, coalesceKey) {
   } catch (err) {
     banner(err instanceof Error ? err.message : String(err), 'error');
   }
+}
+
+// ---------------------------------------------------------------------------
+// Layouts (I-111)
+
+/** Does the preview stage one layout (the Layouts tab with a layout selected)? */
+function stageActive() {
+  return view.tab === 'layouts' && Boolean(view.layout);
+}
+
+/** @param {string | null} id */
+function selectLayout(id) {
+  const staged = stageActive();
+  view.layout = id;
+  view.box = null;
+  el.body.scrollTop = 0;
+  renderPanel();
+  if (staged || stageActive()) run(renderPreview);
+}
+
+/**
+ * @param {string | null} id @param {boolean} focusBox  Selected in the panel: focus the box in the preview.
+ */
+function selectBox(id, focusBox) {
+  if (view.box === id) return;
+  view.box = id;
+  renderPanel();
+  updateOverlay();
+  if (id && focusBox) overlay.focus(id);
+}
+
+/** The boxes over the staged slide: a composed layout in audience mode. */
+function updateOverlay() {
+  const model = store && stageActive() && view.mode === 'audience' ? composedOf(store.get(), /** @type {string} */ (view.layout)) : null;
+  if (!model) {
+    overlay.update(null, null);
+    return;
+  }
+  const def = layoutDef(/** @type {any} */ (store).get(), model.id);
+  overlay.update(model.boxes.map((b) => {
+    const slot = (def?.slots ?? []).find((/** @type {any} */ s) => s.name === b.slot);
+    return { id: b.id, label: b.slot ? `${b.slot} · ${typeLabel(slot?.type ?? '')}` : `${b.id} · picture`, area: b.area, picture: !b.slot };
+  }), view.box);
+}
+
+/**
+ * Ask for a name and id, and add a composed layout (empty, or a copy of `from`).
+ * @param {string | null} from
+ */
+async function newLayout(from) {
+  if (!store) return;
+  const state = store.get();
+  const form = el.layoutForm;
+  form.reset();
+  const nameInput = /** @type {HTMLInputElement} */ (form.elements.namedItem('name'));
+  const idInput = /** @type {HTMLInputElement} */ (form.elements.namedItem('id'));
+  const fromSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem('from'));
+  fromSelect.replaceChildren(new Option('An empty slide with a title', ''),
+    ...(state.template.layouts ?? []).map((/** @type {any} */ l) => new Option(`A copy of "${l.name ?? l.id}"`, l.id)));
+  fromSelect.value = from ?? '';
+  const source = from ? layoutDef(state, from) : null;
+  nameInput.value = source ? `${source.name ?? source.id} (composed)` : '';
+  const suggest = () => {
+    const base = idFromName(nameInput.value) || 'layout';
+    const taken = (store?.get().template.layouts ?? []).map((/** @type {any} */ l) => l.id);
+    idInput.value = freeName(base, [...taken, 'base']);
+  };
+  suggest();
+  let idTouched = false;
+  nameInput.oninput = () => { if (!idTouched) suggest(); };
+  idInput.oninput = () => { idTouched = true; };
+  const ok = await dialogResult(el.layoutDialog, () => {
+    if (!nameInput.value.trim()) return 'Give the layout a name.';
+    return layoutIdProblem(/** @type {any} */ (store).get(), idInput.value.trim());
+  }, $('te-layout-error'));
+  if (!ok) return;
+  const id = idInput.value.trim();
+  update((s) => addLayout(s, { id, name: nameInput.value.trim(), from: fromSelect.value || null }));
+  if (layoutDef(store.get(), id)) {
+    selectLayout(id);
+    banner(`Added the layout "${nameInput.value.trim()}" (layouts/${id}.html and a block at the end of theme.css).`, 'success');
+  }
+}
+
+async function addSlot() {
+  if (!store || !view.layout) return;
+  const layoutId = view.layout;
+  const form = el.slotForm;
+  form.reset();
+  const typeSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem('type'));
+  const nameInput = /** @type {HTMLInputElement} */ (form.elements.namedItem('name'));
+  const lookSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem('look'));
+  typeSelect.replaceChildren(...SLOT_TYPES.map(([t, label]) => new Option(label, t)));
+  const taken = () => (layoutDef(/** @type {any} */ (store).get(), layoutId)?.slots ?? []).map((/** @type {any} */ s) => s.name);
+  /** @type {Record<string, string>} */
+  const names = { text: 'subtitle', richtext: 'body', list: 'body', image: 'image', 'tag-cloud': 'cloud' };
+  let nameTouched = false;
+  const fillLooks = () => {
+    if (!nameTouched) nameInput.value = freeName(names[typeSelect.value] ?? typeSelect.value, taken());
+    const looks = looksFor(looksOf(/** @type {any} */ (store).get()), typeSelect.value, nameInput.value);
+    lookSelect.replaceChildren(...looks.map((l) => new Option(l.label, l.key)));
+  };
+  typeSelect.value = 'richtext';
+  fillLooks();
+  typeSelect.onchange = fillLooks;
+  nameInput.oninput = () => { nameTouched = true; };
+  const ok = await dialogResult(el.slotDialog, () => {
+    const name = nameInput.value.trim();
+    if (!isSlotName(name)) return 'A slot name has letters, digits, hyphens and underscores.';
+    if (taken().includes(name) || composedOf(/** @type {any} */ (store).get(), layoutId)?.boxes.some((b) => b.id === name)) return `The layout already has "${name}".`;
+    return null;
+  }, $('te-slot-error'));
+  if (!ok) return;
+  const name = nameInput.value.trim();
+  update((s) => addSlotBox(s, layoutId, { type: typeSelect.value, name, lookKey: lookSelect.value }));
+  selectBox(name, true);
+}
+
+async function addPicture() {
+  if (!store || !view.layout) return;
+  const layoutId = view.layout;
+  const form = el.pictureForm;
+  form.reset();
+  const pathSelect = /** @type {HTMLSelectElement} */ (form.elements.namedItem('path'));
+  const fileInput = /** @type {HTMLInputElement} */ (form.elements.namedItem('file'));
+  const images = templateImages(store.get().files.keys());
+  pathSelect.replaceChildren(new Option(images.length ? 'Choose a picture of the template' : 'The template has no pictures yet', ''), ...images.map((p) => new Option(p, p)));
+  const ok = await dialogResult(el.pictureDialog, () => {
+    const file = fileInput.files?.[0];
+    if (file && !/\.(svg|png|jpe?g|webp|gif|avif)$/i.test(file.name)) return 'Choose an SVG, PNG, JPEG, WebP, GIF or AVIF image.';
+    if (!file && !pathSelect.value) return 'Choose a picture, or a new image file.';
+    return null;
+  }, $('te-picture-error'));
+  if (!ok) return;
+  const file = fileInput.files?.[0];
+  /** @type {string | null} */
+  let boxId = null;
+  update((s) => {
+    let next = s;
+    let path = pathSelect.value;
+    if (file) ({ state: next, path } = addImageFile(next, file.name, file));
+    next = addPictureBox(next, layoutId, path);
+    boxId = composedOf(next, layoutId)?.boxes.at(-1)?.id ?? null;
+    return next;
+  });
+  if (boxId) selectBox(boxId, true);
 }
 
 // ---------------------------------------------------------------------------
@@ -392,6 +629,16 @@ function setAspectChoice(state) {
 async function renderPreview() {
   if (!store) return;
   const state = store.get();
+  el.sample.disabled = stageActive();
+  if (stageActive()) {
+    const sample = generatedSample(state.template);
+    const slide = sample.slides.find((/** @type {any} */ s) => s.layout === view.layout);
+    const show = withAspect({ ...sample, slides: slide ? [slide] : [] }, view.aspect);
+    await preview.render(state, { show, showUrl: location.href, mode: view.mode, stage: true });
+    updateOverlay();
+    return;
+  }
+  overlay.update(null, null);
   const entry = SAMPLE_SHOWS.find((s) => s.id === view.sample);
   const base = entry && samples.has(entry.id)
     ? { show: fitSample(samples.get(entry.id), state.template).show, showUrl: new URL(entry.url, location.href).href }
@@ -442,9 +689,12 @@ async function save() {
     banner('Nothing to save.', 'info');
     return;
   }
-  await writeTemplateFiles(folder, files, paths);
+  const deleted = deletedPaths(state, files);
+  await writeTemplateFiles(folder, files, paths.filter((p) => !deleted.includes(p)));
+  await removeTemplateFiles(folder, deleted);
   store.update((s) => markSaved(s, files), { history: false });
-  banner(`Saved ${paths.join(', ')}.`, 'success');
+  const written = paths.filter((p) => !deleted.includes(p));
+  banner([written.length ? `Saved ${written.join(', ')}.` : '', deleted.length ? `Deleted ${deleted.join(', ')}.` : ''].join(' ').trim(), 'success');
 }
 
 async function saveAs() {

@@ -111,6 +111,25 @@ export async function writeTemplateFiles(dir, files, paths = [...files.keys()]) 
 }
 
 /**
+ * Delete files from a template folder (a removed layout's file, I-111). A file
+ * that is not there is skipped.
+ * @param {FileSystemDirectoryHandle} dir
+ * @param {string[]} paths
+ */
+export async function removeTemplateFiles(dir, paths) {
+  for (const path of paths) {
+    const parts = path.split('/');
+    try {
+      let folder = dir;
+      for (const part of parts.slice(0, -1)) folder = await folder.getDirectoryHandle(part);
+      await folder.removeEntry(/** @type {string} */ (parts.at(-1)));
+    } catch (err) {
+      if (!(err instanceof DOMException && err.name === 'NotFoundError')) throw err;
+    }
+  }
+}
+
+/**
  * Ask for a folder to write into (read-write). Null when the user cancels.
  * @param {string} id  Remembers the last place per purpose.
  * @returns {Promise<FileSystemDirectoryHandle | null>}

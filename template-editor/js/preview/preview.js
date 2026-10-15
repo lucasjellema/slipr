@@ -6,7 +6,9 @@
  * - `setStyles(theme, reader)`: replace the template's stylesheet text (a
  *   token change: immediate, nothing is re-rendered);
  * - `render(payload)`: draw the sample slides with the shared renderer, in
- *   audience mode (a grid) or reader mode (an article with reader blocks).
+ *   audience mode (a grid) or reader mode (an article with reader blocks);
+ *   with `stage`, one slide filling the frame (the layout composer, I-111);
+ * - `canvasRect()`: where the staged slide's canvas is, in the frame.
  *
  * The payload's objects come from the editor's window; they are copied here
  * with structuredClone so the renderer works with this window's own objects.
@@ -29,6 +31,7 @@ const LAYOUT_BASE = new URL('https://slipr.invalid/template/layouts/');
  * @property {any} show
  * @property {string} showUrl     Base for the show's own images and data files.
  * @property {'audience' | 'reader'} mode
+ * @property {boolean} [stage]   One slide, as large as the frame allows (I-111).
  */
 
 let generation = 0;
@@ -46,7 +49,7 @@ function setStyles(theme, reader) {
  */
 async function render(payload) {
   const run = ++generation;
-  const { template, layouts, show, showUrl, mode } = structuredClone(payload);
+  const { template, layouts, show, showUrl, mode, stage } = structuredClone(payload);
   const showBase = new URL(showUrl, location.href);
   /** @type {import('../../../shared/load.js').ShowContext} */
   const ctx = {
@@ -61,7 +64,19 @@ async function render(payload) {
     registerAsset: () => {},
     notices: [],
   };
-  document.body.className = mode === 'reader' ? 'pv-reader' : 'pv-audience';
+  document.body.className = stage ? `pv-stage pv-stage--${mode}` : mode === 'reader' ? 'pv-reader' : 'pv-audience';
+  if (stage) {
+    const [w, h] = show.settings?.aspectRatio === '4:3' ? [4, 3] : [16, 9];
+    document.body.style.setProperty('--pv-aspect', String(w / h));
+    const slide = show.slides?.[0];
+    const holder = document.createElement('div');
+    holder.className = 'pv-stage-slide';
+    if (slide) holder.append(renderSlide(slide, ctx, mode === 'reader' ? { mode: 'reader', slideHref: (id) => `#${id}` } : { mode: 'audience' }));
+    root.replaceChildren(holder);
+    if (run !== generation) return;
+    await hydrateEmbeds(root, { thumbnail: true }).catch((err) => console.warn('Slipr preview: embeds', err));
+    return;
+  }
   const slides = (show.slides ?? []).filter((/** @type {any} */ s) => !(mode === 'reader' && s.reader?.hidden));
   const fragment = document.createDocumentFragment();
   if (!slides.length) {
@@ -135,5 +150,16 @@ document.addEventListener('click', (e) => {
   if (a) e.preventDefault();
 });
 
-Object.assign(window, { sliprPreview: { setStyles, render } });
+/**
+ * The staged slide's canvas, in frame coordinates (null when nothing is staged).
+ * @returns {{ left: number, top: number, width: number, height: number } | null}
+ */
+function canvasRect() {
+  const canvas = document.querySelector('.pv-stage .slipr-canvas');
+  if (!canvas) return null;
+  const r = canvas.getBoundingClientRect();
+  return { left: r.left, top: r.top, width: r.width, height: r.height };
+}
+
+Object.assign(window, { sliprPreview: { setStyles, render, canvasRect } });
 window.dispatchEvent(new Event('slipr-preview-ready'));

@@ -142,6 +142,19 @@ Renderer rules:
 - The renderer adds the mode class `slipr-mode-audience` or `slipr-mode-reader` to the root, so layouts can adapt. For example, a two-column layout stacks into one column in reader mode on narrow screens.
 - A slide with extra images or text elements gets `slipr-mode-reader-fixed` instead of `slipr-mode-reader` in reader mode. It stays a scaled picture on narrow screens (Lucas, 2026-10-11), because freely placed images have no place in a reflowed layout. Templates need nothing for this: their `.slipr-mode-reader` reflow rules simply do not apply. Do not style `.slipr-mode-reader-fixed` to reflow.
 
+### Composed layouts (template editor, I-111)
+
+The template editor's **layout composer** makes layouts without hand-written HTML or CSS (D-019). A composed layout is an ordinary layout fragment, recognised by the class `slipr-composed` on its root:
+
+```html
+<div class="slipr-layout slipr-composed slipr-composed--quote-photo cnc cnc-dark">
+  <h2 class="cnc-title" data-slot="title" data-box="title"></h2>
+  <img class="slipr-composed-picture" src="../assets/decor/wave.svg" alt="" data-box="picture-1">
+</div>
+```
+
+Each child is a **box** (`data-box`): a slot element copied from one of the template's own layouts (its *look*), or a picture. Boxes are placed on a 100 × 100 CSS grid over the whole slide by rules in a **marked block** at the end of `theme.css`, between `/* slipr-composer:begin <id> … */` and `/* slipr-composer:end <id> */`; one shared `base` block holds the grid and the reader-mode reflow (one column in box order, pictures hidden, below 640 px). The composer rewrites only the text between its markers; `grid-area`, `background: var(--token)` and `object-fit` values edited by hand inside a block are read back. Nothing else in the format changes: no new `template.json` fields.
+
 ### Cards slots (since 0.2)
 
 A `cards` slot holds a small, repeated group of fields: columns with a heading and text, numbered boxes, key figures with an icon, photo cards, people. The slot definition lists the fields of one card:

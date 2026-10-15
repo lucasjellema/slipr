@@ -37,3 +37,11 @@ body.pv-reader {
 .pv-summary { margin: 0 0 1.25rem; color: var(--slipr-color-muted, #5B6573); font-style: italic; max-width: var(--slipr-reader-measure, 42rem); }
 
 .pv-empty { padding: 24px; font-size: 14px; }
+
+/* Stage: one slide, as large as the frame allows (the layout composer, I-111) */
+body.pv-stage { background: #3A3F46; height: 100vh; overflow: hidden; }
+.pv-stage .pv-root { height: 100%; display: grid; place-items: center; padding: 24px; box-sizing: border-box; }
+.pv-stage-slide { width: min(100%, calc((100vh - 48px) * var(--pv-aspect, 1.7778))); }
+.pv-stage-slide .slipr-slide { box-shadow: 0 2px 14px rgb(0 0 0 / 40%); }
+body.pv-stage--reader { overflow: auto; }
+.pv-stage--reader .pv-root { height: auto; min-height: 100%; }

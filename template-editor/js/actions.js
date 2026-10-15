@@ -147,7 +147,7 @@ export function withFamilyFirst(stack, family) {
  * A path that is not taken yet: `a.woff2`, `a-2.woff2`, …
  * @param {Map<string, unknown>} files @param {string} path
  */
-function uniquePath(files, path) {
+export function uniquePath(files, path) {
   if (!files.has(path)) return path;
   const dot = path.lastIndexOf('.');
   for (let n = 2; ; n += 1) {
@@ -187,10 +187,20 @@ export function outputFiles(state) {
  */
 export function changedPaths(state) {
   const out = [];
-  for (const [path, content] of outputFiles(state)) {
+  const files = outputFiles(state);
+  for (const [path, content] of files) {
     if (state.saved.get(path) !== content) out.push(path);
   }
-  return out;
+  return [...out, ...deletedPaths(state, files)];
+}
+
+/**
+ * The saved files the template no longer has (a removed layout's file; I-111).
+ * @param {TemplateState} state @param {Map<string, FileContent>} [files]
+ * @returns {string[]}
+ */
+export function deletedPaths(state, files = outputFiles(state)) {
+  return [...state.saved.keys()].filter((path) => !files.has(path));
 }
 
 /**

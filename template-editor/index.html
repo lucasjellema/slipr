@@ -35,7 +35,7 @@
 
   <main id="te-start" class="te-start" aria-labelledby="te-start-title">
     <h2 id="te-start-title">Make a template</h2>
-    <p class="te-lead">Start from one of Slipr's templates and change its colours, fonts and sizes while you watch sample slides. Save the result as a template folder or a .zip.</p>
+    <p class="te-lead">Start from one of Slipr's templates and change its colours, fonts and sizes, or arrange new layouts, while you watch sample slides. Save the result as a template folder or a .zip.</p>
     <div class="te-start-list" id="te-start-list"></div>
     <div class="te-start-open">
       <button type="button" id="te-open-folder">Open a template folder…</button>
@@ -63,7 +63,10 @@
         </div>
         <label class="te-sample">Sample <select id="te-sample"></select></label>
       </div>
-      <iframe id="te-preview-frame" class="te-preview-frame" title="Preview of the template" src="preview.html"></iframe>
+      <div class="te-preview-area">
+        <iframe id="te-preview-frame" class="te-preview-frame" title="Preview of the template" src="preview.html"></iframe>
+        <div id="te-stage-overlay" role="group" aria-label="Boxes of the layout" hidden></div>
+      </div>
     </section>
   </main>
 
@@ -106,6 +109,53 @@
       <div class="te-dialog-buttons">
         <button type="submit" value="cancel" formnovalidate>Cancel</button>
         <button type="submit" value="ok" class="te-primary">Add font</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="te-layout-dialog" class="te-dialog" aria-labelledby="te-layout-title">
+    <form method="dialog" id="te-layout-form">
+      <h2 id="te-layout-title">New layout</h2>
+      <p class="te-hint">A composed layout: you place its slots and pictures on the slide. It is saved as <code>layouts/&lt;id&gt;.html</code> and a marked block at the end of <code>theme.css</code>.</p>
+      <label>Name <input name="name" required maxlength="80" autocomplete="off"></label>
+      <label>Id <input name="id" required pattern="[A-Za-z0-9][A-Za-z0-9_\-]*" autocomplete="off" aria-describedby="te-layout-id-hint"></label>
+      <p class="te-hint" id="te-layout-id-hint">Shows refer to the layout by its id.</p>
+      <label>Start with <select name="from"></select></label>
+      <p class="te-error" id="te-layout-error" role="alert"></p>
+      <div class="te-dialog-buttons">
+        <button type="submit" value="cancel" formnovalidate>Cancel</button>
+        <button type="submit" value="ok" class="te-primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="te-slot-dialog" class="te-dialog" aria-labelledby="te-slot-title">
+    <form method="dialog" id="te-slot-form">
+      <h2 id="te-slot-title">Add a slot</h2>
+      <label>Type <select name="type"></select></label>
+      <label>Name <input name="name" required pattern="[A-Za-z0-9][A-Za-z0-9_\-]*" autocomplete="off" aria-describedby="te-slot-name-hint"></label>
+      <p class="te-hint" id="te-slot-name-hint">Shows store the slot's content under this name (<code>title</code>, <code>body</code>, <code>photo</code>).</p>
+      <label>Look <select name="look"></select></label>
+      <p class="te-hint">How one of the template's layouts draws this kind of slot.</p>
+      <p class="te-error" id="te-slot-error" role="alert"></p>
+      <div class="te-dialog-buttons">
+        <button type="submit" value="cancel" formnovalidate>Cancel</button>
+        <button type="submit" value="ok" class="te-primary">Add slot</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="te-picture-dialog" class="te-dialog" aria-labelledby="te-picture-title">
+    <form method="dialog" id="te-picture-form">
+      <h2 id="te-picture-title">Add a picture</h2>
+      <p class="te-hint">A logo or a decoration, the same on every slide with this layout. Readers on a phone do not see it.</p>
+      <label>Picture <select name="path"></select></label>
+      <label>Or a new image file <input type="file" name="file" accept=".svg,.png,.jpg,.jpeg,.webp,.gif,.avif"></label>
+      <p class="te-hint">A new file is copied into the template's <code>assets/decor/</code> folder.</p>
+      <p class="te-error" id="te-picture-error" role="alert"></p>
+      <div class="te-dialog-buttons">
+        <button type="submit" value="cancel" formnovalidate>Cancel</button>
+        <button type="submit" value="ok" class="te-primary">Add picture</button>
       </div>
     </form>
   </dialog>

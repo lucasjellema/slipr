@@ -80,7 +80,7 @@ A template is a folder (`template.json`, `theme.css`, optional `reader.css`, `la
 | `templates/forest/` | 0.3 | 12 | Default's layouts with a forest atmosphere: greens on parchment, ochre accents, pine illustrations on title and section slides, Palatino and Georgia (installed fonts, no files). See its [README](templates/forest/README.md) |
 | `templates/conclusion/` | 0.3 | 19 | Company house style (magenta), derived from the PowerPoint template; placeholder roles in `pptxMapping`; five card layouts; on-brand picture styles. See its [README](templates/conclusion/README.md) |
 
-The **template editor** (`template-editor/`, I-106, D-017) makes new templates from existing ones: it changes only the values of the custom properties in a template's top-level `:root` rules (and adds `@font-face` rules for uploaded fonts), previews the result with the shared renderer in an iframe, and writes the folder or a `.zip`. See [template-editor/ARCHITECTURE.md](template-editor/ARCHITECTURE.md).
+The **template editor** (`template-editor/`, I-106, D-017) makes new templates from existing ones: it changes only the values of the custom properties in a template's top-level `:root` rules (and adds `@font-face` rules for uploaded fonts), previews the result with the shared renderer in an iframe, and writes the folder or a `.zip`. Its **layout composer** (I-111, D-019) also makes composed layouts: boxes on a 100 × 100 grid, written to the layout file and a marked block at the end of `theme.css`. See [template-editor/ARCHITECTURE.md](template-editor/ARCHITECTURE.md).
 
 The viewer and the editor never know which template is in use: everything goes through the layout fragments and `render.js`. The converter uses a template's `pptxMapping` and slot types.
 

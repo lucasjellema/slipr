@@ -76,7 +76,7 @@ export function createPreview(frame) {
     /**
      * Draw a sample show.
      * @param {TemplateState} state
-     * @param {{ show: any, showUrl: string, mode: 'audience' | 'reader' }} sample
+     * @param {{ show: any, showUrl: string, mode: 'audience' | 'reader', stage?: boolean }} sample
      */
     async render(state, sample) {
       const api = await ready;
@@ -89,7 +89,19 @@ export function createPreview(frame) {
           def,
           html: rewriteHtmlUrls(/** @type {string} */ (state.files.get(def.file)), (ref) => assetUrl(state, joinPath(def.file, ref))),
         }));
-      await api.render({ template: state.template, layouts, show: sample.show, showUrl: sample.showUrl, mode: sample.mode });
+      await api.render({ template: state.template, layouts, show: sample.show, showUrl: sample.showUrl, mode: sample.mode, stage: Boolean(sample.stage) });
+    },
+
+    /**
+     * Where the staged slide's canvas is, in the editor's coordinates (I-111).
+     * @returns {DOMRect | null}
+     */
+    canvasRect() {
+      const api = /** @type {any} */ (frame.contentWindow)?.sliprPreview;
+      const r = api?.canvasRect();
+      if (!r) return null;
+      const f = frame.getBoundingClientRect();
+      return new DOMRect(f.left + r.left, f.top + r.top, r.width, r.height);
     },
 
     /** Free every blob: URL (when the template is closed). */
