@@ -1,6 +1,6 @@
-# Slipr Converter (PPTX → Slipr)
+# Slipr Converter (PPTX ⇄ Slipr)
 
-The converter turns a PowerPoint file into a Slipr show folder. It keeps the **content** (titles, text, bullets, images, speaker notes, sections) and maps every slide onto a **layout of a Slipr template**. The show then takes on the look of that template, not the look of the original deck.
+The converter turns a PowerPoint file into a Slipr show folder, and with `slipr-export` a Slipr show back into a PowerPoint file (see [Export to PowerPoint](#export-to-powerpoint)). It keeps the **content** (titles, text, bullets, images, speaker notes, sections) and maps every slide onto a **layout of a Slipr template**. The show then takes on the look of that template, not the look of the original deck.
 
 > Status: **works** (roadmap Phase 4). Requires Python 3.11 or newer.
 
@@ -14,7 +14,7 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
-This installs the `slipr-convert` command inside the virtual environment. Without activating the environment you can also run `.venv\Scripts\slipr-convert`.
+This installs the `slipr-convert` and `slipr-export` commands inside the virtual environment. Without activating the environment you can also run `.venv\Scripts\slipr-convert`.
 
 ## Usage
 
@@ -83,3 +83,44 @@ Placeholder text that doesn't fit, such as a third text block, goes to the slide
 ## The conversion report
 
 Every run writes `conversion-report.md` into the output folder. For each slide it lists which layout was chosen and why, what moved to the reader layer, what was **not converted**, and remarks such as missing alt text or a missing title. That tells you which slides to touch up.
+
+## Export to PowerPoint
+
+`slipr-export` does the reverse: it turns a show into an **editable** `.pptx` (I-045, D-018). Titles, text, lists, cards, tables and pictures become real PowerPoint text, tables and pictures on a matching layout; the reader layer goes into the speaker notes.
+
+```
+slipr-export <show-folder> --out <deck.pptx> [options]
+```
+
+| Option | Meaning |
+|---|---|
+| `--out` | The `.pptx` to write (required). An export report, `<deck>-export-report.md`, is written next to it |
+| `--base <deck.pptx>` | Use the layouts, masters and theme of this deck, e.g. the company PowerPoint template a Slipr template was made from. Its own slides are dropped; its logo and slide numbers carry over. Without it: PowerPoint's default layouts, at the show's aspect ratio |
+| `--template <folder>` | The Slipr template (default: the show's `template.ref`) |
+| `--no-notes` | Leave out the speaker notes |
+| `--no-reader` | Leave the reader layer out of the speaker notes |
+| `--force` | Overwrite an existing `.pptx` |
+
+Examples (from `converter/`):
+
+```
+slipr-export ..\shows\demo --out out\demo.pptx
+slipr-export ..\shows\conclusion-demo --base ..\ConclusionTemplatePresentation.pptx --out out\conclusion.pptx
+```
+
+| Slipr | In PowerPoint |
+|---|---|
+| Slides, layouts | slides on the PowerPoint layout the template's `pptxMapping` names (the one that fits the slide's content best), with placeholder roles honoured; else *Title Only* with the content under the title |
+| Text, lists, subheadings, `A.` / `1.` lists | paragraphs on the outline level whose style matches, so a corporate template's own bullets and text styles are used |
+| Bold, italic, code, links, glossary terms | runs with that formatting; glossary terms as plain text, inline popups left out |
+| Pictures | pictures with their crop, focus, opacity and alt text; SVG stays SVG (PowerPoint 2016 and later), WebP becomes PNG |
+| Cards | the template's card placeholders, or a grid of text boxes (with their pictures) |
+| Tables, tag clouds | a real table (at most 16 rows) / a text box with sized terms |
+| Videos in the show folder | an embedded video with its poster |
+| Graphs, maps | a list of nodes and links / places |
+| Diagrams, web pages, PDFs, YouTube / Vimeo | their fallback picture (a click opens the link), else a card with the title and link; Mermaid source in the notes |
+| Extra images, text elements | at their place and size, text elements with their look |
+| Chapters, hidden slides, `meta` | sections, hidden slides, document properties |
+| Speaker notes, reader layer | the notes, then the reader layer as text under **Reader layer** |
+
+Not exported: animations and transitions, picture styles, and pictures at web addresses (no network calls). The report lists every fallback and anything that could not be exported. Spec: `docs/specs/I-045-pptx-export.md`.

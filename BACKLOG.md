@@ -119,7 +119,10 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-041** [converter] Charts and SmartArt → image fallback (via LibreOffice headless, optional)
 - [ ] **I-042** [converter] Whole-slide image fallback for slides that cannot be mapped
 - [ ] **I-044** [converter] Batch-convert a folder of decks
-- [ ] **I-045** [converter] Reverse direction: export a Slipr show to PPTX (e.g. via PptxGenJS)
+- [ ] **I-117** [converter] PowerPoint export without `--base`: carry the Slipr template's colours and fonts (`theme.css` tokens / `styleguide`) into the deck's theme, so an export on the default layouts looks like the template instead of plain Office (from I-045) · todo · —
+- [ ] **I-118** [converter] PowerPoint export: render diagrams, graphs and maps without a fallback picture to PNG (headless browser, needs Lucas's OK as a dev dependency) instead of a card or a list (from I-045) · todo · —
+- [ ] **I-119** [editor/converter] *Export to PowerPoint…* in the editor (Pyodide running `slipr_convert.export`, or a local helper; pairs with I-023) (from I-045) · todo · —
+- [ ] **I-120** [converter] PowerPoint export of the Conclusion `agenda` layout: the agenda items have no placeholder role (the PowerPoint layout numbers them itself), so they are drawn under the title; map them onto the layout's agenda lines (from I-045) · todo · —
 
 ### Templates & format
 - [ ] **I-050** [templates] House-style template based on your organization's style guide
@@ -156,6 +159,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-045** [converter] **Export a Slipr show to PowerPoint** (`slipr-export`, D-018): editable slides on the layouts of a base deck (e.g. the company template) or PowerPoint's default, `pptxMapping` and placeholder roles read backwards, outline levels chosen by style, SVG kept, tables, tag clouds and local videos native, fallback pictures / lists / link cards for other rich slots, overlays, sections, hidden slides, the reader layer in the notes, an export report. Spec `docs/specs/I-045-pptx-export.md` · 2026-10-15 · ✓
 - [x] **I-110** [format/viewer/editor] **Video from a local MP4 file or from YouTube / another URL (`video` slot and block)**: today a video can only go in a reader `embed` block as a sandboxed iframe; this makes video a proper embed kind (D-011) in both modes:
   - **Sources**: a file in the show folder (`media/clip.mp4`, also WebM; played with the native `<video>` element, works offline and in the single-file export) or a URL: YouTube and Vimeo links (any form, e.g. `youtu.be/…`, `watch?v=…`, `shorts/…`) turned into their privacy-friendly embed address (`youtube-nocookie.com`, Vimeo `dnt=1`), or a direct link to a video file on another server.
   - **Options**: `start` / `end` time, `autoplay` (muted) when the slide appears, `loop`, `muted`, `controls`, a `poster` image (default for YouTube: none fetched, the fallback image), captions from a `.vtt` file for local video, `fit` (contain / cover) from the template.

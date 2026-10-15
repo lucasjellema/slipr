@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Export a show to PowerPoint (I-045, D-018)
+- **Added** `slipr-export <show> --out <deck.pptx> [--base <deck.pptx>] [--template] [--no-notes] [--no-reader] [--force]` and the package `slipr_convert.export` (pure core `export_show(show, template, read_file=…, base=…)` → `ExportResult(pptx, report)`): editable slides on the layouts of a base deck or python-pptx's default, chosen by reading `pptxMapping` backwards (the mapped layout that places most filled slots), with placeholder roles and card roles honoured, `pptxIgnore` decoration (logo, slide number) copied from the base deck's first slide per layout, and unused placeholders removed.
+- **Added** Markdown → runs (`export/markdown.py`); paragraphs go to the placeholder's outline level whose inherited style fits (bullets, `A.` / `1.`, plain, subheading, serif), so corporate text styles are reused. Pictures keep crop, focus, opacity and alt text; SVG via `asvg:svgBlip` with a PNG stand-in, WebP converted with Pillow. Tables (inline or CSV, totals, formats), tag clouds, local videos (embedded), graph and map lists, fallback pictures and link cards for the rest; overlays with their place and look; chapters as sections; hidden slides; the reader layer in the notes. `<deck>-export-report.md` lists fallbacks and losses.
+- **Added** `tests/test_export.py` (13 tests: Markdown, the demo and Conclusion demo shows, a base deck with roles, a round trip through the converter, the CLI). 59 tests. Verified by rendering the demo (default layouts) and the Conclusion demo (on the company template) in PowerPoint.
+
 ### 2026-10-13: Picture crop (I-090)
 - **Added** PowerPoint's picture crop (`crop_left` / `top` / `right` / `bottom`) becomes the image's `crop` (negative crops count as 0); a show with a cropped picture is format 0.2. `ImageRef.crop`. The sample deck's logo is cropped.
 

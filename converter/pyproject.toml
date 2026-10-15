@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "slipr-convert"
 version = "0.1.0"
-description = "Convert PowerPoint (.pptx) decks into Slipr shows"
+description = "Convert PowerPoint (.pptx) decks into Slipr shows, and Slipr shows back into PowerPoint"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "Proprietary (personal project)" }
@@ -19,6 +19,7 @@ dev = ["pytest>=8"]
 
 [project.scripts]
 slipr-convert = "slipr_convert.cli:main"
+slipr-export = "slipr_convert.export_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -68,7 +68,7 @@ This document describes how the Slipr components relate to each other and to the
 
 The core is environment-agnostic where possible. `validate.js`, `markdown.js` (string in, string out) and `migrate.js` have no DOM or `fetch` dependency, so they can be unit-tested in Node. `validate.js` imports the schemas as JSON modules (`import … with { type: 'json' }`), which works in Node ≥ 22 and all current browsers. Tests live in `shared/test/*.test.js`.
 
-The converter is written in **Python** (D-006) and does not import the JS core. Its contract with the rest of Slipr is the **JSON Schema** in `shared/schema/`, which it loads directly from the repository to validate its output.
+The converter is written in **Python** (D-006) and does not import the JS core. It also exports shows back to PowerPoint (`slipr-export`, D-018), reading the template's `pptxMapping` backwards. Its contract with the rest of Slipr is the **JSON Schema** in `shared/schema/`, which it loads directly from the repository to validate its output.
 
 ## Templates
 

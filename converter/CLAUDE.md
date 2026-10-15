@@ -5,8 +5,9 @@ Read the root `CLAUDE.md` first. This file adds converter-specific guidance. Not
 ## Orientation in 60 seconds
 
 - Package `src/slipr_convert/`, pipeline `reader` → `extract` → `mapping` → `emit`. Only `cli.py` (via `emit.write_show`) touches the filesystem.
+- The reverse direction (show → `.pptx`, I-045) is the subpackage `export/` (`layouts` → `write`, with `markdown`, `data`, `report`) and `export_cli.py` (`slipr-export`), the only export module touching files. Its raw-XML module is `export/xml.py`.
 - The **intermediate model** in `model.py` is the seam between "understanding PowerPoint" and "producing Slipr". PowerPoint knowledge goes in `reader.py`/`extract.py`/`text.py`, Slipr/template knowledge goes in `mapping.py`/`emit.py`.
-- Raw XML access (`shape._element`, XPath, private python-pptx attributes) is allowed **only in `reader.py`**. Everywhere else, use the python-pptx public API.
+- Raw XML access (`shape._element`, XPath, private python-pptx attributes) is allowed **only in `reader.py`** (import) and **`export/xml.py`** (export). Everywhere else, use the python-pptx public API.
 - `mapping.py` is template-agnostic: it reasons about slot *types*, not about the default template's layout ids (except the `title` / `section` hints).
 - Dependencies: `python-pptx`, `jsonschema` (runtime) and `pytest` (dev). Ask Lucas before adding more.
 
@@ -19,6 +20,7 @@ From `converter/`:
 | Create venv + install | `python -m venv .venv` → `.venv\Scripts\activate` → `pip install -e ".[dev]"` |
 | Run tests | `pytest` (or `.venv\Scripts\python -m pytest` without activating) |
 | Convert | `slipr-convert deck.pptx --template ../templates/default --out ../shows/deck` |
+| Export to PowerPoint | `slipr-export ../shows/demo --out out/demo.pptx` (add `--base ../ConclusionTemplatePresentation.pptx` for the company layouts) |
 | Try the sample deck | `python -c "import sys; sys.path.insert(0,'tests'); from conftest import build_sample_deck; open('out/sample.pptx','wb').write(build_sample_deck())"`, then convert into `out/sample` (`converter/out/` is git-ignored) and open `viewer/?show=../converter/out/sample/show.json` |
 
 ## Code conventions
@@ -47,6 +49,8 @@ From `converter/`:
 - Group shapes (`MSO_SHAPE_TYPE.GROUP`) must be walked recursively via `shape.shapes`.
 - `paragraph.level` is 0-based. A paragraph in a title placeholder is not a bullet.
 - Tables / charts inside content placeholders are `PlaceholderGraphicFrame`s. `reader.graphic_kind()` detects them via `a:graphicData/@uri`.
+- Filling a picture placeholder (`insert_picture`) replaces its element: the old proxy's `_element` becomes `None`. Look placeholders up again afterwards.
+- python-pptx's `add_slide` does not copy date, footer and slide-number placeholders; the export clones them from a base-deck slide (`xml.clone_shape`).
 - Tables: `shape.has_table` → `shape.table.rows[i].cells[j].text`. Charts: `shape.has_chart` → `chart.plots[0].categories`, `series.values` (for I-040 / I-046).
 
 ## Testing

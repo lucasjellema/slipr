@@ -102,6 +102,44 @@ Slot filling: title → `title`, subtitle → `subtitle` / `caption` / `byline`.
 - `write_show()` (CLI only) refuses a non-empty folder without `--force`. It writes `show.json` (UTF-8, 2-space indent, LF), `images/` and `conversion-report.md`.
 - The CLI writes `template.ref` and `$schema` **relative to the output folder** (forward slashes).
 
+## Export: show → PowerPoint (I-045, D-018)
+
+The reverse direction lives in the subpackage `slipr_convert/export/`, with the same split: a pure core `export_show(show, template, *, read_file, base=None, include_notes=True, include_reader=True)` → `ExportResult(pptx: bytes, report)`, and a thin CLI `export_cli.py` (`slipr-export`) that reads the show folder (`read_file` only serves files inside it), resolves the template, writes the deck and `<deck>-export-report.md`.
+
+```
+ show.json + template.json (+ base.pptx)
+      │
+      ▼
+ ┌──────────────┐   ┌──────────────┐   ┌──────────────┐
+ │   layouts    │──►│    write     │──►│  .pptx bytes │
+ │ pptxMapping  │   │ placeholders,│   │  + report    │
+ │ backwards    │   │ free shapes, │   └──────────────┘
+ └──────────────┘   │ notes        │
+                    └──────┬───────┘
+          markdown · data · xml (raw XML) · report
+```
+
+```
+src/slipr_convert/
+├── export_cli.py             argparse, template resolution (template.ref, /templates/<name>, by name), file access, output
+└── export/
+    ├── __init__.py           exposes export_show(), ExportResult, ExportReport
+    ├── layouts.py            choose_layout() (mapped layout that places most slots, else by shape), assign() (slot type → placeholder type), parse_role()
+    ├── write.py              export_show() and the per-slide _Context: roles, generic placement, leftovers, free area, pictures,
+    │                         rich slots, cards, overlays, notes and the reader layer; _pick_level() (outline level by style)
+    ├── markdown.py           Slipr Markdown → Para / Run (lists, numbering, fenced and inline code, bold, italic, links, glossary, popups)
+    ├── data.py               CSV (separators, decimal commas), table cells and totals, tag cloud terms and order
+    ├── xml.py                the ONLY export module touching raw XML: bullets, level styles, text colour, SVG (asvg:svgBlip),
+    │                         opacity, fill alpha, text outline, sections, hidden slides, removing slides and shapes, cloning
+    └── report.py             ExportReport → markdown (per slide: layout and reason, free shapes, fallbacks, not exported)
+```
+
+- **Layout choice** reads `pptxMapping` backwards: every PowerPoint layout mapped to the slide's Slipr layout is scored by how many filled slots its placeholders cannot take (`_unplaced`), and the lowest wins (ties: mapping order). Without a mapping: *Title Slide* / *Section Header* for short-text slides, else *Title Only*, else the layout with a title and the fewest other placeholders.
+- **Filling**: roles first (`idx → slot`, card roles, a `null`-role off-slide title gets the title), then `assign()` by type, then leftovers (paired `xTitle` headings, joining a text placeholder, or the free area under the title). Picture placeholders are filled with `insert_picture`, which replaces the element: placeholders are looked up again after each pass.
+- **Text styles**: `xml.level_styles()` resolves the inherited style of each outline level with `reader.paragraph_style()` (the same chain the import uses), and `_pick_level()` puts each paragraph on the level that fits. That is how a corporate template's own bullets, `A.` lists and subheadings come back.
+- **Base deck**: its slides stay until the end so their decoration can be cloned (`xml.clone_shape`, image relationships included), then `xml.remove_original_slides()` drops them.
+- **Testing**: `tests/test_export.py` reads every deck back with python-pptx: the demo and Conclusion demo shows, a base deck with roles built in code, a round trip *sample deck → convert → export → convert* (titles and layouts survive), and the CLI. Rendering in PowerPoint itself is a manual check.
+
 ## Error handling
 
 - An unreadable or corrupt file, a missing or invalid template, or a non-empty output folder: a clear message and exit code 1.

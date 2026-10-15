@@ -62,6 +62,7 @@ The demo show `shows/demo/` exercises every format feature. Use it as the refere
 | Run JS tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
 | Run converter tests | `pytest` in `converter/` with its venv active (or `converter/.venv/Scripts/python -m pytest`) |
 | Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` |
+| Export a show to PowerPoint | `slipr-export ../shows/<name> --out out/<name>.pptx [--base <company template>.pptx]` in `converter/` (I-045) |
 | Export a show as one HTML file | `npm run export -- shows/<name> [out.html]` (default `exports/<name>.html`, git-ignored; I-054) |
 | Regenerate the AI prompt kit | `npm run prompt` (writes `docs/ai/prompts/`; run it after changing a template's layouts or the show schema, or the test fails; I-080) |
 
