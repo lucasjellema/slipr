@@ -79,6 +79,8 @@ A template is a folder (`template.json`, `theme.css`, optional `reader.css`, `la
 | `templates/default/` | 0.3 | 8 | Neutral; the reference for the demo show and the tests. Picture styles shadow, soft, rounded, frame |
 | `templates/conclusion/` | 0.3 | 19 | Company house style (magenta), derived from the PowerPoint template; placeholder roles in `pptxMapping`; five card layouts; on-brand picture styles. See its [README](templates/conclusion/README.md) |
 
+The **template editor** (`template-editor/`, I-106, D-017) makes new templates from existing ones: it changes only the values of the custom properties in a template's top-level `:root` rules (and adds `@font-face` rules for uploaded fonts), previews the result with the shared renderer in an iframe, and writes the folder or a `.zip`. See [template-editor/ARCHITECTURE.md](template-editor/ARCHITECTURE.md).
+
 The viewer and the editor never know which template is in use: everything goes through the layout fragments and `render.js`. The converter uses a template's `pptxMapping` and slot types.
 
 ## Formats and versioning

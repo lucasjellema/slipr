@@ -14,7 +14,7 @@ Every slide has a concise audience layer (`content`) and an optional reader laye
 2. [ARCHITECTURE.md](ARCHITECTURE.md): how the components and the shared core fit together
 3. [docs/show-format.md](docs/show-format.md) and [docs/template-format.md](docs/template-format.md): the data contracts
 4. [docs/decisions.md](docs/decisions.md): why things are the way they are. Do not silently undo a decision.
-5. The `CLAUDE.md` of the component you are touching (`viewer/`, `editor/`, `converter/`), and for template work the template's `README.md`
+5. The `CLAUDE.md` of the component you are touching (`viewer/`, `editor/`, `template-editor/`, `converter/`), and for template work the template's `README.md`
 6. [BACKLOG.md](BACKLOG.md): what is being worked on now. Larger items have a spec in `docs/specs/<ID>.md` with Lucas's decisions (e.g. `I-043-conclusion-template.md` for the Conclusion template)
 
 ## Hard rules
@@ -58,6 +58,7 @@ The demo show `shows/demo/` exercises every format feature. Use it as the refere
 | Task | Command |
 |---|---|
 | Serve everything locally | `npm run serve` (then open `http://localhost:8080/viewer/?show=../shows/demo/show.json`). In Claude's browser pane: `preview_start` with the `slipr` entry from `.claude/launch.json` |
+| Make or restyle a template | Open `http://localhost:8080/template-editor/` (I-106). In Claude's browser pane, when another session holds port 8080: the `slipr-alt` entry (port 8085) |
 | Run JS tests | `npm test` (Node built-in runner; finds `*.test.js` files) |
 | Run converter tests | `pytest` in `converter/` with its venv active (or `converter/.venv/Scripts/python -m pytest`) |
 | Convert a PPTX | `slipr-convert <file.pptx> --template ../templates/default --out ../shows/<name>` in `converter/` |

@@ -50,6 +50,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [X] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · done · lucas
 - [ ] **C-007** [editor] Find & replace does not look inside table cells (I-104) or tag cloud terms (I-105); add them to `findMatches()` and `replaceInSlide()` / `replaceAllText()` together · todo · —
 - [ ] **C-008** [docs] Try the AI prompt kit (I-080) with ChatGPT and Copilot on the three briefs in `docs/ai/prompt-kit-results.md`, fill in the table, and report repeated mistakes so the generator can be tuned · todo · lucas
+- [ ] **C-009** [templates] Contrast below WCAG AA, found by the template editor's checks (I-106): **default**: accent `#F2A900` on white 2.0 : 1 (used for the kicker text, bullets and lines), graph colour 2 (the same amber) 2.0, tip `#2E8B57` 4.24 and warning `#B5651D` 4.33 (callout titles in reader mode); **Conclusion**: tip (brand green) 3.27, warning (brand red) 4.31, graph colour 3 (cyan) 2.75. Changing them changes how existing shows look: Lucas decides (darker reader-only shades are an option for the callouts) · todo · —
 
 ## Later
 
@@ -127,13 +128,11 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-055** [format] Multilingual shows: per-slide content per language
 - [ ] **I-057** [format] Profile-specific audience variants (a different deck cut per audience)
 - [ ] **I-058** [templates] Conclusion Facts icons: the six brand icons are fixed in the PowerPoint layout, so converted Facts slides have none. Option: ship the original icons in `templates/conclusion/assets/icons/` (needs Lucas's OK, like the other assets) and let the converter fill empty `icon` fields from the layout
-- [ ] **I-106** [templates/editor] **Visual Template Editor (compose and customize Slipr templates)**:
-  - **Brand & Theme Designer**: visual palette editor (primary, accent, background, surface, text, and `--slipr-graph-*` 1–6 color scales) with real-time WCAG AA contrast validation; typography controls (heading, body, code fonts, size scales, line heights) with local `.woff2` font uploads or system/web font selectors.
-  - **Layout Composer**: visual canvas (16:9 and 4:3) to build and arrange layout fragments (`layouts/*.html`); add and configure slots (`text`, `image`, `quote`, `code`, `cards`, `diagram`, `graph`, `map`, `table`) with validation constraints (`maxLength`, `maxItems`, `required`, placeholder labels).
-  - **Master Branding & Chrome**: global header/footer rules, slide number placement, persistent logos/watermarks, and picture style effects (shadow, soft edges, rounded corners, borders).
-  - **Reader Theme Styler**: customize article typography, reading column width, tab bars, callout cards, and glossaries in Reader mode (`reader.css`).
-  - **Live Preview & Test Drive**: real-time dual-mode preview (Audience + Reader) using sample slides as you tweak tokens and layouts; one-click "Test in Editor" to launch a new show with the template.
-  - **Import & Export**: clone any existing template (`default`, `conclusion`), import from PPTX mapping (pairs with `I-043`), and save/export as a folder or `.zip` template package (`template.json`, `theme.css`, `reader.css`, `layouts/`, `assets/`). · todo · —
+- [ ] **I-111** [template-editor] **Layout composer** (from I-106): a visual canvas (16:9 and 4:3) to build and arrange layout fragments (`layouts/*.html`); add and configure slots (`text`, `image`, `quote`, `code`, `cards`, `diagram`, `graph`, `map`, `table`, …) with their limits (`maxLength`, `maxItems`, `required`, labels). Needs a spec: how positions become CSS without breaking hand-written layouts (D-017 keeps files hand-editable) · todo · —
+- [ ] **I-112** [template-editor] **Master branding and chrome** (from I-106): header / footer rules, slide number placement, logos and watermarks on every slide, and editing picture styles (shadow, soft edges, rounded corners, frame). Today these are CSS rules and layout markup, not tokens: needs a spec (new tokens, or rule editing) · todo · —
+- [ ] **I-113** [template-editor] **Reader theme styler** (from I-106): article typography, column width, tab bars, callout cards and glossary popups beyond today's `reader.css` tokens (phase 1 already edits `--slipr-reader-*` and the callout colours). Pairs with standard reader tokens in both templates · todo · —
+- [ ] **I-114** [template-editor/editor] **Test drive** (from I-106): one click opens the show editor with a new show on the template being edited (needs the template in `templates/` and `templates/index.json`, or templates inside a show folder, D-012) · todo · —
+- [ ] **I-115** [template-editor/converter] **Template from a PowerPoint** (from I-106): import a `.pptx` template's theme colours, fonts and placeholder mapping into a new Slipr template; pairs with I-043 (`slipr-template-from-pptx`) · todo · —
 
 ### Rich embeds & visualizations
 - [ ] **I-109** [format/viewer/editor] **Embedded bar charts from CSV or inline data (`chart` slot and block, `kind: "bar"`)**: the first concrete chart kind of I-007, built on the I-104 table data so the same data can be shown as a table or a chart:
@@ -156,6 +155,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-106** [template-editor] **Template editor, phase 1: theme designer** (Lucas's decisions 2026-10-15: a new app `template-editor/`; token values rewritten in place, D-017; only the tokens a template declares). Start from a template or open a template folder; colours with links between tokens and WCAG AA checks, fonts with `.woff2` upload, sizes; the Template tab (name, id, version, description, style guide fonts); live audience and reader preview in an iframe (demo shows or a generated slide per layout, 16:9 / 4:3); undo / redo; Save, Save as folder…, Download .zip; `template.json` keeps its formatting and its style guide colours follow their tokens. The other parts of the original idea are I-111 … I-115; contrast findings in the shipped templates are C-009. Spec `docs/specs/I-106-template-editor.md` · done 2026-10-15 · claude
 - [x] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
   - **Contents of the instruction:**
     - what Slipr is and the two-layer idea: a concise audience layer, with depth in the reader layer

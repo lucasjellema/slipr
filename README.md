@@ -17,6 +17,7 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 > - <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience; add `&mode=reader` for reader mode)
 > - <http://localhost:8080/viewer/?show=../shows/conclusion-demo/show.json> (every layout of the Conclusion template)
 > - <http://localhost:8080/editor/?show=../shows/demo/show.json> (editor; or open <http://localhost:8080/editor/> for a show folder on disk)
+> - <http://localhost:8080/template-editor/> (template editor: a new template from an existing one, with live preview)
 
 ## Components
 
@@ -24,6 +25,7 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 |---|---|---|---|
 | **Viewer** | [viewer/](viewer/README.md) | Presents a show in audience mode (Reveal.js) or lets a reader explore it in the interactive reader mode | HTML, CSS, vanilla JS, Reveal.js (audience mode only) |
 | **Editor** | [editor/](editor/README.md) | Creates and edits shows in the browser | HTML, CSS, vanilla JS |
+| **Template Editor** | [template-editor/](template-editor/README.md) | Makes a new template from an existing one: colours (with contrast checks), fonts and sizes, with a live audience and reader preview | HTML, CSS, vanilla JS |
 | **Converter** | [converter/](converter/README.md) | Turns a PowerPoint file (`.pptx`) into a Slipr show | Python (CLI), `python-pptx` |
 | *Shared core* | `shared/` | Loads, validates and renders shows. All components use it | Vanilla JS (ES modules) |
 
@@ -68,6 +70,7 @@ slipr/
 ├── shared/          shared core: loader, validator, renderer, JSON schemas
 ├── viewer/          viewer web app
 ├── editor/          editor web app
+├── template-editor/ template editor web app (I-106)
 ├── converter/       PPTX → Slipr converter
 ├── templates/       Slipr templates: default, conclusion (house style)
 ├── shows/           shows: demo (every format feature), conclusion-demo, impact-autonomy-agents, fixtures

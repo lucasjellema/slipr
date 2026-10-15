@@ -1,0 +1,39 @@
+/*
+ * The preview page inside the template editor's iframe (I-106). Only the
+ * frame around the slides; the slides and reader blocks are styled by the
+ * template being edited (its theme.css and reader.css).
+ */
+html, body { margin: 0; }
+body { font-family: system-ui, "Segoe UI", Roboto, sans-serif; }
+
+/* Audience: every sample slide, in a grid on a neutral grey */
+body.pv-audience { background: #3A3F46; color: #F4F6F9; }
+.pv-audience .pv-root {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 20px 16px;
+  padding: 16px;
+}
+.pv-card { margin: 0; }
+.pv-card .slipr-slide { box-shadow: 0 2px 10px rgb(0 0 0 / 35%); }
+.pv-card figcaption { margin-top: 6px; font-size: 12px; color: #C9CED6; }
+.pv-card figcaption code { font-size: 11px; color: #E6E9EE; }
+
+/* Reader: an article in the template's colours and fonts */
+body.pv-reader {
+  background: var(--slipr-color-bg, #fff);
+  color: var(--slipr-color-text, #1E2329);
+  font-family: var(--slipr-font-body, system-ui, sans-serif);
+}
+.pv-reader .pv-root { max-width: 52rem; margin: 0 auto; padding: 24px 20px 64px; }
+.pv-section { margin: 0 0 3rem; }
+.pv-section > h2 {
+  margin: 0 0 0.75rem;
+  font-family: var(--slipr-font-heading, inherit);
+  color: var(--slipr-color-primary, inherit);
+  font-size: 1.5rem;
+}
+.pv-section .pv-slide { margin: 0 0 1rem; }
+.pv-summary { margin: 0 0 1.25rem; color: var(--slipr-color-muted, #5B6573); font-style: italic; max-width: var(--slipr-reader-measure, 42rem); }
+
+.pv-empty { padding: 24px; font-size: 14px; }

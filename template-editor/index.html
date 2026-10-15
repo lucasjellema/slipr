@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slipr Template Editor</title>
+  <script>
+    // Theme before the first paint: the editor's choice (System, Light, Dark;
+    // editor/js/theme.js, I-082), so both apps look the same.
+    try {
+      const choice = localStorage.getItem('slipr-editor-theme');
+      document.documentElement.dataset.theme = choice === 'light' || choice === 'dark'
+        ? choice
+        : (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    } catch { document.documentElement.dataset.theme = 'dark'; }
+  </script>
+  <link rel="stylesheet" href="css/template-editor.css">
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+  <header class="te-bar">
+    <h1 class="te-brand">Slipr <span>Template Editor</span></h1>
+    <p class="te-title" id="te-title"></p>
+    <div class="te-actions" id="te-actions" hidden>
+      <button type="button" id="te-undo" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+      <button type="button" id="te-redo" title="Redo (Ctrl+Y)" aria-label="Redo">↷</button>
+      <button type="button" id="te-save" class="te-primary" title="Save (Ctrl+S)">Save</button>
+      <button type="button" id="te-save-as">Save as folder…</button>
+      <button type="button" id="te-zip">Download .zip</button>
+      <button type="button" id="te-close" title="Back to the start screen">Close</button>
+    </div>
+  </header>
+
+  <div id="te-banner" class="te-banner" role="status" hidden></div>
+
+  <main id="te-start" class="te-start" aria-labelledby="te-start-title">
+    <h2 id="te-start-title">Make a template</h2>
+    <p class="te-lead">Start from one of Slipr's templates and change its colours, fonts and sizes while you watch sample slides. Save the result as a template folder or a .zip.</p>
+    <div class="te-start-list" id="te-start-list"></div>
+    <div class="te-start-open">
+      <button type="button" id="te-open-folder">Open a template folder…</button>
+      <p class="te-hint" id="te-open-hint">Edit a template in place, for example one in Slipr's <code>templates/</code> folder.</p>
+    </div>
+  </main>
+
+  <main id="te-workspace" class="te-workspace" hidden>
+    <section class="te-panel" aria-label="Template settings">
+      <div class="te-tabs" role="tablist" id="te-tabs" aria-label="Settings"></div>
+      <div class="te-filter" id="te-filter-row">
+        <input type="search" id="te-filter" placeholder="Filter tokens" aria-label="Filter tokens">
+      </div>
+      <div class="te-panel-body" id="te-panel-body" role="tabpanel"></div>
+    </section>
+    <section class="te-preview" aria-label="Preview">
+      <div class="te-preview-bar">
+        <div class="te-segmented" role="group" aria-label="Mode">
+          <button type="button" data-mode="audience" aria-pressed="true">Audience</button>
+          <button type="button" data-mode="reader" aria-pressed="false">Reader</button>
+        </div>
+        <div class="te-segmented" role="group" aria-label="Aspect ratio">
+          <button type="button" data-aspect="16:9" aria-pressed="true">16:9</button>
+          <button type="button" data-aspect="4:3" aria-pressed="false">4:3</button>
+        </div>
+        <label class="te-sample">Sample <select id="te-sample"></select></label>
+      </div>
+      <iframe id="te-preview-frame" class="te-preview-frame" title="Preview of the template" src="preview.html"></iframe>
+    </section>
+  </main>
+
+  <dialog id="te-clone-dialog" class="te-dialog" aria-labelledby="te-clone-title">
+    <form method="dialog" id="te-clone-form">
+      <h2 id="te-clone-title">New template</h2>
+      <p class="te-hint" id="te-clone-source"></p>
+      <label>Name <input name="name" required maxlength="80" autocomplete="off"></label>
+      <label>Id <input name="id" required pattern="[a-z0-9]+(-[a-z0-9]+)*" autocomplete="off" aria-describedby="te-clone-id-hint"></label>
+      <p class="te-hint" id="te-clone-id-hint">Lower case letters, digits and hyphens. Shows refer to the template by its folder, which gets this name.</p>
+      <p class="te-error" id="te-clone-error" role="alert"></p>
+      <div class="te-dialog-buttons">
+        <button type="submit" value="cancel" formnovalidate>Cancel</button>
+        <button type="submit" value="ok" class="te-primary">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="te-font-dialog" class="te-dialog" aria-labelledby="te-font-title">
+    <form method="dialog" id="te-font-form">
+      <h2 id="te-font-title">Add a font file</h2>
+      <p class="te-hint">The file is copied into the template's <code>assets/fonts/</code> folder, so shows present offline. Check that its licence allows that.</p>
+      <label>File <input type="file" name="file" accept=".woff2,.woff,.ttf,.otf" required></label>
+      <label>Family name <input name="family" required maxlength="60" autocomplete="off"></label>
+      <label>Weight
+        <select name="weight">
+          <option value="400">Regular (400)</option>
+          <option value="700">Bold (700)</option>
+          <option value="100 900">Variable (100–900)</option>
+          <option value="300">Light (300)</option>
+          <option value="600">Semibold (600)</option>
+          <option value="900">Black (900)</option>
+        </select>
+      </label>
+      <label>Style
+        <select name="style"><option value="normal">Normal</option><option value="italic">Italic</option></select>
+      </label>
+      <label>Use it for <select name="token"></select></label>
+      <p class="te-error" id="te-font-error" role="alert"></p>
+      <div class="te-dialog-buttons">
+        <button type="submit" value="cancel" formnovalidate>Cancel</button>
+        <button type="submit" value="ok" class="te-primary">Add font</button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

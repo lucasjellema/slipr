@@ -186,6 +186,8 @@ The style guide as CSS custom properties, plus the shared typography and layout 
 }
 ```
 
+**The template editor** (`template-editor/`, I-106) edits exactly these variables: every custom property declared in a **top-level `:root` rule** of `theme.css` or `reader.css` (not inside `@media`), grouped by the comment above it (`/* Data tables (I-104) */` → *Data tables*; a longer or multi-line comment is shown as a note on the next token). A value that is just `var(--other)` is shown as linked. So put everything an author may want to change in `:root` as a token, and refer to tokens from the rules below it. When it saves, the `styleguide` colours follow their tokens (by name, `--slipr-color-<name>` or `--<prefix>-<name>`, or by value).
+
 The `styleguide` block in `template.json` and the variables in `theme.css` describe the same values. The JSON copy exists so the editor can show swatches and the converter can match colors without parsing CSS. *(Backlog: generate one from the other.)*
 
 ## Reader styling (`reader.css`)

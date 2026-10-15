@@ -22,7 +22,7 @@ Slipr is documented in a fixed set of files. Each file has one job and one main 
 ## Two levels: project and component
 
 - The **root** files cover Slipr as a whole: the overall idea, the system architecture, the shared formats, and cross-cutting changes such as a new show-format version.
-- Each **component** (`viewer/`, `editor/`, `converter/`) has its own `README.md`, `ARCHITECTURE.md`, `CHANGELOG.md` and `CLAUDE.md`. These go deeper into that one application.
+- Each **component** (`viewer/`, `editor/`, `template-editor/`, `converter/`) has its own `README.md`, `ARCHITECTURE.md`, `CHANGELOG.md` and `CLAUDE.md`. These go deeper into that one application.
 
 Claude Code reads the root `CLAUDE.md` automatically. It also picks up a component's `CLAUDE.md` when it works on files in that folder, so instructions that only apply to one component belong in that component's file.
 

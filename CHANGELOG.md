@@ -6,6 +6,11 @@ Format: newest first. Each entry has a date and a short description, grouped as 
 
 ## [Unreleased]
 
+### 2026-10-15: Template editor, phase 1 (I-106)
+- **Added** a fourth app, `template-editor/` (D-017): make a template from one in `templates/index.json` or open a template folder, edit the values of its `:root` tokens (colours with WCAG AA checks, fonts with `.woff2` upload, sizes) with a live audience and reader preview, and save the folder or a `.zip`. Token values are rewritten in place and `template.json` keeps its formatting; no format change. Spec `docs/specs/I-106-template-editor.md`; the rest of I-106 is I-111 … I-115. Component docs in `template-editor/`.
+- **Added** chore C-009: the contrast checks found pairs below AA in both shipped templates (left for Lucas to decide).
+- **Changed** `.claude/launch.json`: a `slipr-alt` entry on port 8085 for when another session's server holds 8080.
+
 ### 2026-10-15: AI prompt kit (I-080)
 - **Added** `shared/prompt-kit.js`: `buildPrompt(template, { variant })` writes an instruction that lets any AI chatbot write a valid `show.json` for a template (what Slipr is, output rules, the show structure, the template's layouts with their slots and limits, Markdown, image placeholders, writing guidelines, a worked example, a self-check list and a *Your content* section); `fillBrief()` fills that section; `fixUpPrompt()` turns validation errors into a follow-up message; `exampleShow()` builds the example. Layouts, slots and limits come from `template.json`, enums from `show.schema.json`. It teaches the core of format 0.2; layouts that need web pages, PDFs, graphs or maps are listed under *Do not use*.
 - **Added** `tools/prompt-kit.js` (`npm run prompt`, `-- --template <folder>`, `-- --check`): writes `docs/ai/prompts/<template>-full.md` and `-compact.md` (committed; the compact one stays under 12 000 characters). `shared/test/prompt-kit.test.js` checks that every layout appears, that the example validates without warnings and that the committed files are up to date.
