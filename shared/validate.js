@@ -19,6 +19,7 @@ import { pdfEntries } from './embeds/pdf.js';
 import { isGraph } from './embeds/graph.js';
 import { isMap, tileSource } from './embeds/map.js';
 import { isCsvPath, isTable, tableModel } from './embeds/table.js';
+import { isTagCloud, tagKey } from './embeds/tag-cloud.js';
 import { isShown, normalCrop, toShown } from './crop.js';
 import showSchema from './schema/show.schema.json' with { type: 'json' };
 import templateSchema from './schema/template.schema.json' with { type: 'json' };
@@ -80,6 +81,7 @@ export function validateShow(show, options = {}) {
     checkGraphs(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
     checkMaps(slide, at, show.slipr, errors, warnings, options.imageExists, slideIds);
     checkTables(slide, at, show.slipr, errors, warnings, options.imageExists);
+    checkTagClouds(slide, at, show.slipr, errors, warnings, options.imageExists, glossaryIds);
 
     const reader = isObject(slide.reader) ? slide.reader : {};
     const blockIds = new Set();
@@ -236,6 +238,8 @@ export function collectImagePaths(show) {
     }
     // Table data files (I-104): the same.
     for (const { value } of tableEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
+    // Tag cloud data files (I-105): the same.
+    for (const { value } of tagCloudEntries(slide, '')) if (isCsvPath(value.data) && !/^[a-z][a-z0-9+.-]*:|^\//i.test(value.data)) found.push(value.data);
     // PDF files in the show folder (I-072): checked, embedded and opened like images.
     for (const { value } of pdfEntries({ slides: [slide] })) {
       if (!/^[a-z][a-z0-9+.-]*:/i.test(value.pdf)) found.push(value.pdf);
@@ -660,7 +664,7 @@ function tableEntries(slide, at) {
   /** @type {{ value: any, path: string, block: boolean }[]} */
   const found = [];
   for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
-    if (isTable(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+    if (isTable(value) && !isTagCloud(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
   }
   arrayOf(slide?.reader?.blocks).forEach((block, j) => {
     if (block?.type === 'table' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
@@ -709,6 +713,62 @@ function checkTables(slide, at, version, errors, warnings, fileExists) {
       if (!col || col.numeric) return;
       if (c.total && c.total !== 'count') warnings.push({ path: `${path}.columns[${k}].total`, code: 'not-numeric', message: `column "${c.key}" has no numbers: no ${c.total} is shown` });
       if (c.visual) warnings.push({ path: `${path}.columns[${k}].visual`, code: 'not-numeric', message: `column "${c.key}" has no numbers: the ${c.visual} is not shown` });
+    });
+  }
+}
+
+/**
+ * The tag clouds of a slide (I-105): slot values and tag cloud blocks, with their path.
+ * @param {any} slide @param {string} at
+ * @returns {{ value: any, path: string, block: boolean }[]}
+ */
+function tagCloudEntries(slide, at) {
+  /** @type {{ value: any, path: string, block: boolean }[]} */
+  const found = [];
+  for (const [name, value] of Object.entries(isObject(slide?.content) ? slide.content : {})) {
+    if (isTagCloud(value)) found.push({ value, path: `${at}.content.${name}`, block: false });
+  }
+  arrayOf(slide?.reader?.blocks).forEach((block, j) => {
+    if (block?.type === 'tag-cloud' && isObject(block)) found.push({ value: block, path: `${at}.reader.blocks[${j}]`, block: true });
+  });
+  return found;
+}
+
+/**
+ * Tag clouds (I-105): format 0.2; the data file exists (with a file check);
+ * a term's glossary id exists; highlights name a term there is (inline terms:
+ * a file's terms are only known once it is read).
+ * @param {any} slide @param {string} at @param {unknown} version
+ * @param {Issue[]} errors @param {Issue[]} warnings
+ * @param {((src: string) => boolean) | undefined} fileExists
+ * @param {Set<string>} glossaryIds
+ */
+function checkTagClouds(slide, at, version, errors, warnings, fileExists, glossaryIds) {
+  for (const { value, path, block } of tagCloudEntries(slide, at)) {
+    if (version === '0.1') {
+      errors.push({ path, code: 'format-version', message: `a tag cloud ${block ? 'block' : 'slot'} needs show format 0.2: set "slipr" to "0.2"` });
+    }
+    const fromFile = isCsvPath(value.data);
+    if (fromFile && fileExists && !fileExists(value.data)) {
+      warnings.push({ path: `${path}.data`, code: 'missing-file', message: `tag cloud data file "${value.data}" not found` });
+    }
+    const names = new Set();
+    arrayOf(value.terms).forEach((t, k) => {
+      if (!isObject(t) || typeof t.text !== 'string') return;
+      names.add(tagKey(t.text));
+      if (typeof t.glossary === 'string' && !glossaryIds.has(t.glossary)) {
+        warnings.push({ path: `${path}.terms[${k}].glossary`, code: 'unknown-glossary', message: `unknown glossary term "${t.glossary}"` });
+      }
+    });
+    if (fromFile && !Array.isArray(value.terms)) continue;
+    arrayOf(value.steps).forEach((step, k) => {
+      const list = Array.isArray(step?.highlight) ? step.highlight : [step?.highlight];
+      list.forEach((name, n) => {
+        if (typeof name === 'string' && !names.has(tagKey(name))) {
+          const where = Array.isArray(step.highlight) ? `${path}.steps[${k}].highlight[${n}]` : `${path}.steps[${k}].highlight`;
+          warnings.push({ path: where, code: 'unknown-term', message: `the tag cloud has no term "${name}"` });
+        }
+      });
     });
   }
 }
@@ -839,6 +899,7 @@ function matchesSlotType(value, type) {
     case 'graph': return isGraph(value);
     case 'map': return isMap(value);
     case 'table': return isTable(value);
+    case 'tag-cloud': return isObject(value) && (Array.isArray(value.terms) || isCsvPath(value.data));
     case 'cards': return Array.isArray(value) && value.every(isObject);
     default: return true;
   }
@@ -860,6 +921,7 @@ function slotTypeLabel(type) {
     graph: 'a graph object { "nodes": [...], "edges": [...] } or { "data": "data/....json" }',
     map: 'a map object { "center": {...}, "markers": [...] }',
     table: 'a table object { "columns": [...], "rows": [...] } or { "data": "data/....csv" }',
+    'tag-cloud': 'a tag cloud object { "terms": [...] } or { "data": "data/....csv" }',
     cards: 'an array of card objects',
   }[type] ?? type;
 }

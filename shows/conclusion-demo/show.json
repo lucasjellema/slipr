@@ -231,6 +231,33 @@
       }
     },
     {
+      "id": "s-tag-cloud",
+      "layout": "tag-cloud",
+      "chapter": "sections",
+      "content": {
+        "kicker": "Tag cloud",
+        "title": "What our clients ask about",
+        "cloud": {
+          "terms": [
+            { "text": "Data & AI", "weight": 24 },
+            { "text": "Cloud migration", "weight": 18 },
+            { "text": "Security", "weight": 16 },
+            { "text": "ERP", "weight": 12 },
+            { "text": "Integration", "weight": 11 },
+            { "text": "Digital workplace", "weight": 9 },
+            { "text": "Low-code", "weight": 7 },
+            { "text": "Governance", "weight": 6 },
+            { "text": "Sustainability", "weight": 5 },
+            { "text": "Analytics", "weight": 5 },
+            { "text": "DevOps", "weight": 4 },
+            { "text": "Change management", "weight": 3 }
+          ],
+          "weightLabel": "requests",
+          "steps": [{ "terms": 3 }, { "terms": "all" }, { "highlight": "Security" }]
+        }
+      }
+    },
+    {
       "id": "s-section-image",
       "layout": "section-image",
       "chapter": "sections",

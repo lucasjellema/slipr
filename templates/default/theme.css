@@ -52,6 +52,15 @@
   --slipr-table-positive: #1A7F37;
   --slipr-table-negative: #B3412C;
   --slipr-table-highlight: #F2A900;
+
+  /* Tag clouds (I-105): colours by weight, light to strong; sizes in em */
+  --slipr-tag-cloud-1: #5B6573;
+  --slipr-tag-cloud-2: #2A9D8F;
+  --slipr-tag-cloud-3: #7B5EA7;
+  --slipr-tag-cloud-4: #1F3A5F;
+  --slipr-tag-cloud-highlight: #F2A900;
+  --slipr-tag-cloud-min-size: 0.9em;
+  --slipr-tag-cloud-max-size: 3em;
 }
 
 /* ---------- Slide frame ---------- */
@@ -289,6 +298,12 @@
 .slipr-figure--table { align-items: stretch; min-height: 0; }
 .slipr-layout--table .slipr-table { flex: 1; min-height: 0; width: 100%; font-size: 1.6cqw; }
 
+/* ---------- Layout: tag cloud (I-105) ---------- */
+
+.slipr-layout--tag-cloud { padding-bottom: 3cqw; gap: 1.4cqw; }
+.slipr-figure--tag-cloud { align-items: stretch; min-height: 0; }
+.slipr-layout--tag-cloud .slipr-tag-cloud { flex: 1; min-height: 0; width: 100%; font-size: 2cqw; }
+
 /* ---------- Layout: map (I-075) ---------- */
 
 .slipr-layout--map { padding-bottom: 3cqw; gap: 1.4cqw; }
@@ -326,6 +341,7 @@
   .slipr-mode-reader .slipr-pdf { flex: none; height: 70vh; font-size: 0.9rem; }
   .slipr-mode-reader .slipr-graph { flex: none; height: 60vh; font-size: 0.9rem; }
   .slipr-mode-reader .slipr-layout--map .slipr-map { flex: none; height: 60vh; font-size: 0.9rem; }
+  .slipr-mode-reader .slipr-layout--tag-cloud .slipr-tag-cloud { flex: none; font-size: 0.8rem; }
 }
 
 /* ---------- Picture styles (template format 0.3, D-014, I-084) ----------

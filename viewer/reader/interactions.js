@@ -2,7 +2,9 @@
 /**
  * Interactive behaviour of reader content:
  *  - popovers for glossary terms (.slipr-term), inline footnotes
- *    (.slipr-footnote-ref) and image hotspots (.slipr-hotspot)
+ *    (.slipr-footnote-ref), image hotspots (.slipr-hotspot) and tag cloud
+ *    terms (.slipr-tag-cloud-term, I-105: the glossary definition and the
+ *    slides that mention the term)
  *  - ARIA tabs (role=tablist) with arrow-key navigation
  *
  * One shared popover element in the top layer (native Popover API), placed
@@ -11,8 +13,10 @@
  * toggles. Esc and clicking elsewhere close it (popover="auto").
  */
 import { markdown, escape } from '../../shared/markdown.js';
+import { slideTitle } from '../../shared/render.js';
+import { buildSearchIndex, slidesMentioning } from './search-index.js';
 
-const TRIGGERS = '.slipr-term, .slipr-footnote-ref, .slipr-hotspot';
+const TRIGGERS = '.slipr-term, .slipr-footnote-ref, .slipr-hotspot, .slipr-tag-cloud-term';
 const OPEN_DELAY = 250;
 const CLOSE_DELAY = 200;
 
@@ -58,6 +62,11 @@ export function setupInteractions(root, show) {
     clearTimeout(openTimer);
     if (pop.matches(':popover-open')) pop.hidePopover();
   };
+
+  // A slide link in the popover (tag cloud terms) goes there and closes it.
+  pop.addEventListener('click', (event) => {
+    if (/** @type {Element} */ (event.target).closest('a[data-slide-link]')) close();
+  });
 
   pop.addEventListener('toggle', (event) => {
     if (/** @type {ToggleEvent} */ (event).newState === 'closed') {
@@ -110,6 +119,7 @@ export function setupInteractions(root, show) {
  * @returns {{ html: string, label: string } | null}
  */
 function popoverContent(trigger, show) {
+  if (trigger.classList.contains('slipr-tag-cloud-term')) return tagContent(trigger, show);
   if (trigger.classList.contains('slipr-term')) {
     const id = trigger.dataset.term ?? '';
     const entry = show.glossary?.[id];
@@ -131,6 +141,44 @@ function popoverContent(trigger, show) {
     return { html: content.innerHTML, label: trigger.getAttribute('aria-label') ?? 'Hotspot' };
   }
   return null;
+}
+
+/** The show's search documents, built on the first tag cloud popover. @type {WeakMap<object, import('./search-index.js').SearchDoc[]>} */
+const indexes = new WeakMap();
+
+/**
+ * A tag cloud term (I-105): its glossary definition (when it has one), its
+ * weight, and links to the other slides that mention it (by its name or the
+ * glossary term's names).
+ * @param {HTMLElement} trigger
+ * @param {any} show
+ * @returns {{ html: string, label: string }}
+ */
+function tagContent(trigger, show) {
+  const text = trigger.dataset.tag ?? trigger.textContent ?? '';
+  const entry = trigger.dataset.term ? show.glossary?.[trigger.dataset.term] : null;
+  let docs = indexes.get(show);
+  if (!docs) {
+    docs = buildSearchIndex(show);
+    indexes.set(show, docs);
+  }
+  const names = [text, ...(entry ? [entry.term, ...(Array.isArray(entry.aliases) ? entry.aliases : [])] : [])];
+  const own = /** @type {HTMLElement | null} */ (trigger.closest('[data-slide-id]'))?.dataset.slideId ?? null;
+  const slides = slidesMentioning(docs, names, own)
+    .map((id) => show.slides?.find((/** @type {any} */ s) => s.id === id))
+    .filter(Boolean);
+  const parts = [`<p class="slipr-popover-title">${escape(entry?.term ?? text)}</p>`];
+  if (entry) {
+    parts.push(markdown(entry.definition ?? '', { mode: 'audience', glossary: show.glossary }));
+    if (entry.link && /^https?:/i.test(entry.link)) {
+      parts.push(`<p class="slipr-popover-link"><a href="${escape(entry.link)}" target="_blank" rel="noopener noreferrer">Learn more ↗</a></p>`);
+    }
+  }
+  if (trigger.dataset.tagWeight) parts.push(`<p class="slipr-popover-meta">${escape(trigger.dataset.tagWeight)}</p>`);
+  parts.push(slides.length
+    ? `<p class="slipr-popover-meta">Mentioned on</p><ul class="slipr-popover-slides">${slides.map((/** @type {any} */ s) => `<li><a href="#${escape(s.id)}" data-slide-link="${escape(s.id)}">${escape(slideTitle(s))}</a></li>`).join('')}</ul>`
+    : '<p class="slipr-popover-meta">Not mentioned on other slides.</p>');
+  return { html: parts.join(''), label: entry?.term ?? text };
 }
 
 /**

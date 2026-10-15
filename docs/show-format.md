@@ -234,6 +234,7 @@ Every block has an `id` (unique within the slide, stable, used to anchor annotat
 | `graph` | `nodes` and / or `data`, `edges?`, `layout?`, `title?`, `caption?`, `fallback?` | (0.2) A graph to explore: pan, zoom, select a node, filter by tag; see *Graphs* below |
 | `map` | `center` / `markers` / `layers`, `zoom?`, `tiles?`, `load?`, `title?`, `caption?`, `fallback?` | (0.2) An interactive map: pan, zoom, select a place, filter by tag; see *Maps* below |
 | `table` | `columns` and `rows`, or `data`, plus `sortable?`, `sort?`, `filter?`, `maxRows?`, `pinFirst?`, `locale?`, `title?`, `caption?`, `fallback?` | (0.2) A data table: sort, filter, show or hide columns, copy, download; see *Tables* below |
+| `tag-cloud` | `terms` or `data`, plus `termColumn?`, `weightColumn?`, `order?`, `maxTerms?`, `weightLabel?`, `title?`, `caption?`, `fallback?` | (0.2) A tag cloud: a click on a term shows its glossary definition and the slides that mention it; see *Tag clouds* below |
 
 *Planned block types (backlog):* `quiz` (self-check question), `chart` (data-driven visualization).
 
@@ -360,6 +361,41 @@ Column fields: `key` (required), `label` (default the key), `format` (`text` · 
 
 The table block also has `title` (and `id`, `type: "table"`, `for`, `depth`); it has no `steps`. **Colours come from the template**: `--slipr-table-header-bg`, `-header-text`, `-stripe`, `-border`, `-strong` (scales and bars), `-positive`, `-negative`, `-highlight`. **Reader mode** adds **Columns** (show or hide), **Copy** (tab separated, pastes into a spreadsheet) and **Download CSV** (the rows on show). Reader search finds headers and inline cells; rows in a CSV file are not in the search index.
 
+#### Tag clouds (`tag-cloud` slot and block; I-105, format 0.2)
+
+Terms sized by their weight, from a **CSV file** in the show folder or typed in as **inline terms**: themes of a talk, survey answers, keywords. The terms flow in centred lines (a list, so screen readers read them in order), each sized and coloured by its weight; colours and sizes come from the template. Spec: `docs/specs/I-105-tag-cloud.md`. For authors: `editor/help.html#tag-clouds`.
+
+```json
+"cloud": {
+  "terms": [
+    { "text": "reader layer", "weight": 14 },
+    { "text": "templates", "weight": 10 },
+    { "text": "Markdown", "weight": 7 },
+    { "text": "Popovers", "weight": 5, "glossary": "reader-layer" }
+  ],
+  "steps": [{ "terms": 2 }, { "terms": "all" }, { "highlight": ["reader layer", "templates"] }]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `terms` | The terms inline: `{ "text", "weight"?, "glossary"? }`. `weight` is a number ≥ 0 (default 1). A term written twice (ignoring case and accents) is shown once with the weights added up; an empty `text` is not shown |
+| `data` | Instead of `terms`: a CSV file in the show folder (`data/…csv`, `.tsv` or `.txt`, first line the headers; separators and decimal commas as for tables) |
+| `termColumn` | The CSV column with the terms (default: the first column) |
+| `weightColumn` | The CSV column with the weights (default: the second column when every filled cell in it is a number). Without a weight column every row counts 1, so a file with one answer per row shows the most frequent answers biggest |
+| `order` | `cloud` (default): the heaviest term in the middle, lighter ones alternately before and after it · `weight`: heaviest first · `alphabetical` · `none`: as written |
+| `maxTerms` | Show only the heaviest n terms |
+| `weightLabel` | What a weight counts (`mentions`, `answers`): readers see "12 mentions" in the term's popup, screen readers hear it. Without it the weight is read out as "weight 12" and not shown in the popup |
+| `steps` | Slots, audience mode: one per click, after the slide's own fragments. `{ "terms": n \| "all" }` shows the heaviest n terms, each in its own place (once a `terms` step exists the cloud starts empty); `{ "highlight": "term" \| ["term", …] }` highlights terms (by name, ignoring case and accents) and dims the rest until the next step (a `terms` step ends it); `{ "highlight": null }` clears. Print, thumbnails and the editor show every term |
+| `caption` | Below the cloud, when the layout has no caption slot of its own |
+| `fallback` | As for every embed. Without it, the static content is the cloud itself (for a CSV file: a note) |
+
+**Glossary (D-015).** A term whose name is a glossary term or one of its `aliases` (ignoring case and accents) is linked to that entry; `glossary` names an entry explicitly. **Reader mode**: every term is a button; a click (or Enter) opens a popup with the entry's definition (linked terms only), the weight (with `weightLabel`) and links to the **other slides that mention the term** (its name, or the glossary term's names, as whole words in slide text and reader blocks). Audience mode shows plain text. Reader search finds inline terms; terms in a CSV file are not in the search index.
+
+The tag cloud block also has `title` (and `id`, `type: "tag-cloud"`, `for`, `depth`); it has no `steps`. **Colours and sizes come from the template**: `--slipr-tag-cloud-1` … `-4` (light to strong, by weight), `-highlight`, `-min-size`, `-max-size` (in em) and `-font`.
+
+A value with only `data` (a CSV file) has the same shape as a table's; the slot type in the template (or the block `type`) tells them apart.
+
 #### Web pages (`web` slot, `embed` block; I-071, format 0.2)
 
 | Field | Where | Meaning |
@@ -417,6 +453,7 @@ The template defines which slots a layout has and the type of each slot.
 | `graph` | object | (0.2) `{ "nodes": [...], "edges": [...], "steps": [...] }` or `{ "data": "data/graph.json" }`: a graph, see *Graphs* above |
 | `map` | object | (0.2) `{ "markers": [...], "layers": [...], "tiles": ..., "steps": [...] }`: a map, see *Maps* above |
 | `table` | object | (0.2) `{ "columns": [...], "rows": [...], "steps": [...] }` or `{ "data": "data/sales.csv" }`: a data table, see *Tables* above |
+| `tag-cloud` | object | (0.2) `{ "terms": [{ "text": ..., "weight": ... }], "steps": [...] }` or `{ "data": "data/keywords.csv" }`: a tag cloud, see *Tag clouds* above |
 | `web` | object | (0.2) `{ "url": "https://…", "title": "...", "allow": [...], "present": "live" \| "static", "load": "click" \| "auto", "fallback": {...} }`: a web page on the slide, see *Web pages* above |
 
 ## Template references
@@ -433,11 +470,11 @@ When a show is opened **from a folder** (the editor's *Open…*, File System Acc
 
 The structure is defined by the JSON Schema `shared/schema/show.schema.json`. It is used by VS Code (autocomplete), by `shared/validate.js` (browser and Node), and by the Python converter. Everything below the schema level is checked by `shared/validate.js`. Unknown properties are errors, so typos are caught. The only exception is `_orphaned`, which is reserved for the editor.
 
-- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `graph` / `map` / `table` slot value or `pdf` / `graph` / `map` / `table` block in a 0.1 show; an unsafe web page or PDF address; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block; a table without `rows`, `columns` or `data`, a column without `key`, an unknown column `format`, `total`, `visual` or `align`, a table `data` address that is not a CSV file in the show folder, `steps` on a table block.
-- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, a duplicate table column key, a table row with more cells than columns, a table sort or highlight naming an unknown column, a total (other than `count`) or visual on a column without numbers, a table data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
+- **Errors** (the show cannot render): missing required top-level fields, unknown `layout`, wrong slot value type, duplicate slide or block `id`, unknown block `type`, an overlay with both or neither of `image` and `text`, an invalid text element `style`, `overlays`, a picture `style`, `opacity`, `crop` or `morphId`, glossary `aliases`, an embed `fallback` / `load` / `allow` / `aspect`, or a `web` / `pdf` / `graph` / `map` / `table` slot value or `pdf` / `graph` / `map` / `table` block in a 0.1 show; an unsafe web page or PDF address; a graph without `nodes` or `data`, a node without `id`, an edge without both ends, `steps` on a graph block, a graph `data` address that is not a `.json` file in the show folder; a map without `center`, `markers` or `layers`, a position or zoom out of range, a tile address that is not `https:` or relative with `{z}`, a layer that is not a `.geojson` / `.json` file in the show folder, `steps` or `present` on a map block; a table without `rows`, `columns` or `data`, a column without `key`, an unknown column `format`, `total`, `visual` or `align`, a table `data` address that is not a CSV file in the show folder, `steps` on a table block; a tag cloud without `terms` or `data`, a term without `text`, a negative weight, an unknown `order` or step, a tag cloud `data` address that is not a CSV file in the show folder, `steps` on a tag cloud block.
+- **Warnings** (it renders, but something is off): unknown slot name, missing required slot, text longer than the slot's `maxLength` or more list items (or cards) than its `maxItems`, an unknown or empty required card field, image file not found (only when the caller supplies a file check), missing `alt` text (also on extra images and embed fallbacks), an extra image or text element that sticks out of the slide, a text element without text, a picture `style` the template does not define, a crop that sticks out of the picture or has no size, a hotspot outside its picture's crop, a `morphId` used twice on one slide, unknown glossary id in `[[...]]`, a glossary name (term or alias) used by two terms, a web page presented `static` without a fallback image, `same-origin` on a file in the show folder, a PDF file not found (local files, with a file check), both `page` and `pages`, a reversed page range, a duplicate graph node id, a graph edge or step naming an unknown node, a graph data file not found, a duplicate map marker id, a map step naming an unknown marker, a map layer file not found, a tile server without an attribution, a duplicate table column key, a table row with more cells than columns, a table sort or highlight naming an unknown column, a total (other than `count`) or visual on a column without numbers, a table data file not found, a tag cloud highlight naming a term it does not have (inline terms), an unknown glossary id on a tag cloud term, a tag cloud data file not found, unknown profile in `for`, unknown slide id in `paths`/`related`/links, unknown `chapter`, template version outside range.
 
 ## Versioning
 
 - `0.x`: draft. Breaking changes are allowed but must be recorded in the root `CHANGELOG.md`.
-- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), the `map` slot and block types (I-075, 2026-10-13), and the `table` slot and block types (I-104, 2026-10-14). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
+- `0.2` (2026-10-11): adds `slide.overlays` (extra images I-083; text elements I-089, 2026-10-13), `style` and `opacity` on image values (I-084), `crop` and `morphId` on image values (I-090, I-091, 2026-10-13), `aliases` on glossary terms (I-086), `fallback` / `load` on embeds (I-070, 2026-10-12), the `web` slot type plus `allow` / `aspect` / `present` on web pages (I-071, 2026-10-12), the `pdf` slot and block types (I-072, 2026-10-12), the `graph` slot and block types (I-074, 2026-10-13), the `map` slot and block types (I-075, 2026-10-13), the `table` slot and block types (I-104, 2026-10-14), and the `tag-cloud` slot and block types (I-105, 2026-10-15). Additive: every 0.1 show is still valid as it is, so there is no migration. A show becomes 0.2 when it first uses one of them.
 - From `1.0`: breaking changes require a major bump and a migration in `shared/migrate.js`.

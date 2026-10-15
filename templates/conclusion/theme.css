@@ -107,6 +107,16 @@
   --slipr-table-positive: #3F7D35;
   --slipr-table-negative: #C42424;
   --slipr-table-highlight: var(--cnc-yellow);
+
+  /* Tag clouds (I-105): grey to magenta by weight, yellow highlights */
+  --slipr-tag-cloud-1: #555555;
+  --slipr-tag-cloud-2: #1369AF;
+  --slipr-tag-cloud-3: #5A3F8C;
+  --slipr-tag-cloud-4: var(--cnc-magenta);
+  --slipr-tag-cloud-highlight: var(--cnc-yellow);
+  --slipr-tag-cloud-min-size: 0.9em;
+  --slipr-tag-cloud-max-size: 3em;
+  --slipr-tag-cloud-font: var(--cnc-font-heading);
 }
 
 /* ---------- slide frame ---------- */
@@ -209,6 +219,7 @@
 .cnc-illustration { object-fit: contain; object-position: left top; }
 .cnc-web, .cnc-pdf, .cnc-graph, .cnc-map { display: flex; flex-direction: column; font-size: var(--cnc-size-body); }
 .cnc-table { display: flex; flex-direction: column; font-size: calc(13 * var(--cnc-pt)); }
+.cnc-tag-cloud { display: flex; flex-direction: column; font-size: calc(26 * var(--cnc-pt)); }
 
 /* ---------- quotes ---------- */
 .cnc-quote {
@@ -432,6 +443,7 @@
   .slipr-mode-reader .cnc-illustration { max-height: 60vh; }
   .slipr-mode-reader :is(.cnc-web, .cnc-pdf) { height: 70vh; font-size: 0.9rem; }
   .slipr-mode-reader :is(.cnc-graph, .cnc-map) { height: 60vh; font-size: 0.9rem; }
+  .slipr-mode-reader .cnc-tag-cloud { font-size: 0.8rem; }
   /* Cards stack (two per row for image cards and figures) */
   .slipr-mode-reader .cnc-cards { display: grid; grid-template-columns: 1fr; grid-template-rows: none; gap: 0.75rem; }
   .slipr-mode-reader :is(.cnc-cards--images, .cnc-cards--facts) { grid-template-columns: 1fr 1fr; }

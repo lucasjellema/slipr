@@ -48,6 +48,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [ ] **I-043d** [templates] Review of the Conclusion template by Lucas, and later by the brand team, before external use · todo · lucas
 - [X] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · done · lucas
 - [X] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · done · lucas
+- [ ] **C-007** [editor] Find & replace does not look inside table cells (I-104) or tag cloud terms (I-105); add them to `findMatches()` and `replaceInSlide()` / `replaceAllText()` together · todo · —
 
 ## Later
 
@@ -134,12 +135,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
   - **Import & Export**: clone any existing template (`default`, `conclusion`), import from PPTX mapping (pairs with `I-043`), and save/export as a folder or `.zip` template package (`template.json`, `theme.css`, `reader.css`, `layouts/`, `assets/`). · todo · —
 
 ### Rich embeds & visualizations
-- [ ] **I-105** [format/viewer/editor] **Tag cloud / word cloud from CSV data (`tag-cloud` slot and block)**:
-  - **Data source**: external `.csv` file in `data/` (e.g. `data/keywords.csv`) or inline CSV block with terms and optional weights or frequencies (`term, weight`), parsed client-side with zero external runtime dependencies (D-001/D-002).
-  - **Layout & visual design**: font sizes scaled proportionally to weight/frequency; colors styled with template tokens (`--slipr-graph-*` or accent palette); clean spatial packing that stays legible and fits the slide aspect ratio.
-  - **Glossary integration (D-015)**: tags matching glossary entries (`show.glossary[term]`) automatically link to their glossary definitions. In **Reader mode**, clicking a tag opens its glossary popover with term details, aliases, markdown notes, and related slides.
-  - **Audience mode**: clean presentation view for key themes, survey results, or audience keywords; optional steps to pulse, highlight or reveal top terms on clicks.
-  - **Reader mode**: fully interactive with glossary popovers, click-to-filter related slides, and inclusion of terms in the reader full-text search index (`/`). · todo · —
+- [ ] **I-108** [format/viewer] **More for tag clouds** (left out of I-105): a spiral-packed "word cloud" shape as an alternative to the flowing layout; a pulse animation on highlighted terms; colours by a category column instead of by weight; filtering the reader's contents to the slides that mention a term; terms from a CSV file in the reader search index · todo · —
 - [ ] **I-107** [format/viewer/editor] **More for data tables** (left out of I-104): group rows by a column with a subtotal per group (collapsible in reader mode); filters per column (a value list or a range); pagination as an alternative to scrolling; a remote CSV address (click-to-load, like web pages); editing a CSV file's cells from the editor (now: *Move into the slide*); charts from the same data (`chart`, planned) · todo · —
 
 ### AI authoring
@@ -172,6 +168,12 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ## Done
 
+- [x] **I-105** [format/viewer/editor] **Tag cloud / word cloud from CSV data (`tag-cloud` slot and block)**:
+  - **Data source**: external `.csv` file in `data/` (e.g. `data/keywords.csv`) or inline CSV block with terms and optional weights or frequencies (`term, weight`), parsed client-side with zero external runtime dependencies (D-001/D-002).
+  - **Layout & visual design**: font sizes scaled proportionally to weight/frequency; colors styled with template tokens (`--slipr-graph-*` or accent palette); clean spatial packing that stays legible and fits the slide aspect ratio.
+  - **Glossary integration (D-015)**: tags matching glossary entries (`show.glossary[term]`) automatically link to their glossary definitions. In **Reader mode**, clicking a tag opens its glossary popover with term details, aliases, markdown notes, and related slides.
+  - **Audience mode**: clean presentation view for key themes, survey results, or audience keywords; optional steps to pulse, highlight or reveal top terms on clicks.
+  - **Reader mode**: fully interactive with glossary popovers, click-to-filter related slides, and inclusion of terms in the reader full-text search index (`/`). Spec with Lucas's decisions: `docs/specs/I-105-tag-cloud.md`. Built as a flowing, centred cloud (heaviest in the middle), inline terms or a CSV file (rows counted when there is no weight column), glossary links by name or alias, reveal / highlight steps (no pulse), a reader popup with the definition and the slides that mention the term, and the full editor; not the converter. `shared/embeds/tag-cloud.js`, `editor/js/tag-cloud-values.js`, `editor/js/ui/tag-cloud-fields.js` · done 2026-10-15 · claude
 - [x] **I-104** [format/viewer/editor] **Interactive data tables from CSV (`table` slot and block)**:
   - **Data source**: external `.csv` file in `data/` (e.g. `data/sales.csv`) or inline CSV string; parsed client-side with zero external runtime dependencies (D-001/D-002); packaged in single-file HTML exports and zip archives.
   - **Presentation & styling**: clean layout styled with `--slipr-*` template tokens, zebra striping, sticky header row, and auto-alignment (numbers right-aligned, text left-aligned, dates/codes centered).

@@ -1008,6 +1008,126 @@
       }
     },
     {
+      "id": "s-tag-cloud",
+      "layout": "tag-cloud",
+      "chapter": "how",
+      "tags": [
+        "embed"
+      ],
+      "content": {
+        "title": "What a show is made of",
+        "cloud": {
+          "terms": [
+            {
+              "text": "reader layer",
+              "weight": 14
+            },
+            {
+              "text": "audience layer",
+              "weight": 12
+            },
+            {
+              "text": "templates",
+              "weight": 10
+            },
+            {
+              "text": "JSON",
+              "weight": 9
+            },
+            {
+              "text": "Markdown",
+              "weight": 7
+            },
+            {
+              "text": "slots",
+              "weight": 7
+            },
+            {
+              "text": "layouts",
+              "weight": 6
+            },
+            {
+              "text": "Reveal.js",
+              "weight": 6
+            },
+            {
+              "text": "popovers",
+              "weight": 5
+            },
+            {
+              "text": "search",
+              "weight": 5
+            },
+            {
+              "text": "profiles",
+              "weight": 4
+            },
+            {
+              "text": "annotations",
+              "weight": 4
+            },
+            {
+              "text": "tables",
+              "weight": 3
+            },
+            {
+              "text": "maps",
+              "weight": 3
+            },
+            {
+              "text": "graphs",
+              "weight": 3
+            },
+            {
+              "text": "offline",
+              "weight": 2
+            },
+            {
+              "text": "paths",
+              "weight": 2
+            },
+            {
+              "text": "bookmarks",
+              "weight": 1
+            }
+          ],
+          "steps": [
+            {
+              "terms": 3
+            },
+            {
+              "terms": "all"
+            },
+            {
+              "highlight": [
+                "reader layer",
+                "audience layer"
+              ]
+            }
+          ]
+        },
+        "caption": "The bigger the word, the more the show is about it. In reader mode, click a word."
+      },
+      "reader": {
+        "summary": "Slides and reader blocks can hold tag clouds.",
+        "blocks": [
+          {
+            "id": "cloud-how",
+            "type": "text",
+            "md": "A **tag cloud** sizes each term by its weight and colours it from the template. Terms come from a CSV file or are typed in; a term that names a glossary entry links to its definition. In reader mode a click shows the slides that mention the term; while presenting, the heaviest terms can appear first and terms can be highlighted."
+          },
+          {
+            "id": "cloud-answers",
+            "type": "tag-cloud",
+            "title": "What readers would use Slipr for (from a CSV file)",
+            "data": "data/keywords.csv",
+            "weightLabel": "answers",
+            "caption": "One answer per row: repeated answers add up."
+          }
+        ]
+      }
+    },
+    {
       "id": "s-tailored",
       "layout": "bullets",
       "chapter": "how",

@@ -3,7 +3,7 @@
   "slipr": "0.3",
   "id": "conclusion",
   "name": "Conclusion (magenta)",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Conclusion house style, derived from the official Conclusion PowerPoint template (Conclusion 2025, magenta). Internal use; see docs/specs/I-043-conclusion-template.md.",
   "theme": "theme.css",
   "reader": "reader.css",
@@ -474,6 +474,17 @@
         { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
         { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
         { "name": "table", "type": "table", "label": "Table", "required": true }
+      ]
+    },
+    {
+      "id": "tag-cloud",
+      "name": "Tag cloud",
+      "description": "Title with a cloud of terms sized by weight (glossary terms open their definition in reader mode; terms revealed or highlighted step by step in audience mode) in the content area.",
+      "file": "layouts/tag-cloud.html",
+      "slots": [
+        { "name": "kicker", "type": "text", "label": "Subtitle", "maxLength": 60 },
+        { "name": "title", "type": "text", "label": "Title", "required": true, "maxLength": 46 },
+        { "name": "cloud", "type": "tag-cloud", "label": "Tag cloud", "required": true }
       ]
     },
     {

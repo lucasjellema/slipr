@@ -17,8 +17,8 @@ function validateVariant(mutate) {
 
 /** Remove every show-format 0.2 feature (overlays, picture style / opacity / crop, glossary aliases, embeds, graphs). */
 function withoutFormat02(s) {
-  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map' && x.layout !== 'table');
-  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map' && b.type !== 'table');
+  s.slides = s.slides.filter((x) => x.layout !== 'web' && x.layout !== 'pdf' && x.layout !== 'graph' && x.layout !== 'map' && x.layout !== 'table' && x.layout !== 'tag-cloud');
+  for (const slide of s.slides) if (slide.reader?.blocks) slide.reader.blocks = slide.reader.blocks.filter((b) => b.type !== 'graph' && b.type !== 'map' && b.type !== 'table' && b.type !== 'tag-cloud');
   for (const slide of s.slides) delete slide.overlays;
   for (const block of s.slides.flatMap((x) => x.reader?.blocks ?? [])) if (block.image) { delete block.image.style; delete block.image.opacity; }
   for (const entry of Object.values(s.glossary ?? {})) delete entry.aliases;
@@ -405,8 +405,8 @@ describe('robustness', () => {
 });
 
 describe('helpers', () => {
-  test('collectImagePaths lists unique image sources, local PDFs, graph data files, map layers and table data files', () => {
-    assert.deepEqual(collectImagePaths(demo).sort(), ['data/netherlands.geojson', 'data/route.geojson', 'data/sales.csv', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
+  test('collectImagePaths lists unique image sources, local PDFs, graph data files, map layers, table and tag cloud data files', () => {
+    assert.deepEqual(collectImagePaths(demo).sort(), ['data/keywords.csv', 'data/netherlands.geojson', 'data/route.geojson', 'data/sales.csv', 'data/show-format.json', 'docs/slipr-in-four-pages.pdf', 'images/architecture.svg', 'images/caged-agent.jpg', 'images/json-badge.svg', 'images/two-modes.svg']);
   });
 
   test('satisfies() handles the supported range forms', () => {

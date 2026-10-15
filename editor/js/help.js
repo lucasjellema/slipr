@@ -23,6 +23,9 @@ export const MAP_HELP = `${HELP_PAGE}#maps`;
 /** Manual section on tables (I-104): linked from the table fields. */
 export const TABLE_HELP = `${HELP_PAGE}#tables`;
 
+/** Manual section on tag clouds (I-105): linked from the tag cloud fields. */
+export const TAG_CLOUD_HELP = `${HELP_PAGE}#tag-clouds`;
+
 /**
  * Address of the manual, at the section for the given inspector tab.
  * @param {string | null} [activeTab]  'slide', 'reader' or 'settings'; anything else opens the start.

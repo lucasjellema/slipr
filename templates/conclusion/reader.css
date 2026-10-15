@@ -237,6 +237,10 @@
 .slipr-popover p:last-child { margin-bottom: 0; }
 .slipr-popover-title { display: block; }
 .slipr-popover-link { font-size: 0.85rem; }
+/* Tag cloud terms (I-105): weight, and the slides that mention the term. */
+.slipr-popover-meta { font-size: 0.85rem; color: var(--slipr-color-muted); }
+.slipr-popover-slides { margin: -0.3rem 0 0; padding-left: 1.1rem; font-size: 0.9rem; }
+.slipr-popover-slides li + li { margin-top: 0.15rem; }
 
 /* ======================================================================
    Conclusion house style for reader mode

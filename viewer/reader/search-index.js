@@ -9,6 +9,7 @@
  */
 import { markdownToText, escape } from '../../shared/markdown.js';
 import { slideTitle } from '../../shared/render.js';
+import { findTerms, foldText } from '../../shared/glossary.js';
 
 /**
  * @typedef {object} SearchDoc
@@ -63,6 +64,16 @@ function tableText(value, glossary) {
 }
 
 /**
+ * The searchable text of a tag cloud (I-105): its inline terms. Terms in a
+ * CSV file are not indexed (like table rows).
+ * @param {any} value
+ */
+function tagCloudText(value) {
+  if (!Array.isArray(value?.terms)) return '';
+  return value.terms.map((/** @type {any} */ t) => (typeof t?.text === 'string' ? t.text : '')).filter(Boolean).join(' · ');
+}
+
+/**
  * @param {any} show
  * @returns {SearchDoc[]}
  */
@@ -82,7 +93,7 @@ export function buildSearchIndex(show) {
         return v.map((item) => (typeof item === 'string' ? text(item)
           : Object.values(item ?? {}).map((f) => (typeof f === 'string' ? text(f) : f?.alt ?? '')).join(' '))).join('\n');
       }
-      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary)].filter(Boolean).join(' ');
+      if (v && typeof v === 'object') return [v.alt, v.text, v.source, v.code, v.mermaid, v.title, graphText(v), mapText(v), tableText(v, glossary), tagCloudText(v)].filter(Boolean).join(' ');
       return '';
     }).join('\n');
     // Text elements on the slide (I-089) are slide content too.
@@ -102,7 +113,8 @@ export function buildSearchIndex(show) {
         block.image?.alt, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.label ?? n?.id),
         ...(block.markers ?? []).map((/** @type {any} */ m) => m?.title ?? m?.id)].filter(Boolean).join(' · ');
       const body = [block.md, block.mermaid, ...(block.nodes ?? []).map((/** @type {any} */ n) => n?.md), ...(block.markers ?? []).map((/** @type {any} */ m) => m?.md), ...(block.tabs ?? []).map((/** @type {any} */ t) => t.md), ...(block.hotspots ?? []).map((/** @type {any} */ h) => h.md)]
-        .filter(Boolean).map(text).join('\n') + (block.type === 'table' ? `\n${tableText(block, glossary)}` : '');
+        .filter(Boolean).map(text).join('\n') + (block.type === 'table' ? `\n${tableText(block, glossary)}` : '')
+        + (block.type === 'tag-cloud' ? `\n${tagCloudText(block)}` : '');
       docs.push({
         kind: 'block', slideId: slide.id, blockId: block.id,
         title: block.title ? `${title} › ${block.title}` : title, order: order++,
@@ -258,4 +270,27 @@ function snippet(original, folded, terms) {
   }
   html += escape(original.slice(pos, end)) + (end < original.length ? '…' : '');
   return html.replace(/\s+/g, ' ');
+}
+
+/**
+ * The slides that mention any of `names` (a tag cloud's term and its glossary
+ * names, I-105): whole words, case- and accent-insensitive, in slide text and
+ * reader blocks (not notes or the glossary), in show order.
+ * @param {SearchDoc[]} docs  From buildSearchIndex().
+ * @param {string[]} names
+ * @param {string | null} [except]  A slide to leave out (the tag cloud's own).
+ * @returns {string[]}  Slide ids.
+ */
+export function slidesMentioning(docs, names, except = null) {
+  const phrases = [...new Set(names.filter((n) => typeof n === 'string' && n.trim()).map((n) => foldText(n.trim()).folded))]
+    .sort((a, b) => b.length - a.length)
+    .map((phrase) => ({ id: 'tag', phrase }));
+  if (!phrases.length) return [];
+  /** @type {string[]} */
+  const found = [];
+  for (const doc of docs) {
+    if ((doc.kind !== 'slide' && doc.kind !== 'block') || !doc.slideId || doc.slideId === except || found.includes(doc.slideId)) continue;
+    if (doc.fields.some((f) => findTerms(f.text, phrases, new Set()).length)) found.push(doc.slideId);
+  }
+  return found;
 }

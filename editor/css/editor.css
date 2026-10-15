@@ -3854,3 +3854,23 @@ body.is-screen #slipr-editor-banners {
 .slipr-table-editor-step-tools {
   margin-left: auto;
 }
+
+/* ---------- Tag cloud editor (I-105): the table editor's layout, plus ---------- */
+
+.slipr-tag-cloud-editor .slipr-table-editor-grid .slipr-tag-cloud-editor-term {
+  width: 14em;
+}
+
+.slipr-tag-cloud-editor .slipr-table-editor-grid .slipr-tag-cloud-editor-weight {
+  width: 5.5em;
+}
+
+.slipr-tag-cloud-editor .slipr-table-editor-grid .slipr-select {
+  width: auto;
+  max-width: 12em;
+}
+
+.slipr-tag-cloud-editor-highlight {
+  flex: 1 1 10em;
+  width: auto;
+}

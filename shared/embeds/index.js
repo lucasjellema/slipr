@@ -2,7 +2,7 @@
 /**
  * Rich embeds (I-070, D-011): the shared foundation for content that needs a
  * library or another server (or a data file): diagrams, web pages, PDFs,
- * graphs, maps and tables.
+ * graphs, maps, tables and tag clouds.
  * Every kind is available as an audience slot type and a reader block
  * type, and has one module `shared/embeds/<kind>.js`:
  *
@@ -47,6 +47,7 @@ import * as graph from './graph.js';
 import * as map from './map.js';
 import * as pdf from './pdf.js';
 import * as table from './table.js';
+import * as tagCloud from './tag-cloud.js';
 import * as web from './web.js';
 
 /**
@@ -67,12 +68,12 @@ import * as web from './web.js';
  */
 
 /** @type {Record<string, EmbedKind>} */
-export const EMBED_KINDS = { diagram, web, pdf, graph, map, table };
+export const EMBED_KINDS = { diagram, web, pdf, graph, map, table, 'tag-cloud': tagCloud };
 
 /** Slot type → embed kind. */
-const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table' });
+const SLOT_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', web: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud' });
 /** Reader block type → embed kind. */
-const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table' });
+const BLOCK_KINDS = /** @type {Record<string, string>} */ ({ diagram: 'diagram', embed: 'web', pdf: 'pdf', graph: 'graph', map: 'map', table: 'table', 'tag-cloud': 'tag-cloud' });
 
 /**
  * The embed kind behind a slot type, or null.
@@ -106,7 +107,8 @@ export function usedEmbedKinds(show) {
       if (pdf.isPdf(value)) kinds.add('pdf');
       if (graph.isGraph(value)) kinds.add('graph');
       if (map.isMap(value)) kinds.add('map');
-      if (table.isTable(value)) kinds.add('table');
+      if (tagCloud.isTagCloud(value)) kinds.add('tag-cloud');
+      else if (table.isTable(value)) kinds.add('table');
     }
     for (const block of Array.isArray(slide?.reader?.blocks) ? slide.reader.blocks : []) {
       const kind = embedKindForBlock(block?.type);

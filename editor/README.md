@@ -35,6 +35,7 @@ It covers every part of the editor, with a Markdown reference, all keyboard shor
 | Graphs | Show a network of nodes and links, built up click by click: a mini graph to add and link nodes, a data file option, snapshot as fallback | [Graphs](help.html#graphs) |
 | Maps | Show places on an interactive map, toured click by click: a mini map to click and drag places, layers, background, snapshot as fallback | [Maps](help.html#maps) |
 | Tables | Data tables typed in, pasted from a spreadsheet or read from a CSV file: column formats, totals, colour scales and bars, sorting, filter; rows revealed and highlighted click by click | [Tables](help.html#tables) |
+| Tag clouds | Terms sized by weight, typed in, pasted as a list or read from a CSV file (repeated answers counted), linked to the glossary; the heaviest terms revealed and terms highlighted click by click | [Tag clouds](help.html#tag-clouds) |
 | Picture styles | Shadow, soft edges, rounded corners or a frame from the template, and an opacity, on any picture | [Picture styles](help.html#picture-styles) |
 | Reader tab | Summary and blocks (text, panels, callouts, tabs, images with hotspots, embeds, slide links, diagrams) per profile and depth; related slides | [Reader tab](help.html#reader-tab) |
 | Diagrams | Flowcharts, sequence diagrams and architectures rendered client-side with Mermaid; theme-matched and searchable | [Diagrams (Mermaid)](help.html#diagrams) |

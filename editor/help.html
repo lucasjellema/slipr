@@ -45,6 +45,7 @@
         <li><a href="#graphs">Graphs</a></li>
         <li><a href="#maps">Maps</a></li>
         <li><a href="#tables">Tables</a></li>
+        <li><a href="#tag-clouds">Tag clouds</a></li>
         <li><a href="#markdown">Writing with Markdown</a></li>
         <li><a href="#settings">Show settings</a></li>
         <li><a href="#glossary">Glossary</a></li>
@@ -307,6 +308,7 @@
           <dt>Graph</dt><dd>On the <strong>Graph</strong> layout: a network of nodes and links, edited with a mini graph (add nodes, click two nodes to link them), plus the build-up while presenting, layout, data file and fallback image. See <a href="#graphs">Graphs</a>.</dd>
           <dt>Map</dt><dd>On the <strong>Map</strong> layout: places on an interactive map, edited with a mini map (click to add, drag to move), plus the tour while presenting, layers, background and fallback image. See <a href="#maps">Maps</a>.</dd>
           <dt>Table</dt><dd>On the <strong>Table</strong> layout: rows typed in, pasted from a spreadsheet or read from a CSV file, with per-column formats, totals and colours, sorting and a filter box, and the steps while presenting (show rows, highlight a row, column or cell). See <a href="#tables">Tables</a>.</dd>
+          <dt>Tag cloud</dt><dd>On the <strong>Tag cloud</strong> layout: terms sized by their weight, typed in, pasted as a list or read from a CSV file, with the order, how many terms, what a weight counts, and the steps while presenting (show the heaviest terms, highlight terms). See <a href="#tag-clouds">Tag clouds</a>.</dd>
           <dt>PDF document</dt><dd>On the <strong>PDF</strong> layout: <strong>Choose PDF…</strong> copies a PDF into the show folder (<code>docs/</code>), or type its path or an https address (that site must allow it). A title, and which <strong>pages</strong>: empty shows page 1; one page shows that page; a range shows the first, and each click while presenting shows the next. A fallback image is optional.</dd>
         </dl>
         <p>A field marked <em>No editor for this slot type yet</em> (such as charts) can only be changed in <code>show.json</code> for now.</p>
@@ -485,6 +487,7 @@
             <tr><td><strong>Graph</strong></td><td>A network readers explore: drag, zoom, click a node for its text and slide, filter by tag</td><td>A mini graph (+ Node, 🔗 Connect, snapshot), nodes, links, layout, data file, caption, fallback image (see <a href="#graphs">Graphs</a>)</td></tr>
             <tr><td><strong>Map</strong></td><td>Places on a map readers explore: drag, zoom, click a place for its text and slide, filter by tag</td><td>A mini map (click to add places, drag to move, use the current view, snapshot), places, layers, background, caption, fallback image (see <a href="#maps">Maps</a>)</td></tr>
             <tr><td><strong>Table</strong></td><td>A data table readers sort, filter, show or hide columns of, copy and download</td><td>A grid to type or paste rows in, or a CSV file; column formats, totals and colours; sorting, filter, rows before scrolling, caption (see <a href="#tables">Tables</a>)</td></tr>
+            <tr><td><strong>Tag cloud</strong></td><td>Terms sized by weight; a click shows a term's glossary definition and the slides that mention it</td><td>Terms and weights typed or pasted in, or a CSV file; order, how many terms, what a weight counts, caption (see <a href="#tag-clouds">Tag clouds</a>)</td></tr>
           </tbody>
         </table>
         <p class="note">Many websites refuse to be embedded in another page. The editor warns about addresses that cannot work; check the preview for the rest.</p>
@@ -746,6 +749,40 @@
         <h3>For readers</h3>
         <p>In reader mode a table also has a <strong>Columns</strong> menu (show or hide columns), <strong>Copy</strong> (pastes into a spreadsheet) and <strong>Download CSV</strong> (the rows on show), and a line saying how many rows are on show. Reader search finds the headers and typed-in cells (not the rows of a CSV file).</p>
         <p>In <code>show.json</code> a table is a <code>table</code> value with <code>columns</code> and <code>rows</code>, or <code>data</code> for a CSV file; see the show format (<code>docs/show-format.md</code>, <em>Tables</em>).</p>
+      </section>
+
+      <section id="tag-clouds">
+        <h2>Tag clouds</h2>
+        <p>A <strong>tag cloud</strong> shows terms sized by their weight: the bigger the word, the more it counts. Use it for the themes of a talk, the answers to a survey question or the keywords of a document. The colours, from light to strong by weight, and the font come from the template.</p>
+        <p>To add one, give a slide the <strong>Tag cloud</strong> layout, or add a <strong>Tag cloud</strong> block in the <a href="#reader-tab">Reader tab</a>. On an empty slot, <strong>Start a tag cloud</strong> gives you three terms to type over.</p>
+
+        <h3>The terms</h3>
+        <ul>
+          <li><strong>Type them in</strong>: each row has the term and its <strong>weight</strong> (a number such as a count or a score; empty counts 1). <strong>+ Term</strong> adds one; ▲ ▼ move a term, 🗑 removes it. A term written twice is shown once, with the weights added up.</li>
+          <li><strong>Paste a list</strong>: one term per line, optionally followed by a comma, semicolon or tab and its weight (<code>Onboarding, 12</code>). A column copied from a spreadsheet works too. <strong>Replace the terms</strong> uses the list.</li>
+          <li><strong>A CSV file</strong>: <strong>Use a CSV file…</strong> copies a <code>.csv</code> file into the show's <code>data/</code> folder. The <strong>term column</strong> is the first column unless you pick another; the <strong>weight column</strong> is the second column when it holds numbers. Without weights each row counts 1, so a file with one survey answer per row shows the most frequent answers biggest. The editor lists the heaviest terms as the cloud reads them; <strong>Move into the slide</strong> copies them into the slide so you can edit them here.</li>
+          <li><strong>Glossary</strong>: a term with the name of a <a href="#glossary">glossary</a> term (or one of its other names) is linked to it automatically; the <strong>Glossary</strong> column shows which, and lets you pick another one.</li>
+        </ul>
+
+        <h3>Options</h3>
+        <ul>
+          <li><strong>Order</strong>: <em>heaviest in the middle</em> (the usual cloud), <em>heaviest first</em>, <em>alphabetical</em> or <em>as written</em>.</li>
+          <li><strong>Show at most</strong>: only the heaviest terms, for a long list or a large CSV file.</li>
+          <li><strong>A weight counts</strong>: what the numbers mean, such as <em>mentions</em> or <em>answers</em>. Readers then see <em>12 mentions</em> when they click a term.</li>
+          <li><strong>Caption</strong>: a line below the cloud.</li>
+        </ul>
+
+        <h3>While presenting (slides only)</h3>
+        <ul>
+          <li><strong>+ Show terms</strong>: show the heaviest terms first, for example 3, then all (leave the number empty for all). With such a step the cloud starts empty; every term appears in its own place.</li>
+          <li><strong>+ Highlight</strong>: highlight one or more terms (separate them with commas); the rest dims until the next step.</li>
+          <li><strong>+ Clear highlight</strong> ends a highlight; a <em>show terms</em> step does too.</li>
+        </ul>
+        <p>The preview and the slide thumbnails show every term; the steps play in audience mode. Every change is one step for <kbd>Ctrl</kbd>+<kbd>Z</kbd>; typing in a field counts as one step.</p>
+
+        <h3>For readers</h3>
+        <p>In reader mode every term is a button. Clicking it (or <kbd>Enter</kbd> on it) opens a popup with the term's glossary definition, if it has one, its weight (when you said what a weight counts) and links to the other slides that mention the term. Reader search finds typed-in terms (not those of a CSV file).</p>
+        <p>In <code>show.json</code> a tag cloud is a <code>tag-cloud</code> value with <code>terms</code>, or <code>data</code> for a CSV file; see the show format (<code>docs/show-format.md</code>, <em>Tag clouds</em>).</p>
       </section>
 
       <section id="markdown">

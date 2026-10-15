@@ -4,6 +4,10 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Tag cloud editor (I-105)
+- **Added** a tag cloud editor for the `tag-cloud` slot and a new **Tag cloud** reader block type (`ui/tag-cloud-fields.js`, value helpers `tag-cloud-values.js` with tests): terms with weight and glossary term (automatic by name, or picked), + Term, move, remove, **Paste a list** (one term per line, optional weight after a comma, semicolon or tab), **Use a CSV file…** (copied into `data/`; term and weight column, the heaviest terms as the cloud reads them) and **Move into the slide** (merged, heaviest first); options for the order, how many terms, what a weight counts and the caption; for slots the steps while presenting (+ Show terms, + Highlight, + Clear highlight). Every change is one undo step. The manual has a *Tag clouds* part.
+- **Changed** the save order knows tag cloud keys; a text block switched to Tag cloud gets three terms to type over (a table's CSV file is kept).
+
 ### 2026-10-14: Table editor (I-104)
 - **Added** a table editor for the `table` slot and a new **Table** reader block type (`ui/table-fields.js`, value helpers `table-values.js` with tests): a grid to type in (+ Row, + Column, move, remove; a number alone is stored as a number), **Paste from a spreadsheet** (headers in the first row; columns with the same header keep their settings), pasting a block of cells into a grid cell (fills from there and grows the table), **Use a CSV file…** (copied into `data/`, first rows shown, semicolons and decimal commas understood) and **Move into the slide**; per column the header, format (decimals, currency), alignment, total, colours, hidden, order; sortable, start sort, filter box, rows before scrolling, pin first column, number format, caption; for slots the steps while presenting (show rows, highlight a row / column / cell, clear). Renaming a typed-in column renames it in sort and steps. A table makes a 0.1 show 0.2. The manual has a *Tables* section.
 - **Changed** the data-file copy helper also takes text files (`addTableDataFile()` in `image-input.js`); the save order knows table keys.

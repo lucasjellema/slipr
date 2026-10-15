@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readJson } from '../../shared/test/helpers.js';
 import { defaultState, migrate, createStore, memoryAdapter, openReaderState, isAnnotation } from '../reader/state.js';
 import { describeQuote, locateQuote } from '../reader/quote.js';
-import { buildSearchIndex, search, fold, tokens, pdfSearchDocs } from '../reader/search-index.js';
+import { buildSearchIndex, search, fold, tokens, pdfSearchDocs, slidesMentioning } from '../reader/search-index.js';
 import { personalize } from '../reader/personalize.js';
 import { annotationsToMarkdown, annotationsToJson, mergeImportedAnnotations } from '../reader/notes-export.js';
 
@@ -162,6 +162,20 @@ describe('search', () => {
     assert.ok(hits.includes('s-table'));
     assert.ok(search(docs, 'read to the end').results.some((x) => x.doc.slideId === 's-table'));
     assert.match(docs.find((d) => d.slideId === 's-table' && d.kind === 'slide').fields[2].text, /the reader layer/);
+  });
+
+  test('tag cloud terms are searchable; slidesMentioning finds whole words in slides and blocks (I-105)', () => {
+    assert.ok(search(docs, 'bookmarks').results.some((x) => x.doc.slideId === 's-tag-cloud'));
+    const withTerm = slidesMentioning(docs, ['reader layer']);
+    assert.ok(withTerm.includes('s-table'), 'a glossary reference in a table cell counts');
+    assert.ok(withTerm.includes('s-tag-cloud'));
+    assert.ok(!slidesMentioning(docs, ['reader layer'], 's-tag-cloud').includes('s-tag-cloud'), 'leaves out its own slide');
+    // Several names (a term and its aliases) find any of them.
+    const order = docs.filter((d) => d.kind === 'slide').map((d) => d.slideId);
+    const found = slidesMentioning(docs, ['template', 'templates']);
+    assert.deepEqual(found, [...found].sort((a, b) => order.indexOf(a) - order.indexOf(b)), 'in show order');
+    assert.deepEqual(slidesMentioning(docs, ['zzzz-not-there']), []);
+    assert.deepEqual(slidesMentioning(docs, ['', '  ']), []);
   });
 
   test('fold() strips accents and keeps an index map', () => {

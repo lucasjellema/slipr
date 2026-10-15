@@ -279,9 +279,11 @@ function fillSlot(el, type, value, ctx, md, doc, options) {
 
     case 'graph':
     case 'map':
-    case 'table': {
-      // A graph (I-074), a map (I-075) or a table (I-104): a list or the table now,
-      // the drawing (or the data file and controls) from hydrateEmbeds().
+    case 'table':
+    case 'tag-cloud': {
+      // A graph (I-074), a map (I-075), a table (I-104) or a tag cloud (I-105): a
+      // list, the table or the cloud now, the drawing (or the data file and
+      // controls) from hydrateEmbeds().
       fillEmbedElement(el, type, value, ctx, { mode: /** @type {any} */ (options.mode) });
       if (value.caption && !el.parentElement?.querySelector('[data-slot="caption"]')) {
         const figcaption = doc.createElement('figcaption');

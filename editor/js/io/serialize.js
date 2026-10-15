@@ -9,6 +9,7 @@
  */
 import showSchema from '../../../shared/schema/show.schema.json' with { type: 'json' };
 import { isTable } from '../../../shared/embeds/table.js';
+import { isTagCloud } from '../../../shared/embeds/tag-cloud.js';
 
 const defs = /** @type {Record<string, any>} */ (showSchema.$defs);
 
@@ -61,6 +62,16 @@ const table = (def) => ({
   },
 });
 
+/** A tag cloud value or block (I-105): its keys, and those of terms and steps. @param {any} def @returns {Shape} */
+const tagCloud = (def) => ({
+  keys: keysOf(def),
+  fields: {
+    terms: { items: { keys: keysOf(defs.tagCloudTerm) } },
+    steps: { items: { keys: keysOf(defs.tagCloudStep) } },
+    fallback: image,
+  },
+});
+
 /** A slot value: shape by what it holds (docs/show-format.md, "Slot value types"). */
 const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if (Array.isArray(value)) return { items: { values: slotValue } };
@@ -70,6 +81,7 @@ const slotValue = /** @type {(value: any) => Shape} */ ((value) => {
   if ('mermaid' in value) return { keys: keysOf(defs.diagram), fields: { fallback: image } };
   if ('url' in value) return { keys: keysOf(defs.web), fields: { fallback: image } };
   if ('pdf' in value) return { keys: keysOf(defs.pdf), fields: { fallback: image } };
+  if (isTagCloud(value)) return tagCloud(defs.tagCloud);
   if (isTable(value)) return table(defs.table);
   if ('nodes' in value || ('data' in value && !('kind' in value))) return graph(defs.graph);
   if ('markers' in value || 'center' in value || 'layers' in value) return map(defs.map);
@@ -85,6 +97,7 @@ const block = /** @type {(value: any) => Shape} */ ((value) => {
   if (value?.type === 'graph') return graph(def);
   if (value?.type === 'map') return map(def);
   if (value?.type === 'table') return table(def);
+  if (value?.type === 'tag-cloud') return tagCloud(def);
   return {
     keys: keysOf(def),
     fields: {

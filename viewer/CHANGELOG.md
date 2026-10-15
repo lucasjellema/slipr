@@ -4,6 +4,9 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Tag clouds (I-105)
+- **Added** tag clouds on slides and in the reader layer (`shared/embeds/tag-cloud.js`): terms sized and coloured by weight from the template. In audience mode the heaviest terms can appear first and terms can be highlighted, click by click. In reader mode every term is a button (tap and keyboard too): its popup shows the glossary definition when the term is a glossary term, the weight when the author said what it counts, and links to the other slides that mention the term (`slidesMentioning()` in `reader/search-index.js`, used by `reader/interactions.js`). Search finds typed-in terms. The terms wrap between words on narrow screens instead of being cut off.
+
 ### 2026-10-14: Data tables (I-104)
 - **Added** tables on slides and in the reader layer (`shared/embeds/table.js`): sorting and a filter box (in both modes when the author allows them), totals, colours from the template, a header that stays in place and a first column that can. In audience mode rows appear and rows, columns or cells are highlighted click by click, and the table starts from the author's sort and filter each time the slide is shown. Reader mode adds a **Columns** menu, **Copy** and **Download CSV**; search finds headers and typed-in cells. The manual (`help.html`) has a *Tables* part.
 

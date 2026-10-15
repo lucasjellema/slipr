@@ -419,3 +419,89 @@
   .slipr-table-scroll { max-height: none !important; overflow: visible; }
   .slipr-table-toolbar { display: none; }
 }
+
+/* ---------- tag clouds (I-105) ---------- */
+/* Colours (by weight tier, light to strong) and sizes come from the template's
+   --slipr-tag-cloud-* tokens, with defaults from its palette; sizes are in em,
+   so the same rules work on a scaled slide and in reader mode.
+   See shared/embeds/tag-cloud.js. */
+.slipr-embed--tag-cloud {
+  --_c-1: var(--slipr-tag-cloud-1, var(--slipr-color-muted, #5b6573));
+  --_c-2: var(--slipr-tag-cloud-2, var(--slipr-graph-3, #2a9d8f));
+  --_c-3: var(--slipr-tag-cloud-3, var(--slipr-graph-4, #7b5ea7));
+  --_c-4: var(--slipr-tag-cloud-4, var(--slipr-color-primary, #1f3a5f));
+  --_c-highlight: var(--slipr-tag-cloud-highlight, var(--slipr-color-accent, #f2a900));
+  --_min: var(--slipr-tag-cloud-min-size, 0.9em);
+  --_max: var(--slipr-tag-cloud-max-size, 2.8em);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  font-family: var(--slipr-tag-cloud-font, var(--slipr-font-heading, system-ui, sans-serif));
+}
+.slipr-embed--tag-cloud > .slipr-embed-live { display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+/* The static cloud until the live one is ready (then the shared rule hides it). */
+.slipr-embed--tag-cloud:not([data-embed-state="ready"]) > .slipr-embed-fallback[data-fallback="tag-cloud"] { display: flex; flex-direction: column; justify-content: center; }
+[data-slot].slipr-embed--tag-cloud > :is(.slipr-embed-live, .slipr-embed-fallback[data-fallback="tag-cloud"]) { flex: 1; min-height: 0; }
+.slipr-tag-cloud-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.3em 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  gap: 0.1em 0.55em;
+  line-height: 1.1;
+}
+.slipr-tag-cloud-item {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  font-size: calc(var(--_min) + (var(--_max) - var(--_min)) * var(--slipr-tag-level, 0.5));
+  font-weight: 500;
+  color: var(--_c-1);
+  transition: opacity 0.4s, visibility 0.4s;
+}
+.slipr-tag-cloud-item[data-tier="2"] { color: var(--_c-2); font-weight: 600; }
+.slipr-tag-cloud-item[data-tier="3"] { color: var(--_c-3); font-weight: 700; }
+.slipr-tag-cloud-item[data-tier="4"] { color: var(--_c-4); font-weight: 800; }
+/* Reveal steps keep every term in its place; highlights dim the rest. */
+.slipr-tag-cloud-item.is-hidden { visibility: hidden; opacity: 0; }
+.slipr-tag-cloud-list.has-highlight .slipr-tag-cloud-item:not(.is-highlight) { opacity: 0.25; }
+.slipr-tag-cloud-item.is-highlight .slipr-tag-cloud-term { background: color-mix(in srgb, var(--_c-highlight) 35%, transparent); }
+.slipr-tag-cloud-term {
+  display: inline-block;
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0.04em 0.18em;
+  border-radius: var(--slipr-radius, 0.3em);
+  /* A term wraps between its words only when it does not fit on a line. */
+  overflow-wrap: anywhere;
+  transition: background-color 0.3s;
+}
+button.slipr-tag-cloud-term { cursor: pointer; }
+/* Terms with a glossary definition are marked like glossary terms in text. */
+button.slipr-tag-cloud-term[data-term] { text-decoration: underline dotted 0.06em; text-underline-offset: 0.15em; }
+button.slipr-tag-cloud-term:hover { background: color-mix(in srgb, var(--_c-highlight) 20%, transparent); }
+button.slipr-tag-cloud-term:focus-visible { outline: 2px solid var(--_c-highlight); outline-offset: 1px; }
+/* Read out, not shown: the weight of each term in audience mode. */
+.slipr-tag-cloud-weight {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.slipr-tag-cloud-empty { margin: 0; text-align: center; color: var(--slipr-color-muted, #5b6573); font-style: italic; }
+.slipr-tag-cloud-step { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .slipr-tag-cloud-item, .slipr-tag-cloud-term { transition: none; }
+}

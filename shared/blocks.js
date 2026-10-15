@@ -154,6 +154,14 @@ export function renderBlock(block, slideId, ctx) {
         + `${embedHtml('table', block, ctx)}${caption}</figure></div>`;
     }
 
+    case 'tag-cloud': {
+      // A tag cloud (I-105): the terms now (or the data file's from hydrateEmbeds()).
+      const title = block.title ? `<p class="slipr-block-title">${escape(block.title)}</p>` : '';
+      const caption = block.caption ? `<figcaption class="slipr-caption">${escape(block.caption)}</figcaption>` : '';
+      return `<div ${attrs}>${badges}${title}<figure class="slipr-figure slipr-figure--tag-cloud">`
+        + `${embedHtml('tag-cloud', block, ctx)}${caption}</figure></div>`;
+    }
+
     default:
       return ''; // unknown block types are reported by validation, not rendered
   }
