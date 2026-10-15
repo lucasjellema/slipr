@@ -37,6 +37,7 @@
         <li><a href="#annotations">Personal annotations</a></li>
         <li><a href="#search">Full-text search</a></li>
         <li><a href="#open">Opening &amp; sharing</a></li>
+        <li><a href="#ai">Create a show with AI</a></li>
         <li><a href="#shortcuts">Keyboard &amp; clicker cheatsheet</a></li>
         <li><a href="#troubleshooting">Troubleshooting</a></li>
       </ol>
@@ -369,6 +370,22 @@ http://localhost:8080/viewer/?zip=https://example.com/repo-main.zip&amp;path=sho
         <p>Shows can be compiled into a single, self-contained offline HTML file using the Slipr Editor's <strong>Export…</strong> button or the CLI:</p>
         <pre><code>npm run export -- shows/demo</code></pre>
         <p>The resulting <code>exports/demo.html</code> contains the entire presentation, template styles, fonts, images, diagrams, and runtime bundled together. It requires zero backend servers, zero installations, and presents seamlessly offline when double-clicked on any computer.</p>
+      </section>
+
+      <section id="ai">
+        <h2>Create a show with AI</h2>
+        <p>An AI chatbot such as Claude, ChatGPT or Copilot can write a whole show for you. <a href="create-with-ai.html">Create with AI</a> (also linked from the viewer start page) gives you the instruction it needs: what Slipr is, the show format, and the layouts of the template you pick, with their limits.</p>
+        <ol>
+          <li>Pick a template and a length. <strong>Full</strong> includes an example and gives the best results; <strong>Compact</strong> is for chatbots that only accept short messages.</li>
+          <li>Describe your show: topic, audience, number of slides, whether readers get extra depth, reader profiles, and any source material.</li>
+          <li><strong>Copy instruction</strong> and paste it into a new chat, or <strong>Download .md</strong> and attach the file when the text is too long to paste.</li>
+          <li>Save the code block the chatbot answers with as <code>show.json</code> in a new folder, and open that folder with <strong>Open a show folder…</strong>.</li>
+        </ol>
+        <p>Chatbots cannot make the pictures. Every image in the show is a placeholder such as <code>images/quiet-room.png</code>, with a description of the picture it should be. The viewer warns about each missing image: put a matching file in the folder's <code>images/</code> folder.</p>
+        <p>When the show has errors, the viewer lists them. Click <strong>Copy fix-up prompt</strong> on that page and send the text to the same chat: it asks the chatbot for a corrected <code>show.json</code>.</p>
+        <div class="tip">
+          <strong>Privacy:</strong> the Create with AI page only builds the text you copy; nothing you type there is sent anywhere. What you paste into a chatbot is shared with that service, so leave out what you would not share.
+        </div>
       </section>
 
       <section id="shortcuts">

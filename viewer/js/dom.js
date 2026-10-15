@@ -41,3 +41,32 @@ export function addStylesheet(href) {
     document.head.append(link);
   });
 }
+
+/**
+ * Copy text to the clipboard. Falls back to a hidden text area where the
+ * Clipboard API is not available (a page opened from file://, older browsers).
+ * @param {string} text
+ * @returns {Promise<boolean>} Whether the text was copied.
+ */
+export async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    const area = document.createElement('textarea');
+    area.value = text;
+    area.setAttribute('readonly', '');
+    area.style.position = 'fixed';
+    area.style.opacity = '0';
+    document.body.append(area);
+    area.select();
+    let ok = false;
+    try {
+      ok = document.execCommand('copy');
+    } catch {
+      ok = false;
+    }
+    area.remove();
+    return ok;
+  }
+}

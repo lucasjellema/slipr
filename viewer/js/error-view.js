@@ -1,6 +1,7 @@
 // @ts-check
 /** Readable pages for "no show given", "could not load" and "invalid show". */
-import { h } from './dom.js';
+import { h, copyText } from './dom.js';
+import { fixUpPrompt } from '../../shared/prompt-kit.js';
 
 /** @typedef {import('../../shared/schema-check.js').Issue} Issue */
 
@@ -98,6 +99,8 @@ export function showHelp(app, { onOpenFolder, onOpenZip, onDropZip, recentArchiv
       h('li', {}, [h('a', { href: `${demoLink}&mode=reader` }, ['Demo show, reader mode'])]),
       h('li', {}, [h('a', { href: `?show=${encodeURIComponent('../shows/fixtures/broken/show.json')}` }, ['An invalid show']), ' (shows the error page)']),
     ]),
+    h('h2', {}, ['Create a show with AI']),
+    h('p', {}, [h('a', { href: 'create-with-ai.html' }, ['Get an instruction for an AI chatbot']), ': describe your show, paste the instruction into Claude, ChatGPT or Copilot, and open the show.json it writes.']),
     h('h2', {}, ['Documentation']),
     h('p', {}, [h('a', { href: 'help.html' }, ['User manual (help.html)']), ' — complete guide for Audience & Reader modes, phone remote setup, keyboard shortcuts, and troubleshooting.']),
   ]));
@@ -227,10 +230,29 @@ export function showValidationErrors(app, report) {
     issueList(report.errors, 'slipr-issues'),
     report.warnings.length > 0 && h('h2', {}, [`Also ${report.warnings.length} warning${report.warnings.length === 1 ? '' : 's'}`]),
     report.warnings.length > 0 && issueList(report.warnings, 'slipr-issues slipr-issues--warnings'),
+    fixUpSection(report),
     h('p', { class: 'slipr-hint' }, [
       'Tip: open show.json in VS Code inside the Slipr folder: the schema gives autocomplete and underlines most mistakes as you type.',
     ]),
   ]));
+}
+
+/**
+ * "Copy fix-up prompt" (I-080): the errors as a message for the AI chatbot that wrote the show.
+ * @param {{ errors: Issue[], warnings: Issue[] }} report
+ */
+function fixUpSection(report) {
+  const button = h('button', { type: 'button', class: 'slipr-page-button slipr-page-button--secondary' }, ['Copy fix-up prompt']);
+  const status = h('span', { class: 'slipr-hint', role: 'status' });
+  button.addEventListener('click', async () => {
+    const ok = await copyText(fixUpPrompt(report.errors, report.warnings));
+    status.textContent = ok ? 'Copied. Send it to the chat that wrote this show.' : 'Copying did not work in this browser.';
+  });
+  return h('div', { class: 'slipr-fixup' }, [
+    button,
+    h('span', { class: 'slipr-hint' }, ['Written by an AI chatbot? Send it this list of problems.']),
+    status,
+  ]);
 }
 
 /** @param {Issue[]} issues @param {string} cls */

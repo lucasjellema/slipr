@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Slipr: create a show with AI</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 40'%3E%3Cpath d='M4 32 L16 8 H26 L14 32 Z' fill='%23F2A900'/%3E%3Cpath d='M16 32 L28 8 H34 L22 32 Z' fill='%231F3A5F'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/viewer.css">
+</head>
+<body>
+  <main class="slipr-page slipr-page--wide">
+    <h1>Create a show with AI</h1>
+    <p>Get an instruction for Claude, ChatGPT, Copilot or another AI chatbot. Describe your show below, copy the instruction into a new chat, and the chatbot answers with a <code>show.json</code> for the template you pick.</p>
+
+    <form id="kit" class="slipr-form" novalidate>
+      <fieldset>
+        <legend>Instruction</legend>
+        <div class="slipr-form-row">
+          <label for="template">Template</label>
+          <select id="template" name="template" disabled><option>Loading…</option></select>
+        </div>
+        <div class="slipr-form-row" role="radiogroup" aria-labelledby="variant-label">
+          <span id="variant-label" class="slipr-form-label">Length</span>
+          <span class="slipr-form-choices">
+            <label><input type="radio" name="variant" value="full" checked> Full, with an example (best results)</label>
+            <label><input type="radio" name="variant" value="compact"> Compact, for chatbots with a small prompt limit</label>
+          </span>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your show</legend>
+        <div class="slipr-form-row">
+          <label for="topic">Topic</label>
+          <input id="topic" name="topic" type="text" placeholder="What the show is about">
+        </div>
+        <div class="slipr-form-row">
+          <label for="audience">Audience</label>
+          <input id="audience" name="audience" type="text" placeholder="Who will watch or read it">
+        </div>
+        <div class="slipr-form-row slipr-form-row--short">
+          <label for="slides">Number of slides</label>
+          <input id="slides" name="slides" type="number" min="1" max="80" value="10">
+        </div>
+        <div class="slipr-form-row slipr-form-row--short">
+          <label for="language">Language</label>
+          <input id="language" name="language" type="text" value="en" aria-describedby="language-hint">
+          <span id="language-hint" class="slipr-hint">A language code: en, nl, de…</span>
+        </div>
+        <div class="slipr-form-row">
+          <span class="slipr-form-label">Reader layer</span>
+          <label class="slipr-form-check"><input id="reader" name="reader" type="checkbox" checked> Add depth for readers (explanations, details, tips)</label>
+        </div>
+        <div class="slipr-form-row">
+          <label for="profiles">Profiles</label>
+          <input id="profiles" name="profiles" type="text" placeholder="Optional, e.g. Developer, Manager" aria-describedby="profiles-hint">
+          <span id="profiles-hint" class="slipr-hint">Reader groups that can get content of their own.</span>
+        </div>
+        <div class="slipr-form-row">
+          <label for="source">Source material</label>
+          <textarea id="source" name="source" rows="6" placeholder="Paste notes, an outline or an article. Or leave this empty and attach files in the chat."></textarea>
+        </div>
+      </fieldset>
+
+      <div class="slipr-form-actions">
+        <button id="copy" class="slipr-page-button" type="button" disabled>Copy instruction</button>
+        <button id="download" class="slipr-page-button slipr-page-button--secondary" type="button" disabled>Download .md</button>
+        <span id="status" class="slipr-hint" role="status"></span>
+      </div>
+
+      <details class="slipr-form-preview">
+        <summary>Show the instruction (<span id="size">…</span>)</summary>
+        <textarea id="preview" rows="16" readonly aria-label="The instruction"></textarea>
+      </details>
+    </form>
+
+    <h2>Then</h2>
+    <ol>
+      <li>Paste the instruction into a new chat and send it. When the chat says it is too long, attach the downloaded <code>.md</code> file instead.</li>
+      <li>Save the chatbot's answer (the code block) as <code>show.json</code> in a new folder. Pictures are placeholders: their descriptions tell you which images to put in the folder's <code>images/</code> folder.</li>
+      <li>Open the <a href="./">viewer</a> and choose <strong>Open a show folder…</strong>.</li>
+      <li>When the viewer lists errors, click <strong>Copy fix-up prompt</strong> and send that to the same chat.</li>
+    </ol>
+    <p class="slipr-hint">Nothing you type here leaves this page: it only builds the text you copy. More in the <a href="help.html#ai">user manual</a>.</p>
+  </main>
+  <script type="module" src="js/create-with-ai.js"></script>
+</body>
+</html>

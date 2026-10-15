@@ -11,6 +11,7 @@
     "serve": "npx --yes http-server . -p 8080 -c-1",
     "remote": "node tools/relay.js",
     "test": "node --test --test-reporter=spec",
-    "export": "node tools/export-show.js"
+    "export": "node tools/export-show.js",
+    "prompt": "node tools/prompt-kit.js"
   }
 }

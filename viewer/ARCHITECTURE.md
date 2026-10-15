@@ -38,8 +38,9 @@ viewer/
 │   └── viewer.css          ✅ chrome shared by both modes (loading, help and error pages)
 ├── js/
 │   ├── main.js             ✅ entry: read URL params, load + validate, start mode app
-│   ├── dom.js              ✅ h() element builder (never parses HTML), addStylesheet()
-│   ├── error-view.js       ✅ help page, load-error page, validation-error page, folder access page
+│   ├── dom.js              ✅ h() element builder (never parses HTML), addStylesheet(), copyText()
+│   ├── error-view.js       ✅ help page, load-error page, validation-error page (with Copy fix-up prompt), folder access page
+│   ├── create-with-ai.js   ✅ Create with AI page (create-with-ai.html, I-080): fills the generated prompt with the brief
 │   └── mode-switch.js      ✅ audienceUrl() / readerUrl() by slide id, parseReaderHash()
 ├── audience/
 │   ├── audience.js         ✅ build <section>s, configure and start Reveal

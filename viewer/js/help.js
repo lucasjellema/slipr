@@ -20,6 +20,7 @@ export const HELP_SECTIONS = Object.freeze({
   annotations: 'annotations',
   search: 'search',
   open: 'open',
+  ai: 'ai',
   shortcuts: 'shortcuts',
   troubleshooting: 'troubleshooting',
 });

@@ -49,6 +49,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 - [X] **C-003** [decisions] Confirm the phase order and the first template (see ROADMAP.md). D-001…D-010 were accepted on 2026-10-10 (D-006 is Python) · done · lucas
 - [X] **V-017** [viewer] Verify the speaker view (`S`) in a normal browser: Claude's browser pane blocks popups · done · lucas
 - [ ] **C-007** [editor] Find & replace does not look inside table cells (I-104) or tag cloud terms (I-105); add them to `findMatches()` and `replaceInSlide()` / `replaceAllText()` together · todo · —
+- [ ] **C-008** [docs] Try the AI prompt kit (I-080) with ChatGPT and Copilot on the three briefs in `docs/ai/prompt-kit-results.md`, fill in the table, and report repeated mistakes so the generator can be tuned · todo · lucas
 
 ## Later
 
@@ -148,7 +149,14 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
 
 ### AI authoring
 
-- [ ] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
+### Tooling
+- [ ] **I-060** [tooling] Playwright smoke tests for viewer and editor (would also give `render.js` automated tests, which need a DOM)
+- [ ] **I-061** [tooling] Claude Code slash commands in `.claude/commands/` (e.g. `/new-layout`, `/new-block-type`)
+- [ ] **I-062** [tooling] Publish script: copy viewer + shared + vendor + template + show to a static host
+
+## Done
+
+- [x] **I-080** [docs/tooling] **Prompt kit: let any AI chatbot write a Slipr show.** A ready-made instruction that users can copy or download, add their own content brief to, and paste into Claude, ChatGPT, Copilot or similar. The chatbot answers with a valid `show.json`.
   - **Contents of the instruction:**
     - what Slipr is and the two-layer idea: a concise audience layer, with depth in the reader layer
     - a condensed show-format spec
@@ -167,15 +175,7 @@ Phase 6 items done so far: Mermaid diagrams (I-073), single-file export (I-054, 
     - later, the same button in the editor
   - **Round trip:** the user saves the answer as `show.json` and opens it in the viewer. On the validation-error page, a **"Copy fix-up prompt"** button bundles the errors into a follow-up message for the same chatbot.
   - **Acceptance:** tried with Claude, ChatGPT and Copilot on three different content briefs. Results (valid on first try? which errors?) recorded in `docs/ai/prompt-kit-results.md`, and the instruction tuned until the first answer is usually valid.
-  - **Related:** I-027 (AI assist inside the editor), I-018 ("Ask this show"), I-022 (Markdown outline view) · todo · —
-
-### Tooling
-- [ ] **I-060** [tooling] Playwright smoke tests for viewer and editor (would also give `render.js` automated tests, which need a DOM)
-- [ ] **I-061** [tooling] Claude Code slash commands in `.claude/commands/` (e.g. `/new-layout`, `/new-block-type`)
-- [ ] **I-062** [tooling] Publish script: copy viewer + shared + vendor + template + show to a static host
-
-## Done
-
+  - **Related:** I-027 (AI assist inside the editor), I-018 ("Ask this show"), I-022 (Markdown outline view). Spec with Lucas's decisions: `docs/specs/I-080-prompt-kit.md`. Built: `npm run prompt` writes *full* and *compact* prompts per template into `docs/ai/prompts/` (committed, a test fails when they are stale), teaching the core of format 0.2 (no overlays, web pages, PDFs, graphs, maps or CSV files; layouts that need them are listed under *Do not use*); the viewer's **Create with AI** page (`viewer/create-with-ai.html`, from the start page and the manual) fills in the brief, with **Copy** and **Download .md**; **Copy fix-up prompt** on the validation-error page. Three shows written from the prompt by Claude validated first time; the ChatGPT and Copilot tries are C-008. The editor button stays with I-027. `shared/prompt-kit.js`, `tools/prompt-kit.js`, `viewer/js/create-with-ai.js` · done 2026-10-15 · claude
 - [x] **I-105** [format/viewer/editor] **Tag cloud / word cloud from CSV data (`tag-cloud` slot and block)**:
   - **Data source**: external `.csv` file in `data/` (e.g. `data/keywords.csv`) or inline CSV block with terms and optional weights or frequencies (`term, weight`), parsed client-side with zero external runtime dependencies (D-001/D-002).
   - **Layout & visual design**: font sizes scaled proportionally to weight/frequency; colors styled with template tokens (`--slipr-graph-*` or accent palette); clean spatial packing that stays legible and fits the slide aspect ratio.

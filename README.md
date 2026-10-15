@@ -36,7 +36,8 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 2. **Edit a show:** Open <http://localhost:8080/editor/> and choose **Open show folder…** (a show anywhere on your disk) or **New show…** (from a template), or open the demo at <http://localhost:8080/editor/?show=../shows/demo/show.json>. Select slides in the left pane, edit layout slots and reader blocks in the center inspector, and inspect live updates in the right preview pane. The editor's user manual ([editor/help.html](editor/help.html), also under **? Help** or `F1` in the editor) explains everything in detail, including keyboard shortcuts.
 3. **Present to an audience:** Click **Present ▶** in the editor toolbar, press `F5`, or open <http://localhost:8080/viewer/?show=../shows/demo/show.json>.
 4. **Explore in reader mode:** Click **Read 📖** in the editor or add `&mode=reader` to the viewer URL.
-5. **Share it as one file:** `npm run export -- shows/demo` writes `exports/demo.html`: the show, its template and the viewer in one HTML file that presents offline (double-click it; no server, no internet). Add `?mode=reader` to its address for reader mode.
+5. **Let an AI chatbot write a show:** open <http://localhost:8080/viewer/create-with-ai.html>, pick a template, describe your show, and paste the instruction into Claude, ChatGPT or Copilot. Save its answer as `show.json` in a folder and open it with the viewer's **Open a show folder…**. The instructions are generated from the templates by `npm run prompt` into [docs/ai/prompts/](docs/ai/prompts/).
+6. **Share it as one file:** `npm run export -- shows/demo` writes `exports/demo.html`: the show, its template and the viewer in one HTML file that presents offline (double-click it; no server, no internet). Add `?mode=reader` to its address for reader mode.
 
 ## Key concepts
 
@@ -63,7 +64,7 @@ The details are in [docs/show-format.md](docs/show-format.md) and [docs/template
 slipr/
 ├── README.md, OVERVIEW.md, ARCHITECTURE.md, CLAUDE.md
 ├── ROADMAP.md, BACKLOG.md, CHANGELOG.md
-├── docs/            show & template format specs, decision log
+├── docs/            show & template format specs, decision log, AI prompt kit (docs/ai/)
 ├── shared/          shared core: loader, validator, renderer, JSON schemas
 ├── viewer/          viewer web app
 ├── editor/          editor web app

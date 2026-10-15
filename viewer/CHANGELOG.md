@@ -4,6 +4,11 @@ Newest first. Group entries under **Added / Changed / Fixed / Removed**.
 
 ## [Unreleased]
 
+### 2026-10-15: Create a show with AI (I-080)
+- **Added** `create-with-ai.html` (`js/create-with-ai.js`), linked from the start page and the manual: pick a template and a length (full or compact), describe the show (topic, audience, number of slides, reader layer, profiles, language, source material), then **Copy instruction** or **Download .md** for an AI chatbot. The page fetches the generated prompts from `docs/ai/prompts/` and sends nothing anywhere.
+- **Added** **Copy fix-up prompt** on the "This show can't be shown yet" page: the errors and warnings (without missing images) as a message asking the chatbot for a corrected `show.json`.
+- **Added** `copyText()` in `js/dom.js` (Clipboard API with a fallback), and the manual section *Create a show with AI* (`help.html#ai`).
+
 ### 2026-10-15: Tag clouds (I-105)
 - **Added** tag clouds on slides and in the reader layer (`shared/embeds/tag-cloud.js`): terms sized and coloured by weight from the template. In audience mode the heaviest terms can appear first and terms can be highlighted, click by click. In reader mode every term is a button (tap and keyboard too): its popup shows the glossary definition when the term is a glossary term, the weight when the author said what it counts, and links to the other slides that mention the term (`slidesMentioning()` in `reader/search-index.js`, used by `reader/interactions.js`). Search finds typed-in terms. The terms wrap between words on narrow screens instead of being cut off.
 

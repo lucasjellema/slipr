@@ -146,7 +146,53 @@ body {
   text-decoration: underline;
 }
 
+/* ---------- Create with AI (I-080) ---------- */
+
+.slipr-page--wide { max-width: 52rem; }
+.slipr-form fieldset {
+  border: 1px solid color-mix(in srgb, var(--viewer-muted) 30%, transparent);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem 0.25rem;
+  margin: 0 0 1rem;
+  min-width: 0;
+}
+.slipr-form legend { font-weight: 600; padding: 0 0.35rem; }
+.slipr-form-row {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 0.25rem 0.75rem;
+  align-items: baseline;
+  margin: 0 0 0.75rem;
+}
+.slipr-form-row > .slipr-hint { grid-column: 2; font-size: 0.85rem; }
+.slipr-form-row--short input { max-width: 8rem; }
+.slipr-form label, .slipr-form-label { font-weight: 500; }
+.slipr-form-choices { display: grid; gap: 0.3rem; }
+.slipr-form-choices label, .slipr-form-check { font-weight: 400; }
+.slipr-form input[type="text"], .slipr-form input[type="number"], .slipr-form select, .slipr-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  font: inherit;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--viewer-muted) 45%, transparent);
+  border-radius: 0.35rem;
+  background: var(--viewer-card);
+  color: var(--viewer-ink);
+}
+.slipr-form textarea { resize: vertical; }
+.slipr-form :focus-visible { outline: 3px solid var(--viewer-accent); outline-offset: 1px; }
+.slipr-form-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 0 0 1rem; }
+.slipr-form-preview summary { cursor: pointer; color: var(--viewer-primary); }
+.slipr-form-preview textarea {
+  margin-top: 0.5rem;
+  font-family: ui-monospace, "Cascadia Code", Consolas, Menlo, monospace;
+  font-size: 0.8rem;
+}
+.slipr-fixup { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; margin: 1rem 0 0.75rem; }
+
 @media (max-width: 600px) {
   .slipr-page { margin: 0; border-radius: 0; padding: 1.25rem 1rem; }
+  .slipr-form-row { grid-template-columns: minmax(0, 1fr); }
+  .slipr-form-row > .slipr-hint { grid-column: 1; }
 }
 
