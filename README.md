@@ -13,8 +13,9 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 
 > Status: **Phases 0–5 done, Phase 6 (polish & publish) in progress**. Shows, templates and validation work. **Audience mode** presents shows on Reveal.js, with a laser pointer, spotlight and pen for the presenter. **Reader mode** offers the full interactive reading experience: popups, panels, tabs and hotspots, tailoring by profile, depth and route, progress, bookmarks, search, and your own highlights and notes, on whole slides and on objects within them. The **PPTX converter** turns PowerPoint decks into Slipr shows. Three templates ship: a neutral `default`, **Forest** (deep greens on parchment, pine illustrations, classic serif type) and **Conclusion** (the company house style, 21 layouts, for internal use until the brand team has reviewed it). The **editor** (Chrome or Edge) opens, creates and saves show folders anywhere on disk. It edits slides with a form generated from the layout and a layout picker with live previews, as well as images and hotspots, the reader layer, show settings (chapters, profiles, glossary, routes), and find & replace, all with undo and a live preview. A show grid rearranges slides and chapters, a **slide library** keeps slides to reuse in other shows, **Export…** saves a show as one offline HTML file, and the editor has a light and a dark theme. Slides can show **Mermaid diagrams**, **live web pages** (or their screenshot; pages from other sites load only after the reader's click in reader mode), **PDF documents** (page by page; their text is searchable in reader mode), **graphs** (built up step by step; readers pan, zoom and click a node) **maps** (a tour from place to place; OpenStreetMap loads only after the reader's click) and **data tables** (from a CSV file or typed in, with totals and colours; sortable and filterable, rows revealed click by click) and **tag clouds** (terms sized by weight, linked to the glossary; in reader mode a click shows the slides that mention a term), carry **extra images** and styled **text elements** (badges, labels, callouts) placed anywhere on the slide, and give any picture a **picture style** (shadow, soft edges, rounded corners, frame), an opacity and a **crop**; in reader mode, **glossary terms on the slides** open their definition too. Present and Read open the viewer on the same show. Still to come: draft autosave. See [ROADMAP.md](ROADMAP.md).
 >
-> Try it: run `npm run serve` in this folder and open
+> Try it: start any local HTTP server in this folder (e.g. `npm run serve`, `python -m http.server 8080`, or Live Server) and open
 > - <http://localhost:8080/viewer/?show=../shows/demo/show.json> (audience; add `&mode=reader` for reader mode)
+> - <http://localhost:8080/viewer/?zip=https://raw.githubusercontent.com/lucasjellema/slipr/main/shows/quickstart-demo.zip> (remote ZIP demo; add `&mode=reader` for reader mode)
 > - <http://localhost:8080/viewer/?show=../shows/conclusion-demo/show.json> (every layout of the Conclusion template)
 > - <http://localhost:8080/editor/?show=../shows/demo/show.json> (editor; or open <http://localhost:8080/editor/> for a show folder on disk)
 > - <http://localhost:8080/template-editor/> (template editor: a new template from an existing one, with live preview)
@@ -29,17 +30,98 @@ Each slide carries both layers: the concise **audience layer** (the slide itself
 | **Converter** | [converter/](converter/README.md) | Turns a PowerPoint file (`.pptx`) into a Slipr show | Python (CLI), `python-pptx` |
 | *Shared core* | `shared/` | Loads, validates and renders shows. All components use it | Vanilla JS (ES modules) |
 
-## Quick start: editing and presenting
+## Getting started
 
-1. Start the local server:
-   ```bash
-   npm run serve
-   ```
-2. **Edit a show:** Open <http://localhost:8080/editor/> and choose **Open show folder…** (a show anywhere on your disk) or **New show…** (from a template), or open the demo at <http://localhost:8080/editor/?show=../shows/demo/show.json>. Select slides in the left pane, edit layout slots and reader blocks in the center inspector, and inspect live updates in the right preview pane. The editor's user manual ([editor/help.html](editor/help.html), also under **? Help** or `F1` in the editor) explains everything in detail, including keyboard shortcuts.
-3. **Present to an audience:** Click **Present ▶** in the editor toolbar, press `F5`, or open <http://localhost:8080/viewer/?show=../shows/demo/show.json>.
-4. **Explore in reader mode:** Click **Read 📖** in the editor or add `&mode=reader` to the viewer URL.
-5. **Let an AI chatbot write a show:** open <http://localhost:8080/viewer/create-with-ai.html>, pick a template, describe your show, and paste the instruction into Claude, ChatGPT or Copilot. Save its answer as `show.json` in a folder and open it with the viewer's **Open a show folder…**. The instructions are generated from the templates by `npm run prompt` into [docs/ai/prompts/](docs/ai/prompts/).
-6. **Share it as one file:** `npm run export -- shows/demo` writes `exports/demo.html`: the show, its template and the viewer in one HTML file that presents offline (double-click it; no server, no internet). Add `?mode=reader` to its address for reader mode.
+Follow these steps to clone Slipr, run it locally, and explore presentations in both audience and reader mode.
+
+### Prerequisites & server
+
+Slipr is built entirely with web standards—HTML, CSS, and vanilla JavaScript ES modules. **There are no build tools, bundlers, or `npm install` requirements.**
+
+- **A modern browser:** Chrome, Edge, Firefox, or Safari.
+- **Any static HTTP server:** Web browsers require an HTTP origin to load ES modules. You can use any static server you prefer:
+  - **Node.js / npx:** `npm run serve` (or `npx http-server . -p 8080 -c-1`)
+  - **VS Code:** Right-click and select *Open with Live Server* (or use the Live Preview extension)
+  - **Python:** `python -m http.server 8080`
+  - Any local or remote web server (Caddy, nginx, GitHub Pages, etc.)
+
+> **When is Node.js required?**  
+> Node.js is **not** required to view, present, or edit presentations. Node (≥ 22) is only needed if you want to use your **smartphone as a remote presenter control** (which runs the local WebSocket relay server via `npm run remote` or `node tools/relay.js`), or to run developer CLI tools (`npm test`, single-file exporter `npm run export`, AI prompt kit `npm run prompt`).
+
+### 1. Clone and run
+
+```bash
+git clone https://github.com/lucasjellema/slipr.git
+cd slipr
+```
+
+Start your preferred local HTTP server in the repository root:
+
+```bash
+# Option A: With Node.js / npx (built into package.json)
+npm run serve
+
+# Option B: With Python
+python -m http.server 8080
+
+# Option C: With VS Code Live Server extension, or any static server
+```
+
+Then open <http://localhost:8080> (or your server's address).
+
+### 2. Try out the demo show
+
+Open the built-in demo show ([`shows/demo/`](shows/demo/)) in your browser:
+
+- **Audience mode** (slideshow for the big screen with presenter view, animations, laser pointer, and pen):  
+  👉 <http://localhost:8080/viewer/?show=../shows/demo/show.json>
+- **Reader mode** (interactive reading article with deep dives, popups, tabs, full-text search, highlights, and notes):  
+  👉 <http://localhost:8080/viewer/?show=../shows/demo/show.json&mode=reader>
+
+> **Keyboard shortcuts:** Press **`A`** to switch to Audience mode and **`R`** to switch to Reader mode at any time. Press **`?`** or **`F1`** to open the viewer manual with all shortcuts. In audience mode, press **`P`** to pair a smartphone as a remote clicker (requires the WebSocket relay server: `npm run remote`).
+
+You can also preview all 21 layouts of the Conclusion corporate template:  
+<http://localhost:8080/viewer/?show=../shows/conclusion-demo/show.json>
+
+### 3. Display a show from a ZIP file via URL
+
+Slipr can download, decompress, and present `.zip` or `.slipr` presentation archives entirely in memory in the browser using standard Web Streams—keeping Slipr completely offline and serverless once loaded.
+
+- **From a remote URL:** Use the `?zip=` parameter to load a zipped presentation archive directly:
+  - **Audience mode:**  
+    <http://localhost:8080/viewer/?zip=https://raw.githubusercontent.com/lucasjellema/slipr/main/shows/quickstart-demo.zip>
+  - **Reader mode:**  
+    <http://localhost:8080/viewer/?zip=https://raw.githubusercontent.com/lucasjellema/slipr/main/shows/quickstart-demo.zip&mode=reader>
+- **From a local zip archive:**  
+  You can also point to local zip files served by the web server:  
+  <http://localhost:8080/viewer/?zip=../shows/quickstart-demo.zip>
+- **Drag & drop or file chooser:**  
+  Open the viewer start screen at <http://localhost:8080/viewer/> and click **Open zip archive…**, or simply drag and drop any `.zip` or `.slipr` file directly onto the browser window. Works in Chrome, Edge, Firefox, and Safari.
+
+> **Note on CORS:** Remote zip URLs must allow cross-origin requests. Raw links from GitHub (`https://raw.githubusercontent.com/...`) and GitHub Pages include the required `Access-Control-Allow-Origin` headers by default.
+
+### 4. Edit and create shows
+
+- **Open the editor on the demo show:**  
+  <http://localhost:8080/editor/?show=../shows/demo/show.json>
+- **Create or open shows on disk:**  
+  Open <http://localhost:8080/editor/> to start a new show from a template or open an existing show folder on your disk (Chrome or Edge via the File System Access API). In any browser, you can also click **Open zip…** to load and edit a `.zip` archive.
+- **Live preview and presentation:**  
+  Select slides in the left pane, edit layout slots and reader blocks in the center inspector, and inspect live updates in the right preview pane. Click **Present ▶** (`F5`) or **Read 📖** in the editor toolbar to preview. The complete user manual is at [editor/help.html](editor/help.html) or under **? Help** (`F1`) in the editor.
+
+### 5. Share as a single offline HTML file
+
+Package an entire presentation—including the show, template, fonts, images, and the viewer—into a single self-contained HTML file (using the export CLI script; requires Node.js):
+
+```bash
+npm run export -- shows/demo
+```
+
+This writes `exports/demo.html`. Double-click the file to open and present it completely offline (no server or internet required). Add `?mode=reader` to the address or press `R` for reader mode.
+
+### 6. Create shows with AI
+
+Open <http://localhost:8080/viewer/create-with-ai.html>, pick a template, describe your presentation topic, and paste the generated instruction into Claude, ChatGPT, or Copilot. Save the response as `show.json` in a folder (or zip it) and open it with the viewer or editor. The instructions are generated from the templates into [docs/ai/prompts/](docs/ai/prompts/) (regenerate with Node.js: `npm run prompt`).
 
 ## Key concepts
 
@@ -73,7 +155,7 @@ slipr/
 ├── template-editor/ template editor web app (I-106)
 ├── converter/       PPTX → Slipr converter
 ├── templates/       Slipr templates: default, forest, conclusion (house style)
-├── shows/           shows: demo (every format feature), conclusion-demo, impact-autonomy-agents, fixtures
+├── shows/           shows: demo (every format feature), conclusion-demo, quickstart-demo.zip, fixtures
 └── vendor/          third-party libraries, checked in (Reveal.js)
 ```
 
